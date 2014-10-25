@@ -18,10 +18,11 @@ def write_git_info(command_subclass):
         import subprocess
         try:
             sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+            print "git revision: %s" % sha
             with open("QDYN/__git__.py", 'w') as f:
                 print >> f, "__revision__ = '%s'" % sha
-        except subprocess.CalledProcessError:
-            pass
+        except subprocess.CalledProcessError as e:
+            print "git revision unnown: %s" % str(e)
         orig_run(self)
 
     command_subclass.run = modified_run
