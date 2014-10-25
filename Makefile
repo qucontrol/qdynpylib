@@ -1,5 +1,8 @@
 install:
-	python setup.py install
+	pip install -Ie .
+
+uninstall:
+	pip uninstall QDYN
 
 sdist:
 	python setup.py sdist
@@ -17,4 +20,4 @@ clean:
 test:
 	python run_tests.py
 
-.PHONY: install sdist clean
+.PHONY: install uninstall sdist clean

@@ -1,7 +1,7 @@
 # The QDYN Python Package
 
 The QDYN Python Package provides a collection of utilties to augment the Fortran
-QDYN library for quantum dynamics and control, developed in-house in the 
+QDYN library for quantum dynamics and control, developed in-house in the
 [Koch group at the University of Kassel][AGKOCH]
 
 The package will read and write some of the files generated
@@ -14,8 +14,8 @@ greatly benefit from (i)Python's interactiveness.
 
 The QDYN package depends on the [Python scientific stack](Scipy)
 (numpy/scipy/matplotlib) in a recent version. It is recommended to use one of
-the standalone scientific Python distributions like [Enthought Canopy][EPD] 
-or [Anaconda][Anaconda]. You might want to use a [virtual environment][VE} as
+the standalone scientific Python distributions like [Enthought Canopy][EPD]
+or [Anaconda][]. You might want to use a [virtual environment][VE} as
 well.
 
 The QDYN library is written for Python 2.7. It will not run on Python 3.x
@@ -27,26 +27,38 @@ Assuming that you have either a scientific Python distribution installed in your
 home directory (recommended), or created and activated a virtual environment,
 you can install the latest official release of the QDYN package with
 
-    pip install QDYN
+    pip install QDYN  # NOTE: as of yet, no official version has been released
 
-Alternatively, from a checkout of the source code, you can run
+For development versions, you must specify the full version manually:
 
-    python setup.py install
+    pip install -I QDYN==2.0.dev1
 
-to install the most current revision. The same command is also executed by
+Lastly, to install the latest master from the github repository:
 
-    make install
+    pip install -I git+https://github.com/goerz/qdynpylib.git#egg=QDYN
 
-In order to run the automated tests, run
+To uninstall, run
+
+    pip uninstall QDYN
+
+Note that a "manual" installation via `python setup.py install` from a checkout
+of the source code is *not* recommended, as it provides no possibility for an
+automatic uninstall.
+
+## Tests ##
+
+From a checkout of the library source code, execute
 
     make test
+
+to run the automated tests.
 
 ## Usage ##
 
 Load the package with `import QDYN` in your python script.
 
 There are a lof parts that can be used interactively in
-[IPython](IPython) (either the shell or the notebook interface).
+[IPython][] (either the shell or the notebook interface).
 For example:
 
     >>> import QDYN
