@@ -12,10 +12,10 @@ greatly benefit from (i)Python's interactiveness.
 
 ## Prerequisites ##
 
-The QDYN package depends on the [Python scientific stack](Scipy)
+The QDYN package depends on the [Python scientific stack][Scipy]
 (numpy/scipy/matplotlib) in a recent version. It is recommended to use one of
 the standalone scientific Python distributions like [Enthought Canopy][EPD]
-or [Anaconda][]. You might want to use a [virtual environment][VE} as
+or [Anaconda][]. You might want to use a [virtual environment][VE] as
 well.
 
 The QDYN library is written for Python 2.7. It will not run on Python 3.x
