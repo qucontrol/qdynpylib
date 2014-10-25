@@ -6,7 +6,7 @@ from . import prop
 from . import linalg
 from . import state
 
-__version__ = "2.0dev"
+__version__ = "2.0.dev1"
 try:
     from __git__ import __revision__
 except ImportError:
