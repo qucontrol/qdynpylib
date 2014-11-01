@@ -83,7 +83,8 @@ header=None, hermitian=True):
     line_formatter: callable, optional
         Function that takes three arguments i, j, v (row index, column index,
         and complex value matrix[i,j]) and returns a line to be written to
-        file. If not given, defaults to
+        file. If the function returns None for any input data, no line will be
+        written to file. If not given, defaults to
 
             lambda i, j, v: "%8d%8d%25.16E" % (i, j, v.real)
 
@@ -91,7 +92,7 @@ header=None, hermitian=True):
 
             lambda i, j, v:  "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
 
-        if matrix is complex
+        if matrix is complex.
 
     header: str, optional
         Header line to be written before any data. Must start with either '#'
@@ -150,9 +151,10 @@ header=None, hermitian=True):
             v = sparse_h.data[i_val]
             if (not hermitian) or (j >= i):
                 line = line_formatter(i, j, v)
-                out_fh.write(line)
-                if not line.endswith("\n"):
-                    out_fh.write("\n")
+                if line is not None:
+                    out_fh.write(line)
+                    if not line.endswith("\n"):
+                        out_fh.write("\n")
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,
