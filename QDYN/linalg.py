@@ -183,3 +183,17 @@ def vectorize(a, order='F'):
     N = a.size
     return np.squeeze(np.asarray(a).reshape((1,N), order=order))
 
+
+def is_hermitian(matrix):
+    """
+    Return True if matrix is Hermitian, False otherwise
+    """
+    n, m = matrix.shape
+    for i in xrange(n):
+        if (matrix[i,i].imag != 0.0):
+            return False
+            raise ValueError("Matrix has complex entries on diagonal")
+        for j in xrange(i+1, m):
+            if (abs(matrix[i,j] - matrix[j,i].conjugate()) > 1.0e-15):
+                return False
+    return True
