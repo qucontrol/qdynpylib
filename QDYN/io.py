@@ -5,7 +5,7 @@ import numpy as np
 import re
 import os.path
 import sys
-import re
+import scipy.sparse
 from StringIO import StringIO
 
 
@@ -59,6 +59,100 @@ def print_2q_gate(U):
                   U[i,2].real, U[i,2].imag,
                   U[i,3].real, U[i,3].imag)
         print row_str
+
+
+def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
+header=None, hermitian=True):
+    """
+    Write the given matrix to file in indexed format (1-based indexing)
+
+    Arguments
+    ---------
+
+    matrix: numpy matrix, 2D ndarray, or any scipy sparse matrix
+        Matrix to write to file
+
+    filename: str
+        Name of file to write to
+
+    comment: str of array of strings, optional
+        Comment line, or array of comment lines to write to the top of the
+        file. Each line that does not start with '#' will have "# "
+        prepended.
+
+    line_formatter: callable, optional
+        Function that takes three arguments i, j, v (row index, column index,
+        and complex value matrix[i,j]) and returns a line to be written to
+        file. If not given, defaults to
+
+            lambda i, j, v: "%8d%8d%25.16E" % (i, j, v.real)
+
+        if matrix is real and
+
+            lambda i, j, v:  "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
+
+        if matrix is complex
+
+    header: str, optional
+        Header line to be written before any data. Must start with either '#'
+        or a space, in which case the leading space will be replaced with '#'.
+        Defaults to a header line suitable for the default line_formatter
+
+    hermitian: boolean, optional
+        If True, write only entries from the upper triangle
+    """
+
+    # set line formatter
+    def real_formatter(i, j, v):
+        return "%8d%8d%25.16E" % (i, j, v.real)
+    def complex_formatter(i, j, v):
+        return "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
+    if line_formatter is None:
+        if np.iscomplexobj(matrix):
+            line_formatter = complex_formatter
+        else:
+            line_formatter = real_formatter
+
+    # set header
+    if header is None:
+        if np.iscomplexobj(matrix):
+            header = "# %6s%8s%25s%25s\n" \
+                     % ('row', 'column', 'Re(val)', 'Im(val)')
+        else:
+            header = "# %6s%8s%25s\n" % ('row', 'column', 'Re(val)')
+    else:
+        if not header.startswith("#"):
+            if header.startswith(" "):
+                header = "#" + header[1:]
+            else:
+                header = "#" + header
+
+    with open(filename, 'w') as out_fh:
+
+        # write comment(s)
+        if comment is not None:
+            if isinstance(comment, (list, tuple)):
+                comment = "\n".join(comment)
+            if len(comment) > 0:
+                for line in comment.split("\n"):
+                    if not line.startswith("#"):
+                        line = "# " + line
+                    out_fh.write(line + "\n")
+
+        # write header
+        out_fh.write(header)
+
+        # write data
+        sparse_h = scipy.sparse.coo_matrix(matrix)
+        for i_val in xrange(sparse_h.nnz):
+            i = sparse_h.col[i_val] + 1 # 1-based indexing
+            j = sparse_h.row[i_val] + 1
+            v = sparse_h.data[i_val]
+            if (not hermitian) or (j >= i):
+                line = line_formatter(i, j, v)
+                out_fh.write(line)
+                if not line.endswith("\n"):
+                    out_fh.write("\n")
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,
@@ -245,3 +339,5 @@ def read_complex(str):
     real_part = fix_fortran_exponent(real_part)
     imag_part = fix_fortran_exponent(imag_part)
     return float(real_part) + 1.0j*float(imag_part)
+
+
