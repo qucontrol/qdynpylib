@@ -109,9 +109,16 @@ def read_2q_gate(file):
 def print_2q_gate(U):
     """
     Print a complex 4x4 matrix to the screen
+
+    >>> from local_invariants import CNOT
+    >>> print_2q_gate(CNOT)
+    1.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j
+    0.000000+0.000000j  1.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j
+    0.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j  1.000000+0.000000j
+    0.000000+0.000000j  0.000000+0.000000j  1.000000+0.000000j  0.000000+0.000000j
     """
     for i in xrange(4):
-        row_str = "%5f+%5fj  %5f+%5fj  %5f+%5fj  %5f+%5fj " % (
+        row_str = "%5f+%5fj  %5f+%5fj  %5f+%5fj  %5f+%5fj" % (
                   U[i,0].real, U[i,0].imag,
                   U[i,1].real, U[i,1].imag,
                   U[i,2].real, U[i,2].imag,
