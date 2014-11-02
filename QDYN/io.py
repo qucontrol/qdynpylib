@@ -51,26 +51,46 @@ class open_file(object):
         return False
 
 
-def read_U(file, must_be_file=True):
-    """ Read in complex 4x4 matrix from file (as written by the QDYN
-        write_cmplx_matrix routine). As an alternative to giving the file, you
-        may give the contents of the file as a multiline string.
+def read_2q_gate(file):
+    """
+    Read in complex 4x4 matrix from file (as written by the QDYN
+    write_cmplx_matrix routine).
 
-        Return a 4x4 double precision complex Numpy matrix
+    Return a 4x4 double precision complex Numpy matrix
 
-        Assumes the propagation is in the canonical basis
+    Assumes the propagation is in the canonical basis
+
+    Argument
+    --------
+
+    file: str or file-like object
+        Filename of file from which to read gate, or file-like object with
+        equivalent content
+
+    Example
+    -------
+
+    >>> gate = '''
+    ... U = [
+    ... { 1.00000000E+00,            0.0}(              0,              0)(              0,              0)(              0,              0)
+    ... (              0,              0){ 5.72735140E-01, 8.19740483E-01}(              0,              0)(              0,              0)
+    ... (              0,              0)(              0,              0){ 2.12007110E-01,-9.77268124E-01}(              0,              0)
+    ... (              0,              0)(              0,              0)(              0,              0){ 9.99593327E-01,-2.85163130E-02}
+    ... ]
+    ... '''
+    >>> from StringIO import StringIO
+    >>> read_2q_gate(StringIO(gate))
+    matrix([[ 1.00000000+0.j        ,  0.00000000+0.j        ,
+              0.00000000+0.j        ,  0.00000000+0.j        ],
+            [ 0.00000000+0.j        ,  0.57273514+0.81974048j,
+              0.00000000+0.j        ,  0.00000000+0.j        ],
+            [ 0.00000000+0.j        ,  0.00000000+0.j        ,
+              0.21200711-0.97726812j,  0.00000000+0.j        ],
+            [ 0.00000000+0.j        ,  0.00000000+0.j        ,
+              0.00000000+0.j        ,  0.99959333-0.02851631j]])
     """
     U = np.zeros(shape=(4,4), dtype=np.complex128)
-    if os.path.isfile(file):
-        fh = open(file)
-    else:
-        # if file is not actually a file, we assume that it's the contents of
-        # a file a a string
-        if must_be_file:
-            raise IOError("%s does not exits" % file)
-        else:
-            fh = StringIO(file)
-    try:
+    with open_file(file) as fh:
         i = 0
         for line in fh:
             items = re.split("[(){}]+", line.strip())[1:-1]
@@ -85,8 +105,6 @@ def read_U(file, must_be_file=True):
                 U[i,j] = z
                 j += 1
             i += 1
-    finally:
-        fh.close()
     return np.matrix(U)
 
 
