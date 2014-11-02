@@ -26,6 +26,7 @@ except ImportError:
 
 
 doctest_modules = [
+'QDYN.io',
 'QDYN.linalg',
 'QDYN.local_invariants',
 'QDYN.state',
