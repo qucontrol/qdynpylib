@@ -188,7 +188,7 @@ header=None, hermitian=True):
             else:
                 header = "#" + header
 
-    with open(filename, 'w') as out_fh:
+    with open_file(filename, 'w') as out_fh:
 
         # write comment(s)
         if comment is not None:
