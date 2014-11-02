@@ -3,10 +3,8 @@ Module containing routines for reading and writing files compatible with QDYN
 """
 import numpy as np
 import re
-import os.path
 import sys
 import scipy.sparse
-from StringIO import StringIO
 
 
 class open_file(object):
@@ -387,6 +385,11 @@ def fix_fortran_exponent(num_str):
     """
     In 3-digit exponents, Fortran drops the 'E'. Return a string with the 'E'
     restored.
+
+    >>> fix_fortran_exponent("1.0-100")
+    '1.0E-100'
+    >>> fix_fortran_exponent("1.0E-99")
+    '1.0E-99'
     """
     if not 'E' in num_str:
         return re.sub('(\d)([+-]\d)', r'\1E\2', num_str)
@@ -396,6 +399,9 @@ def fix_fortran_exponent(num_str):
 def read_complex(str):
     """
     Convert a string to a complex number
+
+    >>> read_complex("1.0 -2.0-100")
+    (1-2e-100j)
     """
     real_part, imag_part = str.split()
     real_part = fix_fortran_exponent(real_part)
