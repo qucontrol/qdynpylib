@@ -333,14 +333,65 @@ expand_hermitian=True, val_real=False):
 def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     outfile=None):
     """
-    Print a numpy complex matrix to screen. Values below the given limit
-    are printed as zero
+    Print a numpy complex matrix to screen, or to a file if outfile is given.
+    Values below the given limit are printed as zero
+
+    Arguments
+    ---------
+
+    M: numpy matrix, 2D ndarray
+        Matrix to print. In addition to a standard dense matrix, may also be
+        any scipy sparse matrix in a format where M[i,j] is defined.
+    matrix_name: str, optional
+        Name of matrix
+    limit: float, optional
+       Any number (real or imaginary part) whose absolute value is smaller than
+       this limit will be printed as 0.0.
+    fmt: str, optional
+        Format of each entry (both for real and imaginary part)
+    outfile: filename or file-like object
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> M = np.matrix([[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20],
+    ... [1+1j, 1.0e-9, -1.0]])
+
+    >>> print_matrix(M)
+    { 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)
+    (      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)
+    ( 1.00E+00, 1.00E+00)( 1.00E-09,      0.0){-1.00E+00,      0.0}
+
+    >>> print_matrix(M, limit=1.0e-5)
+    { 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)
+    (      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)
+    ( 1.00E+00, 1.00E+00)(      0.0,      0.0){-1.00E+00,      0.0}
+
+    >>> M[2,1] = 1.0
+    >>> print_matrix(M, fmt="%5.1f")
+    {  1.0,  0.0}(  2.0,  0.0)(    0,    0)
+    (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)
+    (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}
+
+    >>> print_matrix(M, matrix_name="M", fmt="%5.1f")
+    M = [
+    {  1.0,  0.0}(  2.0,  0.0)(    0,    0)
+    (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)
+    (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}
+    ]
+
+    >>> import scipy.sparse
+    >>> print_matrix(scipy.sparse.csr_matrix(M), matrix_name="M", fmt="%5.1f")
+    M = [
+    {  1.0,  0.0}(  2.0,  0.0)(    0,    0)
+    (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)
+    (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}
+    ]
     """
     m, n = M.shape
-    if outfile is not None:
-        out = open(outfile, 'w')
-    else:
-        out = sys.stdout
+    if outfile is None:
+        outfile = sys.stdout
     fmt_rx = re.compile(r'%[#0i +-]?(?P<width>\d+)\.\d+[hlL]?[diouxXeEfFgG]')
     fmt_m = fmt_rx.match(fmt)
     width = 9
@@ -353,9 +404,9 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
         small = small_fmt % 0
     else:
         raise ValueError("fmt must match '%[conversion flags]w.d<type>'")
-    try:
+    with open_file(outfile) as out:
         if matrix_name is not None:
-            print >> out, "%s = [" % matrix_name
+            out.write("%s = [\n" % matrix_name)
         for i in xrange(m):
             for j in xrange(n):
                 if M[i,j] == 0.0:
@@ -382,10 +433,7 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
                     out.write("(" + entry + ")")
             out.write("\n")
         if matrix_name is not None:
-            print >> out, "]"
-    finally:
-        if outfile is not None:
-            out.close()
+            out.write("]\n")
 
 
 def fix_fortran_exponent(num_str):
