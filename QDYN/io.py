@@ -211,8 +211,8 @@ header=None, hermitian=True):
         # write data
         sparse_h = scipy.sparse.coo_matrix(matrix)
         for i_val in xrange(sparse_h.nnz):
-            i = sparse_h.col[i_val] + 1 # 1-based indexing
-            j = sparse_h.row[i_val] + 1
+            i = sparse_h.row[i_val] + 1 # 1-based indexing
+            j = sparse_h.col[i_val] + 1
             v = sparse_h.data[i_val]
             if (not hermitian) or (j >= i):
                 line = line_formatter(i, j, v)
@@ -404,7 +404,7 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
         small = small_fmt % 0
     else:
         raise ValueError("fmt must match '%[conversion flags]w.d<type>'")
-    with open_file(outfile) as out:
+    with open_file(outfile, 'w') as out:
         if matrix_name is not None:
             out.write("%s = [\n" % matrix_name)
         for i in xrange(m):
