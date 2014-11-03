@@ -4,10 +4,9 @@ Run all tests
 
 Options:
 
--v  Be verbose about tests
+-v            Be verbose about tests
+--nocapture   Print stdout in nose tests
 """
-import numpy as np
-import os
 import sys
 import doctest
 try:
@@ -49,6 +48,7 @@ def run_doctests(modules):
 
 nosetest_modules = [
 'tests.test_newton',
+'tests.test_io',
 ]
 def run_nosetests(modules):
     print "*******************"
