@@ -58,7 +58,7 @@ class Bloch():
         Color of sphere wireframe.
     frame_width : int {1}
         Width of wireframe.
-    wire_frame : boolean {True}
+    wireframe : boolean {True}
         Whether or not to plot the wireframe
     xyz_axes : int {2}
         Code for how coordinate axes should be drawn.
@@ -502,8 +502,8 @@ class Bloch():
         y = outer(sin(u), sin(v))
         z = outer(ones(size(u)), cos(v))
         self.axes.plot_surface(x, y, z, rstride=2, cstride=2,
-                               color=self.sphere_color, linewidth=0,
-                               alpha=self.sphere_alpha)
+                               color=self.sphere_color, linewidth=0.0,
+                               alpha=self.sphere_alpha, edgecolor='none')
         # wireframe
         if self.wireframe:
             self.axes.plot_wireframe(x, y, z, rstride=5, cstride=5,
@@ -523,8 +523,8 @@ class Bloch():
         y = outer(sin(u), sin(v))
         z = outer(ones(size(u)), cos(v))
         self.axes.plot_surface(x, y, z, rstride=2, cstride=2,
-                               color=self.sphere_color, linewidth=0,
-                               alpha=self.sphere_alpha)
+                               color=self.sphere_color, linewidth=0.0,
+                               alpha=self.sphere_alpha, edgecolor='none')
         # wireframe
         if self.wireframe:
             self.axes.plot_wireframe(x, y, z, rstride=5, cstride=5,
