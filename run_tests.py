@@ -29,6 +29,7 @@ doctest_modules = [
 'QDYN.linalg',
 'QDYN.local_invariants',
 'QDYN.state',
+'QDYN.bloch',
 'QDYN.prop',
 'QDYN.prop.exact'
 ]
