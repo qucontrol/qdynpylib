@@ -60,6 +60,12 @@ class Bloch():
         Width of wireframe.
     wire_frame : boolean {True}
         Whether or not to plot the wireframe
+    xyz_axes : int {1}
+        Code for how coordinate axes should be drawn.
+        xyz_axes = 1: Axes will be shown by a wireframe
+        xyz_axes = 2: Axes will be shown by wireframe and axis arrows
+    xyz_axis_extend: float {0.1}
+        if xyz_axes=2, value by which to extend axis arrows beyond 1.0
     point_color : list {["b","r","g","#CC6600"]}
         List of colors for Bloch sphere point markers to cycle through.
         i.e. By default, points 0 and 4 will both be blue ('b').
@@ -130,16 +136,19 @@ class Bloch():
         self.wire_frame = True
         # Transparency of wireframe, default = 0.2
         self.frame_alpha = 0.2
-        # Labels for x-axis (in LaTex), default = ['$x$', '']
+        # Mode in which the coordiante axes are shown
+        self.xyz_axes = 1
+        # If showing axis arrow, how far to extend beyond 1.0
+        self.xyz_axis_extend = 0.1
+        # Labels for x-axis (in LaTex)
         self.xlabel = ['$x$', '']
-        # Position of x-axis labels, default = [1.2, -1.2]
+        # Position of x-axis labels
         self.xlpos = [1.2, -1.2]
-        # Labels for y-axis (in LaTex), default = ['$y$', '']
+        # Labels for y-axis (in LaTex)
         self.ylabel = ['$y$', '']
-        # Position of y-axis labels, default = [1.1, -1.1]
+        # Position of y-axis labels
         self.ylpos = [1.2, -1.2]
         # Labels for z-axis (in LaTex),
-        # default = [r'$\left|0\right>$', r'$\left|1\right>$']
         self.zlabel = [r'$\left|0\right>$', r'$\left|1\right>$']
         # Position of z-axis labels, default = [1.2, -1.2]
         self.zlpos = [1.2, -1.2]
@@ -203,6 +212,7 @@ class Bloch():
         convention : string
             One of the following:
             - "original"
+            - "xyz01"
             - "xyz"
             - "sx sy sz"
             - "01"
@@ -219,6 +229,10 @@ class Bloch():
             self.xlabel = ['$x$', '']
             self.ylabel = ['$y$', '']
             self.zlabel = ['$\\left|0\\right>$', '$\\left|1\\right>$']
+        elif convention == "xyz01":
+            self.xlabel = ['$x$', '']
+            self.ylabel = ['$y$', '']
+            self.zlabel = [r'$\left|0\right>$, $z$', '$\\left|1\\right>$']
         elif convention == "xyz":
             self.xlabel = ['$x$', '']
             self.ylabel = ['$y$', '']
@@ -460,7 +474,7 @@ class Bloch():
             self.axes.set_ylim3d(-1.3, 1.3)
             self.axes.set_zlim3d(-1.3, 1.3)
         else:
-            self.plot_axes()
+            self.plot_xyz_axes()
             self.axes.set_axis_off()
             self.axes.set_xlim3d(-0.7, 0.7)
             self.axes.set_ylim3d(-0.7, 0.7)
@@ -519,15 +533,32 @@ class Bloch():
                        zs=0, zdir='x', lw=self.frame_width,
                        color=self.frame_color)
 
-    def plot_axes(self):
+    def plot_xyz_axes(self):
         # axes
-        span = linspace(-1.0, 1.0, 2)
-        self.axes.plot(span, 0 * span, zs=0, zdir='z', label='X',
-                       lw=self.frame_width, color=self.frame_color)
-        self.axes.plot(0 * span, span, zs=0, zdir='z', label='Y',
-                       lw=self.frame_width, color=self.frame_color)
-        self.axes.plot(0 * span, span, zs=0, zdir='y', label='Z',
-                       lw=self.frame_width, color=self.frame_color)
+        if self.xyz_axes > 0:
+            span = linspace(-1.0, 1.0, 2)
+            self.axes.plot(span, 0 * span, zs=0, zdir='z', label='X',
+                        lw=self.frame_width, color=self.frame_color)
+            self.axes.plot(0 * span, span, zs=0, zdir='z', label='Y',
+                        lw=self.frame_width, color=self.frame_color)
+            self.axes.plot(0 * span, span, zs=0, zdir='y', label='Z',
+                        lw=self.frame_width, color=self.frame_color)
+        if self.xyz_axes == 2:
+            arr_y = Arrow3D((0,1+self.xyz_axis_extend), (0,0), (0,0),
+                    mutation_scale=self.vector_mutation,
+                    lw=2*self.frame_width, arrowstyle=self.vector_style,
+                    color=self.frame_color)
+            self.axes.add_artist(arr_y)
+            arr_x = Arrow3D((0,0), (0,-(1+self.xyz_axis_extend)), (0,0),
+                    mutation_scale=self.vector_mutation,
+                    lw=2*self.frame_width, arrowstyle=self.vector_style,
+                    color=self.frame_color)
+            self.axes.add_artist(arr_x)
+            arr_z = Arrow3D((0,0), (0,0), (0,1+self.xyz_axis_extend),
+                    mutation_scale=self.vector_mutation,
+                    lw=2*self.frame_width, arrowstyle=self.vector_style,
+                    color=self.frame_color)
+            self.axes.add_artist(arr_z)
 
     def plot_axes_labels(self):
         # axes labels
