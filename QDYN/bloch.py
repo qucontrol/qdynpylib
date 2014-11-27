@@ -354,12 +354,17 @@ class Bloch():
             self.points.append(points)
             self.point_style.append('m')
 
-    def add_precession(self, point, axis):
-        """Add a precession circle of the given point rotating around the given
-        axis"""
+    def add_precession(self, point, axis, arc=2.0):
+        """Add (part of) a precession circle of the given point rotating around
+        the given axis, with arc given in units of pi.
+        """
         axis_norm = sqrt(axis[0]**2 + axis[1]**2 + axis[2]**2)
         u = array(axis) / axis_norm
-        self.precessions.append( (array(point), u) )
+        while arc > 2.0:
+            arc -= 2.0
+        while arc < -2.0:
+            arc += 2.0
+        self.precessions.append( (array(point), u, arc) )
 
     def plot_precessions(self):
         """Draw all precession circles"""
@@ -379,11 +384,11 @@ class Bloch():
             ])
             return R
 
-        thetas = linspace(0, 2*pi, self.segments)
 
         for k in range(len(self.precessions)):
 
-            point, u = self.precessions[k]
+            point, u, arc = self.precessions[k]
+            thetas = linspace(0, arc*pi, int((arc/2.0)*self.segments))
             xs = zeros(len(thetas))
             ys = zeros(len(thetas))
             zs = zeros(len(thetas))
