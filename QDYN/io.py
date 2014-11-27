@@ -464,3 +464,23 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
+def print_matrix_latex(M):
+    r"""
+    Print matrix M as LaTeX Code
+
+    >>> from local_invariants import CNOT
+    >>> print_matrix_latex(CNOT)
+    \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 \\
+    \end{pmatrix}
+    """
+    from sympy.printing.latex import latex
+    from sympy import nsimplify
+    print r'\begin{pmatrix}'
+    for line in np.asarray(M):
+        entries = [latex(nsimplify(v)) for v in line]
+        print " & ".join(entries) + r' \\'
+    print r'\end{pmatrix}'
