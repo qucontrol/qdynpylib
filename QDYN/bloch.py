@@ -60,7 +60,7 @@ class Bloch():
         Width of wireframe.
     wire_frame : boolean {True}
         Whether or not to plot the wireframe
-    xyz_axes : int {1}
+    xyz_axes : int {2}
         Code for how coordinate axes should be drawn.
         xyz_axes = 1: Axes will be shown by a wireframe
         xyz_axes = 2: Axes will be shown by wireframe and axis arrows
@@ -137,7 +137,7 @@ class Bloch():
         # Transparency of wireframe, default = 0.2
         self.frame_alpha = 0.2
         # Mode in which the coordiante axes are shown
-        self.xyz_axes = 1
+        self.xyz_axes = 2
         # If showing axis arrow, how far to extend beyond 1.0
         self.xyz_axis_extend = 0.1
         # Labels for x-axis (in LaTex)
