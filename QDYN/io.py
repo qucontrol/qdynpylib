@@ -484,3 +484,51 @@ def print_matrix_latex(M):
         entries = [latex(nsimplify(v)) for v in line]
         print " & ".join(entries) + r' \\'
     print r'\end{pmatrix}'
+
+
+def mathematica_number(val):
+    r"""
+    Format a number in a way that can be pasted into Mathematica
+
+    >>> mathematica_number(0.0)
+    '0'
+
+    >>> mathematica_number(1.0)
+    '1.0'
+
+    In [36]: mathematica_number(1.0j)
+    '1.0I'
+
+    In [37]: mathematica_number(1.0j+1.0)
+    '1.0+1.0I'
+
+    In [38]: mathematica_number(-1.0j+1.0)
+    '1.0-1.0I'
+    """
+    result = ""
+    if val == 0.0:
+        return "0"
+    if val.real != 0.0:
+        result = str(val.real)
+    if val.imag != 0.0:
+        if result != "" and val.imag > 0.0:
+            result += "+"
+        result += str(val.imag) + "I"
+    return result
+
+
+def print_matrix_mathematica(M):
+    r"""
+    Print matrix M as a string that can be pasted into Mathematica
+
+    >>> from local_invariants import CNOT, unity
+    >>> print_matrix_mathematica(CNOT)
+    {{1.0, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 0, 1.0}, {0, 0, 1.0, 0}}
+    >>> print_matrix_mathematica(1.0j*CNOT+unity)
+    {{1.0+1.0I, 0, 0, 0}, {0, 1.0+1.0I, 0, 0}, {0, 0, 1.0, 1.0I}, {0, 0, 1.0I, 1.0}}
+    """
+    lines = []
+    for row in np.asarray(M):
+        entries = [mathematica_number(v) for v in row]
+        lines.append('{' + ", ".join(entries) + '}')
+    print '{' + ", ".join(lines) + '}'
