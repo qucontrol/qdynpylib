@@ -604,7 +604,8 @@ class Pulse(object):
         self._shift()
 
     def show(self, show_pulse=True, show_spectrum=True, zoom=True,
-             wmin=None, wmax=None, freq_unit=None, title="", mark_freqs=None):
+             wmin=None, wmax=None, spec_scale=None, spec_max=None,
+             freq_unit=None, title="", mark_freqs=None):
         """
         Show a plot of the pulse and its spectrum
 
@@ -628,6 +629,10 @@ class Pulse(object):
         wmax: float
             Higherst frequency to show. Overrides zoom options.
             Must be given together with wmin
+        spec_scale: float
+            Factor by which to scale the amplitudes in the spectrum
+        spec_max: float
+            Maximum amplitude in the spectrum, after spec_scale has been applied
         freq_unit : str
             Unit in which to show the frequency axis in the spectrum. If not
             given, use the `freq_unit` attribute
@@ -736,7 +741,11 @@ class Pulse(object):
                     ax3.set_xlim(wmin, wmax)
             ax3.set_xlabel("frequency (%s)" % freq_unit)
             ax3.set_ylabel("abs(spec) (arb. un.)")
-            ax3.plot(freq, spectrum)
+            if spec_scale is None:
+                spec_scale = 1.0
+            ax3.plot(freq, spec_scale*spectrum)
+            if spec_max is not None:
+                ax3.set_ylim(0, spec_max)
             if mark_freqs is not None:
                 for freq in mark_freqs:
                     ax3.axvline(x=float(freq), ls='--', color='black')
