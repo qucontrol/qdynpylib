@@ -604,7 +604,7 @@ class Pulse(object):
         self._shift()
 
     def show(self, show_pulse=True, show_spectrum=True, zoom=True,
-             freq_unit=None, title="", mark_freqs=None):
+             wmin=None, wmax=None, freq_unit=None, title="", mark_freqs=None):
         """
         Show a plot of the pulse and its spectrum
 
@@ -622,6 +622,12 @@ class Pulse(object):
             If `True`, only show the part of the spectrum that has
             amplitude of at least 0.1% of the maximum peak in the spectrum.
             For real pulses, only the positive part of the spectrum is shown
+        wmin: float
+            Lowest frequency to show. Overrides zoom options. Must be given
+            together with wmax.
+        wmax: float
+            Higherst frequency to show. Overrides zoom options.
+            Must be given together with wmin
         freq_unit : str
             Unit in which to show the frequency axis in the spectrum. If not
             given, use the `freq_unit` attribute
@@ -689,6 +695,8 @@ class Pulse(object):
             # transform
             spectrum *= 1.0 / len(spectrum)
 
+            if wmax is not None and wmin is not None:
+                zoom = False
             if zoom:
                 # figure out the range of the spectrum
                 max_amp = np.amax(spectrum)
@@ -723,6 +731,9 @@ class Pulse(object):
             ax3 = plt.subplot(gs[-1])
             if zoom:
                 ax3.set_xlim((wmin-buffer), (wmax+buffer))
+            else:
+                if wmin is not None and wmax is not None:
+                    ax3.set_xlim(wmin, wmax)
             ax3.set_xlabel("frequency (%s)" % freq_unit)
             ax3.set_ylabel("abs(spec) (arb. un.)")
             ax3.plot(freq, spectrum)
