@@ -603,93 +603,37 @@ class Pulse(object):
 
         self._shift()
 
-
-    def render_pulse(self, ax, pulse_line_props=None, mid_line_props=None):
+    def render_pulse(self, ax):
         """
         Render the pulse amplitude on the given axes.
-
-        Parameters
-        ----------
-
-        ax : matplotlib.axes.Axes
-            axes onto which to render the pulse
-        pulse_line_props : dict
-            dictionary of line properties for pulse line
-        mid_line_props : dict
-            dictionary of line properties for horizontal line at 0.
-            Defaults to `{'ls':'-', 'color':'black'}`
         """
-        if pulse_line_props is None:
-            pulse_line_props = {}
-        if mid_line_props is None:
-            mid_line_props = {'ls':'-', 'color':'black'}
         if np.max(np.abs(self.amplitude.imag)) > 0.0:
             ampl_line, = ax.plot(self.tgrid, np.abs(self.amplitude),
-                                  **pulse_line_props)
+                                 label='pulse')
             ax.set_ylabel("abs(pulse) (%s)" % self.ampl_unit)
         else:
-            ax.axhline(y=0.0, **mid_line_props)
+            if np.min(self.amplitude.real) < 0:
+                ax.axhline(y=0.0, ls='-', color='black')
             ampl_line, = ax.plot(self.tgrid, self.amplitude.real,
-                                  **pulse_line_props)
+                                 label='pulse')
             ax.set_ylabel("pulse (%s)" % (self.ampl_unit))
+        ax.set_xlabel("time (%s)" % self.time_unit)
 
-
-    def render_phase(self, ax, phase_line_props=None, mid_line_props=None):
+    def render_phase(self, ax):
         """
         Render the complex phase of the pulse on the given axes.
-
-        Parameters
-        ----------
-
-        ax : matplotlib.axes.Axes
-            axes onto which to render the pulse
-        phase_line_props : dict
-            dictionary of line properties for phase line
-        mid_line_props : dict
-            dictionary of line properties for horizontal line at 0.
-            Defaults to `{'ls':'-', 'color':'black'}`
         """
-        if phase_line_props is None:
-            phase_line_props = {}
-        if mid_line_props is None:
-            mid_line_props = {'ls':'-', 'color':'black'}
-        ax.axhline(y=0.0, **mid_line_props)
+        ax.axhline(y=0.0, ls='-', color='black')
         phase_line, = ax.plot(self.tgrid, np.angle(self.amplitude) / np.pi,
-                              **phase_line_props)
+                              ls='-', color='black', label='phase')
         ax.set_ylabel(r'phase ($\pi$)')
         ax.set_xlabel("time (%s)" % self.time_unit)
 
-
     def render_spectrum(self, ax, zoom=True, wmin=None, wmax=None,
-    spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None,
-    spect_line_props=None, mark_line_props=None):
+    spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None):
         """
-        Render spectrum onto the given axis
-
-        Parameters
-        ----------
-
-        ax : matplotlib.axes.Axes
-            axes onto which to render the pulse
-        zoom : see plot()
-        wmin: see plot()
-        wmax: see plot()
-        spec_scale: see plot()
-        spec_max: see plot()
-        freq_unit : see plot()
-        mark_freqs : see plot()
-        spect_line_props : dict
-            dictionary of line properties for phase line
-        mark_line_props : dict
-            dictionary of line properties for the vertical markers defined in
-            `mark_freqs`.
-            Defaults to `{'ls':'-', 'color':'black'}`
+        Render spectrum onto the given axis, see `plot` for arguments
         """
-        if spect_line_props is None:
-            spect_line_props = {}
-        if mark_line_props is None:
-            mark_line_props = {'ls':'--', 'color':'black'}
-
         freq, spectrum = self.spectrum(mode='abs', sort=True,
                                         freq_unit=freq_unit)
         # normalizing the spectrum makes it independent of the number of
@@ -741,16 +685,16 @@ class Pulse(object):
         ax.set_ylabel("abs(spec) (arb. un.)")
         if spec_scale is None:
             spec_scale = 1.0
-        ax.plot(freq, spec_scale*spectrum, **spect_line_props)
+        ax.plot(freq, spec_scale*spectrum, label='spectrum')
         if spec_max is not None:
             ax.set_ylim(0, spec_max)
         if mark_freqs is not None:
             for freq in mark_freqs:
-                ax.axvline(x=float(freq), **mark_line_props)
+                ax.axvline(x=float(freq), ls='--', color='black')
 
     def plot(self, fig=None, show_pulse=True, show_spectrum=True, zoom=True,
     wmin=None, wmax=None, spec_scale=None, spec_max=None, freq_unit=None,
-    mark_freqs=None, line_props=None, **figargs):
+    mark_freqs=None, **figargs):
         """
         Generate a plot of the pulse on a given figure
 
@@ -786,14 +730,6 @@ class Pulse(object):
             given, use the `freq_unit` attribute
         mark_freqs : None, array of floats
             Array of frequencies to mark in spectrum as vertical dashed lines
-        line_props : dict
-            Dictionary definining line styles for the various plotted lines,
-            allowing to override the defaults.
-            Possible keys are 'spect' (spectrum line), 'mark' (marker lines in
-            spectrum), 'pulse' (pulse amplitude line), 'midline' (horizontal
-            line marking zero in pulse plots), and 'phase' (pulse phase
-            line). Each value must also be a dict of line style properties,
-            e.g. `{'color':'red'}`
 
         The remaining figargs are passed to matplotlib.pyplot.figure to create
         a new figure if `fig` is None.
@@ -803,9 +739,6 @@ class Pulse(object):
 
         if freq_unit is None:
             freq_unit = self.freq_unit
-
-        if line_props is None:
-            line_props = {}
 
         self._check()
         pulse_is_complex = self.is_complex()
@@ -832,18 +765,15 @@ class Pulse(object):
         if show_spectrum:
             ax_spectrum = fig.add_subplot(gs[-1], label='spectrum')
             self.render_spectrum(ax_spectrum, zoom, wmin, wmax, spec_scale,
-                                 spec_max, freq_unit, mark_freqs,
-                                 line_props.get('spect'),
-                                 line_props.get('mark'))
+                                 spec_max, freq_unit, mark_freqs)
         if show_pulse:
             # plot pulse amplitude
             ax_pulse = fig.add_subplot(gs[0], label='pulse')
-            self.render_pulse(ax_pulse, line_props.get('pulse'),
-                              line_props.get('midline'))
+            self.render_pulse(ax_pulse)
             if pulse_is_complex:
                 # plot pulse phase
                 ax_phase = fig.add_subplot(gs[1], label='phase')
-                self.render_phase(ax_phase, line_props.get('phase'))
+                self.render_phase(ax_phase)
 
         fig.subplots_adjust(hspace=0.3)
 
