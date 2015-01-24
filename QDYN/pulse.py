@@ -308,9 +308,7 @@ class Pulse(object):
         return "\n".join(result)
 
     def convert(self, time_unit=None, ampl_unit=None, freq_unit=None):
-        """
-        Convert the pulse data to different units
-        """
+        """Convert the pulse data to different units"""
         if not time_unit is None:
             c = convert.to_au(1, self.time_unit) \
                 * convert.from_au(1, time_unit)
@@ -324,6 +322,10 @@ class Pulse(object):
         if not freq_unit is None:
             self.freq_unit = freq_unit
         self._check()
+
+    def is_complex(self):
+        """Return True if any pulse amplitude has a non-zero imaginary part"""
+        return (np.max(np.abs(self.amplitude.imag)) > 0.0)
 
     def get_timegrid_point(self, t, move="left"):
         """
@@ -509,7 +511,6 @@ class Pulse(object):
         Move the pulse onto the unshifted time grid. This increases the number
         of points by one
         """
-        dt = self.dt()
         tgrid_new = np.linspace(self.t0(), self.T(), len(self.tgrid)+1)
         pulse_new = np.zeros(len(self.amplitude)+1,
                              dtype=self.amplitude.dtype.type)
@@ -572,7 +573,6 @@ class Pulse(object):
         the pulse in general.
         """
         self._unshift()
-        dt = self.dt()
         nt = len(self.tgrid)
 
         if sum([(x is not None) for x in [upsample, downsample, num]]) != 1:
@@ -603,15 +603,163 @@ class Pulse(object):
 
         self._shift()
 
-    def show(self, show_pulse=True, show_spectrum=True, zoom=True,
-             wmin=None, wmax=None, spec_scale=None, spec_max=None,
-             freq_unit=None, title="", mark_freqs=None):
+
+    def render_pulse(self, ax, pulse_line_props=None, mid_line_props=None):
         """
-        Show a plot of the pulse and its spectrum
+        Render the pulse amplitude on the given axes.
 
         Parameters
         ----------
 
+        ax : matplotlib.axes.Axes
+            axes onto which to render the pulse
+        pulse_line_props : dict
+            dictionary of line properties for pulse line
+        mid_line_props : dict
+            dictionary of line properties for horizontal line at 0.
+            Defaults to `{'ls':'-', 'color':'black'}`
+        """
+        if pulse_line_props is None:
+            pulse_line_props = {}
+        if mid_line_props is None:
+            mid_line_props = {'ls':'-', 'color':'black'}
+        if np.max(np.abs(self.amplitude.imag)) > 0.0:
+            ampl_line, = ax.plot(self.tgrid, np.abs(self.amplitude),
+                                  **pulse_line_props)
+            ax.set_ylabel("abs(pulse) (%s)" % self.ampl_unit)
+        else:
+            ax.axhline(y=0.0, **mid_line_props)
+            ampl_line, = ax.plot(self.tgrid, self.amplitude.real,
+                                  **pulse_line_props)
+            ax.set_ylabel("pulse (%s)" % (self.ampl_unit))
+
+
+    def render_phase(self, ax, phase_line_props=None, mid_line_props=None):
+        """
+        Render the complex phase of the pulse on the given axes.
+
+        Parameters
+        ----------
+
+        ax : matplotlib.axes.Axes
+            axes onto which to render the pulse
+        phase_line_props : dict
+            dictionary of line properties for phase line
+        mid_line_props : dict
+            dictionary of line properties for horizontal line at 0.
+            Defaults to `{'ls':'-', 'color':'black'}`
+        """
+        if phase_line_props is None:
+            phase_line_props = {}
+        if mid_line_props is None:
+            mid_line_props = {'ls':'-', 'color':'black'}
+        ax.axhline(y=0.0, **mid_line_props)
+        phase_line, = ax.plot(self.tgrid, np.angle(self.amplitude) / np.pi,
+                              **phase_line_props)
+        ax.set_ylabel(r'phase ($\pi$)')
+        ax.set_xlabel("time (%s)" % self.time_unit)
+
+
+    def render_spectrum(self, ax, zoom=True, wmin=None, wmax=None,
+    spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None,
+    spect_line_props=None, mark_line_props=None):
+        """
+        Render spectrum onto the given axis
+
+        Parameters
+        ----------
+
+        ax : matplotlib.axes.Axes
+            axes onto which to render the pulse
+        zoom : see plot()
+        wmin: see plot()
+        wmax: see plot()
+        spec_scale: see plot()
+        spec_max: see plot()
+        freq_unit : see plot()
+        mark_freqs : see plot()
+        spect_line_props : dict
+            dictionary of line properties for phase line
+        mark_line_props : dict
+            dictionary of line properties for the vertical markers defined in
+            `mark_freqs`.
+            Defaults to `{'ls':'-', 'color':'black'}`
+        """
+        if spect_line_props is None:
+            spect_line_props = {}
+        if mark_line_props is None:
+            mark_line_props = {'ls':'--', 'color':'black'}
+
+        freq, spectrum = self.spectrum(mode='abs', sort=True,
+                                        freq_unit=freq_unit)
+        # normalizing the spectrum makes it independent of the number of
+        # sampling points. That is, the spectrum of a signal that is simply
+        # resampled will be the same as that of the original signal. Scipy
+        # follows the convention of doing the normalization in the inverse
+        # transform
+        spectrum *= 1.0 / len(spectrum)
+
+        if wmax is not None and wmin is not None:
+            zoom = False
+        if zoom:
+            # figure out the range of the spectrum
+            max_amp = np.amax(spectrum)
+            if self.is_complex():
+                # we center the spectrum around zero, and extend
+                # symmetrically in both directions as far as there is
+                # significant amplitude
+                wmin = np.max(freq)
+                wmax = np.min(freq)
+                for i, w in enumerate(freq):
+                    if spectrum[i] > 0.001*max_amp:
+                        if w > wmax:
+                            wmax = w
+                        if w < wmin:
+                            wmin = w
+                wmax = max(abs(wmin), abs(wmax))
+                wmin = -wmax
+            else:
+                # we show only the positive part of the spectrum (under the
+                # assumption that the spectrum is symmetric) and zoom in
+                # only on the region that was significant amplitude
+                wmin = 0.0
+                wmax = 0.0
+                for i, w in enumerate(freq):
+                    if spectrum[i] > 0.001*max_amp:
+                        if wmin == 0 and w > 0:
+                            wmin = w
+                        wmax = w
+            buffer = (wmax - wmin) * 0.1
+
+        # plot spectrum
+        if zoom:
+            ax.set_xlim((wmin-buffer), (wmax+buffer))
+        else:
+            if wmin is not None and wmax is not None:
+                ax.set_xlim(wmin, wmax)
+        ax.set_xlabel("frequency (%s)" % freq_unit)
+        ax.set_ylabel("abs(spec) (arb. un.)")
+        if spec_scale is None:
+            spec_scale = 1.0
+        ax.plot(freq, spec_scale*spectrum, **spect_line_props)
+        if spec_max is not None:
+            ax.set_ylim(0, spec_max)
+        if mark_freqs is not None:
+            for freq in mark_freqs:
+                ax.axvline(x=float(freq), **mark_line_props)
+
+    def plot(self, fig=None, show_pulse=True, show_spectrum=True, zoom=True,
+    wmin=None, wmax=None, spec_scale=None, spec_max=None, freq_unit=None,
+    mark_freqs=None, line_props=None, **figargs):
+        """
+        Generate a plot of the pulse on a given figure
+
+        Parameters
+        ----------
+
+        fig : Instance of matplotlib.figure.Figure
+            The figure onto which to plot. If not given, create a new figure
+            from `matplotlib.pyplot.figure
         show_pulse : bool
             Include a plot of the pulse amplitude? If the pulse has a vanishing
             imaginary part, the plot will show the real part of the amplitude,
@@ -636,22 +784,33 @@ class Pulse(object):
         freq_unit : str
             Unit in which to show the frequency axis in the spectrum. If not
             given, use the `freq_unit` attribute
-        title: str
-            An optional title to show at the top of the figure
         mark_freqs : None, array of floats
             Array of frequencies to mark in spectrum as vertical dashed lines
+        line_props : dict
+            Dictionary definining line styles for the various plotted lines,
+            allowing to override the defaults.
+            Possible keys are 'spect' (spectrum line), 'mark' (marker lines in
+            spectrum), 'pulse' (pulse amplitude line), 'midline' (horizontal
+            line marking zero in pulse plots), and 'phase' (pulse phase
+            line). Each value must also be a dict of line style properties,
+            e.g. `{'color':'red'}`
+
+        The remaining figargs are passed to matplotlib.pyplot.figure to create
+        a new figure if `fig` is None.
         """
+        if fig is None:
+            fig = plt.figure(**figargs)
+
         if freq_unit is None:
             freq_unit = self.freq_unit
-        self._check()
-        # determine whether pulse is complex or real by looking at all the
-        # imaginary parts. We do *not* want to use the 'mode' attribute, which
-        # only indicates how the file is to be written out
-        if np.max(np.abs(self.amplitude.imag)) > 0.0:
-            pulse_is_complex = True
-        else:
-            pulse_is_complex = False
 
+        if line_props is None:
+            line_props = {}
+
+        self._check()
+        pulse_is_complex = self.is_complex()
+
+        # do the layout
         if show_pulse and show_spectrum:
             if pulse_is_complex:
                 # show abs(pulse), phase(pulse), abs(spectrum)
@@ -670,103 +829,77 @@ class Pulse(object):
             else:
                 gs = GridSpec(1, 1)
 
+        if show_spectrum:
+            ax_spectrum = fig.add_subplot(gs[-1], label='spectrum')
+            self.render_spectrum(ax_spectrum, zoom, wmin, wmax, spec_scale,
+                                 spec_max, freq_unit, mark_freqs,
+                                 line_props.get('spect'),
+                                 line_props.get('mark'))
         if show_pulse:
             # plot pulse amplitude
-            ax1 = plt.subplot(gs[0])
-            if pulse_is_complex:
-                ax1.plot(self.tgrid, np.abs(self.amplitude))
-                ax1.set_ylabel("abs(pulse) (%s)" % self.ampl_unit)
-            else:
-                ax1.axhline(y=0.0, ls='-', color='black')
-                ax1.plot(self.tgrid, self.amplitude.real)
-                ax1.set_ylabel("pulse) (%s)" % self.ampl_unit)
-            ax1.set_xlabel("time (%s)" % self.time_unit)
+            ax_pulse = fig.add_subplot(gs[0], label='pulse')
+            self.render_pulse(ax_pulse, line_props.get('pulse'),
+                              line_props.get('midline'))
             if pulse_is_complex:
                 # plot pulse phase
-                ax2 = plt.subplot(gs[1])
-                ax2.axhline(y=0.0, ls='-', color='black')
-                ax2.plot(self.tgrid, np.angle(self.amplitude) / np.pi)
-                ax2.set_ylabel("phase (pi)")
-                ax2.set_xlabel("time (%s)" % self.time_unit)
+                ax_phase = fig.add_subplot(gs[1], label='phase')
+                self.render_phase(ax_phase, line_props.get('phase'))
 
-        if show_spectrum:
+        fig.subplots_adjust(hspace=0.3)
 
-            freq, spectrum = self.spectrum(mode='abs', sort=True,
-                                           freq_unit=freq_unit)
-            # normalizing the spectrum makes it independent of the number of
-            # sampling points. That is, the spectrum of a signal that is simply
-            # resampled will be the same as that of the original signal. Scipy
-            # follows the convention of doing the normalization in the inverse
-            # transform
-            spectrum *= 1.0 / len(spectrum)
+    def _repr_png_(self):
+        """Return png representation"""
+        return self._figure_data(fmt='png')
 
-            if wmax is not None and wmin is not None:
-                zoom = False
-            if zoom:
-                # figure out the range of the spectrum
-                max_amp = np.amax(spectrum)
-                if pulse_is_complex:
-                    # we center the spectrum around zero, and extend
-                    # symmetrically in both directions as far as there is
-                    # significant amplitude
-                    wmin = np.max(freq)
-                    wmax = np.min(freq)
-                    for i, w in enumerate(freq):
-                        if spectrum[i] > 0.001*max_amp:
-                            if w > wmax:
-                                wmax = w
-                            if w < wmin:
-                                wmin = w
-                    wmax = max(abs(wmin), abs(wmax))
-                    wmin = -wmax
-                else:
-                    # we show only the positive part of the spectrum (under the
-                    # assumption that the spectrum is symmetric) and zoom in
-                    # only on the region that was significant amplitude
-                    wmin = 0.0
-                    wmax = 0.0
-                    for i, w in enumerate(freq):
-                        if spectrum[i] > 0.001*max_amp:
-                            if wmin == 0 and w > 0:
-                                wmin = w
-                            wmax = w
-                buffer = (wmax - wmin) * 0.1
+    def _repr_svg_(self):
+        """Return svg representation"""
+        return self._figure_data(fmt='svg')
 
-            # plot spectrum
-            ax3 = plt.subplot(gs[-1])
-            if zoom:
-                ax3.set_xlim((wmin-buffer), (wmax+buffer))
+    def _figure_data(self, fmt='png', display=False):
+        """Return image representation"""
+        from IPython.core.pylabtools import print_figure
+        from IPython.display import Image, SVG
+        from IPython.display import display as ipy_display
+        fig = plt.figure()
+        self.plot(fig=fig)
+        fig_data = print_figure(fig, fmt)
+        if fmt=='svg':
+            fig_data = fig_data.decode('utf-8')
+        # We MUST close the figure, otherwise IPython's display machinery
+        # will pick it up and send it as output, resulting in a
+        # double display
+        plt.close(fig)
+        if display:
+            if fmt=='svg':
+                ipy_display(SVG(fig_data))
             else:
-                if wmin is not None and wmax is not None:
-                    ax3.set_xlim(wmin, wmax)
-            ax3.set_xlabel("frequency (%s)" % freq_unit)
-            ax3.set_ylabel("abs(spec) (arb. un.)")
-            if spec_scale is None:
-                spec_scale = 1.0
-            ax3.plot(freq, spec_scale*spectrum)
-            if spec_max is not None:
-                ax3.set_ylim(0, spec_max)
-            if mark_freqs is not None:
-                for freq in mark_freqs:
-                    ax3.axvline(x=float(freq), ls='--', color='black')
+                ipy_display(Image(fig_data))
+        else:
+            return fig_data
 
-        plt.subplots_adjust(hspace=0.3)
-        plt.suptitle(title)
+    def show(self, **kwargs):
+        """
+        Show a plot of the pulse and its spectrum. All arguments will be passed
+        to the plot method
+        """
+        self.plot(**kwargs) # uses plt.figure()
         plt.show()
 
-    def show_pulse(self):
+    def show_pulse(self, **kwargs):
         """
         Show a plot of the pulse amplitude; alias for
-        `show(show_spectrum=False)`
+        `show(show_spectrum=False)`. All other arguments will be passed to the
+        `show` method
         """
-        self.show(show_spectrum=False)
+        self.show(show_spectrum=False, **kwargs)
 
-    def show_spectrum(self, zoom=True, freq_unit=None):
+    def show_spectrum(self, zoom=True, freq_unit=None, **kwargs):
         """
         Show a plot of the pulse spectrum; alias for
-        `show(show_pulse=False, zoom=zoom, freq_unit=freq_unit)`
+        `show(show_pulse=False, zoom=zoom, freq_unit=freq_unit)`. All other
+        arguments will be passed to the `show` method
         """
-        self.show(show_pulse=False, zoom=zoom, freq_unit=freq_unit)
+        self.show(show_pulse=False, zoom=zoom, freq_unit=freq_unit, **kwargs)
 
 
 def tgrid_from_config(config, pulse_grid=True):
