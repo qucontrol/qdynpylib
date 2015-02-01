@@ -13,7 +13,6 @@ from numpy import (ndarray, array, linspace, pi, outer, cos, sin, ones,
 
 try:
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
     from matplotlib.patches import FancyArrowPatch
     from mpl_toolkits.mplot3d import proj3d
 
@@ -301,7 +300,7 @@ class Bloch():
     def _repr_png_(self):
         from IPython.core.pylabtools import print_figure
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax = Axes3D(fig, azim=self.view[0], elev=self.view[1])
+        ax = fig.add_subplot(111, projection='3d')
         self.render(fig, ax)
         fig_data = print_figure(fig, 'png')
         plt.close(fig)
@@ -310,7 +309,7 @@ class Bloch():
     def _repr_svg_(self):
         from IPython.core.pylabtools import print_figure
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax = Axes3D(fig, azim=self.view[0], elev=self.view[1])
+        ax = fig.add_subplot(111, projection='3d')
         self.render(fig, ax)
         fig_data = print_figure(fig, 'svg').decode('utf-8')
         plt.close(fig)
@@ -665,8 +664,9 @@ class Bloch():
         """
         Generate a plot of the Bloch sphere on the given figure
         """
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax = Axes3D(fig, azim=self.view[0], elev=self.view[1])
+        if fig is None:
+            fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+        ax = fig.add_subplot(111, aspect='equal', projection='3d')
         self.render(ax)
 
     def show(self):
