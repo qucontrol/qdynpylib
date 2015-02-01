@@ -7,8 +7,6 @@ Routines for creating plots of the Bloch Sphere
 # All dependencies from the QuTiP package have been removed, and additional
 # capabilities have been added (e.g. drawing precession circles)
 #
-import os
-
 from .linalg import inner
 from numpy import (ndarray, array, linspace, pi, outer, cos, sin, ones,
                    size, sqrt, real, mod, append, ceil, arange, zeros, asarray)
@@ -453,42 +451,33 @@ class Bloch():
                                  'text': text,
                                  'opts': kwargs})
 
-    def render(self, fig=None, axes=None):
+    def render(self, ax):
         """
-        Render the Bloch sphere and its data sets in on given figure and axes.
-
-        If fig is not given, create a new pyplot figure. If axes is not given,
-        create new axes in fig
+        Render the Bloch sphere on the given Axes3D object
         """
 
-        # Figure instance for Bloch sphere plot
-        if not fig and not axes:
-            fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-
-        if not axes:
-            axes = Axes3D(fig)
-        axes.view_init(azim=self.view[0], elev=self.view[1])
+        ax.view_init(azim=self.view[0], elev=self.view[1])
 
         if self.background:
-            axes.clear()
-            axes.set_xlim3d(-1.3, 1.3)
-            axes.set_ylim3d(-1.3, 1.3)
-            axes.set_zlim3d(-1.3, 1.3)
+            ax.clear()
+            ax.set_xlim3d(-1.3, 1.3)
+            ax.set_ylim3d(-1.3, 1.3)
+            ax.set_zlim3d(-1.3, 1.3)
         else:
-            self._plot_xyz_axes(axes)
-            axes.set_axis_off()
-            axes.set_xlim3d(-0.7, 0.7)
-            axes.set_ylim3d(-0.7, 0.7)
-            axes.set_zlim3d(-0.7, 0.7)
+            self._plot_xyz_axes(ax)
+            ax.set_axis_off()
+            ax.set_xlim3d(-0.7, 0.7)
+            ax.set_ylim3d(-0.7, 0.7)
+            ax.set_zlim3d(-0.7, 0.7)
 
-        axes.grid(False)
-        self._plot_back(axes)
-        self._plot_points(axes)
-        self._plot_vectors(axes)
-        self._plot_precessions(axes)
-        self._plot_front(axes)
-        self._plot_axes_labels(axes)
-        self._plot_annotations(axes)
+        ax.grid(False)
+        self._plot_back(ax)
+        self._plot_points(ax)
+        self._plot_vectors(ax)
+        self._plot_precessions(ax)
+        self._plot_front(ax)
+        self._plot_axes_labels(ax)
+        self._plot_annotations(ax)
 
     def _plot_back(self, axes):
         # back half of sphere
@@ -672,53 +661,21 @@ class Bloch():
             axes.text(vec[1], -vec[0], vec[2],
                       annotation['text'], **opts)
 
+    def plot(self, fig=None):
+        """
+        Generate a plot of the Bloch sphere on the given figure
+        """
+        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+        ax = Axes3D(fig, azim=self.view[0], elev=self.view[1])
+        self.render(ax)
+
     def show(self):
         """
-        Display Bloch sphere and corresponding data sets.
+        Show a plot of the Bloch sphere
         """
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax = Axes3D(fig, azim=self.view[0], elev=self.view[1])
-        self.render(fig, ax)
-        plt.show(fig)
+        self.plot()
+        plt.show()
 
-    def save(self, name=None, format='png', dirc=None):
-        """Saves Bloch sphere to file of type ``format`` in directory ``dirc``.
-
-        Parameters
-        ----------
-
-        name : str
-            Name of saved image. Must include path and format as well.
-            i.e. '/Users/Paul/Desktop/bloch.png'
-            This overrides the 'format' and 'dirc' arguments.
-        format : str
-            Format of output image.
-        dirc : str
-            Directory for output images. Defaults to current working directory.
-
-        Returns
-        -------
-        File containing plot of Bloch sphere.
-
-        """
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax = Axes3D(fig, azim=self.view[0], elev=self.view[1])
-        self.render(fig, ax)
-        if dirc:
-            if not os.path.isdir(os.getcwd() + "/" + str(dirc)):
-                os.makedirs(os.getcwd() + "/" + str(dirc))
-        if name is None:
-            if dirc:
-                plt.savefig(os.getcwd() + "/" + str(dirc) + '/bloch_' +
-                            str(self.savenum) + '.' + format)
-            else:
-                plt.savefig(os.getcwd() + '/bloch_' + str(self.savenum) +
-                            '.' + format)
-        else:
-            plt.savefig(name, self.dpi)
-        self.savenum += 1
-        if fig:
-            plt.close(fig)
 
 
 def bloch_coordinates(state, normalize=True):
