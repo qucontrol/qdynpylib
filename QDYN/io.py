@@ -49,82 +49,6 @@ class open_file(object):
         return False
 
 
-def read_2q_gate(file):
-    """
-    Read in complex 4x4 matrix from file (as written by the QDYN
-    write_cmplx_matrix routine).
-
-    Return a 4x4 double precision complex Numpy matrix
-
-    Assumes the propagation is in the canonical basis
-
-    Argument
-    --------
-
-    file: str or file-like object
-        Filename of file from which to read gate, or file-like object with
-        equivalent content
-
-    Example
-    -------
-
-    >>> gate = '''
-    ... U = [
-    ... { 1.00000000E+00,            0.0}(              0,              0)(              0,              0)(              0,              0)
-    ... (              0,              0){ 5.72735140E-01, 8.19740483E-01}(              0,              0)(              0,              0)
-    ... (              0,              0)(              0,              0){ 2.12007110E-01,-9.77268124E-01}(              0,              0)
-    ... (              0,              0)(              0,              0)(              0,              0){ 9.99593327E-01,-2.85163130E-02}
-    ... ]
-    ... '''
-    >>> from StringIO import StringIO
-    >>> read_2q_gate(StringIO(gate))
-    matrix([[ 1.00000000+0.j        ,  0.00000000+0.j        ,
-              0.00000000+0.j        ,  0.00000000+0.j        ],
-            [ 0.00000000+0.j        ,  0.57273514+0.81974048j,
-              0.00000000+0.j        ,  0.00000000+0.j        ],
-            [ 0.00000000+0.j        ,  0.00000000+0.j        ,
-              0.21200711-0.97726812j,  0.00000000+0.j        ],
-            [ 0.00000000+0.j        ,  0.00000000+0.j        ,
-              0.00000000+0.j        ,  0.99959333-0.02851631j]])
-    """
-    U = np.zeros(shape=(4,4), dtype=np.complex128)
-    with open_file(file) as fh:
-        i = 0
-        for line in fh:
-            items = re.split("[(){}]+", line.strip())[1:-1]
-            if len(items) != 4: continue
-            j = 0
-            for item in items:
-                if "," in item:
-                    x, y = item.split(",")
-                    z = complex(float(x), float(y))
-                elif item.strip() == '0':
-                    z = complex(0.0, 0.0)
-                U[i,j] = z
-                j += 1
-            i += 1
-    return np.matrix(U)
-
-
-def print_2q_gate(U):
-    """
-    Print a complex 4x4 matrix to the screen
-
-    >>> from local_invariants import CNOT
-    >>> print_2q_gate(CNOT)
-    1.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j
-    0.000000+0.000000j  1.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j
-    0.000000+0.000000j  0.000000+0.000000j  0.000000+0.000000j  1.000000+0.000000j
-    0.000000+0.000000j  0.000000+0.000000j  1.000000+0.000000j  0.000000+0.000000j
-    """
-    for i in xrange(4):
-        row_str = "%5f+%5fj  %5f+%5fj  %5f+%5fj  %5f+%5fj" % (
-                  U[i,0].real, U[i,0].imag,
-                  U[i,1].real, U[i,1].imag,
-                  U[i,2].real, U[i,2].imag,
-                  U[i,3].real, U[i,3].imag)
-        print row_str
-
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
 header=None, hermitian=True):
@@ -464,12 +388,12 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
-def print_matrix_latex(M):
+def matrix_to_latex(M):
     r"""
-    Print matrix M as LaTeX Code
+    Return matrix M as LaTeX Code
 
-    >>> from local_invariants import CNOT
-    >>> print_matrix_latex(CNOT)
+    >>> from gate2q import CNOT
+    >>> print matrix_to_latex(CNOT)
     \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
@@ -477,13 +401,15 @@ def print_matrix_latex(M):
     0 & 0 & 1 & 0 \\
     \end{pmatrix}
     """
+    lines = []
     from sympy.printing.latex import latex
     from sympy import nsimplify
-    print r'\begin{pmatrix}'
+    lines.append(r'\begin{pmatrix}')
     for line in np.asarray(M):
         entries = [latex(nsimplify(v)) for v in line]
-        print " & ".join(entries) + r' \\'
-    print r'\end{pmatrix}'
+        lines.append(" & ".join(entries) + r' \\')
+    lines.append(r'\end{pmatrix}')
+    return "\n".join(lines)
 
 
 def mathematica_number(val):
@@ -517,18 +443,18 @@ def mathematica_number(val):
     return result
 
 
-def print_matrix_mathematica(M):
+def matrix_to_mathematica(M):
     r"""
     Print matrix M as a string that can be pasted into Mathematica
 
-    >>> from local_invariants import CNOT, unity
-    >>> print_matrix_mathematica(CNOT)
+    >>> from gate2q import CNOT, identity
+    >>> print matrix_to_mathematica(CNOT)
     {{1.0, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 0, 1.0}, {0, 0, 1.0, 0}}
-    >>> print_matrix_mathematica(1.0j*CNOT+unity)
+    >>> print matrix_to_mathematica(1.0j*CNOT+identity)
     {{1.0+1.0I, 0, 0, 0}, {0, 1.0+1.0I, 0, 0}, {0, 0, 1.0, 1.0I}, {0, 0, 1.0I, 1.0}}
     """
     lines = []
     for row in np.asarray(M):
         entries = [mathematica_number(v) for v in row]
         lines.append('{' + ", ".join(entries) + '}')
-    print '{' + ", ".join(lines) + '}'
+    return '{' + ", ".join(lines) + '}'

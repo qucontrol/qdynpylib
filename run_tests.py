@@ -27,7 +27,8 @@ except ImportError:
 doctest_modules = [
 'QDYN.io',
 'QDYN.linalg',
-'QDYN.local_invariants',
+'QDYN.gate2q',
+'QDYN.weyl',
 'QDYN.state',
 'QDYN.bloch',
 'QDYN.prop',
@@ -50,6 +51,7 @@ def run_doctests(modules):
 nosetest_modules = [
 'tests.test_newton',
 'tests.test_io',
+'tests.test_bloch',
 ]
 def run_nosetests(modules):
     print "*******************"

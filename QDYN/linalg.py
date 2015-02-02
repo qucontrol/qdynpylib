@@ -69,10 +69,7 @@ def trace(m):
     """
     Return the trace of the given matrix
     """
-    if isinstance(m, np.matrix):
-        return m.trace()[0,0]
-    else:
-        return m.trace()
+    return (np.asarray(m)).trace()
 
 
 def norm(v):
