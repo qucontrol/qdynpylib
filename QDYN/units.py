@@ -10,6 +10,7 @@ class NumericConverter:
     def __init__(self):
         """ Initialize conversion factors """
         self.au_convfactors = {
+            'iu'      : 1.0,
             'au'      : 1.0,
             'fs'      : 0.02418884327440855991,  # atomictime to femtosecond
             'ps'      : 2.4188843274408560e-05,  # atomictime to picosecond
