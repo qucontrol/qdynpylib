@@ -832,6 +832,34 @@ class Pulse(object):
         self.show(show_pulse=False, zoom=zoom, freq_unit=freq_unit, **kwargs)
 
 
+def pulse_tgrid(T, nt, t0=0.0):
+    """
+    Return a pulse time grid suitable for an equidistant time grid of the
+    states between t0 and T with nt intervals. The values of the pulse are
+    defined in the intervals of the time grid, so the pulse time grid will be
+    shifted by dt/2 with respect to the time grid of the states. Also, the
+    pulse time grid will have nt-1 points:
+
+    >>> pulse_tgrid(1.5, nt=4)
+    array([ 0.25,  0.75,  1.25])
+
+    The limits of the states time grid are defined as the starting and end
+    points of the pulse, however:
+
+    >>> p = Pulse(tgrid=pulse_tgrid(1.5, 4))
+    >>> p.t0()
+    0.0
+    >>> p.T()
+    1.5
+    """
+    dt = (T - t0) / (nt - 1)
+    t_first_pulse = t0 + 0.5*dt
+    t_last_pulse  =  T - 0.5*dt
+    nt_pulse = nt - 1
+    return np.linspace(t_first_pulse, t_last_pulse, nt_pulse)
+
+
+
 def tgrid_from_config(config, pulse_grid=True):
     """
     Extract the time grid from the given config file
