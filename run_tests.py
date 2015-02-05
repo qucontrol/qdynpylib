@@ -26,6 +26,7 @@ except ImportError:
 
 doctest_modules = [
 'QDYN.io',
+'QDYN.shutil',
 'QDYN.linalg',
 'QDYN.gate2q',
 'QDYN.weyl',
