@@ -25,6 +25,9 @@ class Pulse(object):
         time points at which the pulse values are defined
     amplitude : ndarray(float64), ndarray(complex128)
         array of real or complex pulse values
+    filename : str
+        Name of file from which pulse was read (if any). Also default name of
+        file to which the pulse will be written.
     mode : str
         How to write the pulse values to file. Can be `complex`, `real`, or
         `abs`. There will be three columns in the file for `mode='complex'`,
@@ -91,7 +94,9 @@ class Pulse(object):
                 amplitude = np.array(amplitude, dtype=np.complex128)
             else:
                 amplitude = np.array(amplitude, dtype=np.float64)
+            self.filename = filename
         else:
+            self.filename = None
             assert tgrid is None and amplitude is None, \
             "Either filename or tgrid and amplitude must be present"
         self.tgrid = tgrid
@@ -441,7 +446,7 @@ class Pulse(object):
         deriv_pulse._shift()
         return deriv_pulse
 
-    def write(self, filename, mode=None):
+    def write(self, filename=None, mode=None):
         """
         Write a pulse to file, in the same format as the QDYN `write_pulse`
         routine
@@ -449,7 +454,7 @@ class Pulse(object):
         Parameters
         ----------
 
-        filename : str
+        filename : str, optional
             Name of file to which to write the pulse
         mode : str, optional
            Mode in which to write files. Possible values are 'abs', 'real', or
@@ -459,6 +464,12 @@ class Pulse(object):
         """
         if mode is None:
             mode = self.mode
+        if filename is None:
+            filename = self.filename
+        if filename is None:
+            raise ValueError("You must give a filename to write the pulse, "
+            "either by setting the filename attribute or by passing a "
+            "filename to the write method")
         self._check()
         preamble = self.preamble
         if not hasattr(preamble, '__getitem__'):
