@@ -124,9 +124,6 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         Finalize the creation of the matrix, also allows for view-casting,
         see <http://docs.scipy.org/doc/numpy/user/basics.subclassing.html>
         """
-        if self.shape != (4, 4):
-            raise ValueError("Gate2Q must be 4 x 4 matrix, has shape %s"
-                             % str(self.shape))
         if 'name' not in self.__dict__:
             self.name = None
 
