@@ -369,6 +369,7 @@ class Pulse(object):
             iter_match = iter_rx.search(line)
             if iter_match:
                 return int(iter_match.group(1))
+        return 0
 
     def spectrum(self, freq_unit=None, mode='complex', sort=False):
         """
