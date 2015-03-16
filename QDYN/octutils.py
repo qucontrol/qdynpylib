@@ -65,7 +65,9 @@ class OCTConvergences(object):
         from bokeh.plotting import figure, show
         from bokeh.models import ColumnDataSource, HoverTool
         fig_args = {'tools': "pan,box_zoom,reset,resize,hover",
-                    'title': '', 'plot_width': 900, 'plot_height': 400}
+                    'title': '', 'plot_width': 900, 'plot_height': 400,
+                    'x_axis_label':"OCT iteration",
+                    'y_axis_label':"Optimization Error"}
         if log_scale:
             fig_args['y_axis_type'] = 'log'
             fig_args['y_range'] = [self.J_T_min, max(1.0, self.J_T_max)]
@@ -78,7 +80,7 @@ class OCTConvergences(object):
         splits_colors = []
         for key in self.convergence.keys():
             p.line(self.convergence[key].iter, self.convergence[key].J_T,
-                color=self.colors[key])
+                  color=self.colors[key], legend=self.labels[key])
             for (iter, J_T, description) in self.splits[key]:
                 splits_J_T.append(J_T)
                 splits_iters.append(iter)
