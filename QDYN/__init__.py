@@ -8,6 +8,7 @@ from . import linalg
 from . import state
 from . import bloch
 from . import shutil
+from . import octutils
 
 __version__ = "2.0.dev1"
 try:
