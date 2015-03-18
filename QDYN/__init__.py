@@ -9,6 +9,7 @@ from . import state
 from . import bloch
 from . import shutil
 from . import octutils
+from . import memoize
 
 __version__ = "2.0.dev1"
 try:
