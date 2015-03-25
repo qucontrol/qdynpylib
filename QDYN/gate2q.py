@@ -6,6 +6,7 @@ Also defines common two-qubit gates as Gate2Q objects.
 import numpy as np
 import scipy
 import cmath
+import os
 from numpy import pi, cos, sin
 import re
 from warnings import warn
@@ -80,6 +81,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         Return a new instance of Gate2Q
         """
 
+        file = None
+
         # We allow an empty constructor to create a zero-matrix
         if len(args) == 0:
             args = [(np.zeros((4,4), dtype=np.complex128)), ]
@@ -89,6 +92,10 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
                 # it appears that a numpy matrix will not change its type to
                 # Gate2Q. So, we make sure to downcast it to a normal array
                 args = [np.asarray(arg), ]
+            if isinstance(arg, str):
+                if os.path.isfile(arg):
+                    kwargs['file'] = arg
+                    args = [(np.zeros((4,4), dtype=np.complex128)), ]
 
         # Make sure that dtype is np.complex128
         if 'dtype' in kwargs:
@@ -97,7 +104,6 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         kwargs['dtype'] = np.complex128
 
         # Allow to read from file
-        file = None
         if 'file' in kwargs:
             file = kwargs['file'] # delay until after construction
             del kwargs['file']
