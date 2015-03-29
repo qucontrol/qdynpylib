@@ -33,6 +33,7 @@ doctest_modules = [
 'QDYN.state',
 'QDYN.bloch',
 'QDYN.memoize',
+'QDYN.octutils',
 'QDYN.prop',
 'QDYN.prop.exact'
 ]
