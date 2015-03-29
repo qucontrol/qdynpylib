@@ -115,8 +115,8 @@ class OCTConvergences(object):
         splits_timestamps = []
         splits_lambda_vals = []
         splits_colors = []
-        for key in self.convergence.keys():
-            p.line(self.convergence[key].iter, self.convergence[key].J_T,
+        for key in self.data.keys():
+            p.line(self.data[key].iter, self.data[key].J_T,
                   color=self.colors[key], legend=self.labels[key])
             for (iter, J_T, description) in self.splits[key]:
                 splits_J_T.append(J_T)
