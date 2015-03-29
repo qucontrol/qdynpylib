@@ -98,16 +98,23 @@ class OCTConvergences(object):
                                Delta_J   = np.array(Delta_J_vals),
                                sec       = np.array(sec_vals, dtype=np.int))
 
-    def bokeh(self, log_scale=True):
+    def bokeh(self, log_scale='y'):
         from bokeh.plotting import figure, show
         from bokeh.models import ColumnDataSource, HoverTool
         fig_args = {'tools': "pan,box_zoom,reset,resize,hover",
                     'title': '', 'plot_width': 900, 'plot_height': 400,
                     'x_axis_label':"OCT iteration",
                     'y_axis_label':"Optimization Error"}
-        if log_scale:
+        if 'y' in log_scale:
             fig_args['y_axis_type'] = 'log'
             fig_args['y_range'] = [self.J_T_min, max(1.0, self.J_T_max)]
+        if 'x' in log_scale:
+            fig_args['x_axis_type'] = 'log'
+            max_iter = 1
+            for key in self.data.keys():
+                if np.max(self.data[key].iter) > max_iter:
+                    max_iter = np.max(self.data[key].iter)
+            fig_args['x_range'] = [1, max_iter]
         p = figure(**fig_args)
         # collect the split points
         splits_J_T = []
