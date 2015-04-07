@@ -2,6 +2,8 @@
 """
 Linear algebra helper routines
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import numpy as np
 import scipy.linalg
 
@@ -119,7 +121,7 @@ def get_op_matrix(apply_op, state_shape, t):
 
     Example
     -------
-    >>> from prop import generate_apply_H, generate_apply_L
+    >>> from . prop import generate_apply_H, generate_apply_L
     >>> H0 = np.matrix(np.array([[1,0],[0,2]]))
     >>> H1 = np.matrix(np.array([[0,1],[1,0]]))
     >>> def pulse(t):

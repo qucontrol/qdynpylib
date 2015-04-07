@@ -8,6 +8,8 @@ function
 For a constant operator O or the corresponding product of exponentials for a
 time-dependent (piece-wise constant) Operator
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import numpy as np
 from . import newton
 from . import exact
@@ -154,8 +156,7 @@ def propagate(apply_op, state, tgrid, method='exact', info_hook=None,
             state = newton.newton_step(apply_op, state, t, dt, m, maxrestart,
                                        tol)
         else:
-            print >> sys.stderr, "Unknown method: %s" % method
-            return None
+            raise ValueError("Unknown method: %s", method)
         if info_hook is not None:
             info_hook(state, t=(t+0.5*dt))
         if storage is not None:

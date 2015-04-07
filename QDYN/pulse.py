@@ -1,16 +1,18 @@
 """
 Working with (real-valued) pulses
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import numpy as np
-from numpy.fft import fftfreq, fft, ifft
-import matplotlib
+from numpy.fft import fftfreq, fft
 from matplotlib.gridspec import GridSpec
 import matplotlib.pyplot as plt
 from scipy import signal
 import scipy.fftpack
 import re
-import sys
-from QDYN.units import NumericConverter
+import logging
+
+from .units import NumericConverter
 convert = NumericConverter()
 
 
@@ -130,6 +132,7 @@ class Pulse(object):
         """
         Check self-consistency of pulse
         """
+        logger = logging.getLogger(__name__)
         assert self.tgrid is not None, "Pulse is not initialized"
         assert self.amplitude is not None, "Pulse is not initialized"
         assert type(self.tgrid) == np.ndarray, "tgrid must be numpy array"
@@ -151,8 +154,8 @@ class Pulse(object):
         "Unknown freq_unit %s" % self.freq_unit
         if self.mode == 'real':
             if np.max(np.abs(self.amplitude.imag)) > 0.0:
-                print >> sys.stderr, \
-                "mode is 'real', but pulse has non-zero imaginary part"
+                logger.warn("mode is 'real', but pulse has non-zero imaginary "
+                            "part")
 
 
     def read(self, filename):
@@ -165,6 +168,7 @@ class Pulse(object):
 
         The `write` method allows to restore *exactly* the original pulse file
         """
+        logger = logging.getLogger(__name__)
         header_rx = {
             'complex': re.compile(r'''
                 ^\#\s*t(ime)? \s* \[\s*(?P<time_unit>\w+)\s*\]\s*
@@ -210,8 +214,8 @@ class Pulse(object):
                         found_mode = True
                         break
                 if not found_mode:
-                    print "\nWARNING: Non-standard header in pulse file"
-                    print "Check that pulse was read with correct units\n"
+                    logger.warn("Non-standard header in pulse file."
+                                "Check that pulse was read with correct units")
                     if y is None:
                         self.mode = 'abs'
                     else:
@@ -223,11 +227,11 @@ class Pulse(object):
                     if match:
                         self.time_unit = match.group('time_unit')
                         self.ampl_unit = match.group('ampl_unit')
-                        print "Set time_unit = ", self.time_unit
-                        print "Set ampl_unit = ", self.ampl_unit
+                        logger.info("Set time_unit = %s", self.time_unit)
+                        logger.info("Set ampl_unit = %s", self.ampl_unit)
                     else:
-                        print "\nWARNING: Could not identify units."
-                        print "Setting to atomic units\n"
+                        logger.warn("Could not identify units. Setting to "
+                                    "atomic units.")
                         self.time_unit = 'au'
                         self.ampl_unit = 'au'
             except IndexError:
@@ -483,40 +487,41 @@ class Pulse(object):
             for line in preamble:
                 line = str(line).strip()
                 if line.startswith('#'):
-                    print >> out_fh, line
+                    print(line, file=out_fh)
                 else:
-                    print >> out_fh, '# ', line
+                    print('# ', line, file=out_fh)
             # header and data
             time_header     = "time [%s]" % self.time_unit
             ampl_re_header  = "Re(ampl) [%s]" % self.ampl_unit
             ampl_im_header  = "Im(ampl) [%s]" % self.ampl_unit
             ampl_abs_header = "Abs(ampl) [%s]" % self.ampl_unit
             if mode == 'abs':
-                print >> out_fh, "# %23s%25s" % (time_header, ampl_abs_header)
+                print("# %23s%25s" % (time_header, ampl_abs_header),
+                      file=out_fh)
                 for i, t in enumerate(self.tgrid):
-                    print >> out_fh, "%25.17E%25.17E" \
-                                     % (t, abs(self.amplitude[i]))
+                    print("%25.17E%25.17E" % (t, abs(self.amplitude[i])),
+                          file=out_fh)
             elif mode == 'real':
-                print >> out_fh, "# %23s%25s" % (time_header, ampl_re_header)
+                print("# %23s%25s" % (time_header, ampl_re_header),
+                      file=out_fh)
                 for i, t in enumerate(self.tgrid):
-                    print >> out_fh, "%25.17E%25.17E" \
-                                     % (t, self.amplitude.real[i])
+                    print("%25.17E%25.17E" % (t, self.amplitude.real[i]),
+                          file=out_fh)
             elif mode == 'complex':
-                print >> out_fh, "# %23s%25s%25s" \
-                                % (time_header, ampl_re_header, ampl_im_header)
+                print("# %23s%25s%25s" % (time_header, ampl_re_header,
+                      ampl_im_header), file=out_fh)
                 for i, t in enumerate(self.tgrid):
-                    print >> out_fh, "%25.17E%25.17E%25.17E" \
-                                     % (t, self.amplitude.real[i],
-                                        self.amplitude.imag[i])
+                    print("%25.17E%25.17E%25.17E" % (t, self.amplitude.real[i],
+                          self.amplitude.imag[i]), file=out_fh)
             else:
                 raise ValueError("mode must be 'abs', 'real', or 'complex'")
             # postamble
             for line in self.postamble:
                 line = str(line).strip()
                 if line.startswith('#'):
-                    print >> out_fh, line
+                    print(line, file=out_fh)
                 else:
-                    print >> out_fh, '# ', line
+                    print('# ', line, file=out_fh)
 
     def _unshift(self):
         """

@@ -1,3 +1,5 @@
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 from shutil import *
 import contextlib
 import os
@@ -45,4 +47,4 @@ def tail(file, n):
     """
     with open(file) as in_fh:
         lines = in_fh.readlines()
-        print "".join(lines[-n:])
+        print("".join(lines[-n:]))

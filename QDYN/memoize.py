@@ -29,7 +29,12 @@ to reload it at a later time
 >>> import os
 >>> os.unlink('memoize.dump')
 '''
-import cPickle
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 from functools import update_wrapper
 from QDYN.io import open_file
 
@@ -50,12 +55,15 @@ class memoize(object):
         self.cache = {}
         self.pickle_cache = {}
         self.func = func
+        self.autosave = 0
+        self._count = 0
+        self.cache_file = None
         update_wrapper(self, func)
 
     def dump(self, filename):
         """Write memoization cache to the given file or file-like object"""
         with open_file(filename, 'w') as pickle_file:
-            cPickle.dump((self.cache, self.pickle_cache), pickle_file)
+            pickle.dump((self.cache, self.pickle_cache), pickle_file)
 
     def load(self, filename, raise_error=False):
         """
@@ -67,7 +75,7 @@ class memoize(object):
         """
         try:
             with open_file(filename) as pickle_file:
-                cache, pickle_cache = cPickle.load(pickle_file)
+                cache, pickle_cache = pickle.load(pickle_file)
                 self.cache.update(cache)
                 self.pickle_cache.update(pickle_cache)
         except IOError:
@@ -88,7 +96,7 @@ class memoize(object):
                 # argument.  fall through to using pickle
                 pass
         try:
-            key = (cPickle.dumps(args, 1), cPickle.dumps(kwargs, 1))
+            key = (pickle.dumps(args, 1), pickle.dumps(kwargs, 1))
         except TypeError:
             # probably have a function being passed in
             return self.func(*args, **kwargs)

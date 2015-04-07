@@ -7,6 +7,8 @@ Routines for creating plots of the Bloch Sphere
 # All dependencies from the QuTiP package have been removed, and additional
 # capabilities have been added (e.g. drawing precession circles)
 #
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 from .linalg import inner
 from numpy import (ndarray, array, linspace, pi, outer, cos, sin, ones,
                    size, sqrt, real, mod, append, ceil, arange, zeros, asarray)

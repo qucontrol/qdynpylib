@@ -2,6 +2,8 @@
 Routines for calculating local invariants, concurrence, and related quantities
 for two-qubit gates
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import numpy as np
 import scipy.linalg
 
@@ -39,9 +41,9 @@ def g1g2g3(U):
     Given Numpy matrix U, calculate local invariants g1,g2,g3
     U must be in the canonical basis
 
-    >>> from gate2q import CNOT
-    >>> "%.2f %.2f %.2f" % g1g2g3(CNOT)
-    '0.00 0.00 1.00'
+    >>> from . gate2q import CNOT
+    >>> print("%.2f %.2f %.2f" % g1g2g3(CNOT))
+    0.00 0.00 1.00
     """
     # mathematically, the determinant of U and to_magic(U) is the same, but
     # we seem to get better numerical accuracy if we calculate detU with
@@ -63,9 +65,9 @@ def c1c2c3(U):
 
     Algorithm from Childs et al., PRA 68, 052311 (2003).
 
-    >>> from gate2q import CNOT
-    >>> "%.2f %.2f %.2f" % c1c2c3(CNOT)
-    '0.50 0.00 0.00'
+    >>> from . gate2q import CNOT
+    >>> print("%.2f %.2f %.2f" % c1c2c3(CNOT))
+    0.50 0.00 0.00
     """
     U_tilde = SySy * U.transpose() * SySy
     ev = np.linalg.eigvals((U * U_tilde)/np.sqrt(complex(np.linalg.det(U))))
@@ -89,9 +91,9 @@ def g1g2g3_from_c1c2c3(c1, c2, c3):
     Calculate the local invariants from the Weyl-chamber coordinates (c1, c2,
     c3, in units of pi)
 
-    >>> from QDYN.gate2q import CNOT
-    >>> "%.2f %.2f %.2f" % g1g2g3_from_c1c2c3(*c1c2c3(CNOT))
-    '0.00 0.00 1.00'
+    >>> from . gate2q import CNOT
+    >>> print("%.2f %.2f %.2f" % g1g2g3_from_c1c2c3(*c1c2c3(CNOT)))
+    0.00 0.00 1.00
     """
     c1 *= np.pi
     c2 *= np.pi
@@ -107,10 +109,9 @@ def point_in_weyl_chamber(c1, c2, c3):
     """
     Return True if the coordinates c1, c2, c3 are inside the Weyl chamber
 
-    >>> from QDYN.gate2q import BGATE
+    >>> from . gate2q import BGATE, identity
     >>> point_in_weyl_chamber(*c1c2c3(BGATE))
     True
-    >>> from QDYN.gate2q import identity
     >>> point_in_weyl_chamber(*c1c2c3(identity))
     True
     """
@@ -141,13 +142,11 @@ def concurrence(c1, c2, c3):
     Calculate the concurrence directly from the Weyl Chamber coordinates c1,
     c2, c3
 
-    >>> from QDYN.gate2q import SWAP
+    >>> from . gate2q import SWAP, CNOT, identity
     >>> round(concurrence(*c1c2c3(SWAP)), 2)
     0.0
-    >>> from QDYN.gate2q import CNOT
     >>> round(concurrence(*c1c2c3(CNOT)), 2)
     1.0
-    >>> from QDYN.gate2q import identity
     >>> round(concurrence(*c1c2c3(identity)), 2)
     0.0
     """
@@ -193,10 +192,10 @@ def F_PE(g1, g2, g3):
     """
     Evaluate the Perfect-Entangler Functional
 
-    >>> from gate2q import CNOT
+    >>> from . gate2q import CNOT
     >>> F_PE(*g1g2g3(CNOT))
     0.0
-    >>> from gate2q import identity
+    >>> from . gate2q import identity
     >>> F_PE(*g1g2g3(identity))
     2.0
     """
@@ -308,7 +307,7 @@ def cartan_decomposition(U):
     A = np.matrix(scipy.linalg.expm(np.pi*0.5j * (c1*SxSx +c2*SySy + c3*SzSz)))
 
     # Check our results
-    from QDYN.gate2q import identity
+    from . gate2q import identity
     assert( np.max(np.abs(O_1*O_1.T - identity)) < 1.0e-12 ), \
     "O_1 not orthogonal"
     assert( np.max(np.abs(O_2*O_2.T - identity)) < 1.0e-12 ), \

@@ -1,6 +1,11 @@
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import os
 from .io import open_file
 import numpy as np
+# import for doctests
+from StringIO import StringIO
+from textwrap import dedent
 
 from collections import namedtuple
 
@@ -26,8 +31,6 @@ class OCTConvergences(object):
 
     def load_file(self, filename, key=None, label=None):
         r'''
-        >>> from StringIO import StringIO
-        >>> from textwrap import dedent
         >>> oct_iters = """# Fri Mar 27 23:44:56 +0100 2015
         ... # lambda_a =    5.000000E+08; lambda_intens =    0.000000E+00; lambda_b =    0.000000E+00
         ... # it.                 J_T             g_a_int             g_b_int                   J           Delta_J_T             Delta J sec/it
@@ -37,8 +40,10 @@ class OCTConvergences(object):
         ... """
         >>> c = OCTConvergences()
         >>> c.load_file(StringIO(oct_iters), key='oct_iters.dat')
-        >>> c.data
-        {'oct_iters.dat': Convergence(iter=array([0, 1, 2]), J_T=array([ 0.01401102,  0.00729416,  0.00350202]), g_a_int=array([ 0.        ,  0.00331256,  0.00188202]), g_b_int=array([ 0.,  0.,  0.]), J=array([ 0.01401102,  0.01060672,  0.00538403]), Delta_J_T=array([ 0.01401102, -0.00671686, -0.00379214]), Delta_J=array([ 0.01401102, -0.0034043 , -0.00191013]), sec=array([ 0, 96, 97]))}
+        >>> len(c.data)
+        1
+        >>> c.data['oct_iters.dat']
+        Convergence(iter=array([0, 1, 2]), J_T=array([ 0.01401102,  0.00729416,  0.00350202]), g_a_int=array([ 0.        ,  0.00331256,  0.00188202]), g_b_int=array([ 0.,  0.,  0.]), J=array([ 0.01401102,  0.01060672,  0.00538403]), Delta_J_T=array([ 0.01401102, -0.00671686, -0.00379214]), Delta_J=array([ 0.01401102, -0.0034043 , -0.00191013]), sec=array([ 0, 96, 97]))
         '''
         if key is None:
             key = str(filename)

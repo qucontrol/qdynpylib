@@ -1,6 +1,8 @@
 """
 Module containing routines for reading and writing files compatible with QDYN
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import numpy as np
 import re
 import sys
@@ -22,7 +24,7 @@ class open_file(object):
     ... inside atoms. Atoms behave like atoms, nothing else.''')
     >>> with open_file(file) as in_fh: # file could also be a filename
     ...     for line in in_fh:
-    ...         print line.strip()
+    ...         print(line.strip())
     ...
     <BLANKLINE>
     In the world of the very small, where particle and wave
@@ -365,10 +367,10 @@ def fix_fortran_exponent(num_str):
     In 3-digit exponents, Fortran drops the 'E'. Return a string with the 'E'
     restored.
 
-    >>> fix_fortran_exponent("1.0-100")
-    '1.0E-100'
-    >>> fix_fortran_exponent("1.0E-99")
-    '1.0E-99'
+    >>> print(fix_fortran_exponent("1.0-100"))
+    1.0E-100
+    >>> print(fix_fortran_exponent("1.0E-99"))
+    1.0E-99
     """
     if not 'E' in num_str:
         return re.sub('(\d)([+-]\d)', r'\1E\2', num_str)
@@ -392,8 +394,8 @@ def matrix_to_latex(M):
     r"""
     Return matrix M as LaTeX Code
 
-    >>> from gate2q import CNOT
-    >>> print matrix_to_latex(CNOT)
+    >>> from . gate2q import CNOT
+    >>> print(matrix_to_latex(CNOT))
     \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
@@ -416,20 +418,20 @@ def mathematica_number(val):
     r"""
     Format a number in a way that can be pasted into Mathematica
 
-    >>> mathematica_number(0.0)
-    '0'
+    >>> print(mathematica_number(0.0))
+    0
 
-    >>> mathematica_number(1.0)
-    '1.0'
+    >>> print(mathematica_number(1.0))
+    1.0
 
-    In [36]: mathematica_number(1.0j)
-    '1.0I'
+    In [36]: print(mathematica_number(1.0j))
+    1.0I
 
-    In [37]: mathematica_number(1.0j+1.0)
-    '1.0+1.0I'
+    In [37]: print(mathematica_number(1.0j+1.0))
+    1.0+1.0I
 
-    In [38]: mathematica_number(-1.0j+1.0)
-    '1.0-1.0I'
+    In [38]: print(mathematica_number(-1.0j+1.0))
+    1.0-1.0I
     """
     result = ""
     if val == 0.0:
@@ -447,10 +449,10 @@ def matrix_to_mathematica(M):
     r"""
     Print matrix M as a string that can be pasted into Mathematica
 
-    >>> from gate2q import CNOT, identity
-    >>> print matrix_to_mathematica(CNOT)
+    >>> from . gate2q import CNOT, identity
+    >>> print(matrix_to_mathematica(CNOT))
     {{1.0, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 0, 1.0}, {0, 0, 1.0, 0}}
-    >>> print matrix_to_mathematica(1.0j*CNOT+identity)
+    >>> print(matrix_to_mathematica(1.0j*CNOT+identity))
     {{1.0+1.0I, 0, 0, 0}, {0, 1.0+1.0I, 0, 0}, {0, 0, 1.0, 1.0I}, {0, 0, 1.0I, 1.0}}
     """
     lines = []

@@ -1,3 +1,5 @@
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import tempfile
 import os
 import QDYN
@@ -14,7 +16,7 @@ def tempfilename():
 
 def test_print_matrix():
 
-    print "*** Running test_print_matrix"
+    print("*** Running test_print_matrix")
 
     M = np.matrix([[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20],
                    [1+1j, 1.0e-9, -1.0]])
@@ -56,7 +58,7 @@ def identical_matrices(A, B):
 def print_file(file):
     with open(file) as in_fh:
         for line in in_fh:
-            print line,
+            print(line, end="")
 
 def make_hermitian(A):
     n = A.shape[0]
@@ -68,7 +70,7 @@ def make_hermitian(A):
 
 def test_read_write_indexed_matrix():
 
-    print "Simple real sparse matrix"
+    print("Simple real sparse matrix")
     M = np.matrix([
             [0.0, 1.0, 1.0],
             [1.0, 0.0, 1.0],
@@ -81,9 +83,9 @@ def test_read_write_indexed_matrix():
     O = QDYN.io.read_indexed_matrix(filename)
     assert identical_matrices(M, O)
     os.unlink(filename)
-    print ""
+    print("")
 
-    print "Complex sparse matrix"
+    print("Complex sparse matrix")
     filename = tempfilename()
     M2 = np.matrix(make_hermitian((M + 0.5j * M)).todense(),
                    dtype=np.complex128)
@@ -92,9 +94,9 @@ def test_read_write_indexed_matrix():
     O2 = QDYN.io.read_indexed_matrix(filename)
     assert identical_matrices(M2, O2)
     os.unlink(filename)
-    print ""
+    print("")
 
-    print "Complex non-Hermitian sparse matrix"
+    print("Complex non-Hermitian sparse matrix")
     filename = tempfilename()
     M3 = np.matrix((M + 0.5j * M).todense(),
                    dtype=np.complex128)
@@ -103,5 +105,5 @@ def test_read_write_indexed_matrix():
     O3 = QDYN.io.read_indexed_matrix(filename, expand_hermitian=False)
     assert identical_matrices(M3, O3)
     os.unlink(filename)
-    print ""
+    print("")
 

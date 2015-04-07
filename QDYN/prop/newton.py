@@ -2,8 +2,10 @@
 """
 Newton Propagator
 """
-import scipy.linalg
-from ..linalg import get_op_matrix, vectorize, norm, inner
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
+import logging
+from ..linalg import norm, inner
 import numpy as np
 
 VERBOSE = False
@@ -56,7 +58,7 @@ def Arnoldi(apply_A, t, dt, v0, m_max):
 
     beta = norm(v0)
     if (abs(beta-1.0) > 1.0e-10):
-        print "beta = ", beta
+        print("beta = ", beta)
         raise AssertionError("v0 must have norm 1.0")
     v = v0 / beta
     arnoldi_vecs.append(v)
@@ -174,6 +176,7 @@ def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
     Perform a propagation step using the Restarted Newton algorithm
     """
 
+    logger = logging.getLogger(__name__)
     N = rho0.shape[0]
     assert(m_max <= N), "m_max must be smaller than the system dimension"
     def gen_zero_vec(v0):
@@ -197,18 +200,18 @@ def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
 
         #if s > 0: # check convergence
             #if ((abs(a[-1])  * beta_prev) / norm(w)) < tol:
-                #print "Converged at restart ", s-1
-                #print "norm of wp     : ", norm(wp)
-                #print "norm of w      : ", norm(w)
-                #print "beta           : ", beta
-                #print "beta*a[-1]     : ", beta * a[-1]
-                #print "max Leja radius: ", np.max(np.abs(Z))
+                #print("Converged at restart ", s-1)
+                #print("norm of wp     : ", norm(wp))
+                #print("norm of w      : ", norm(w))
+                #print("beta           : ", beta)
+                #print("beta*a[-1]     : ", beta * a[-1])
+                #print("max Leja radius: ", np.max(np.abs(Z)))
                 #break
 
         arnoldi_vecs, Hess, Ritz, m = Arnoldi(apply_L, t, dt, v, m_max)
         if m < m_max:
-            print "WARNING: Arnoldi only returned order "\
-                  "%d instead of the requested %d" % (m, m_max)
+            logger.warn("Arnoldi only returned order %d instead of the "
+                        "requested %d", m, m_max)
         if m == 0 and s == 0:
             # The input state must be an eigenstate
             eig_val = beta * Hess[0,0]
@@ -254,21 +257,20 @@ def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
         #if (norm(wp) / norm(w) < tol):
 #        if (norm(wp) < tol):
         if (beta*abs(a[-1])/(1+norm(w)) < tol):
-            if VERBOSE:
-                print "Converged at restart ", s
-                print "norm of wp     : ", norm(wp)
-                print "norm of w      : ", norm(w)
-                print "beta           : ", beta
-                print "|R*a[-1]|/|w|  : ", norm(R) * a[-1] / norm(w)
-                print "max Leja radius: ", np.max(np.abs(Z))
+            logger.debug("Converged at restart %s", s)
+            logger.debug("norm of wp     : %s", norm(wp))
+            logger.debug("norm of w      : %s", norm(w))
+            logger.debug("beta           : %s", beta)
+            logger.debug("|R*a[-1]|/|w|  : %s", norm(R) * a[-1] / norm(w))
+            logger.debug("max Leja radius: %s", np.max(np.abs(Z)))
             break
 
         assert(not np.isnan(np.sum(v))), "v contains NaN"
         assert(not np.isnan(np.sum(w))), "w contains NaN"
 
         if s == maxrestart - 1:
-            print "WARNING: DID NOT REACH CONVERGENCE"
-            print "increase number of restarts"
+            logger.warn("DID NOT REACH CONVERGENCE")
+            logger.warn("increase number of restarts")
 
     return w
 

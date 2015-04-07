@@ -7,6 +7,8 @@ Options:
 -v            Be verbose about tests
 --nocapture   Print stdout in nose tests
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import sys
 import doctest
 try:
@@ -38,14 +40,14 @@ doctest_modules = [
 'QDYN.prop.exact'
 ]
 def run_doctests(modules):
-    print "*****************"
-    print "* Running Doctest"
-    print "*****************"
+    print("*****************")
+    print("* Running Doctest")
+    print("*****************")
     for module in modules:
         module = importlib.import_module(module)
-        print "*** Running doctests for %s" % str(module.__name__)
+        print("*** Running doctests for %s" % str(module.__name__))
         doctest.testmod(module)
-    print "\n\n"
+    print("\n\n")
 
 
 ###############################################################################
@@ -57,11 +59,11 @@ nosetest_modules = [
 'tests.test_bloch',
 ]
 def run_nosetests(modules):
-    print "*******************"
-    print "* Running Nosetests"
-    print "*******************"
+    print("*******************")
+    print("* Running Nosetests")
+    print("*******************")
     nose.main(defaultTest=modules)
-    print "\n\n"
+    print("\n\n")
 
 
 ###############################################################################
@@ -71,7 +73,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
     if '-h' in argv or '--help' in argv:
-        print __doc__
+        print(__doc__)
         return 0
     run_doctests(doctest_modules)
     run_nosetests(nosetest_modules)

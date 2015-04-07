@@ -3,6 +3,8 @@ Module that contains the Gate2Q class for working with two-qubit gates.
 
 Also defines common two-qubit gates as Gate2Q objects.
 """
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
 import numpy as np
 import scipy
 import cmath
@@ -21,7 +23,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
     Instantiation is the same as for a numpy matrix, i.e. a gate can be
     constructed from another 2D-Array:
 
-    >>> CNOT = np.matrix('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0')
+    >>> CNOT = np.matrix(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
+    >>> # Note: the 'str' wrapper is only required in context of doctest
     >>> CNOT = Gate2Q(CNOT)
     >>> CNOT
     matrix([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
@@ -33,7 +36,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
     Alternatively, it can be create from a string:
 
-    >>> Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0')
+    >>> Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
     matrix([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
             [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j],
             [ 0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j],
@@ -71,9 +74,9 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
     The Gate2Q object can also be supplied a name that will be used for output.
 
-    >>> CNOT = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0', name='CNOT')
-    >>> CNOT.name
-    'CNOT'
+    >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'), name='CNOT')
+    >>> print(CNOT.name)
+    CNOT
     """
 
     def __new__(cls, *args, **kwargs):
@@ -138,16 +141,18 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         Return a string representation of the two-qubit gate, as valid Python
         code.
 
-        >>> CNOT = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0', name='CNOT')
-        >>> print CNOT
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'),
+        ...               name='CNOT')
+        >>> # Note: the 'str' wrapper is only required in context of doctest
+        >>> print(CNOT)
         CNOT = Gate2Q([
         [1.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j],
         [0.000000+0.000000j, 1.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j],
         [0.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j, 1.000000+0.000000j],
         [0.000000+0.000000j, 0.000000+0.000000j, 1.000000+0.000000j, 0.000000+0.000000j]])
 
-        >>> CNOT = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0')
-        >>> print CNOT
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
+        >>> print(CNOT)
         [[1.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j],
          [0.000000+0.000000j, 1.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j],
          [0.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j, 1.000000+0.000000j],
@@ -185,8 +190,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         r"""
         Return a LaTeX representation of the gate
 
-        >>> CNOT = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0')
-        >>> print CNOT.to_latex()
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
+        >>> print(CNOT.to_latex())
         \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & 1 & 0 & 0 \\
@@ -199,8 +204,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
     def to_mathematica(self):
         """
         Return a Mathematica representation of the gate
-        >>> cphase(0.25*pi).to_mathematica()
-        '{{0.707106781187+0.707106781187I, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 1.0, 0}, {0, 0, 0, 1.0}}'
+        >>> print(cphase(0.25*pi).to_mathematica())
+        {{0.707106781187+0.707106781187I, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 1.0, 0}, {0, 0, 0, 1.0}}
         """
         return matrix_to_mathematica(self)
 
@@ -209,8 +214,9 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         Return a LaTeX representation where the complex numbers in the gate are
         represented by pointer arrows.
 
-        >>> CNOT = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0', name='CNOT')
-        >>> print CNOT.to_latex_arrows()
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'),
+        ...               name='CNOT')
+        >>> print(CNOT.to_latex_arrows())
         \begin{equation*}
         \text{CNOT} = \begin{pmatrix}
         \scalebox{1.000000}{\rotatebox{0}{$\rightarrow$}} &
@@ -392,15 +398,15 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         is the closest unitary and d is the 2-norm operator distance between
         U_unitary and the original gate.
 
-        >>> CNOT = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0')
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
         >>> from QDYN.linalg import norm
         >>> norm(CNOT - CNOT.closest_unitary()) < 1.0e-15
         True
 
         >>> d = 0.01
-        >>> U = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.99')
+        >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.99'))
         >>> U_unitary, dist = U.closest_unitary(get_distance=True)
-        >>> CPHASE = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1')
+        >>> CPHASE = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1'))
         >>> from QDYN.linalg import norm
         >>> norm(U_unitary - CPHASE) < 1.0e-15
         True
@@ -442,8 +448,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         Return the Weyl chamber coordinates (c1, c2, c3) for the current gate,
         in units of pi
 
-        >>> "%.2f %.2f %.2f" % CNOT.weyl_coordinates()
-        '0.50 0.00 0.00'
+        >>> print("%.2f %.2f %.2f" % CNOT.weyl_coordinates())
+        0.50 0.00 0.00
         """
         from QDYN.weyl import c1c2c3
         return c1c2c3(self)
@@ -452,8 +458,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         """
         Return the local invariants (g1, g2, g3) for the current gate
 
-        >>> "%.2f %.2f %.2f" % CNOT.local_invariants()
-        '0.00 0.00 1.00'
+        >>> print("%.2f %.2f %.2f" % CNOT.local_invariants())
+        0.00 0.00 1.00
         """
         from QDYN.weyl import g1g2g3
         return g1g2g3(self)
@@ -522,7 +528,7 @@ def pop_loss(A):
 
     1 - \Tr[A^\dagger A] / N
 
-    >>> U = Gate2Q('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9')
+    >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
     >>> abs( (1 - (0.9 * 0.9 + 3) / 4) - pop_loss(U) ) < 1.0e-15
     True
     """

@@ -1,3 +1,6 @@
+from __future__ import print_function, division, absolute_import, \
+                       unicode_literals
+import os
 from math import pi
 from functools import partial
 import QDYN
@@ -92,7 +95,7 @@ def generate_liouvillian(N, w_c, gamma, E0, tgrid):
 
 def test_newton():
 
-    print "*** Running newton_test"
+    print("*** Running newton_test")
 
     two_pi = 2.0 * pi
 
@@ -119,25 +122,25 @@ def test_newton():
     rho0[:,:] = 1.0/float(N)
     #for diag in xrange(N):
         #rho0[diag,diag] = 1./N
-    print "Trace of initial state: ", QDYN.linalg.trace(rho0).real
+    print("Trace of initial state: ", QDYN.linalg.trace(rho0).real)
 
     # Liouvillian
     apply_L = generate_liouvillian(N=N, w_c=w_c, gamma=gamma,
                                    E0=E0, tgrid=tgrid)
 
     # Test simple application of Liouvillian first
-    print ""
-    print "**** Application of Liouvillian ****"
-    print ""
+    print("")
+    print("**** Application of Liouvillian ****")
+    print("")
     ti = len(tgrid) / 2
-    print "ti = ", ti
+    print("ti = ", ti)
     dt = tgrid[1] - tgrid[0]
     t = (float(ti)-0.5) * dt
-    print "t = ", t
+    print("t = ", t)
     pulse_value = E0 * QDYN.pulse.blackman(t, tgrid[0], tgrid[-1])
-    print "pulse value = ", pulse_value
+    print("pulse value = ", pulse_value)
     rho = apply_L(rho0, t)
-    print "Norm of output state:", QDYN.linalg.norm(rho)
+    print("Norm of output state:", QDYN.linalg.norm(rho))
     write_v(np.squeeze(np.reshape(np.asarray(rho), (1,N*N) )),
             "rho_%d.dat" % ti)
     L = QDYN.linalg.get_op_matrix(apply_L, rho0.shape, t)
@@ -146,41 +149,41 @@ def test_newton():
             for j in xrange(N**2):
                 for i in xrange(N**2):
                     if (L[i,j] != 0.0):
-                        print >> out, "%5d%5d%25.17E%25.17E" \
-                        % (i+1, j+1, L[i,j].real, L[i,j].imag)
+                        print("%5d%5d%25.17E%25.17E" \
+                        % (i+1, j+1, L[i,j].real, L[i,j].imag), file=out)
 
     #  propagate and write out population dynamics
-    print ""
-    print "**** Exact Propagation ****"
-    print ""
+    print("")
+    print("**** Exact Propagation ****")
+    print("")
     rho = rho0.copy()
     exact_storage = []
 
     rho = QDYN.prop.propagate(apply_L, rho, tgrid, 'exact',
           info_hook=partial(plot_pops, outfile="pops_%s.dat" % 'exact'),
           storage=exact_storage)
-    print "Trace of propagated state: ", QDYN.linalg.trace(rho).real
+    print("Trace of propagated state: ", QDYN.linalg.trace(rho).real)
 
-    print ""
-    print "**** Newton Propagation ****"
-    print ""
+    print("")
+    print("**** Newton Propagation ****")
+    print("")
     rho = rho0.copy()
     newton_storage = []
     rho = QDYN.prop.propagate(apply_L, rho, tgrid, 'newton',
           info_hook=partial(plot_pops, outfile="pops_%s.dat" % 'newton'),
           storage=newton_storage, m=m, maxrestart=maxrestart, tol=tol)
-    print "Trace of propagated state: ", QDYN.linalg.trace(rho).real
+    print("Trace of propagated state: ", QDYN.linalg.trace(rho).real)
 
-    print ""
-    print "Comparison of Newton and Exact Solution"
-    print ""
+    print("")
+    print("Comparison of Newton and Exact Solution")
+    print("")
 
     # compare propagated states
     for i, (rho_newton, rho_exact) \
     in enumerate(zip(newton_storage, exact_storage)):
         t = tgrid[i + 1]
         diff = QDYN.linalg.norm(rho_newton - rho_exact)
-        print "t = %g, diff: %g" % (t, diff)
+        print("t = %g, diff: %g" % (t, diff))
         if diff > 1.0e-12:
             raise AssertionError(
             "Newton propagation and exact propagation do not match")
