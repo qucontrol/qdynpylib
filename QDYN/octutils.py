@@ -14,23 +14,111 @@ ConvergenceData = namedtuple("Convergence",
 ['iter', 'J_T', 'g_a_int', 'g_b_int', 'J', 'Delta_J_T', 'Delta_J', 'sec'])
 
 class OCTConvergences(object):
+    """
+    Collection of convergence data from multiple OCT runs.
 
-    def __init__(self, oct_folders=None, iters_dat='oct_iters.dat'):
+    Attributes
+    ----------
+
+    data: dict
+        key -> ConvergenceData namedtuple
+    plot_label: dict
+        key -> Label for legend in plot
+    color: dict
+        key -> color of line in plot
+    splits: dict
+        key -> tuple (iter, J_T, description)
+    """
+
+    def __init__(self, keys=None, files=None, colors=None, plot_labels=None):
+        """
+        Initialize Collection of convergence informations. All parameters are
+        passed to the `load` method
+        """
         self.data = {}
         self.splits = {}
-        self.labels = {}
-        self.colors = {}
+        self.plot_label = {}
+        self.color = {}
         self.J_T_max = -1.0e100
         self.J_T_min = 1.0e100
-        if oct_folders is not None:
-            self.load(oct_folders, iters_dat)
+        if keys is not None:
+            self.load(keys=keys, files=files, colors=colors,
+                      plot_labels=plot_labels)
 
-    def load(self, oct_folders, iters_data='oct_iters.dat'):
-        for folder in oct_folders:
-            self.load_file(os.path.join(folder, iters_data), label=folder)
+    def load(self, keys, files, colors=None, plot_labels=None):
+        """
+        Load data from a series of files. See `load_file` method for details.
 
-    def load_file(self, filename, key=None, label=None):
+        Parameters
+        ----------
+
+        keys: list of str
+            For each file, a key under which to register the data (data will be
+            stored in the attribute `data[key]`)
+
+        files: list of str, list of file-like objects
+            List of filenames, or filehandles from which to read data
+
+        colors: list of str, str, None
+            For each file, color in which the data should appear in a plot. If
+            a single string, that color will be used for all files.
+
+        plot_labels: list of str, None
+            For each file, label for the legend of a plot. If None, the keys
+            are used as labels.
+
+        All parameters that are passed as lists must be of the same length.
+        Otherwise, a ValueError is thrown.
+        """
+        if files is None:
+            files = []
+        if len(keys) != len(files):
+            raise ValueError("keys and files must be of same length")
+        default_color = 'black'
+        if isinstance(colors, str):
+            default_color = colors
+            colors = None
+        else:
+            if len(colors) != len(keys):
+                raise ValueError("keys and colors must be of same length")
+        if plot_labels is not None:
+            if len(plot_labels) != len(keys):
+                raise ValueError("keys and plot_labels must be of same length")
+        for i, key in enumerate(keys):
+            plot_label = None
+            if plot_labels is not None:
+                plot_label = plot_labels[i]
+            color = default_color
+            if colors is not None:
+                color = colors[i]
+            self.load_file(key=key, file=files[i], color=color,
+                           plot_label=plot_label)
+
+    def load_file(self, key, file, color='black', plot_label=None):
         r'''
+        Load convergence data from a single file, which must be in the format
+        written by the QDYN fortran library when specifying the `iter_dat`
+        attribute in the oct section of the config file.
+
+        Paramters
+        ---------
+
+        key: str
+            Key under which to register the data (i.e., data will be stored in
+            the `data[key]` attribute)
+
+        file: str of file-like object
+            Name of file, or filehandle from which to read data
+
+        plot_label: str, None
+            Label of the data in the plot legend
+
+        color: str
+            Color
+
+        Example
+        -------
+
         >>> oct_iters = """# Fri Mar 27 23:44:56 +0100 2015
         ... # lambda_a =    5.000000E+08; lambda_intens =    0.000000E+00; lambda_b =    0.000000E+00
         ... # it.                 J_T             g_a_int             g_b_int                   J           Delta_J_T             Delta J sec/it
@@ -39,25 +127,29 @@ class OCTConvergences(object):
         ...     2  3.502016076673E-03  1.882015300126E-03  0.000000000000E+00  5.384031376798E-03 -3.792143767433E-03 -1.910128467308E-03     97
         ... """
         >>> c = OCTConvergences()
-        >>> c.load_file(StringIO(oct_iters), key='oct_iters.dat')
+        >>> c.load_file('iters', StringIO(oct_iters))
         >>> len(c.data)
         1
-        >>> c.data['oct_iters.dat']
-        Convergence(iter=array([0, 1, 2]), J_T=array([ 0.01401102,  0.00729416,  0.00350202]), g_a_int=array([ 0.        ,  0.00331256,  0.00188202]), g_b_int=array([ 0.,  0.,  0.]), J=array([ 0.01401102,  0.01060672,  0.00538403]), Delta_J_T=array([ 0.01401102, -0.00671686, -0.00379214]), Delta_J=array([ 0.01401102, -0.0034043 , -0.00191013]), sec=array([ 0, 96, 97]))
+        >>> c.data['iters'].iter
+        array([0, 1, 2])
+        >>> c.data['iters'].J_T
+        array([ 0.01401102,  0.00729416,  0.00350202])
+        >>> c.data['iters'].J
+        array([ 0.01401102,  0.01060672,  0.00538403])
+        >>> c.data['iters'].Delta_J_T
+        array([ 0.01401102, -0.00671686, -0.00379214])
+        >>> c.data['iters'].Delta_J
+        array([ 0.01401102, -0.0034043 , -0.00191013])
+        >>> c.data['iters'].sec
+        array([ 0, 96, 97])
         '''
-        if key is None:
-            key = str(filename)
-        if label is None:
-            if not key in self.labels:
-                self.labels[key] = str(key)
-        else:
-            self.labels[key] = label
-        if not key in self.colors:
-            self.colors[key] = 'black' # TODO
-        if not key in self.splits:
-            self.splits[key] = []
+        if plot_label is None:
+            plot_label = key
+        self.plot_label[key] = plot_label
+        self.color[key] = color
+        self.splits[key] = []
         prev_iter = -1
-        with open_file(filename) as in_fh:
+        with open_file(file) as in_fh:
             iters          = [] # vals[0]
             J_T_vals       = [] # vals[1]
             g_a_int_vals   = [] # vals[2]
@@ -103,8 +195,32 @@ class OCTConvergences(object):
                                Delta_J   = np.array(Delta_J_vals),
                                sec       = np.array(sec_vals, dtype=np.int))
 
-    def bokeh(self, log_scale='y'):
-        from bokeh.plotting import figure, show
+    def show_bokeh(self, log_scale='y', outfile=None):
+        """
+        Show an interactive plot of all data, using the bokeh library
+
+        In order to have the plot show up in an IPython Notebook, you must
+        execute
+
+        >>> import bokeh.plotting
+        >>> bokeh.plotting.output_notebook()
+
+        before calling the `show_bokeh` method. Alternatively, from a script,
+        you may show the plot via a temporary html file, e.g.
+
+        >>> bokeh.plotting.output_file('temp.html')
+
+        Parameters
+        ----------
+
+        log_scale: str
+            One of '', 'x', 'y', or 'xy', to indicate which axis (if any)
+            should be plotted in a log scale
+
+        outfile: str
+            If given, write the plot to an html file instead of showing it.
+        """
+        from bokeh.plotting import figure, show, save, output_file
         from bokeh.models import ColumnDataSource, HoverTool
         fig_args = {'tools': "pan,box_zoom,reset,resize,hover",
                     'title': '', 'plot_width': 900, 'plot_height': 400,
@@ -129,7 +245,7 @@ class OCTConvergences(object):
         splits_colors = []
         for key in self.data.keys():
             p.line(self.data[key].iter, self.data[key].J_T,
-                  color=self.colors[key], legend=self.labels[key])
+                  color=self.color[key], legend=self.plot_label[key])
             for (iter, J_T, description) in self.splits[key]:
                 splits_J_T.append(J_T)
                 splits_iters.append(iter)
@@ -139,7 +255,7 @@ class OCTConvergences(object):
                 lambda_vals = " ".join(lines[1:])
                 splits_timestamps.append(timestamp)
                 splits_lambda_vals.append(lambda_vals)
-                splits_colors.append(self.colors[key])
+                splits_colors.append(self.color[key])
         splits_data = ColumnDataSource(data=dict(
                     J_T=splits_J_T, iter=splits_iters,
                     timestamp=splits_timestamps,
@@ -152,4 +268,8 @@ class OCTConvergences(object):
             ("timestamp", "@timestamp"),
             ("lambdas", "@lambda_vals"),
             ]
-        show(p)
+        if outfile is None:
+            show(p)
+        else:
+            output_file(outfile)
+            save(p)
