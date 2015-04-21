@@ -16,6 +16,7 @@ clean:
 	@rm -f QDYN/prop/*.pyc
 	@rm -f tests/*.pyc
 	@rm -f QDYN/__git__.py
+	@rm -f test_octconvergences.html
 
 test:
 	python run_tests.py

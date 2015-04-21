@@ -58,6 +58,7 @@ nosetest_modules = [
 'tests.test_newton',
 'tests.test_io',
 'tests.test_bloch',
+'tests.test_octconvergences',
 ]
 def run_nosetests(modules):
     print("*******************")
