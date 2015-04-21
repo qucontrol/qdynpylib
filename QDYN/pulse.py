@@ -48,23 +48,62 @@ class Pulse(object):
     postamble : array
         Array of lines that are written after all data lines. Each line
         should start with '# '
+
+    Notes and examples
+    ------------------
+
+    It is important to remember that the QDYN Fortran library considers pulses
+    to be defined on the intervals of the propagation time grid (i.e. for a
+    time grid with n time steps of dt, the pulse will have n-1 points, defined
+    at points shifted by dt/2)
+
+    The `pulse_tgrid` and `tgrid_from_config` routine may be used to obtain the
+    proper pulse time grid from the propagation time grid, whereas the
+    `config_tgrid` attribute provides the inverse
+
+    >>> import numpy as np
+    >>> p = Pulse(tgrid=pulse_tgrid(10, 100))
+    >>> len(p.tgrid)
+    99
+    >>> print("%.5f" % p.dt)
+    0.10101
+    >>> p.t0
+    0.0
+    >>> print("%.5f" % p.tgrid[0])
+    0.05051
+    >>> print("%.5f" % p.T)
+    10.00000
+    >>> print("%.5f" % p.tgrid[-1])
+    9.94949
+    >>> print(p.config_tgrid)
+    tgrid: n = 1
+     1: t_start = 0_au, t_stop = 10_au, nt = 100
     """
 
     def __init__(self, filename=None, tgrid=None, amplitude=None,
                  time_unit='au', ampl_unit='au', freq_unit=None,
                  mode='complex'):
         """
-        Initialize a pulse
+        Initialize a pulse, either from a file or by explicitly passing the
+        data.
+
+        >>> tgrid = pulse_tgrid(10, 100)
+        >>> amplitude = 100 * gaussian(tgrid, 50, 10)
+        >>> p = Pulse(tgrid=tgrid, amplitude=amplitude, time_unit='ns',
+        ...           ampl_unit='MHz')
+        >>> p.write('pulse.dat')
+        >>> p2 = Pulse('pulse.dat')
+        >>> from os import unlink; unlink('pulse.dat')
 
         Arguments
         ---------
         filename : None, str
             Name of file from which to read pulse. If given, `tgrid`,
-            `amplitude`, `time_unit`, `ampl_unit`, `mode` should be None
+            `amplitude`, `time_unit`, `ampl_unit`, `mode` are ignored.
         tgrid : None, ndarray(float64)
             Time grid values
         amplitude : None, ndarray(float64), ndarray(complex128)
-            Amplitude values
+            Amplitude values. If not given, amplitude will be zero
         time_unit : str
             Unit of values in `tgrid`. Will be ignored when reading from file.
         ampl_unit : str
@@ -76,15 +115,6 @@ class Pulse(object):
         mode : str
             Value the `mode` attribute (indicating format of file when pulse is
             written out
-
-        Examples
-        --------
-        >>> p = Pulse('pulse.dat')
-
-        >>> import numpy as np
-        >>> p = Pulse(tgrid=np.linspace(0, 800, 1000),
-        ...           amplitude=np.zeros(1000),
-        ...           time_unit='ns', ampl_unit='MHz')
         """
         if filename is None:
             assert (tgrid is not None), \
@@ -96,7 +126,7 @@ class Pulse(object):
                 amplitude = np.array(amplitude, dtype=np.complex128)
             else:
                 amplitude = np.array(amplitude, dtype=np.float64)
-            self.filename = filename
+            self.filename = None
         else:
             self.filename = None
             assert tgrid is None and amplitude is None, \
@@ -247,18 +277,20 @@ class Pulse(object):
             raise ValueError("mode must be 'abs', 'real', or 'complex'")
         self._check()
 
+    @property
     def dt(self):
         """
-        Return time step
+        Time grid step
         """
         return self.tgrid[1] - self.tgrid[0]
 
+    @property
     def t0(self):
         """
-        Return time at which the pulse begins, which is dt/2 before the first
-        point in the pulse
+        Time at which the pulse begins (dt/2 before the first point in the
+        pulse)
         """
-        result = self.tgrid[0] - 0.5 * self.dt()
+        result = self.tgrid[0] - 0.5 * self.dt
         if abs(result) < 1.0e-15*self.tgrid[-1]:
             result = 0.0
         return result
@@ -271,7 +303,7 @@ class Pulse(object):
         if freq_unit is None:
             freq_unit = self.freq_unit
         n = len(self.tgrid)
-        dt = convert.to_au(self.dt(), self.time_unit)
+        dt = convert.to_au(self.dt, self.time_unit)
         if n % 2 == 1:
             # odd
             w_max = ((n - 1) * np.pi) / (n * dt)
@@ -294,26 +326,27 @@ class Pulse(object):
             # even
             return 2.0 * w_max / float(n)
 
+    @property
     def T(self):
         """
-        Return the time at which the pulse ends, which is dt/2 after the last
-        point in the pulse
+        Time at which the pulse ends (dt/2 after the last point in the pulse)
         """
-        result = self.tgrid[-1] + 0.5 * self.dt()
+        result = self.tgrid[-1] + 0.5 * self.dt
         if abs(round(result) - result) < (1.0e-15 * result):
             result = round(result)
         return result
 
+    @property
     def config_tgrid(self):
         """
-        Return a multiline string describing a time grid in a QDYN config file
+        Multiline string describing a time grid in a QDYN config file
         that is appropriate to the pulse
         """
         unit = self.time_unit
         nt = len(self.tgrid) + 1
         result = ['tgrid: n = 1',]
         result.append(' 1: t_start = %g_%s, t_stop = %g_%s, nt = %d'
-                      % (self.t0(), unit, self.T(), unit, nt))
+                      % (self.t0, unit, self.T, unit, nt))
         return "\n".join(result)
 
     def convert(self, time_unit=None, ampl_unit=None, freq_unit=None):
@@ -332,8 +365,10 @@ class Pulse(object):
             self.freq_unit = freq_unit
         self._check()
 
+    @property
     def is_complex(self):
-        """Return True if any pulse amplitude has a non-zero imaginary part"""
+        """Does any element of the pulse amplitude have a non-zero imaginary
+        part"""
         return (np.max(np.abs(self.amplitude.imag)) > 0.0)
 
     def get_timegrid_point(self, t, move="left"):
@@ -343,7 +378,7 @@ class Pulse(object):
         """
         t_start = self.tgrid[0]
         t_stop = self.tgrid[-1]
-        dt = self.dt()
+        dt = self.dt
         if t < t_start:
             return t_start
         if t > t_stop:
@@ -354,19 +389,20 @@ class Pulse(object):
             n = np.ceil((t - t_start) / dt)
         return t_start + n * dt
 
+    @property
     def fluence(self):
         """
-        Calculate and return the fluence (integrated pulse energy) for the
-        pulse
+        Fluence (integrated pulse energy) for the pulse
 
         .. math:: \\int_{-\\infty}^{\\infty} \\vert|E(t)\\vert^2 dt
         """
-        return np.sum(self.amplitude**2) * self.dt()
+        return np.sum(self.amplitude**2) * self.dt
 
+    @property
     def oct_iter(self):
         """
-        Attempt to extract the OCT iteration number from the pulse preamble and
-        return it. On failure, return 0.
+        OCT iteration number from the pulse preamble, if available. If not
+        available, 0
         """
         iter_rx = re.compile(r'OCT iter[\s:]*(\d+)', re.I)
         for line in self.preamble:
@@ -420,7 +456,7 @@ class Pulse(object):
             freq_unit = self.freq_unit
         s = fft(self.amplitude) # spectrum amplitude
         n = len(self.amplitude)
-        dt = self.dt()
+        dt = self.dt
         dt = convert.to_au(dt, self.time_unit)
         f = fftfreq(n, d=dt/(2.0*np.pi)) # spectrum frequencies
         c = convert.from_au(1, freq_unit)
@@ -528,7 +564,7 @@ class Pulse(object):
         Move the pulse onto the unshifted time grid. This increases the number
         of points by one
         """
-        tgrid_new = np.linspace(self.t0(), self.T(), len(self.tgrid)+1)
+        tgrid_new = np.linspace(self.t0, self.T, len(self.tgrid)+1)
         pulse_new = np.zeros(len(self.amplitude)+1,
                              dtype=self.amplitude.dtype.type)
         pulse_new[0] = self.amplitude[0]
@@ -543,7 +579,7 @@ class Pulse(object):
         """
         Inverse of _unshift
         """
-        dt = self.dt()
+        dt = self.dt
         tgrid_new = np.linspace(self.tgrid[0]  + dt/2.0,
                                 self.tgrid[-1] - dt/2.0, len(self.tgrid)-1)
         pulse_new = np.zeros(len(self.amplitude)-1,
@@ -585,7 +621,7 @@ class Pulse(object):
         Exactly one of `upsample`, `downsample`, or `num` must be given.
 
         Upsampling will maintain the pulse start and end point (as returned by
-        the `T()` and `t0()` methods), up to some rounding errors.
+        the `T` and `t0` properties), up to some rounding errors.
         Downsampling, or using an arbitrary number will change the end point of
         the pulse in general.
         """
@@ -665,7 +701,7 @@ class Pulse(object):
         if zoom:
             # figure out the range of the spectrum
             max_amp = np.amax(spectrum)
-            if self.is_complex():
+            if self.is_complex:
                 # we center the spectrum around zero, and extend
                 # symmetrically in both directions as far as there is
                 # significant amplitude
@@ -758,7 +794,7 @@ class Pulse(object):
             freq_unit = self.freq_unit
 
         self._check()
-        pulse_is_complex = self.is_complex()
+        pulse_is_complex = self.is_complex
 
         # do the layout
         if show_pulse and show_spectrum:
@@ -864,9 +900,9 @@ def pulse_tgrid(T, nt, t0=0.0):
     points of the pulse, however:
 
     >>> p = Pulse(tgrid=pulse_tgrid(1.5, 4))
-    >>> p.t0()
+    >>> p.t0
     0.0
-    >>> p.T()
+    >>> p.T
     1.5
     """
     dt = (T - t0) / (nt - 1)
@@ -1042,14 +1078,21 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, complex=False):
     return signal
 
 
-def gaussian(t, E0, t0, sigma):
+def gaussian(t, t0, sigma):
     """
-    Return a Gaussian shape
+    Return a Gaussian shape with peak amplitude 1.0
 
     Parameters
     ----------
 
-    t : scalar, ndarray
+    t : float, ndarray
+        time value or grid
+
+    t0: float
+        center of peak
+
+    sigma: float
+        width of Gaussian
 
     Returns
     -------
@@ -1058,7 +1101,7 @@ def gaussian(t, E0, t0, sigma):
         Gaussian shape of same type as `t`
 
     """
-    return E0 * np.exp(-(t-t0)**2/(2*sigma**2))
+    return np.exp(-(t-t0)**2/(2*sigma**2))
 
 
 @np.vectorize
