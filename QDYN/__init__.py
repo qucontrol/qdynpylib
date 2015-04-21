@@ -13,8 +13,4 @@ from . import shutil
 from . import octutils
 from . import memoize
 
-__version__ = "2.0.dev1"
-try:
-    from __git__ import __revision__
-except ImportError:
-    __revision__ = ""
+__version__ = "0.1.0"
