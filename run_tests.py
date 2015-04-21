@@ -33,6 +33,7 @@ doctest_modules = [
 'QDYN.gate2q',
 'QDYN.weyl',
 'QDYN.state',
+'QDYN.pulse',
 'QDYN.bloch',
 'QDYN.memoize',
 'QDYN.octutils',
