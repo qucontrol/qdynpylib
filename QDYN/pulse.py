@@ -1009,7 +1009,8 @@ def tgrid_from_config(config, pulse_grid=True):
 ###############################################################################
 
 
-def carrier(t, time_unit, freq, freq_unit, weights=None, complex=False):
+def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
+    complex=False):
     """
     Create the "carrier" of the pulse as a weighted superposition of cosines at
     different frequencies.
@@ -1026,7 +1027,10 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, complex=False):
         Unit of `freq`
     weights : array-like, optional
         If `freq` is an array, weights for the different frequencies. If not
-        given, all weights are 1
+        given, all weights are 1. The weights are normalized to sum to one.
+    phases: array0line, optional
+        If `phases` is an array, phase shift for each frequency component, in
+        units of pi. If not given, all phases are 0.
     complex : bool
         If `True`, oscillate in the complex plane
 
@@ -1036,11 +1040,12 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, complex=False):
     signal : scalar, ndarray(complex128)
         Depending on whether `complex` is `True` or `False`,
         .. math::
-            s(t) = \\sum_j  w_j * \\cos(\\omega_j * t) \\
-            s(t) = \\sum_j  w_j * \\exp(i*\\omega_j * t)
+            s(t) = \\sum_j  w_j * \\cos(\\omega_j * t + \\phi_j) \\
+            s(t) = \\sum_j  w_j * \\exp(i*(\\omega_j * t + \\phi_j))
 
-        with :math:`\\omega_i = 2 * \\pi * f_i`, and frequency `f_i` where
-        `f_i` is the i'th value in `freq`
+        with :math:`\\omega_j = 2 * \\pi * f_j`, and frequency `f_j` where
+        `f_j` is the j'th value in `freq`. The value of `\\phi_j` is the j'th
+        value in `phases`
 
         `signal` is a scalar if `t` is a scalar, and and array if `t` is an
         array
@@ -1064,12 +1069,14 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, complex=False):
     if hasattr(freq, '__getitem__'):
         if weights is None:
             weights = np.ones(len(freq))
+        if phases is None:
+            phases = np.zeros(len(freq))
         norm = float(sum(weights))
-        for (w, weight) in zip(freq, weights):
+        for (w, weight, phase) in zip(freq, weights, phases):
             if complex:
-                signal += (weight/norm) * np.exp(1j*c*w*t) # element-wise
+                signal += (weight/norm) * np.exp(1j*(c*w*t+phase*np.pi))
             else:
-                signal += (weight/norm) * np.cos(c*w*t) # element-wise
+                signal += (weight/norm) * np.cos(c*w*t+phase*np.pi)
     else:
         if complex:
             signal += np.exp(1j*c*freq*t) # element-wise
