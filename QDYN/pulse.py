@@ -1011,7 +1011,7 @@ def tgrid_from_config(config, pulse_grid=True):
 
 def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     complex=False):
-    """
+    r'''
     Create the "carrier" of the pulse as a weighted superposition of cosines at
     different frequencies.
 
@@ -1028,7 +1028,7 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     weights : array-like, optional
         If `freq` is an array, weights for the different frequencies. If not
         given, all weights are 1. The weights are normalized to sum to one.
-    phases: array0line, optional
+    phases: array-line, optional
         If `phases` is an array, phase shift for each frequency component, in
         units of pi. If not given, all phases are 0.
     complex : bool
@@ -1040,11 +1040,11 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     signal : scalar, ndarray(complex128)
         Depending on whether `complex` is `True` or `False`,
         .. math::
-            s(t) = \\sum_j  w_j * \\cos(\\omega_j * t + \\phi_j) \\
-            s(t) = \\sum_j  w_j * \\exp(i*(\\omega_j * t + \\phi_j))
+            s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
+            s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))
 
-        with :math:`\\omega_j = 2 * \\pi * f_j`, and frequency `f_j` where
-        `f_j` is the j'th value in `freq`. The value of `\\phi_j` is the j'th
+        with :math:`\omega_j = 2 * \pi * f_j`, and frequency `f_j` where
+        `f_j` is the j'th value in `freq`. The value of `\phi_j` is the j'th
         value in `phases`
 
         `signal` is a scalar if `t` is a scalar, and and array if `t` is an
@@ -1058,7 +1058,7 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     freq parameter) is converted to an actual frequency as
 
      .. math:: f = E / (\\hbar * 2 * pi)
-    """
+    '''
     if hasattr(t, '__getitem__'):
         signal = np.zeros(len(t), dtype=np.complex128)
         assert type(t) == np.ndarray, "t must be numpy array"
