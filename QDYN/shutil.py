@@ -5,7 +5,7 @@ import contextlib
 import os
 from os import rmdir
 
-def mkdir(name, mode=0750):
+def mkdir(name, mode=0o750):
     """
     Implementation of 'mkdir -p': Creates folder with the given `name` and the
     given permissions (`mode`)
@@ -21,6 +21,42 @@ def mkdir(name, mode=0750):
                       "dir, '%s', already exists." % name)
     else:
         os.makedirs(name, mode)
+
+
+def touch(fname):
+    """
+    Touch a filename (similar to the unix 'touch' utility). If the file does
+    not exist already, create it. Otherwise, update its access time.
+    """
+    with open(fname, 'a'):
+        os.utime(fname, None)
+
+
+def find_files(directory, pattern):
+    """
+    Iterate (recursively) over all the files matching the shell pattern
+    ('*' will yield all files) in the given directory
+
+    >>> mkdir("find_files_test/sub")
+    >>> touch("find_files_test/a.txt")
+    >>> touch("find_files_test/a.dat")
+    >>> touch("find_files_test/sub/b.txt")
+    >>> touch("find_files_test/sub/c.txt")
+    >>> for file in find_files("find_files_test", '*.txt'):
+    ...     print(file)
+    find_files_test/a.txt
+    find_files_test/sub/b.txt
+    find_files_test/sub/c.txt
+    >>> rmtree("find_files_test")
+    """
+    import fnmatch
+    if not os.path.isdir(directory):
+        raise IOError("directory %s does not exist" % directory)
+    for root, dirs, files in os.walk(directory):
+        for basename in files:
+            if fnmatch.fnmatch(basename, pattern):
+                filename = os.path.join(root, basename)
+                yield filename
 
 
 # 'chdir' context manager

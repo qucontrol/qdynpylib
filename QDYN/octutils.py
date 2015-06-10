@@ -4,7 +4,10 @@ import os
 from .io import open_file
 import numpy as np
 # import for doctests
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from textwrap import dedent
 
 from collections import namedtuple

@@ -7,6 +7,11 @@ import numpy as np
 import re
 import sys
 import scipy.sparse
+# import for doctests
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 class open_file(object):
@@ -14,7 +19,6 @@ class open_file(object):
     Context manager that opens a filename and closes it on exit, but does
     nothing for file-like objects.
 
-    >>> from StringIO import StringIO
     >>> file = StringIO('''
     ... In the world of the very small, where particle and wave
     ... aspects of reality are equally significant, things do not

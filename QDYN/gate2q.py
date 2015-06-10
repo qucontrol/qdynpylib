@@ -12,8 +12,12 @@ import os
 from numpy import pi, cos, sin
 import re
 from warnings import warn
-from QDYN.io import open_file, matrix_to_latex, matrix_to_mathematica
-from QDYN.linalg import inner
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+from .io import open_file, matrix_to_latex, matrix_to_mathematica
+from .linalg import inner
 
 class Gate2Q(np.matrixlib.defmatrix.matrix):
     """
@@ -61,7 +65,6 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         ... (              0,              0)(              0,              0)(              0,              0){ 9.99593327E-01,-2.85163130E-02}
         ... ]
         ... '''
-        >>> from StringIO import StringIO
         >>> Gate2Q(file=StringIO(gate))
         matrix([[ 1.00000000+0.j        ,  0.00000000+0.j        ,
                   0.00000000+0.j        ,  0.00000000+0.j        ],
