@@ -1059,14 +1059,19 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
 
      .. math:: f = E / (\\hbar * 2 * pi)
     '''
-    if hasattr(t, '__getitem__'):
+    if np.isscalar(t):
+        signal = 0.0
+    else:
         signal = np.zeros(len(t), dtype=np.complex128)
         assert type(t) == np.ndarray, "t must be numpy array"
         assert t.dtype.type is np.float64, "t must be double precision real"
-    else:
-        signal = 0.0
     c = convert.to_au(1, time_unit) * convert.to_au(1, freq_unit)
-    if hasattr(freq, '__getitem__'):
+    if np.isscalar(freq):
+        if complex:
+            signal += np.exp(1j*c*freq*t) # element-wise
+        else:
+            signal += np.cos(c*freq*t) # element-wise
+    else:
         if weights is None:
             weights = np.ones(len(freq))
         if phases is None:
@@ -1077,11 +1082,6 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
                 signal += (weight/norm) * np.exp(1j*(c*w*t+phase*np.pi))
             else:
                 signal += (weight/norm) * np.cos(c*w*t+phase*np.pi)
-    else:
-        if complex:
-            signal += np.exp(1j*c*freq*t) # element-wise
-        else:
-            signal += np.cos(c*freq*t) # element-wise
     return signal
 
 
