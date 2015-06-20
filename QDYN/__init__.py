@@ -12,5 +12,6 @@ from . import bloch
 from . import shutil
 from . import octutils
 from . import memoize
+from . import config
 
 __version__ = "0.1.1"
