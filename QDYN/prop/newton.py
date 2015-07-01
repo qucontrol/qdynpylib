@@ -171,13 +171,39 @@ def extend_leja(old_leja, new_points, n_use):
     return new_leja, n_added
 
 
-def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
+def newton_step(apply_op, state, t, dt, m_max, maxrestart, tol):
     """
     Perform a propagation step using the Restarted Newton algorithm
+
+    Arguments
+    ---------
+
+    apply_op: function
+        Function that applies the operator (Liouvillian/Hamiltonian) at a given
+        time to a given state (`apply_op(state, t) -> state`)
+
+    state: ndarray
+        Data structure containing state description. 1D-array for wave
+        functions, 2D array or matrix for density matrices
+
+    t: float
+        Time argument to pass to `apply_op`
+
+    dt: float
+        Time grid step
+
+    m_max: int
+        Maximal order of Arnoldi procedure
+
+    maxrestart: int
+        Maximal number of Newton restarts
+
+    tol: float
+        Desired precision of propagation result
     """
 
     logger = logging.getLogger(__name__)
-    N = rho0.shape[0]
+    N = state.shape[0]
     assert(m_max <= N), "m_max must be smaller than the system dimension"
     def gen_zero_vec(v0):
         """ Generator for generation routine that produces zero-vector """
@@ -188,13 +214,13 @@ def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
             else:
                 return result
         return zero_vec
-    zero_vec = gen_zero_vec(rho0)
+    zero_vec = gen_zero_vec(state)
     w = zero_vec()                                     # result vector
     Z = np.zeros(0, dtype=np.complex128)               # Leja points
     a = np.zeros(0, dtype=np.complex128)               # Newton coeffs
 
-    beta = norm(rho0)
-    v = rho0 / beta
+    beta = norm(state)
+    v = state / beta
 
     for s in xrange(maxrestart):
 
@@ -208,7 +234,7 @@ def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
                 #print("max Leja radius: ", np.max(np.abs(Z)))
                 #break
 
-        arnoldi_vecs, Hess, Ritz, m = Arnoldi(apply_L, t, dt, v, m_max)
+        arnoldi_vecs, Hess, Ritz, m = Arnoldi(apply_op, t, dt, v, m_max)
         if m < m_max:
             logger.warn("Arnoldi only returned order %d instead of the "
                         "requested %d", m, m_max)
@@ -216,7 +242,7 @@ def newton_step(apply_L, rho0, t, dt, m_max, maxrestart, tol):
             # The input state must be an eigenstate
             eig_val = beta * Hess[0,0]
             phase = np.exp(-1.0j * eig_val) # dt is absorbed in eig_val
-            w = phase * rho0
+            w = phase * state
             break
 
         # normalize Ritz points
