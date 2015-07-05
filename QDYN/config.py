@@ -246,14 +246,21 @@ def read_old_config(filename):
 
     file = open(filename)
     for line in file:
+        has_comment = False
+        if '!' in line:
+            has_comment = True
+            line = line[0:line.index('!')]
         line = line.strip()
-        if line == '' or line.startswith('!'):
+        if line.startswith('&'):
+            line = line[1:]
+        line = line.strip()
+        if line == '':
             continue
         if not has_line_break:
             curr_line = ''
 
         m = RX['continue_line'].match(line)
-        if m:
+        if m and not has_comment:
             has_line_break = True
             curr_line = curr_line + m.group('line')
             continue
@@ -286,7 +293,7 @@ def read_old_config(filename):
 
         # If item line, remove entry 'n = {number}' from sec_line_array,
         # since this only indicates the number of following item lines.
-        # This information is gathered within 'num_lines'
+        # This information is gathered in 'num_lines'
         for item in sec_line_array:
             m = RX['item'].match(item)
             if m:
@@ -301,6 +308,7 @@ def read_old_config(filename):
             # Check for missing ',' => otherwise additional '=' signs
             # will appear
             if item.count('=') != 1:
+                print('Line |' + line)
                 raise AssertionError("Number of '=' differs from one. "
                 "Missing or too much '=' signs?")
             m_item = RX['item'].match(item)
@@ -310,6 +318,7 @@ def read_old_config(filename):
                 config_data[sec_name]['item_lines'][item_num]\
                     [item_name] = item_val
             else:
+                print('Line |' + line)
                 raise AssertionError("Item name and value have to be separated"
                 " by a '=' sign")
 
@@ -473,7 +482,7 @@ def convert_config(filename, mappings):
     old_config_data = read_old_config(filename)
 
     obsolete_sec_items = [
-        ('pulse', 'ftrt')
+        ('pulse', 'ftrt'), ('psi', 'width')
     ]
 
     ham_line = 0
@@ -498,7 +507,7 @@ def convert_config(filename, mappings):
                     continue
                 # Check for cases which require a special treatment
                 if sec_name == 'oct' and curr_item == 'max_hours':
-                    print("Converting 'max_hours' to 'max_seconds'")
+                    print("***** Converting 'max_hours' to 'max_seconds'")
                     item_val = str(int(old_config_data[sec_name]['item_lines']\
                                [item_line][curr_item])*3600)
                     curr_item = 'max_seconds'
