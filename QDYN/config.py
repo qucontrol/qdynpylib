@@ -169,6 +169,8 @@ def get_old_config_structure(foldername):
 
     for file in os.listdir(foldername):
         file = file.strip()
+        if file == 'trap.fi':
+            continue
         if file.endswith('.fi'):
             m = re.compile(r'^(?P<sec_name>[^\s].*)\.fi$').match(file)
             if m:
@@ -365,18 +367,25 @@ def get_mappings(old_config_structure_file='old_config_structure.json',
                     mappings[sec_name][item] = (sec_name, 'maptype')
                 elif sec_name == 'grid' and item == 'n':
                     mappings[sec_name][item] = (sec_name, 'nr')
+                elif sec_name == 'grid' and item == 'system':
+                    mappings[sec_name][item] = (sec_name, 'label')
+                elif sec_name == 'psi' and item == 'system':
+                    mappings[sec_name][item] = (sec_name, 'label')
+                elif sec_name == 'psi' and item == 'width':
+                    mappings[sec_name][item] = (sec_name, 'sigma')
                 else:
                     pass
                     # Silently ignore missing assigments
         # If sec_name has been replaced/renamed in the new config structure
         else:
-            if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser', 'spin',\
-                            'trap']:
+            if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser', 'spin']:
                 # Move all operator like types to new ham_pt
                 for item in old_config_structure[sec_name]:
                     target_item = item
                     if item == 'type':
                         target_item = 'op_form'
+                    if item == 'system':
+                        target_item = 'label'
                     if item == 'surf':
                         target_item = 'op_surf'
                     if item == 'surf1':
@@ -398,7 +407,7 @@ def get_mappings(old_config_structure_file='old_config_structure.json',
                     if item == 'j':
                         target_item = 'rotbarr_j'
                     if item == 'imaginary':
-                        target_item = 'imag_pot'
+                        target_item = 'imag_op'
                     if item == 'dip_unit':
                         target_item = 'op_unit'
                     if item == 'pot_unit':
@@ -413,12 +422,8 @@ def get_mappings(old_config_structure_file='old_config_structure.json',
                         target_item = 'is_periodic'
                     if item == 'stark_0':
                         target_item = 'asym_stark'
-                    if item == 'w':
-                        target_item = 'w_trap'
-                    if item == 'd':
-                        target_item = 'd_trap'
-                    if item == 'negative':
-                        target_item = 'negative_trap'
+                    if item == 'w' or item =='negative':
+                        pass # Ignore trap_pt types
                     # Check for existence in the new config structure
                     if not target_item in new_config_structure['ham']:
                         raise KeyError("Item '%s' doesn't exist in new config "
@@ -441,15 +446,17 @@ def get_mappings(old_config_structure_file='old_config_structure.json',
                             target_item = 'inhom_method'
                     # Part moved to new ham_pt
                     elif item in ['mass', 'map_to_j', 'specrad_method',\
-                                  'memoize_pots']:
+                                  'base', 'memoize_pots']:
                         target_sec = 'ham'
                         if item == 'memoize_pots':
                             target_item = 'memoize_ops'
+                        if item == 'base':
+                            target_item = 'kin_base'
                     # Part moved to pulse_pt
                     elif item in ['rwa']:
                         target_sec = 'pulse'
                     # Part moved to grid_pt
-                    elif item in ['base', 'spher_method']:
+                    elif item in ['spher_method']:
                         target_sec = 'grid'
                     # Part moved to oct_pt
                     elif item in ['bwr_nint', 'bwr_base']:
@@ -461,6 +468,9 @@ def get_mappings(old_config_structure_file='old_config_structure.json',
                         raise KeyError("Item '%s' doesn't exist in new config "
                                        "structure" % target_item)
                     mappings[sec_name][item] = (target_sec, target_item)
+            elif sec_name == 'trap':
+                # Silently ignore trap sections
+                continue
             else:
                 raise KeyError("Unknown section name '%s' detected" % sec_name)
 
@@ -482,7 +492,7 @@ def convert_config(filename, mappings):
     old_config_data = read_old_config(filename)
 
     obsolete_sec_items = [
-        ('pulse', 'ftrt'), ('psi', 'width')
+        ('pulse', 'ftrt')
     ]
 
     ham_line = 0
@@ -492,16 +502,16 @@ def convert_config(filename, mappings):
 
         for item_line in old_config_data[sec_name]['item_lines']:
             curr_item_line = item_line
-            if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser', 'spin',\
-                            'trap']:
+            if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser', 'spin']:
                 ham_line += 1
                 curr_item_line = ham_line
 
             for item in old_config_data[sec_name]['item_lines'][item_line]:
                 # Check for obsolete items, will be ignored since they have to
                 # be replaced by hand anyways
-                curr_item      = item
-                if (sec_name, curr_item) in obsolete_sec_items:
+                curr_item = item
+                if (sec_name, curr_item) in obsolete_sec_items\
+                or sec_name == 'trap':
                     print("WARNING! Skipping item '%s' in section '%s'"\
                           % (curr_item, sec_name))
                     continue
@@ -511,6 +521,11 @@ def convert_config(filename, mappings):
                     item_val = str(int(old_config_data[sec_name]['item_lines']\
                                [item_line][curr_item])*3600)
                     curr_item = 'max_seconds'
+                elif sec_name == 'grid' and curr_item == 'coord_type':
+                    item_val = old_config_data[sec_name]['item_lines']\
+                               [item_line][curr_item]
+                    if item_val.startswith('cartesian'):
+                        item_val = 'cartesian'
                 else:
                     if not sec_name in mappings:
                         raise KeyError("Unknown section name: '%s'" % sec_name)
@@ -534,14 +549,20 @@ def convert_config(filename, mappings):
                 if curr_item_line > 0:
                     new_config_data[new_sec_name][curr_item_line]\
                         [new_item_name] = item_val
+                    #if new_sec_name == 'grid':
+                    #    print(curr_item_line)
                 else:
                     new_config_data[new_sec_name][new_item_name] = item_val
 
                 # Add `op_type` if necessary
                 if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser',\
-                                'spin', 'trap']:
+                                'spin']:
                     new_config_data[new_sec_name][curr_item_line]['op_type']\
                         = sec_name
+
+    if 'grid' in new_config_data:
+        for item_line in new_config_data['grid']:
+            new_config_data['grid'][item_line]['dim'] = str(item_line)
 
     # Add parameters from former 'misc' section to respective new section. If
     # they allow for lines, add the item to each line
