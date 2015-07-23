@@ -549,8 +549,6 @@ def convert_config(filename, mappings):
                 if curr_item_line > 0:
                     new_config_data[new_sec_name][curr_item_line]\
                         [new_item_name] = item_val
-                    #if new_sec_name == 'grid':
-                    #    print(curr_item_line)
                 else:
                     new_config_data[new_sec_name][new_item_name] = item_val
 
@@ -559,10 +557,10 @@ def convert_config(filename, mappings):
                                 'spin']:
                     new_config_data[new_sec_name][curr_item_line]['op_type']\
                         = sec_name
-
-    if 'grid' in new_config_data:
-        for item_line in new_config_data['grid']:
-            new_config_data['grid'][item_line]['dim'] = str(item_line)
+                    if not 'type' in\
+                    new_config_data[new_sec_name][curr_item_line]:
+                        new_config_data[new_sec_name][curr_item_line]['type']\
+                            = 'op'
 
     # Add parameters from former 'misc' section to respective new section. If
     # they allow for lines, add the item to each line
@@ -595,5 +593,13 @@ def convert_config(filename, mappings):
                     new_config_data[new_sec_name] = {}
                 new_config_data[new_sec_name][new_item_name]\
                     = item_val
+
+    # Set 'dim' parameter in for each grid line
+    if 'grid' in new_config_data:
+        for item_line in new_config_data['grid']:
+            new_config_data['grid'][item_line]['dim'] = str(item_line)
+            if not 'coord_type' in new_config_data['grid'][item_line]:
+                new_config_data['grid'][item_line]['coord_type']\
+                    = 'cartesian'
 
     return new_config_data
