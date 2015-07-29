@@ -8,10 +8,7 @@ import re
 import sys
 import scipy.sparse
 # import for doctests
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from six import StringIO
 
 
 class open_file(object):
