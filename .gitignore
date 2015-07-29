@@ -1,5 +1,7 @@
 /QDYN/__git__.py
 test_octconvergences.html
+/.venv
+MANIFEST
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -18,7 +18,27 @@ clean:
 	@rm -f QDYN/__git__.py
 	@rm -f test_octconvergences.html
 
-test:
-	python run_tests.py
+PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh
 
-.PHONY: install uninstall sdist clean
+.venv/py27/bin/python:
+	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
+
+.venv/py33/bin/python:
+	@conda create -y -m -p .venv/py33 python=3.3 $(PACKAGES)
+
+.venv/py34/bin/python:
+	@conda create -y -m -p .venv/py34 python=3.4 $(PACKAGES)
+
+test27: .venv/py27/bin/python
+	.venv/py27/bin/python run_tests.py
+
+test33: .venv/py33/bin/python
+	.venv/py33/bin/python run_tests.py
+
+test34: .venv/py34/bin/python
+	.venv/py34/bin/python run_tests.py
+
+
+test: test27 test33 test34
+
+.PHONY: install uninstall sdist clean test test26 test27 test33 test34
