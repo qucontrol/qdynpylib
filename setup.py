@@ -10,6 +10,11 @@ setup(name='QDYN',
       author_email='goerz@physik.uni-kassel.de',
       url='https://github.com/goerz/qdynpylib',
       license='GPL',
+      install_requires=[
+          'numpy>=1.9',
+          'matplotlib>=1.3',
+          'scipy>=0.15',
+      ],
       packages=['QDYN', 'QDYN.prop'],
       scripts=[],
       classifiers=[
