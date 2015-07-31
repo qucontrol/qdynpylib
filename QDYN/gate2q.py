@@ -12,12 +12,9 @@ import os
 from numpy import pi, cos, sin
 import re
 from warnings import warn
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from six import StringIO
 from .io import open_file, matrix_to_latex, matrix_to_mathematica
-from .linalg import inner
+from .linalg import inner, norm
 
 class Gate2Q(np.matrixlib.defmatrix.matrix):
     """
@@ -432,6 +429,13 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         """
         return pop_loss(self)
 
+    def logical_pops(self):
+        """
+        Return the total population in each of the mapped logical states
+        (projected to the logical subspace)
+        """
+        return logical_pops(self)
+
     def concurrence(self):
         """
         Return the concurrence of the gate
@@ -540,6 +544,24 @@ def pop_loss(A):
     A_H = A.conjugate().transpose()
     return 1.0 - (A_H.dot(A)).trace().real / N + 0.0
     # + 0.0 is for numerical stability (avoids result -0.0)
+
+
+def logical_pops(A):
+    """
+    Return a numpy array of four values that give the total population of the
+    states A |00>, A |01> A |10> A |11>. If A is unitary, all values are 1.0.
+    If there is loss from the logical subspace, the values are between 0.0 and
+    1.0.
+
+    >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
+    >>> logical_pops(U)
+    array([ 1.  ,  1.  ,  1.  ,  0.81])
+
+    The average of the logical_pops sums to one minus the population loss:
+    >>> print("%.3f" % ( (np.sum(logical_pops(U))/4.0) - (1.0-U.pop_loss()) ))
+    0.000
+    """
+    return np.array([norm(np.asarray(A[:,i])) for i in range(4)])**2
 
 
 def F_avg(U, O):
