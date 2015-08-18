@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 from setuptools import setup
-from QDYN import __version__
+
+
+def get_version(filename):
+    with open(filename) as in_fh:
+        for line in in_fh:
+            if line.startswith('__version__'):
+                return line.split('=')[1].strip()[1:-1]
+    raise ValueError("Cannot extract version from %s" % filename)
+
 
 setup(name='QDYN',
-      version=__version__,
+      version=get_version("QDYN/__init__.py"),
       description='Package providing some Python modules for working with ' \
                   'the QDYN Fortran library',
       author='Michael Goerz',
@@ -16,7 +24,7 @@ setup(name='QDYN',
           'scipy>=0.15',
           'sympy>=0.7',
           'bokeh>=0.8',
-          'click>=3.0',
+          'click>=5.0',
       ],
       packages=['QDYN', 'QDYN.prop'],
       scripts=[],
