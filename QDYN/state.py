@@ -7,6 +7,7 @@ import numpy as np
 from numpy import pi
 import re
 from .io import read_complex
+from six.moves import xrange
 
 
 class State(object):

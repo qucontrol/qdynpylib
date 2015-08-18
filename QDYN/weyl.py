@@ -10,6 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D # required to activate 2D plotting
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import FancyArrowPatch
+from six.moves import xrange
 
 # TODO: routine to obtain canonical gate from weyl-coordinates
 # TODO: allow to obtain gates for names points in Weyl chamber

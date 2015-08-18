@@ -6,6 +6,7 @@ from __future__ import print_function, division, absolute_import, \
                        unicode_literals
 import numpy as np
 import scipy.linalg
+from six.moves import xrange
 
 
 def inner(v1, v2):

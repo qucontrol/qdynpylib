@@ -5,6 +5,7 @@ from math import pi
 from functools import partial
 import QDYN
 import numpy as np
+from six.moves import xrange
 
 WRITE_FILES = False # Set to True to write out populations and debug files
 

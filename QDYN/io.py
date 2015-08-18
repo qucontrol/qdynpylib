@@ -12,6 +12,7 @@ from click.utils import open_file
 # import for doctests
 from contextlib import contextmanager
 import tempfile
+from six.moves import xrange
 
 
 @contextmanager

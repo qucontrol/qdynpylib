@@ -5,6 +5,7 @@ import os
 import QDYN
 import numpy as np
 import scipy.sparse
+from six.moves import xrange
 
 
 def tempfilename():

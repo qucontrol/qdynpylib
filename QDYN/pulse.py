@@ -11,6 +11,7 @@ from scipy import signal
 import scipy.fftpack
 import re
 import logging
+from six.moves import xrange
 
 from .units import NumericConverter
 convert = NumericConverter()

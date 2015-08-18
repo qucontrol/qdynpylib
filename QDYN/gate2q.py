@@ -12,6 +12,7 @@ import os
 from numpy import pi, cos, sin
 import re
 from warnings import warn
+from six.moves import xrange
 from .io import tempinput, open_file, matrix_to_latex, matrix_to_mathematica
 from .linalg import inner, norm
 
