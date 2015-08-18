@@ -1,14 +1,8 @@
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
 import os
-from .io import open_file
+from .io import tempinput, open_file
 import numpy as np
-# import for doctests
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-from textwrap import dedent
 
 from collections import namedtuple
 
@@ -130,7 +124,8 @@ class OCTConvergences(object):
         ...     2  3.502016076673E-03  1.882015300126E-03  0.000000000000E+00  5.384031376798E-03 -3.792143767433E-03 -1.910128467308E-03     97
         ... """
         >>> c = OCTConvergences()
-        >>> c.load_file('iters', StringIO(oct_iters))
+        >>> with tempinput(oct_iters) as oct_iters_dat:
+        ...     c.load_file('iters', oct_iters_dat)
         >>> len(c.data)
         1
         >>> c.data['iters'].iter

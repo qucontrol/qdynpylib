@@ -4,29 +4,36 @@ Module containing routines for reading and writing files compatible with QDYN
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
 import numpy as np
-import re
 import sys
+import re
+import os
 import scipy.sparse
+from click.utils import open_file
 # import for doctests
-from six import StringIO
+from contextlib import contextmanager
+import tempfile
 
 
-class open_file(object):
-    """
-    Context manager that opens a filename and closes it on exit, but does
-    nothing for file-like objects.
+@contextmanager
+def tempinput(data, binary=False):
+    """Context manager providing a temporary filename for a file containing the
+    given data. If binary is True, the data will be written as-is, and must be
+    suitable for writing in binary mode. Otherwise, if encoding the given data
+    to utf-8 is at all possible, the temporary file will be
+    a text file with utf-8 encoding. The file is deleted on leaving the
+    context.
 
-    >>> file = StringIO('''
+    >>> test_str = '''
     ... In the world of the very small, where particle and wave
     ... aspects of reality are equally significant, things do not
     ... behave in any way that we can understand from our experience
     ... of the everyday world...all pictures are false, and there is
     ... no physical analogy we can make to understand what goes on
-    ... inside atoms. Atoms behave like atoms, nothing else.''')
-    >>> with open_file(file) as in_fh: # file could also be a filename
-    ...     for line in in_fh:
-    ...         print(line.strip())
-    ...
+    ... inside atoms. Atoms behave like atoms, nothing else.'''
+    >>> with tempinput(test_str) as filename:
+    ...     with open_file(filename) as in_fh:
+    ...         for line in in_fh:
+    ...             print(line.strip())
     <BLANKLINE>
     In the world of the very small, where particle and wave
     aspects of reality are equally significant, things do not
@@ -35,22 +42,23 @@ class open_file(object):
     no physical analogy we can make to understand what goes on
     inside atoms. Atoms behave like atoms, nothing else.
     """
-    def __init__(self, filename, *args, **kwargs):
-        self.closing = kwargs.pop('closing', False)
-        if isinstance(filename, basestring):
-            self.fh = open(filename, *args, **kwargs)
-            self.closing = True
-        else:
-            self.fh = filename
-
-    def __enter__(self):
-        return self.fh
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.closing:
-            self.fh.close()
-        return False
-
+    # see http://stackoverflow.com/questions/11892623/python-stringio-and-compatibility-with-with-statement-context-manager
+    temp = tempfile.NamedTemporaryFile(delete=False)
+    if not binary:
+        try:
+            # Python 3 str data can be encoded, as well as Python 2 unicode
+            # data
+            data = data.encode('utf-8')
+        except (AttributeError, UnicodeDecodeError):
+            # Python 3 bytes data is already encoded and will raise an
+            # AttributeError; standard Python 2 str data
+            # tends to raise UnicodeDecodeError for non-ascii strings. Consider
+            # importing unicode_literals from __future__ to fix this
+            pass
+    temp.write(data)
+    temp.close()
+    yield temp.name
+    os.unlink(temp.name)
 
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
@@ -258,7 +266,7 @@ expand_hermitian=True, val_real=False):
 
 
 def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
-    outfile=None):
+    out=None):
     """
     Print a numpy complex matrix to screen, or to a file if outfile is given.
     Values below the given limit are printed as zero
@@ -276,7 +284,7 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
        this limit will be printed as 0.0.
     fmt: str, optional
         Format of each entry (both for real and imaginary part)
-    outfile: filename or file-like object
+    out: open filehandle. If None, print to stdout
 
     Examples
     --------
@@ -317,8 +325,6 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     ]
     """
     m, n = M.shape
-    if outfile is None:
-        outfile = sys.stdout
     fmt_rx = re.compile(r'%[#0i +-]?(?P<width>\d+)\.\d+[hlL]?[diouxXeEfFgG]')
     fmt_m = fmt_rx.match(fmt)
     width = 9
@@ -331,36 +337,37 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
         small = small_fmt % 0
     else:
         raise ValueError("fmt must match '%[conversion flags]w.d<type>'")
-    with open_file(outfile, 'w') as out:
-        if matrix_name is not None:
-            out.write("%s = [\n" % matrix_name)
-        for i in xrange(m):
-            for j in xrange(n):
-                if M[i,j] == 0.0:
-                    entry = zero
+    if out is None:
+        out = sys.stdout
+    if matrix_name is not None:
+        out.write("%s = [\n" % matrix_name)
+    for i in xrange(m):
+        for j in xrange(n):
+            if M[i,j] == 0.0:
+                entry = zero
+            else:
+                x = M[i,j].real
+                if abs(x) < limit:
+                    x = 0.0
+                y = M[i,j].imag
+                if abs(y) < limit:
+                    y = 0.0
+                if x == 0.0:
+                    entry = small
                 else:
-                    x = M[i,j].real
-                    if abs(x) < limit:
-                        x = 0.0
-                    y = M[i,j].imag
-                    if abs(y) < limit:
-                        y = 0.0
-                    if x == 0.0:
-                        entry = small
-                    else:
-                        entry = fmt % x
-                    entry += ","
-                    if y == 0.0:
-                        entry += small
-                    else:
-                        entry += fmt % y
-                if i == j:
-                    out.write("{" + entry + "}")
+                    entry = fmt % x
+                entry += ","
+                if y == 0.0:
+                    entry += small
                 else:
-                    out.write("(" + entry + ")")
-            out.write("\n")
-        if matrix_name is not None:
-            out.write("]\n")
+                    entry += fmt % y
+            if i == j:
+                out.write("{" + entry + "}")
+            else:
+                out.write("(" + entry + ")")
+        out.write("\n")
+    if matrix_name is not None:
+        out.write("]\n")
 
 
 def fix_fortran_exponent(num_str):

@@ -12,8 +12,7 @@ import os
 from numpy import pi, cos, sin
 import re
 from warnings import warn
-from six import StringIO
-from .io import open_file, matrix_to_latex, matrix_to_mathematica
+from .io import tempinput, open_file, matrix_to_latex, matrix_to_mathematica
 from .linalg import inner, norm
 
 class Gate2Q(np.matrixlib.defmatrix.matrix):
@@ -62,7 +61,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         ... (              0,              0)(              0,              0)(              0,              0){ 9.99593327E-01,-2.85163130E-02}
         ... ]
         ... '''
-        >>> Gate2Q(file=StringIO(gate))
+        >>> with tempinput(gate) as gatefile:
+        ...     Gate2Q(file=gatefile)
         matrix([[ 1.00000000+0.j        ,  0.00000000+0.j        ,
                   0.00000000+0.j        ,  0.00000000+0.j        ],
                 [ 0.00000000+0.j        ,  0.57273514+0.81974048j,

@@ -21,8 +21,6 @@ def test_print_matrix():
     M = np.matrix([[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20],
                    [1+1j, 1.0e-9, -1.0]])
 
-    # simple write and read
-
     expected = [
     'M = [',
     '{ 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)',
@@ -30,18 +28,11 @@ def test_print_matrix():
     '( 1.00E+00, 1.00E+00)( 1.00E-09,      0.0){-1.00E+00,      0.0}',
     ']']
 
-    filename = tempfilename()
-    QDYN.io.print_matrix(M, matrix_name='M', outfile=filename)
-    with open(filename) as in_fh:
-        for i, line in enumerate(in_fh):
-            assert line.rstrip() == expected[i]
-    os.unlink(filename)
-
     # write to already open file
     filename = tempfilename()
     with open(filename, 'w') as out_fh:
-        QDYN.io.print_matrix(M, matrix_name='M', outfile=out_fh)
-        QDYN.io.print_matrix(M, matrix_name='M', outfile=out_fh)
+        QDYN.io.print_matrix(M, matrix_name='M', out=out_fh)
+        QDYN.io.print_matrix(M, matrix_name='M', out=out_fh)
     with open(filename) as in_fh:
         for i, line in enumerate(in_fh):
             assert line.rstrip() == expected[i%5]
