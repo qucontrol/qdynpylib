@@ -22,12 +22,15 @@ PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh
 
 .venv/py27/bin/python:
 	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
+	@.venv/py27/bin/pip install -e .
 
 .venv/py33/bin/python:
 	@conda create -y -m -p .venv/py33 python=3.3 $(PACKAGES)
+	@.venv/py33/bin/pip install -e .
 
 .venv/py34/bin/python:
 	@conda create -y -m -p .venv/py34 python=3.4 $(PACKAGES)
+	@.venv/py34/bin/pip install -e .
 
 test27: .venv/py27/bin/python
 	.venv/py27/bin/python run_tests.py
@@ -41,4 +44,4 @@ test34: .venv/py34/bin/python
 
 test: test27 test33 test34
 
-.PHONY: install uninstall sdist clean test test26 test27 test33 test34
+.PHONY: install uninstall sdist clean test test27 test33 test34
