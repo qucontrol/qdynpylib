@@ -5,36 +5,34 @@ Memoization (sic!) is the concept caching the result of a function, so that if
 the function is called again with the same parameters, the result is returned
 directly, without recalculating it.
 
+>>> from click import echo
 >>> @memoize
 ... def f(a,b,c):
 ...     return str(a) + str(b) + str(c)
 ...
->>> f(1,2,3)
-'123'
->>> f([], None, (1,2,3))
-'[]None(1, 2, 3)'
->>> f._combined_cache()
-{('(]q\x01N(K\x01K\x02K\x03tq\x02tq\x03.', '}q\x01.'): '[]None(1, 2, 3)', (1, 2, 3): '123'}
+>>> echo(f(1,2,3))
+123
+>>> echo(f([], None, (1,2,3)))
+[]None(1, 2, 3)
+>>> len(f._combined_cache())
+2
 
 The memoize decorator allows for the possibility to write the cache to disk and
 to reload it at a later time
 
 >>> f.dump('memoize.dump')
 >>> f.clear()
->>> f._combined_cache()
-{}
+>>> len(f._combined_cache())
+0
 >>> f.load('memoize.dump')
->>> f._combined_cache()
-{('(]q\x01N(K\x01K\x02K\x03tq\x02tq\x03.', '}q\x01.'): '[]None(1, 2, 3)', (1, 2, 3): '123'}
+>>> len(f._combined_cache())
+2
 >>> import os
 >>> os.unlink('memoize.dump')
 '''
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+from six.moves import cPickle as pickle
 from functools import update_wrapper
 from QDYN.io import open_file
 
@@ -62,19 +60,19 @@ class memoize(object):
 
     def dump(self, filename):
         """Write memoization cache to the given file or file-like object"""
-        with open_file(filename, 'w') as pickle_file:
+        with open_file(filename, 'wb') as pickle_file:
             pickle.dump((self.cache, self.pickle_cache), pickle_file)
 
     def load(self, filename, raise_error=False):
         """
-        Load dumped data from the given file or file-like object and update the
+        Load dumped data from the given file and update the
         memoization cache
 
         If raise_error is True, raise an IOError if the file does not exist.
         Otherwise, simply leave cache unchanged.
         """
         try:
-            with open_file(filename) as pickle_file:
+            with open_file(filename, 'rb') as pickle_file:
                 cache, pickle_cache = pickle.load(pickle_file)
                 self.cache.update(cache)
                 self.pickle_cache.update(pickle_cache)

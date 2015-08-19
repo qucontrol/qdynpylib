@@ -688,21 +688,21 @@ def bloch_coordinates(state, normalize=True):
     The `normalize` parameter is only applied to Hilbert space states.
 
     >>> import numpy as np
-    >>> [round(v, 5) for v in bloch_coordinates((1,1))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates((1,1)))
     [1.0, 0.0, 0.0]
-    >>> [round(v, 5) for v in bloch_coordinates((1,0))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates((1,0)))
     [0.0, 0.0, 1.0]
-    >>> [round(v, 5) for v in bloch_coordinates((0,1))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates((0,1)))
     [0.0, 0.0, -1.0]
-    >>> [round(v, 5) for v in bloch_coordinates((1j,1))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates((1j,1)))
     [0.0, -1.0, 0.0]
-    >>> [round(v, 5) for v in bloch_coordinates(np.array([1j,1]))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates(np.array([1j,1])))
     [0.0, -1.0, 0.0]
-    >>> [round(v, 5) for v in bloch_coordinates(state=(1j,1),normalize=False)]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates(state=(1j,1),normalize=False))
     [0.0, -2.0, 0.0]
-    >>> [round(v, 5) for v in bloch_coordinates(np.array([[1,0.5], [0.5,1]]))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates(np.array([[1,0.5], [0.5,1]])))
     [1.0, 0.0, 0.0]
-    >>> [round(v, 5) for v in bloch_coordinates(np.array([[1,0], [0,1]]))]
+    >>> print("[%.1f, %.1f, %.1f]" % bloch_coordinates(np.array([[1,0], [0,1]])))
     [0.0, 0.0, 0.0]
     """
     if isinstance(state, tuple) or isinstance(state, list):

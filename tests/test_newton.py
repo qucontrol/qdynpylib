@@ -97,6 +97,7 @@ def generate_liouvillian(N, w_c, gamma, E0, tgrid):
 def test_newton():
 
     print("*** Running newton_test")
+    from six.moves import xrange
 
     two_pi = 2.0 * pi
 

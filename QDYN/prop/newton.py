@@ -7,6 +7,7 @@ from __future__ import print_function, division, absolute_import, \
 import logging
 from ..linalg import norm, inner
 import numpy as np
+from six.moves import xrange
 
 VERBOSE = False
 

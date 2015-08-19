@@ -13,6 +13,7 @@ from __future__ import print_function, division, absolute_import, \
 import numpy as np
 from . import newton
 from . import exact
+from six.moves import xrange
 
 def generate_apply_H(H0, H1, pulse):
     """
