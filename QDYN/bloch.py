@@ -659,14 +659,22 @@ class Bloch():
             axes.text(vec[1], -vec[0], vec[2],
                       annotation['text'], **opts)
 
-    def plot(self, fig=None):
+    def plot(self, fig=None, outfile=None):
         """
-        Generate a plot of the Bloch sphere on the given figure
+        Generate a plot of the Bloch sphere on the given figure, or create a
+        new figure if fig argument is not given. If `outfile` is given, write
+        the reulting plot to the file.
         """
+        pyplot_fig = False
         if fig is None:
+            pyplot_fig = True
             fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         ax = fig.add_subplot(111, aspect='equal', projection='3d')
         self.render(ax)
+        if outfile is not None:
+            fig.savefig(outfile)
+            if pyplot_fig:
+                plt.close(fig)
 
     def show(self):
         """

@@ -376,7 +376,7 @@ class WeylChamber():
 
     def show(self):
         """
-        Show a plot of the Bloch sphere
+        Show a plot of the Weyl chamber
         """
         self.plot()
         plt.show()
