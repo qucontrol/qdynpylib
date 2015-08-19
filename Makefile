@@ -17,6 +17,7 @@ clean:
 	@rm -f tests/*.pyc
 	@rm -f QDYN/__git__.py
 	@rm -f test_octconvergences.html
+	@rm -f tests/result_images/*
 
 PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh
 
