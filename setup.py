@@ -37,5 +37,7 @@ setup(name='QDYN',
           'Natural Language :: English',
           'Topic :: Scientific/Engineering',
           'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
       ]
      )
