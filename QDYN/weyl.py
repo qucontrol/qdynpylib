@@ -328,7 +328,7 @@ class WeylChamber():
     def scatter(self, c1, c2, c3, **kwargs):
         """Add a scatter plot to the Weyl chamber. All keyword arguments will
         be passed to matplotlib scatter3D function"""
-        self._scatter.append(c1, c2, c3, kwargs)
+        self._scatter.append((c1, c2, c3, kwargs))
 
     def _draw_line(self, ax, origin, end, **kwargs):
         """Draw a line from origin to end onto the given axis. Both origin and
