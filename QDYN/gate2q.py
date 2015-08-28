@@ -462,6 +462,30 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         from .weyl import c1c2c3
         return c1c2c3(self)
 
+    def show_in_weyl_chamber(self, weyl_chamber=None, **kwargs):
+        """
+        Show the gate graphically as a point in the Weyl chamber.
+
+        Arguments
+        ---------
+        weyl_chamber: QDYN.weyl.WeylChamber or None
+            WeylChamber instance on which to the gate. If None, a new temporary
+            instance will be created
+
+        All other keyword arguments are passed to the matplotlib scatter3D
+        routine
+        """
+        from .weyl import WeylChamber
+        if weyl_chamber is None:
+            weyl_chamber = WeylChamber()
+        c1s = []; c2s = []; c3s = []
+        c1, c2, c3 = self.weyl_coordinates()
+        c1s.append(c1)
+        c2s.append(c2)
+        c3s.append(c3)
+        weyl_chamber.scatter(c1s, c2s, c3s)
+        weyl_chamber.show()
+
     def local_invariants(self):
         """
         Return the local invariants (g1, g2, g3) for the current gate
