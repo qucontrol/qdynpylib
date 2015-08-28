@@ -447,8 +447,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         >>> round(identity.concurrence(), 2)
         0.0
         """
-        from QDYN.weyl import concurrence as concurrence_c1c2c3
-        from QDYN.weyl import c1c2c3
+        from .weyl import concurrence as concurrence_c1c2c3
+        from .weyl import c1c2c3
         return concurrence_c1c2c3(*c1c2c3(self))
 
     def weyl_coordinates(self):
@@ -459,7 +459,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         >>> print("%.2f %.2f %.2f" % CNOT.weyl_coordinates())
         0.50 0.00 0.00
         """
-        from QDYN.weyl import c1c2c3
+        from .weyl import c1c2c3
         return c1c2c3(self)
 
     def local_invariants(self):
@@ -469,7 +469,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         >>> print("%.2f %.2f %.2f" % CNOT.local_invariants())
         0.00 0.00 1.00
         """
-        from QDYN.weyl import g1g2g3
+        from .weyl import g1g2g3
         return g1g2g3(self)
 
 
@@ -520,7 +520,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         >>> abs(A.concurrence() - 1.0) < 1.0e-15
         True
         """
-        from QDYN.weyl import cartan_decomposition
+        from .weyl import cartan_decomposition
         k1, A, k2 = cartan_decomposition(self.closest_unitary())
         return Gate2Q(k1), Gate2Q(A), Gate2Q(k2)
 
