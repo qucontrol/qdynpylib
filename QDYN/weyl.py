@@ -330,6 +330,21 @@ class WeylChamber():
         be passed to matplotlib scatter3D function"""
         self._scatter.append((c1, c2, c3, kwargs))
 
+    def add_point(self, c1, c2, c3, scatter_index=0, **kwargs):
+        """Add a point to a scatter plot with the given scatter_index. If there
+        is no existing scatter plot with that index, a new one will be created.
+        The arguments of the scatter plot are updated with the given kwargs."""
+        try:
+            c1s, c2s, c3s, kw = self._scatter[scatter_index]
+            kw.update(kwargs)
+            self._scatter[scatter_index] = (np.append(c1s, [c1, ]),
+                                            np.append(c2s, [c2, ]),
+                                            np.append(c3s, [c3, ]),
+                                            kw)
+        except IndexError:
+            self._scatter.append((np.array([c1, ]), np.array([c2, ]),
+                                  np.array([c3, ]), kwargs))
+
     def _draw_line(self, ax, origin, end, **kwargs):
         """Draw a line from origin to end onto the given axis. Both origin and
         end must either be 3-tuples, or names of weyl_points. All keyword
