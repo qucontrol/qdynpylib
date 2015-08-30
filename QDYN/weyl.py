@@ -521,6 +521,87 @@ def point_in_PE(c1, c2, c3):
         return False
 
 
+def point_in_region(region, c1, c2, c3):
+    """Return True if the coordinates c1, c2, c3 are inside the given region
+    of the Weyl chamber. The regions are 'W0' (between origin O and perfect
+    entangerls polyhedron), 'W0*' (between point A1 and perfect entangler
+    polyhedron), 'W1' (between A3 point and perfect entanglers polyhedron), and
+    'PE' (inside perfect entanglers polyhedron)
+
+    >>> point_in_region('W0', *WeylChamber.O)
+    True
+    >>> point_in_region('W0', 0.2, 0.05, 0.0)
+    True
+    >>> point_in_region('W0', *WeylChamber.L)
+    False
+    >>> point_in_region('W0', *WeylChamber.Q)
+    False
+    >>> point_in_region('PE', *WeylChamber.Q)
+    True
+    >>> point_in_region('W0*', *WeylChamber.A1)
+    True
+    >>> point_in_region('W0*', 0.8, 0.1, 0.1)
+    True
+    >>> point_in_region('W1', *WeylChamber.A3)
+    True
+    >>> point_in_region('W1', 0.5, 0.4, 0.25)
+    True
+    >>> point_in_region('W1', 0.5, 0.25, 0)
+    False
+    >>> point_in_region('PE', 0.5, 0.25, 0)
+    True
+    >>> try:
+    ...     point_in_region('PE', 1.0, 0.5, 0)
+    ... except ValueError as e:
+    ...     print(e)
+    (1, 0.5, 0) is not in the Weyl chamber
+    """
+    regions = ['W0', 'W0*', 'W1', 'PE']
+    if not point_in_weyl_chamber(c1, c2, c3):
+        raise ValueError("(%g, %g, %g) is not in the Weyl chamber"
+                           % (c1, c2, c3))
+    if not region in regions:
+        raise ValueError("region %s is not in %s"%(region, regions))
+    if region == 'PE':
+        return point_in_PE(c1, c2, c3)
+    else:
+        p = np.array((c1, c2, c3))
+        n = WeylChamber.normal[region]
+        a = WeylChamber.anchor[region]
+        return (np.inner((p-a), n) > 0)
+
+
+def get_region(c1, c2, c3):
+    """Return the region of the Weyl chamber ('W0', 'W0*', 'W1', 'PE') the the
+    given point is in.
+
+    >>> print(get_region(*WeylChamber.O))
+    W0
+    >>> print(get_region(*WeylChamber.A1))
+    W0*
+    >>> print(get_region(*WeylChamber.A3))
+    W1
+    >>> print(get_region(*WeylChamber.L))
+    PE
+    >>> print(get_region(0.2, 0.05, 0.0))
+    W0
+    >>> print(get_region(0.8, 0.1, 0.1))
+    W0*
+    >>> print(get_region(0.5, 0.25, 0))
+    PE
+    >>> print(get_region(0.5, 0.4, 0.25))
+    W1
+    >>> try:
+    ...     get_region(1.0, 0.5, 0)
+    ... except ValueError as e:
+    ...     print(e)
+    (1, 0.5, 0) is not in the Weyl chamber
+    """
+    for region in ['W0', 'W0*', 'W1', 'PE']:
+        if point_in_region(region, c1, c2, c3):
+            return region
+
+
 def concurrence(c1, c2, c3):
     """
     Calculate the concurrence directly from the Weyl Chamber coordinates c1,
