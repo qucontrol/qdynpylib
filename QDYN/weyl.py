@@ -56,6 +56,24 @@ class Arrow3D(FancyArrowPatch):
 class WeylChamber():
     """Class for plotting data in the Weyl Chamber
 
+    Class Attributes
+    ----------------
+
+    weyl_points: dict
+        Dictionary of Weyl chamber point names to (c1, c2, c3) coordinates (in
+        units of pi). Each point name is also a class attribute itself
+    normal: dict
+        Dictionary of Weyl chamber region name to normal vectors for the
+        surface that separates the region from the polyhedron of perfect
+        entanglers (pointing outwards from the PE's). The three regions are
+        'W0': region from the origin point (O) to the PE polyhedron
+        'W0*': region from the A2 point to the PE polyhedron
+        'W1': region from the A2 point (SWAP gate) to the PE polyhedron
+    anchor: dict
+        Dictionary of anchor points for the normal vectors (i.e., an arbitrary
+        point on the surface that separates the region specified by the key
+        from the perfect entanglers polyhedron
+
     Attributes
     ----------
     fig_width : float {8.5}
@@ -128,6 +146,10 @@ class WeylChamber():
     Q  = np.array((0.25, 0.25, 0))
     weyl_points = {'A1' : A1, 'A2' : A2, 'A3' : A3, 'O' : O, 'L' : L,
                    'M' : M, 'N' : N, 'P' : P, 'Q': Q}
+    normal = {'W0' : (np.sqrt(2.0)/2.0)*np.array((-1, -1, 0)),
+              'W0*': (np.sqrt(2.0)/2.0)*np.array(( 1, -1, 0)),
+              'W1' : (np.sqrt(2.0)/2.0)*np.array(( 0,  1, 1))}
+    anchor = {'W0': L, 'W0*': L, 'W1': A2}
 
     def __init__(self):
         self._fig = None
