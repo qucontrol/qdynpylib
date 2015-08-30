@@ -602,6 +602,42 @@ def get_region(c1, c2, c3):
             return region
 
 
+def project_to_PE(c1, c2, c3):
+    """Return new tuple (c1', c2', c3') obtained by projecting the given input
+    point (c1, c2, c3) onto the closest boundary of the perfect entanglers
+    polyhedron. If the input point already is a perfect entangler, it will be
+    returned unchanged
+
+    >>> print("%s, %s, %s" % tuple(project_to_PE(*WeylChamber.A3)))
+    0.5, 0.25, 0.25
+    >>> print("%.3f, %.3f, %.3f" % tuple(project_to_PE(0.5, 0.5, 0.25)))
+    0.500, 0.375, 0.125
+    >>> print("%.3f, %.3f, %.3f" % tuple(project_to_PE(0.25, 0, 0)))
+    0.375, 0.125, 0.000
+    >>> print("%.3f, %.3f, %.3f" % tuple(project_to_PE(0.75, 0, 0)))
+    0.625, 0.125, 0.000
+    >>> print("%.3f, %.3f, %.3f" % tuple(project_to_PE(0.3125, 0.0625, 0.01)))
+    0.375, 0.125, 0.010
+    >>> print("%.1f, %.1f, %.1f" % tuple(project_to_PE(0.5, 0, 0)))
+    0.5, 0.0, 0.0
+    >>> print("%.1f, %.1f, %.1f" % tuple(project_to_PE(0.5, 0.2, 0.2)))
+    0.5, 0.2, 0.2
+    >>> try:
+    ...     project_to_PE(1.0, 0.5, 0)
+    ... except ValueError as e:
+    ...     print(e)
+    (1, 0.5, 0) is not in the Weyl chamber
+    """
+    if point_in_PE(c1, c2, c3):
+        return c1, c2, c3
+    else:
+        region = get_region(c1, c2, c3)
+        p = np.array((c1, c2, c3))
+        n = WeylChamber.normal[region]
+        a = WeylChamber.anchor[region]
+        return p - np.inner((p-a), n) * n
+
+
 def concurrence(c1, c2, c3):
     """
     Calculate the concurrence directly from the Weyl Chamber coordinates c1,
