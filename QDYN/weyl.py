@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import FancyArrowPatch
 from six.moves import xrange
+from .gate2q import Gate2Q
 
-# TODO: routine to obtain canonical gate from weyl-coordinates
 # TODO: allow to obtain gates for names points in Weyl chamber
 
 Qmagic = (1.0/np.sqrt(2.0)) * np.matrix(
@@ -703,6 +703,22 @@ def F_PE(g1, g2, g3):
     return g3 * np.sqrt(g1**2 + g2**2) - g1 + 0.0
 
 
+def canonical_gate(c1,c2,c3):
+    """Return the canonical two-qubit gate characterized by the given Weyl
+    chamber coordinates (in units of pi)
+    >>> print(canonical_gate(0.5,0,0))
+    [[0.707107+0.000000j, 0.000000+0.000000j, 0.000000+0.000000j, 0.000000+0.707107j],
+     [0.000000+0.000000j, 0.707107+0.000000j, 0.000000+0.707107j, 0.000000+0.000000j],
+     [0.000000+0.000000j, 0.000000+0.707107j, 0.707107+0.000000j, 0.000000+0.000000j],
+     [0.000000+0.707107j, 0.000000+0.000000j, 0.000000+0.000000j, 0.707107+0.000000j]]
+    >>> U = canonical_gate(0.5,0,0)
+    >>> diff = np.array(U.weyl_coordinates()) - np.array([0.5, 0, 0])
+    >>> print("%.1f" % np.max(np.abs(diff)))
+    0.0
+    """
+    return Gate2Q(scipy.linalg.expm(np.pi*0.5j * (c1*SxSx +c2*SySy + c3*SzSz)))
+
+
 def cartan_decomposition(U):
     """
     Calculate the Cartan Decomposition of the given U in U(4)
@@ -805,7 +821,7 @@ def cartan_decomposition(U):
     k2 = from_magic(O_2)
     O_1 = UB * O_2.T * F.H
     k1 = from_magic(O_1)
-    A = np.matrix(scipy.linalg.expm(np.pi*0.5j * (c1*SxSx +c2*SySy + c3*SzSz)))
+    A = canonical_gate(c1, c2, c3)
 
     # Check our results
     from . gate2q import identity
