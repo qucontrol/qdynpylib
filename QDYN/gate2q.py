@@ -462,6 +462,62 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         from .weyl import c1c2c3
         return c1c2c3(self)
 
+    def get_weyl_region(self):
+        """
+        Return the name of the Weyl chamber region ('W0', 'W0*', 'W1', or 'PE')
+        that the gate is in.
+
+        >>> print(CNOT.get_weyl_region())
+        PE
+        >>> print(SWAP.get_weyl_region())
+        W1
+        >>> print(identity.get_weyl_region())
+        W0
+        >>> A2Gate = Gate2Q(str('0 0 0 1j; 0 0 1j 0; 0 1j 0 0; 1j 0 0 0'),
+        ...                 name='A2')
+        >>> print(A2Gate.get_weyl_region())
+        W0*
+        """
+        from .weyl import get_region
+        return get_region(*self.weyl_coordinates())
+
+    def in_weyl_region(self, region):
+        """
+        Check if the gate is in the given Weyl chamber region ('W0', 'W0*',
+        'W1', or 'PE')
+
+        >>> CNOT.in_weyl_region('PE')
+        True
+        >>> CNOT.in_weyl_region('W0')
+        False
+        >>> identity.in_weyl_region('W0')
+        True
+        >>> SWAP.in_weyl_region('W1')
+        True
+        """
+        from .weyl import point_in_region
+        return point_in_region(region, *self.weyl_coordinates())
+
+    def project_to_PE(self):
+        """
+        Return the canonical gate for the projection onto the surface of the
+        perfect entanglers polyhedron. If already a perfect entangler, return
+        gate unchanged .
+
+        >>> G = SWAP.project_to_PE()
+        >>> G.concurrence()
+        1.0
+        >>> print("%.2f, %.2f, %.2f" % G.weyl_coordinates())
+        0.50, 0.25, 0.25
+        >>> np.max(np.abs(CNOT.project_to_PE() - CNOT))
+        0.0
+        """
+        from .weyl import canonical_gate, project_to_PE
+        if self.in_weyl_region('PE'):
+            return self
+        else:
+            return canonical_gate(*project_to_PE(*self.weyl_coordinates()))
+
     def show_in_weyl_chamber(self, weyl_chamber=None, **kwargs):
         """
         Show the gate graphically as a point in the Weyl chamber.
