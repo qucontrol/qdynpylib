@@ -462,20 +462,20 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         from .weyl import c1c2c3
         return c1c2c3(self)
 
-    def get_weyl_region(self):
+    def weyl_region(self):
         """
         Return the name of the Weyl chamber region ('W0', 'W0*', 'W1', or 'PE')
         that the gate is in.
 
-        >>> print(CNOT.get_weyl_region())
+        >>> print(CNOT.weyl_region())
         PE
-        >>> print(SWAP.get_weyl_region())
+        >>> print(SWAP.weyl_region())
         W1
-        >>> print(identity.get_weyl_region())
+        >>> print(identity.weyl_region())
         W0
         >>> A2Gate = Gate2Q(str('0 0 0 1j; 0 0 1j 0; 0 1j 0 0; 1j 0 0 0'),
         ...                 name='A2')
-        >>> print(A2Gate.get_weyl_region())
+        >>> print(A2Gate.weyl_region())
         W0*
         """
         from .weyl import get_region
