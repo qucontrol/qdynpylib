@@ -11,6 +11,11 @@ from __future__ import print_function, division, absolute_import, \
                        unicode_literals
 import sys
 import doctest
+import logging
+logging.basicConfig(level=logging.INFO)
+if '-v' in sys.argv:
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
 try:
     import importlib
 except ImportError:
@@ -59,6 +64,7 @@ nosetest_modules = [
 'tests.test_io',
 'tests.test_bloch',
 'tests.test_octconvergences',
+'tests.test_gate2q',
 ]
 def run_nosetests(modules):
     print("*******************")
