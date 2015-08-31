@@ -5,13 +5,17 @@ for two-qubit gates
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
 import numpy as np
-import scipy.linalg
+from numpy import cos, sin, exp, pi
 from mpl_toolkits.mplot3d import Axes3D # required to activate 2D plotting
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import FancyArrowPatch
 from six.moves import xrange
 from .gate2q import Gate2Q
+from .linalg import vectorize
+from .memoize import memoize
+from scipy.optimize import leastsq
+from scipy.linalg import expm
 
 # TODO: allow to obtain gates for names points in Weyl chamber
 
@@ -134,6 +138,9 @@ class WeylChamber():
         Name of color for figure background
     ticklabelsize: float {7}
         font size for tick labels
+    full_cube: logical {False}
+        if True, draw all three axes in the range [0,1]. This may result in a
+        less distorted view of the Weyl chamber
     """
     A1 = np.array((1, 0, 0))
     A2 = np.array((0.5, 0.5, 0))
@@ -212,6 +219,7 @@ class WeylChamber():
         self.panecolor = (1.0, 1.0, 1.0, 0.0)
         self.facecolor = 'None'
         self.ticklabelsize = 7
+        self.full_cube = False
         self._scatter = []
 
     @property
@@ -308,9 +316,14 @@ class WeylChamber():
         ax.set_xlabel(r'$c_1/\pi$')
         ax.set_ylabel(r'$c_2/\pi$')
         ax.set_zlabel(r'$c_3/\pi$')
-        ax.set_xlim(0,1)
-        ax.set_ylim(0,0.5)
-        ax.set_zlim(0,0.5)
+        if self.full_cube:
+            ax.set_xlim(0,1)
+            ax.set_ylim(0,1)
+            ax.set_zlim(0,1)
+        else:
+            ax.set_xlim(0,1)
+            ax.set_ylim(0,0.5)
+            ax.set_zlim(0,0.5)
         ax.tick_params(axis='both', which='major',
                        labelsize=self.ticklabelsize)
         # try to fix positioning of tick labels
@@ -366,6 +379,12 @@ class WeylChamber():
         except IndexError:
             self._scatter.append((np.array([c1, ]), np.array([c2, ]),
                                   np.array([c3, ]), kwargs))
+
+    def add_gate(self, U, scatter_index=0, **kwargs):
+        """Call the add_point method for the Weyl chamber coordinates of the
+        given gate."""
+        self.add_point(*U.weyl_coordinates(), scatter_index=scatter_index,
+                       **kwargs)
 
     def _draw_line(self, ax, origin, end, **kwargs):
         """Draw a line from origin to end onto the given axis. Both origin and
@@ -479,13 +498,13 @@ def g1g2g3_from_c1c2c3(c1, c2, c3):
     >>> print("%.2f %.2f %.2f" % g1g2g3_from_c1c2c3(*c1c2c3(CNOT)))
     0.00 0.00 1.00
     """
-    c1 *= np.pi
-    c2 *= np.pi
-    c3 *= np.pi
-    g1 = np.cos(c1)**2 * np.cos(c2)**2 * np.cos(c3)**2 \
-       - np.sin(c1)**2 * np.sin(c2)**2 * np.sin(c3)**2     + 0.0
-    g2 = 0.25 * np.sin(2*c1) * np.sin(2*c2) * np.sin(2*c3) + 0.0
-    g3 = 4*g1 - np.cos(2*c1) * np.cos(2*c2) * np.cos(2*c3) + 0.0
+    c1 *= pi
+    c2 *= pi
+    c3 *= pi
+    g1 = cos(c1)**2 * cos(c2)**2 * cos(c3)**2 \
+       - sin(c1)**2 * sin(c2)**2 * sin(c3)**2     + 0.0
+    g2 = 0.25 * sin(2*c1) * sin(2*c2) * sin(2*c3) + 0.0
+    g3 = 4*g1 - cos(2*c1) * cos(2*c2) * cos(2*c3) + 0.0
     return g1, g2, g3
 
 
@@ -660,7 +679,7 @@ def concurrence(c1, c2, c3):
         c1_c2_c3 = np.array([c1, c2, c3])
         c3_c1_c2 = np.roll(c1_c2_c3, 1)
         m = np.concatenate((c1_c2_c3 - c3_c1_c2, c1_c2_c3 + c3_c1_c2))
-        return np.max(abs(np.sin(np.pi * m)))
+        return np.max(abs(sin(pi * m)))
 
 
 def to_magic(A):
@@ -684,7 +703,7 @@ def J_T_LI(O, U, form='g'):
         return np.sum(np.abs(np.array(g1g2g3(O)) - np.array(g1g2g3(U)))**2)
     elif form=='c':
         delta_c = np.array(c1c2c3(O)) - np.array(c1c2c3(U))
-        return np.prod(np.cos(np.pi * (delta_c) / 2.0))
+        return np.prod(cos(np.pi * (delta_c) / 2.0))
     else:
         raise ValueError("Illegal value for 'form'")
 
@@ -716,7 +735,7 @@ def canonical_gate(c1,c2,c3):
     >>> print("%.1f" % np.max(np.abs(diff)))
     0.0
     """
-    return Gate2Q(scipy.linalg.expm(np.pi*0.5j * (c1*SxSx +c2*SySy + c3*SzSz)))
+    return Gate2Q(expm(pi*0.5j * (c1*SxSx +c2*SySy + c3*SzSz)))
 
 
 def cartan_decomposition(U):
@@ -772,10 +791,10 @@ def cartan_decomposition(U):
         # It is a diagonal matrix containing the squares of the eigenvalues of
         # m
         c1, c2, c3 = c1c2c3(Utilde)
-        F1 = np.exp( np.pi * 0.5j * ( c1 - c2 + c3) )
-        F2 = np.exp( np.pi * 0.5j * ( c1 + c2 - c3) )
-        F3 = np.exp( np.pi * 0.5j * (-c1 - c2 - c3) )
-        F4 = np.exp( np.pi * 0.5j * (-c1 + c2 + c3) )
+        F1 = exp( pi * 0.5j * ( c1 - c2 + c3) )
+        F2 = exp( pi * 0.5j * ( c1 + c2 - c3) )
+        F3 = exp( pi * 0.5j * (-c1 - c2 - c3) )
+        F4 = exp( pi * 0.5j * (-c1 + c2 + c3) )
         Fd = np.array([F1, F2, F3, F4])
         F  = np.matrix(np.diag(Fd))
 
@@ -833,3 +852,84 @@ def cartan_decomposition(U):
     "Cartan Decomposition Failed"
 
     return k1, A, k2
+
+
+def _U2(phi, theta, phi1, phi2):
+    r"""Return a unitary gate using the parametrization
+
+        U = e^{i \phi} \begin{bmatrix}
+             \cos\theta e^{ i\phi_1}  & \sin\theta e^{ i\phi_2}\\
+            -\sin\theta e^{-i\phi_2}  & \cos\theta e^{-i\phi_1}\\
+            \end{bmatrix}
+
+    >>> from .gate2q import pop_loss
+    >>> gates = [_U2(*(2*np.pi*np.random.random(4))) for i in range(100)]
+    >>> np.any([(pop_loss(U) > 1.0e-14) for U in gates])
+    False
+    """
+    return exp(1j*phi) * np.array([
+        [  cos(theta) * exp( 1j*phi1), sin(theta) * exp( 1j*phi2) ],
+        [ -sin(theta) * exp(-1j*phi2), cos(theta) * exp(-1j*phi1) ]])
+
+
+def _SQ_unitary(phi_left, theta_left, phi1_left, phi2_left,
+    phi_right, theta_right, phi1_right, phi2_right):
+    """
+    Return a non-entangling two-qubit gate (a two-qubit gate locally equivalent
+    to the identity)
+
+    >>> from .gate2q import pop_loss
+    >>> gates = [_SQ_unitary(*(2*np.pi*np.random.random(8))) for i in range(100)]
+    >>> np.any([(pop_loss(U) > 1.0e-14) for U in gates])
+    False
+    >>> np.any([(U.concurrence() > 1.0e-14) for U in gates])
+    False
+    """
+    I = np.identity(2)
+    return Gate2Q(
+           np.kron(_U2(phi_left, theta_left, phi1_left, phi2_left), I).dot(
+           np.kron(I, _U2(phi_right, theta_right, phi1_right, phi2_right))))
+
+
+def closest_LI(U, c1, c2, c3, method='Powell', limit=1.0e-6):
+    """Find the closest gate that has the given Weyl chamber coordinates (in
+    units of pi)"""
+    from .gate2q import _closest_gate
+    A = canonical_gate(c1, c2, c3)
+    def f_U(p):
+        return _SQ_unitary(*p[:8]).dot(A).dot(_SQ_unitary(*p[8:]))
+    return _closest_gate(U, f_U, n=16, method=method, limit=limit)
+
+
+def random_weyl_point(region=None):
+    """Return a random point (c1, c2, c3) in the Weyl chamber, in units of pi.
+    If region is given in ['W0', 'W0*', 'W1', 'PE'], the point will be in the
+    specified region of the Weyl chamber
+
+    >>> c1, c2, c3 = random_weyl_point()
+    >>> point_in_weyl_chamber(c1, c2, c3)
+    True
+    >>> c1, c2, c3 = random_weyl_point(region='PE')
+    >>> point_in_region('PE', c1, c2, c3)
+    True
+    >>> c1, c2, c3 = random_weyl_point(region='W0')
+    >>> point_in_region('W0', c1, c2, c3)
+    True
+    >>> c1, c2, c3 = random_weyl_point(region='W0*')
+    >>> point_in_region('W0*', c1, c2, c3)
+    True
+    >>> c1, c2, c3 = random_weyl_point(region='W1')
+    >>> point_in_region('W1', c1, c2, c3)
+    True
+    """
+    while True:
+        c1 = np.random.rand()
+        c2 = 0.5*np.random.rand()
+        c3 = 0.5*np.random.rand()
+        if point_in_weyl_chamber(c1, c2, c3):
+            if region is None:
+                return c1, c2, c3
+            else:
+                if point_in_region(region, c1, c2, c3):
+                    return c1, c2, c3
+

@@ -14,7 +14,11 @@ import re
 from warnings import warn
 from six.moves import xrange
 from .io import tempinput, open_file, matrix_to_latex, matrix_to_mathematica
-from .linalg import inner, norm
+from .linalg import inner, norm, vectorize
+from .memoize import memoize
+from scipy.optimize import leastsq
+from scipy.linalg import expm
+import logging
 
 class Gate2Q(np.matrixlib.defmatrix.matrix):
     """
@@ -424,6 +428,16 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
                 d = abs(s-1.0)
         return U_unitary, d
 
+    def closest_SQ(self, method='Powell', limit=1.0e-6):
+        """Call the closest_SQ function for the current gate in order to
+        find the closest gate that is locally equivalent to the identity"""
+        return closest_SQ(self, method=method, limit=limit)
+
+    def closest_PE(self, method='Powell', limit=1.0e-6):
+        """Call the closest_PE function for the current gate in order to find
+        the closest perfect entanglers"""
+        return closest_PE(self, method=method, limit=limit)
+
     def pop_loss(self):
         """
         Return the loss of population from the two-qubit logical subspace
@@ -603,6 +617,146 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         from .weyl import cartan_decomposition
         k1, A, k2 = cartan_decomposition(self.closest_unitary())
         return Gate2Q(k1), Gate2Q(A), Gate2Q(k2)
+
+
+def _closest_gate(U, f_U, n, x_max=2*pi, method='Powell', limit=1.0e-6):
+    """Find the closest gate to U that fulfills the parametrization implied by
+    the function f_U
+
+    Arguments
+    ---------
+
+    U: QDYN.gate2q.Gate2Q
+        Target gate
+    f_U: callable
+        function that takes an array of n values and returns an instance of
+        QDYN.gate2q.Gate2Q
+    n: integer
+        Number of parameters (size of the argument of f_U)
+    x_max: float
+        Maximum value for each element of the array passed as an argument to
+        f_U. There is no way to have different a different range
+        for the different elements
+    method: string
+        Name of mimimization method, either 'leastsq' or any of the
+        gradient-free methods implemented by scipy.optimize.mimize
+    limit: float
+        absolute error of the distance between the target gate and the
+        optimized gate for convergence. The limit is automatically increased by
+        an order of magnitude every 100 iterations
+    """
+    logger = logging.getLogger(__name__)
+    logger.debug("_closests_gate with method %s", method)
+    from scipy.optimize import minimize
+    if method == 'leastsq':
+        def f_minimize(p):
+            d = vectorize(f_U(p)-U)
+            return np.concatenate([d.real, d.imag])
+    else:
+        def f_minimize(p):
+            return norm(U - f_U(p))
+    dist_min = None
+    iter = 0
+    while True:
+        iter += 1
+        if iter > 100:
+            iter = 0
+            limit *= 10
+            logger.debug("_closests_gate limit -> %.2e", limit)
+        p0 = x_max * np.random.random(n)
+        success = False
+        if method == 'leastsq':
+            p, info = leastsq(f_minimize, p0)
+            U_min = f_U(p)
+            if info in [1,2,3,4]:
+                success = True
+        else:
+            res = minimize(f_minimize, p0, method=method)
+            U_min = f_U(res.x)
+            success = res.success
+        if success:
+            dist = norm(U_min - U)
+            logger.debug("_closests_gate dist = %.5e", dist)
+            if dist_min is None:
+                dist_min = dist
+                logger.debug("_closests_gate dist_min -> %.5e", dist_min)
+            else:
+                logger.debug("_closests_gate delta_dist = %.5e",
+                             abs(dist-dist_min))
+                if abs(dist-dist_min) < limit:
+                    return U_min
+                else:
+                    if dist < dist_min:
+                        dist_min = dist
+                        logger.debug("_closests_gate dist_min -> %.5e",
+                                     dist_min)
+
+
+@memoize
+def closest_SQ(U, method='Powell', limit=1.0e-6):
+    """Find the closest gate locally equivalent to the identity for the given
+    two-qubit gate. Allowed methods are 'leastsq', or any of the gradient-free
+    methods implemented by scipy.optimize.mimimize. Convergence is reached when
+    the optimized gate has a distance from U of less than the given limit. The
+    limit is automatically increased by an order of magnitude every 100
+    iterations. Finding the global optimimum is not guaranteed.
+    """
+    from .weyl import _SQ_unitary
+    U_unitary = U.closest_unitary()
+    if U_unitary.concurrence() == 0.0:
+        return U_unitary
+    def f_U(p):
+        return _SQ_unitary(*p)
+    return _closest_gate(U, f_U, n=8, method=method, limit=1.0e-6)
+
+
+@memoize
+def closest_PE(U, method='Powell', limit=1.0e-6):
+    """Find the closest entangler, using the given optimization method. Allowed
+    methods are 'leastsq', or any of the gradient-free methods implemented by
+    scipy.optimize.mimimize. Convergence is reached when the optimized gate has
+    a distance from U of less than the given limit.The limit is automatically
+    increased by an order of magnitude every 100 iterations. Finding the global
+    optimimum is not guaranteed.
+    """
+    from .weyl import closest_LI
+    U_unitary = U.closest_unitary()
+    if U_unitary.concurrence() == 1.0:
+        return U_unitary
+    else:
+        return closest_LI(U, *U.project_to_PE().weyl_coordinates(),
+                          method=method, limit=limit)
+
+
+def random_Gate2Q(region=None):
+    """Return a random gate in the given region of the Weyl chamber. If region
+    is not None, the gate will be in the specified region of the Weyl chamber.
+    The following region names are allowed:
+    'SQ': single qubit gates, consisting of the Weyl chamber points O, A2
+    'PE': polyhedron of perfect entanglers
+    'W0': region between point O and the PE polyhedron
+    'W0*': region between point A2 and the PE polyhedron
+    'W1': region between point A3 ([SWAP]) and the PE polyhedron
+
+    >>> print("%.1f"%random_Gate2Q("SQ").concurrence())
+    0.0
+    >>> print("%.1f"%random_Gate2Q("PE").concurrence())
+    1.0
+    >>> print(random_Gate2Q("W0").weyl_region())
+    W0
+    >>> print(random_Gate2Q("W0*").weyl_region())
+    W0*
+    >>> print(random_Gate2Q("W1").weyl_region())
+    W1
+    """
+    from .weyl import _SQ_unitary, canonical_gate, random_weyl_point
+    if region == 'SQ':
+        p = 2.0*pi*np.random.random(8)
+        return _SQ_unitary(*p)
+    else:
+        A = canonical_gate(*random_weyl_point(region=region))
+        p = 2.0*pi*np.random.random(16)
+        return _SQ_unitary(*p[:8]).dot(A).dot(_SQ_unitary(*p[8:]))
 
 
 def pop_loss(A):
