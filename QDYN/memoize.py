@@ -106,6 +106,23 @@ class memoize(object):
             self.pickle_cache[key] = value
             return value
 
+    def add_to_cache(self, result, args=None, kwargs=None):
+        """Add the known result for a given set of args and kwargs to the
+        cache. One case where this is useful is when calling a function as part
+        of a multiprocessing pool, or another parallelization method that does
+        not have shared memory. In this situation, memoization will fail, but
+        the results may be added to the cache later on."""
+        if not kwargs is None:
+            try:
+                self.cache[args] = result
+                return
+            except TypeError:
+                # unhashable -- for instance, passing a list or dict as an
+                # argument.  fall through to using pickle
+                pass
+        key = (pickle.dumps(args, 1), pickle.dumps(kwargs, 1))
+        self.pickle_cache[key] = result
+
     def _combined_cache(self):
         """Return the combined cache and pickle_cache"""
         result = {}
