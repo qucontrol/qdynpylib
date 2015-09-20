@@ -6,6 +6,11 @@ from __future__ import print_function, division, absolute_import, \
                        unicode_literals
 import numpy as np
 from numpy import cos, sin, exp, pi
+from numpy import less, greater
+from numpy import logical_and as And
+from numpy import logical_or as Or
+from numpy import less_equal as less_eq
+from numpy import greater_equal as greater_eq
 from mpl_toolkits.mplot3d import Axes3D # required to activate 2D plotting
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
@@ -492,6 +497,7 @@ def c1c2c3(U):
 def g1g2g3_from_c1c2c3(c1, c2, c3):
     """
     Calculate the local invariants from the Weyl-chamber coordinates (c1, c2,
+                pass
     c3, in units of pi)
 
     >>> from . gate2q import CNOT
@@ -508,7 +514,7 @@ def g1g2g3_from_c1c2c3(c1, c2, c3):
     return g1, g2, g3
 
 
-def point_in_weyl_chamber(c1, c2, c3):
+def point_in_weyl_chamber(c1, c2, c3, raise_exception=False):
     """
     Return True if the coordinates c1, c2, c3 are inside the Weyl chamber
 
@@ -517,12 +523,40 @@ def point_in_weyl_chamber(c1, c2, c3):
     True
     >>> point_in_weyl_chamber(*c1c2c3(identity))
     True
+
+    The coordinates may also be array-like, in which case a boolean numpy array
+    is returned.
+
+    >>> point_in_weyl_chamber([0.0,0.5,0.8], [1.0,0.25,0.0], [1.0,0.25,0.0])
+    array([False,  True,  True], dtype=bool)
+
+    If raise_exception is True, raise an ValueError if any values are outside
+    the Weyl chamber.
+
+    >>> try:
+    ...     point_in_weyl_chamber(1.0, 0.5, 0, raise_exception=True)
+    ... except ValueError as e:
+    ...     print(e)
+    (1, 0.5, 0) is not in the Weyl chamber
     """
-    return ( ((c1 < 0.5)  and (c2 <= c1)   and (c3 <= c2))
-          or ((c1 >= 0.5) and (c2 <= 1-c1) and (c3 <= c2)) )
+    result = Or(
+        And(And(
+          less(c1, 0.5), less_eq(c2, c1)), less_eq(c3, c2)),
+        And(And(
+          greater_eq(c1, 0.5), less_eq(c2, 1.0-np.array(c1))), less_eq(c3, c2))
+    )
+    if raise_exception:
+        if not np.all(result):
+            if np.isscalar(c1): # assume c2, c3 are scalar, too
+                raise ValueError("(%g, %g, %g) is not in the Weyl chamber"
+                                % (c1, c2, c3))
+            else:
+                raise ValueError("Not all values (c1, c2, c3) are in the "
+                                    "Weyl chamber")
+    return result
 
 
-def point_in_PE(c1, c2, c3):
+def point_in_PE(c1, c2, c3, check_weyl=False):
     """
     Return True if the coordinates c1, c2, c3 are inside the perfect-entangler
     polyhedron
@@ -533,19 +567,28 @@ def point_in_PE(c1, c2, c3):
     >>> from QDYN.gate2q import identity
     >>> point_in_PE(*c1c2c3(identity))
     False
+
+    >>> point_in_PE([0.0, 0.5, 0.8], [1.0, 0.25, 0.0], [1.0, 0.25, 0.0])
+    array([False,  True, False], dtype=bool)
     """
-    if point_in_weyl_chamber(c1, c2, c3):
-        return ( ((c1 + c2) >= 0.5) and (c1-c2 <= 0.5) and ((c2+c3) <= 0.5))
-    else:
-        return False
+    in_weyl = point_in_weyl_chamber(c1, c2, c3, raise_exception=check_weyl)
+    c1 = np.array(c1); c2 = np.array(c2); c3 = np.array(c3)
+    return And(in_weyl,
+        And(And(
+            greater_eq(c1+c2, 0.5), less_eq(c1-c2, 0.5)), less_eq(c2+c3, 0.5)
+        )
+    )
 
 
-def point_in_region(region, c1, c2, c3):
+def point_in_region(region, c1, c2, c3, check_weyl=False):
     """Return True if the coordinates c1, c2, c3 are inside the given region
     of the Weyl chamber. The regions are 'W0' (between origin O and perfect
     entangerls polyhedron), 'W0*' (between point A1 and perfect entangler
     polyhedron), 'W1' (between A3 point and perfect entanglers polyhedron), and
     'PE' (inside perfect entanglers polyhedron)
+
+    If the check_weyl parameter is given a True, raise a ValueError for any
+    points outside of the Weyl chamber
 
     >>> point_in_region('W0', *WeylChamber.O)
     True
@@ -569,25 +612,25 @@ def point_in_region(region, c1, c2, c3):
     False
     >>> point_in_region('PE', 0.5, 0.25, 0)
     True
-    >>> try:
-    ...     point_in_region('PE', 1.0, 0.5, 0)
-    ... except ValueError as e:
-    ...     print(e)
-    (1, 0.5, 0) is not in the Weyl chamber
+
+    The function may be also applied against arrays:
+    >>> point_in_region('W1', [0.5,0.5], [0.4,0.25], [0.25,0.0])
+    array([ True, False], dtype=bool)
     """
     regions = ['W0', 'W0*', 'W1', 'PE']
-    if not point_in_weyl_chamber(c1, c2, c3):
-        raise ValueError("(%g, %g, %g) is not in the Weyl chamber"
-                           % (c1, c2, c3))
-    if not region in regions:
-        raise ValueError("region %s is not in %s"%(region, regions))
     if region == 'PE':
-        return point_in_PE(c1, c2, c3)
+        return point_in_PE(c1, c2, c3, check_weyl=check_weyl)
     else:
-        p = np.array((c1, c2, c3))
-        n = WeylChamber.normal[region]
-        a = WeylChamber.anchor[region]
-        return (np.inner((p-a), n) > 0)
+        in_weyl = point_in_weyl_chamber(c1, c2, c3, raise_exception=check_weyl)
+        c1 = np.array(c1); c2 = np.array(c2); c3 = np.array(c3)
+        if region == 'W0':
+            return And(in_weyl, less(c1+c2, 0.5))
+        elif region == 'W0*':
+            return And(in_weyl, greater(c1-c2, 0.5))
+        elif region == 'W1':
+            return And(in_weyl, greater(c2+c3, 0.5))
+        else:
+            raise ValueError("region %s is not in %s"%(region, regions))
 
 
 def get_region(c1, c2, c3):
@@ -615,10 +658,18 @@ def get_region(c1, c2, c3):
     ... except ValueError as e:
     ...     print(e)
     (1, 0.5, 0) is not in the Weyl chamber
+
+    Only scalar values are accepted for c1, c2, c3
     """
-    for region in ['W0', 'W0*', 'W1', 'PE']:
-        if point_in_region(region, c1, c2, c3):
-            return region
+    point_in_weyl_chamber(c1, c2, c3, raise_exception=True)
+    if c1+c2 < 0.5:
+        return 'W0'
+    elif c1-c2 > 0.5:
+        return 'W0*'
+    elif c2+c3 > 0.5:
+        return 'W1'
+    else:
+        return 'PE'
 
 
 def project_to_PE(c1, c2, c3):
