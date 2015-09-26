@@ -22,7 +22,9 @@ from .memoize import memoize
 from scipy.optimize import leastsq
 from scipy.linalg import expm
 
-# TODO: allow to obtain gates for names points in Weyl chamber
+DEFAULT_WEYL_PRECISSION = 8
+
+# TODO: allow to obtain gates for named points in Weyl chamber
 
 Qmagic = (1.0/np.sqrt(2.0)) * np.matrix(
                    [[ 1,  0,  0,  1j],
@@ -444,7 +446,7 @@ class WeylChamber():
 
 
 
-def g1g2g3(U, ndigits=8):
+def g1g2g3(U, ndigits=DEFAULT_WEYL_PRECISSION):
     """
     Given Numpy matrix U, calculate local invariants g1,g2,g3
     U must be in the canonical basis. For numerical stability, the resulting
@@ -462,13 +464,13 @@ def g1g2g3(U, ndigits=8):
     m = to_magic(U).T * to_magic(U)
     g1_2 = (np.trace(m))**2 / (16.0 * detU)
     g3   = (np.trace(m)**2 - np.trace(m*m)) / ( 4.0 * detU)
-    g1 = round(g1_2.real, ndigits)
-    g2 = round(g1_2.imag, ndigits)
-    g3 = round(g3.real, ndigits)
+    g1 = round(g1_2.real + 0.0, ndigits) # adding 0.0 turns -0.0 into +0.0
+    g2 = round(g1_2.imag + 0.0, ndigits)
+    g3 = round(g3.real   + 0.0, ndigits)
     return (g1, g2, g3)
 
 
-def c1c2c3(U, ndigits=8):
+def c1c2c3(U, ndigits=DEFAULT_WEYL_PRECISSION):
     """
     Given U (canonical basis), calculate the Weyl Chamber coordinates
     c1,c2,c3.
@@ -498,14 +500,17 @@ def c1c2c3(U, ndigits=8):
     if c3 < 0:
         c1 = 1 - c1
         c3 = -c3
-    return (round(c1, ndigits), round(c2, ndigits), round(c3, ndigits))
+    return (round(c1+0.0, ndigits), # adding 0.0 turns -0.0 into +0.0
+            round(c2+0.0, ndigits),
+            round(c3+0.0, ndigits))
 
 
-def g1g2g3_from_c1c2c3(c1, c2, c3):
+def g1g2g3_from_c1c2c3(c1, c2, c3, ndigits=DEFAULT_WEYL_PRECISSION):
     """
     Calculate the local invariants from the Weyl-chamber coordinates (c1, c2,
-                pass
-    c3, in units of pi)
+    c3, in units of pi). The result is rounded to the given precision, in order
+    to enhance numerical stability (cf. `ndigits` parameter of the built-in
+    `round` function)
 
     >>> from . gate2q import CNOT
     >>> print("%.2f %.2f %.2f" % g1g2g3_from_c1c2c3(*c1c2c3(CNOT)))
@@ -514,10 +519,10 @@ def g1g2g3_from_c1c2c3(c1, c2, c3):
     c1 *= pi
     c2 *= pi
     c3 *= pi
-    g1 = cos(c1)**2 * cos(c2)**2 * cos(c3)**2 \
-       - sin(c1)**2 * sin(c2)**2 * sin(c3)**2     + 0.0
-    g2 = 0.25 * sin(2*c1) * sin(2*c2) * sin(2*c3) + 0.0
-    g3 = 4*g1 - cos(2*c1) * cos(2*c2) * cos(2*c3) + 0.0
+    g1 = round(cos(c1)**2 * cos(c2)**2 * cos(c3)**2 \
+             - sin(c1)**2 * sin(c2)**2 * sin(c3)**2     + 0.0, ndigits)
+    g2 = round(0.25 * sin(2*c1) * sin(2*c2) * sin(2*c3) + 0.0, ndigits)
+    g3 = round(4*g1 - cos(2*c1) * cos(2*c2) * cos(2*c3) + 0.0, ndigits)
     return g1, g2, g3
 
 
