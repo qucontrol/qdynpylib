@@ -444,10 +444,12 @@ class WeylChamber():
 
 
 
-def g1g2g3(U):
+def g1g2g3(U, ndigits=8):
     """
     Given Numpy matrix U, calculate local invariants g1,g2,g3
-    U must be in the canonical basis
+    U must be in the canonical basis. For numerical stability, the resulting
+    values are rounded to the given precision, cf. the `ndigits` parameter of
+    the built-in `round` function.
 
     >>> from . gate2q import CNOT
     >>> print("%.2f %.2f %.2f" % g1g2g3(CNOT))
@@ -460,16 +462,21 @@ def g1g2g3(U):
     m = to_magic(U).T * to_magic(U)
     g1_2 = (np.trace(m))**2 / (16.0 * detU)
     g3   = (np.trace(m)**2 - np.trace(m*m)) / ( 4.0 * detU)
-    g1 = g1_2.real + 0.0 # adding 0.0 turns -0.0 result into +0.0
-    g2 = g1_2.imag + 0.0
-    g3 = g3.real   + 0.0
+    g1 = round(g1_2.real, ndigits)
+    g2 = round(g1_2.imag, ndigits)
+    g3 = round(g3.real, ndigits)
     return (g1, g2, g3)
 
 
-def c1c2c3(U):
+def c1c2c3(U, ndigits=8):
     """
     Given U (canonical basis), calculate the Weyl Chamber coordinates
-    c1,c2,c3
+    c1,c2,c3.
+
+    In order to facility numerical stability, the resulting coordinates are
+    rounded to the given precision (cf. `ndigits` parameter of the built-in
+    `round` function). Otherwise, rounding errors would likely to result in
+    points that are not in the Weyl chamber, e.g. (0.1, 0.0, 1.0e-13)
 
     Algorithm from Childs et al., PRA 68, 052311 (2003).
 
@@ -491,7 +498,7 @@ def c1c2c3(U):
     if c3 < 0:
         c1 = 1 - c1
         c3 = -c3
-    return (c1+0.0, c2+0.0, c3+0.0) # adding 0.0 turns -0.0 result into +0.0
+    return (round(c1, ndigits), round(c2, ndigits), round(c3, ndigits))
 
 
 def g1g2g3_from_c1c2c3(c1, c2, c3):
