@@ -492,8 +492,13 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         >>> print(A2Gate.weyl_region())
         W0*
         """
+        logger = logging.getLogger(__name__)
         from .weyl import get_region
-        return get_region(*self.weyl_coordinates())
+        # by definition, if we start from a proper gate, the Weyl coordinates
+        # are in the Weyl chamber. Thus, we could only be tripped up by
+        # rounding errors, and can set check_weyl to False with relative
+        # safety
+        return get_region(*self.weyl_coordinates(), check_weyl=False)
 
     def in_weyl_region(self, region):
         """
@@ -510,7 +515,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         True
         """
         from .weyl import point_in_region
-        return point_in_region(region, *self.weyl_coordinates())
+        return point_in_region(region, *self.weyl_coordinates(),
+                               check_weyl=False)
 
     def project_to_PE(self):
         """
@@ -530,7 +536,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         if self.in_weyl_region('PE'):
             return self
         else:
-            return canonical_gate(*project_to_PE(*self.weyl_coordinates()))
+            return canonical_gate(*project_to_PE(*self.weyl_coordinates(),
+                                  check_weyl=False))
 
     def show_in_weyl_chamber(self, weyl_chamber=None, **kwargs):
         """

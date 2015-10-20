@@ -645,7 +645,7 @@ def point_in_region(region, c1, c2, c3, check_weyl=False):
             raise ValueError("region %s is not in %s"%(region, regions))
 
 
-def get_region(c1, c2, c3):
+def get_region(c1, c2, c3, check_weyl=True):
     """Return the region of the Weyl chamber ('W0', 'W0*', 'W1', 'PE') the the
     given point is in.
 
@@ -670,10 +670,12 @@ def get_region(c1, c2, c3):
     ... except ValueError as e:
     ...     print(e)
     (1, 0.5, 0) is not in the Weyl chamber
+    >>> print(get_region(1.0, 0.1, 0, check_weyl=False))
+    W0*
 
     Only scalar values are accepted for c1, c2, c3
     """
-    point_in_weyl_chamber(c1, c2, c3, raise_exception=True)
+    point_in_weyl_chamber(c1, c2, c3, raise_exception=check_weyl)
     if c1+c2 < 0.5:
         return 'W0'
     elif c1-c2 > 0.5:
@@ -684,7 +686,7 @@ def get_region(c1, c2, c3):
         return 'PE'
 
 
-def project_to_PE(c1, c2, c3):
+def project_to_PE(c1, c2, c3, check_weyl=True):
     """Return new tuple (c1', c2', c3') obtained by projecting the given input
     point (c1, c2, c3) onto the closest boundary of the perfect entanglers
     polyhedron. If the input point already is a perfect entangler, it will be
@@ -713,7 +715,7 @@ def project_to_PE(c1, c2, c3):
     if point_in_PE(c1, c2, c3):
         return c1, c2, c3
     else:
-        region = get_region(c1, c2, c3)
+        region = get_region(c1, c2, c3, check_weyl=check_weyl)
         p = np.array((c1, c2, c3))
         n = WeylChamber.normal[region]
         a = WeylChamber.anchor[region]
