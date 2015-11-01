@@ -1,7 +1,10 @@
 PROJECT_NAME = QDYN
 PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh pytest
 TESTPYPI = https://testpypi.python.org/pypi
+
 TESTS = QDYN tests
+# You may redefine TESTS to run a specific test. E.g.
+#     make test TESTS="tests/test_io.py"
 
 develop:
 	pip install -e .[dev]
