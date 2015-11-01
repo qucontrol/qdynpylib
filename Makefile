@@ -1,6 +1,7 @@
 PROJECT_NAME = QDYN
 PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh pytest
 TESTPYPI = https://testpypi.python.org/pypi
+TESTS = QDYN tests
 
 develop:
 	pip install -e .[dev]
@@ -38,26 +39,26 @@ clean:
 	@rm -f test_octconvergences.html
 	@rm -f tests/result_images/*
 
-.venv/py27/bin/python:
+.venv/py27/bin/py.test:
 	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
-	@.venv/py27/bin/pip install -e .
+	@.venv/py27/bin/pip install -e .[dev]
 
-.venv/py33/bin/python:
+.venv/py33/bin/py.test:
 	@conda create -y -m -p .venv/py33 python=3.3 $(PACKAGES)
-	@.venv/py33/bin/pip install -e .
+	@.venv/py33/bin/pip install -e .[dev]
 
-.venv/py34/bin/python:
+.venv/py34/bin/py.test:
 	@conda create -y -m -p .venv/py34 python=3.4 $(PACKAGES)
-	@.venv/py34/bin/pip install -e .
+	@.venv/py34/bin/pip install -e .[dev]
 
-test27: .venv/py27/bin/python
-	.venv/py27/bin/python run_tests.py
+test27: .venv/py27/bin/py.test
+	$< -v --doctest-modules $(TESTS)
 
-test33: .venv/py33/bin/python
-	.venv/py33/bin/python run_tests.py
+test33: .venv/py33/bin/py.test
+	$< -v --doctest-modules $(TESTS)
 
-test34: .venv/py34/bin/python
-	.venv/py34/bin/python run_tests.py
+test34: .venv/py34/bin/py.test
+	$< -v --doctest-modules $(TESTS)
 
 test: test27 test33 test34
 
