@@ -1,11 +1,29 @@
+PROJECT_NAME = QDYN
+PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh pytest
+TESTPYPI = https://testpypi.python.org/pypi
+
+develop:
+	pip install -e .[dev]
+
 install:
-	pip install -Ie .
+	pip install .
 
 uninstall:
-	pip uninstall QDYN
+	pip uninstall $(PROJECT_NAME)
 
 sdist:
 	python setup.py sdist
+
+upload:
+	python setup.py register
+	python setup.py sdist upload
+
+test-upload:
+	python setup.py register -r $(TESTPYPI)
+	python setup.py sdist upload -r $(TESTPYPI)
+
+test-install:
+	pip install -i $(TESTPYPI) $(PROJECT_NAME)
 
 clean:
 	@rm -rf build
@@ -19,8 +37,6 @@ clean:
 	@rm -f QDYN/__git__.py
 	@rm -f test_octconvergences.html
 	@rm -f tests/result_images/*
-
-PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh
 
 .venv/py27/bin/python:
 	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
@@ -43,7 +59,7 @@ test33: .venv/py33/bin/python
 test34: .venv/py34/bin/python
 	.venv/py34/bin/python run_tests.py
 
-
 test: test27 test33 test34
 
-.PHONY: install uninstall sdist clean test test27 test33 test34
+.PHONY: install develop uninstall upload test-upload test-install sdist clean \
+test test27 test33 test34
