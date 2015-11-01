@@ -9,6 +9,7 @@ sdist:
 
 clean:
 	@rm -rf build
+	@rm -rf __pycache__
 	@rm -rf dist
 	@rm -f *.pyc
 	@rm -rf QDYN.egg-info
