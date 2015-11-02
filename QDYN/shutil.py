@@ -35,18 +35,22 @@ def touch(fname):
 def find_files(directory, pattern):
     """
     Iterate (recursively) over all the files matching the shell pattern
-    ('*' will yield all files) in the given directory
+    ('*' will yield all files) in the given directory. There is no guarantee on
+    the order in which files are processed
 
+    >>> files = ["find_files_test/a.txt", "find_files_test/a.dat",
+    ...          "find_files_test/sub/b.txt", "find_files_test/sub/c.txt"]
     >>> mkdir("find_files_test/sub")
-    >>> touch("find_files_test/a.txt")
-    >>> touch("find_files_test/a.dat")
-    >>> touch("find_files_test/sub/b.txt")
-    >>> touch("find_files_test/sub/c.txt")
+    >>> for file in files:
+    ...     touch(file)
+    >>> found_files = set()
     >>> for file in find_files("find_files_test", '*.txt'):
-    ...     print(file)
-    find_files_test/a.txt
-    find_files_test/sub/b.txt
-    find_files_test/sub/c.txt
+    ...     found_files.add(file)
+    >>> for file in files:
+    ...     if file.endswith('txt'):
+    ...         assert file in found_files
+    ...     else:
+    ...         assert file not in found_files
     >>> rmtree("find_files_test")
     """
     import fnmatch
