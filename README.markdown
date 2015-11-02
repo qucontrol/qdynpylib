@@ -77,20 +77,13 @@ For example:
 Development of the QDYN package follows the [git-flow][] branching model with
 the default settings. After cloning the repository, you must run
 
-    %:> git flow init
+    git checkout master
+    git checkout develop
+    git flow init -d
 
-    Which branch should be used for bringing forth production releases?
-       - master
-    Branch name for production releases: [master]
-    Branch name for “next release” development: [develop]
-
-    How to name your supporting branch prefixes?
-    Feature branches? [feature/]
-    Release branches? [release/]
-    Hotfix branches? [hotfix/]
-    Support branches? [support/]
-    Version tag prefix? []
-
+The first two commands are essential for ensuring that both the `master` and
+`develop` branch exist and are tracking their respective branch in `origin`.
+Otherwise, `git flow init` will fail, or produce incorrectly set up branches.
 All pull requests must be against the `develop` branch.
 
 [git-flow]: https://github.com/nvie/gitflow#git-flow
