@@ -2,6 +2,7 @@ PROJECT_NAME = QDYN
 PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh pytest
 TESTPYPI = https://testpypi.python.org/pypi
 
+TESTOPTIONS = --doctest-modules
 TESTS = QDYN tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
@@ -55,13 +56,13 @@ clean:
 	@.venv/py34/bin/pip install -e .[dev]
 
 test27: .venv/py27/bin/py.test
-	$< -v --doctest-modules $(TESTS)
+	$< -v $(TESTOPTIONS) $(TESTS)
 
 test33: .venv/py33/bin/py.test
-	$< -v --doctest-modules $(TESTS)
+	$< -v $(TESTOPTIONS) $(TESTS)
 
 test34: .venv/py34/bin/py.test
-	$< -v --doctest-modules $(TESTS)
+	$< -v $(TESTOPTIONS) $(TESTS)
 
 test: test27 test33 test34
 
