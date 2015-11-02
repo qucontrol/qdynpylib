@@ -5,17 +5,6 @@ import numpy as np
 from numpy import sqrt
 from matplotlib.figure import Figure as figure
 
-
-def compare_images(expected, actual, tol=1.0e-3):
-    """Raise an AssertionError if the images are not the same"""
-    from matplotlib.testing.compare import compare_images as mpl_compare_images
-    try:
-        result = mpl_compare_images(expected, actual, tol=tol)
-    except Exception as e:
-        raise AssertionError(e)
-    assert result is None, result
-
-
 def test_bloch_plot():
     bloch = QDYN.bloch.Bloch()
     bloch.wireframe=False
@@ -46,7 +35,3 @@ def test_bloch_plot():
         if diff > 1.0e-12:
             raise AssertionError("3D world limits should all be 0.7, diff: %s"
                                  % diff)
-    bloch.plot(outfile='tests/result_images/bloch_test.png')
-    compare_images(expected='tests/baseline_images/bloch_test.png',
-                   actual='tests/result_images/bloch_test.png', tol=1.0)
-
