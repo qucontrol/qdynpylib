@@ -1,7 +1,7 @@
 # The QDYN Python Package
 
-The QDYN Python Package provides a collection of utilties to augment the Fortran
-QDYN library for quantum dynamics and control, developed in-house in the
+The QDYN Python Package provides a collection of utilities to augment the
+Fortran QDYN library for quantum dynamics and control, developed in-house in the
 [Koch group at the University of Kassel][AGKOCH]
 
 The package will read and write some of the files generated
@@ -15,11 +15,7 @@ greatly benefit from (i)Python's interactiveness.
 The QDYN package depends on the [Python scientific stack][Scipy]
 (numpy/scipy/matplotlib) in a recent version. It is recommended to use one of
 the standalone scientific Python distributions like [Enthought Canopy][EPD]
-or [Anaconda][]. You might want to use a [virtual environment][VE] as
-well.
-
-The QDYN library is written for Python 2.7. It will not run on Python 3.x
-
+or [Anaconda][].
 
 ## Installation ##
 
@@ -27,11 +23,7 @@ Assuming that you have either a scientific Python distribution installed in your
 home directory (recommended), or created and activated a virtual environment,
 you can install the latest official release of the QDYN package with
 
-    pip install QDYN  # NOTE: as of yet, no official version has been released
-
-For development versions, you must specify the full version manually:
-
-    pip install -I QDYN==2.0.dev1
+    pip install QDYN
 
 Lastly, to install the latest master from the github repository:
 
