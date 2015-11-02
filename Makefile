@@ -3,7 +3,7 @@ PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh pytest
 TESTPYPI = https://testpypi.python.org/pypi
 
 TESTOPTIONS = --doctest-modules
-TESTS = QDYN tests
+TESTS = QDYN tests slow_tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
 
