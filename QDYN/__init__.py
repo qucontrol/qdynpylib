@@ -14,4 +14,4 @@ from . import octutils
 from . import memoize
 from . import config
 
-__version__ = "1.1.0"
+__version__ = "1.2.dev"
