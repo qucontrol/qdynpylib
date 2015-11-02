@@ -1,5 +1,5 @@
 PROJECT_NAME = QDYN
-PACKAGES =  pip nose numpy matplotlib scipy sympy ipython bokeh pytest
+PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest
 TESTPYPI = https://testpypi.python.org/pypi
 
 TESTOPTIONS = --doctest-modules
