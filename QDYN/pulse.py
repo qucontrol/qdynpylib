@@ -1029,6 +1029,7 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     weights : array-like, optional
         If `freq` is an array, weights for the different frequencies. If not
         given, all weights are 1. The weights are normalized to sum to one.
+        Any weight smaller than machine precision is assumed zero.
     phases: array-line, optional
         If `phases` is an array, phase shift for each frequency component, in
         units of pi. If not given, all phases are 0.
@@ -1073,16 +1074,20 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
         else:
             signal += np.cos(c*freq*t) # element-wise
     else:
+        eps = 1.0e-16 # machine precision
         if weights is None:
             weights = np.ones(len(freq))
         if phases is None:
             phases = np.zeros(len(freq))
         norm = float(sum(weights))
-        for (w, weight, phase) in zip(freq, weights, phases):
-            if complex:
-                signal += (weight/norm) * np.exp(1j*(c*w*t+phase*np.pi))
-            else:
-                signal += (weight/norm) * np.cos(c*w*t+phase*np.pi)
+        if norm > eps:
+            for (w, weight, phase) in zip(freq, weights, phases):
+                if weight > eps:
+                    weight = weight/norm
+                    if complex:
+                        signal += weight * np.exp(1j*(c*w*t+phase*np.pi))
+                    else:
+                        signal += weight * np.cos(c*w*t+phase*np.pi)
     return signal
 
 
