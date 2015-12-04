@@ -12,7 +12,9 @@ from click.utils import open_file
 # import for doctests
 from contextlib import contextmanager
 import tempfile
+import six
 from six.moves import xrange
+import json
 
 
 @contextmanager
@@ -469,3 +471,126 @@ def matrix_to_mathematica(M):
         entries = [mathematica_number(v) for v in row]
         lines.append('{' + ", ".join(entries) + '}')
     return '{' + ", ".join(lines) + '}'
+
+
+def obj_to_data(obj, classkey=None, attr_filter=None, depth=10):
+    """Convert the given object recursively into a simple data structure of
+    dicts and lists. This facilitates easy introspection into complicated
+    objects. See `obj_to_json` for examples.
+
+    Arguments
+    ---------
+
+    obj: object
+        The object to convert
+    classkey: str or None
+        When converting an object into a dictionary, include the name of the
+        object's class using `classkey` as the key
+    attr_filter: dict or None
+        Dictionary where each key is a class, and each value is a list of
+        regular experessions (as strings, or compiled). When converting an
+        object into a dictionary, only consider attributes that match one of
+        the regular expressions in the list. If None, assume ('[^_].*', ), that
+        is all attributes that do not start with an underscore
+    depth: int
+        Recursion depth
+    """
+    if depth < 0:
+        return '...'
+    if isinstance(obj, dict):
+        data = {}
+        for (k, v) in obj.items():
+            data[k] = obj_to_data(v, classkey=classkey,
+                                  attr_filter=attr_filter, depth=depth-1)
+        return data
+    elif hasattr(obj, "_ast"):
+        return obj_to_data(obj._ast(), classkey=classkey,
+                           attr_filter=attr_filter, depth=depth-1)
+    elif isinstance(obj, six.string_types):
+        return obj
+    elif hasattr(obj, "__iter__"):
+        return [obj_to_data(v, classkey=classkey, attr_filter=attr_filter,
+                            depth=depth-1)
+                for v in obj]
+    elif hasattr(obj, "__dict__"):
+        data = {}
+        try:
+            allowed_key_rxs = []
+            for pattern in attr_filter[obj.__class__]:
+                allowed_key_rxs.append(re.compile(pattern))
+        except (AttributeError, KeyError, TypeError):
+            allowed_key_rxs = [re.compile(r'[^_].*'), ]
+        for k, v in six.iteritems(obj.__dict__):
+            for rx in allowed_key_rxs:
+                if rx.match(k):
+                    data[k] = obj_to_data(v, classkey=classkey,
+                                          attr_filter=attr_filter,
+                                          depth=depth-1)
+                    break
+        if classkey is not None and hasattr(obj, "__class__"):
+            data[classkey] = obj.__class__.__name__
+        return data
+    else:
+        return obj
+
+
+def obj_to_json(obj, classkey=None, attr_filter=None, depth=10, sort_keys=True,
+        indent=4, separators=(',', ': ')):
+    """Return a json string for the data returned by obj_to_data for the given
+    obj. The parameters `obj`, `classkey`, `attr_filter`, and `depth` are
+    passed to `obj_to_data`; the remaining arguments are passed to `json.dumps`
+
+    >>> import numpy as np
+    >>> import matplotlib
+    >>> from matplotlib.figure import Figure as figure
+    >>> from collections import defaultdict
+    >>> fig = figure()
+    >>> ax = fig.add_subplot(111)
+    >>> x = np.linspace(0, 2*np.pi, 100)
+    >>> l1 = ax.plot(x, np.sin(x), label='sin')
+    >>> l2 = ax.plot(x, np.cos(x), label='cos')
+    >>> F = defaultdict(lambda:[r'^(?!(_|axes|figure|axis|callbacks))'])
+    >>> F[matplotlib.figure.Figure]          = ['_axstack']
+    >>> F[matplotlib.figure.AxesStack]       = ['_elements']
+    >>> F[matplotlib.axes._subplots.Subplot] = ['lines']
+    >>> F[matplotlib.lines.Line2D]           = [r'_label']
+    >>> print(obj_to_json(fig, attr_filter=F, classkey='class'))
+    {
+        "_axstack": {
+            "_elements": [
+                [
+                    [
+                        [
+                            1,
+                            1,
+                            1
+                        ],
+                        []
+                    ],
+                    [
+                        1,
+                        {
+                            "class": "AxesSubplot",
+                            "lines": [
+                                {
+                                    "_label": "sin",
+                                    "class": "Line2D"
+                                },
+                                {
+                                    "_label": "cos",
+                                    "class": "Line2D"
+                                }
+                            ]
+                        }
+                    ]
+                ]
+            ],
+            "class": "AxesStack"
+        },
+        "class": "Figure"
+    }
+    """
+    return json.dumps(
+        obj_to_data(obj, classkey=classkey, attr_filter=attr_filter,
+                    depth=depth),
+        sort_keys=sort_keys, indent=indent, separators=separators)
