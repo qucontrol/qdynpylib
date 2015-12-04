@@ -401,13 +401,21 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
-def matrix_to_latex(M):
+def matrix_to_latex(M, name=None):
     r"""
     Return matrix M as LaTeX Code
 
     >>> from . gate2q import CNOT
     >>> print(matrix_to_latex(CNOT))
     \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 \\
+    \end{pmatrix}
+
+    >> print(matrix_to_latex(CNOT, name='CNOT'))
+    CNOT = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 1 \\
@@ -422,7 +430,10 @@ def matrix_to_latex(M):
         entries = [latex(nsimplify(v)) for v in line]
         lines.append(" & ".join(entries) + r' \\')
     lines.append(r'\end{pmatrix}')
-    return "\n".join(lines)
+    if name is None:
+        return "\n".join(lines)
+    else:
+        return name + " = " + "\n".join(lines)
 
 
 def mathematica_number(val):
