@@ -189,13 +189,14 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
     def _repr_latex_(self):
         """Alias for self.to_latex; used for IPython Notebook display"""
-        return self.to_latex()
+        return self.to_latex(include_name=True)
 
-    def to_latex(self):
+    def to_latex(self, include_name=False):
         r"""
         Return a LaTeX representation of the gate
 
-        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'),
+        ...               name='CNOT')
         >>> print(CNOT.to_latex())
         \begin{pmatrix}
         1 & 0 & 0 & 0 \\
@@ -203,8 +204,19 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         0 & 0 & 0 & 1 \\
         0 & 0 & 1 & 0 \\
         \end{pmatrix}
+
+        >>> print(CNOT.to_latex(include_name=True))
+        CNOT = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 0 \\
+        \end{pmatrix}
         """
-        return matrix_to_latex(self)
+        name = None
+        if include_name:
+            name = self.name
+        return matrix_to_latex(self, name=name)
 
     def to_mathematica(self):
         """
