@@ -13,7 +13,8 @@ from numpy import pi, cos, sin
 import re
 from warnings import warn
 from six.moves import xrange
-from .io import tempinput, open_file, matrix_to_latex, matrix_to_mathematica
+from .io import (tempinput, open_file, matrix_to_latex, matrix_to_mathematica,
+    split_sup_sub)
 from .linalg import inner, norm, vectorize
 from .memoize import memoize
 from scipy.optimize import leastsq
@@ -84,6 +85,9 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
     CNOT
     """
 
+    tex_op = r'\Op{%s}'
+    tex_str = r'\text{%s}'
+
     def __new__(cls, *args, **kwargs):
         """
         Return a new instance of Gate2Q
@@ -132,6 +136,60 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         gate.name = name
 
         return gate
+
+    @property
+    def latex_name(self):
+        r'''the `name` attribute, auto-formatted for LaTeX
+
+        * Single-letter names are typeset as operators
+        * Strings (letters only) are typeset as text
+        * Subscripts and superscripts are translated to LaTeX syntax (no
+          nesting)
+        * LaTeX commands prefixed with backslash, or groups in braces are kept
+          unchanged
+
+        >>> print(Gate2Q(np.eye(4), name='A_1').latex_name)
+        \Op{A}_{1}
+        >>> print(Gate2Q(np.eye(4), name='A_left').latex_name)
+        \Op{A}_{\text{left}}
+        >>> print(Gate2Q(np.eye(4), name='CNOT_left').latex_name)
+        \text{CNOT}_{\text{left}}
+        >>> print(Gate2Q(np.eye(4), name=r'\CNOT_\left').latex_name)
+        \CNOT_{\left}
+        >>> print(Gate2Q(np.eye(4), name=r'\CNOT_2d+1').latex_name)
+        \CNOT_{2d+1}
+        >>> print(Gate2Q(np.eye(4), name=r'\CNOT_{2d+1}').latex_name)
+        \CNOT_{2d+1}
+
+        You may set the tex_op and tex_str class attributes to control how
+        operators and strings are typeset
+        >>> Gate2Q.tex_op = r'\hat{%s}'
+        >>> Gate2Q.tex_str = r'%s'
+        >>> print(Gate2Q(np.eye(4), name='A_left').latex_name)
+        \hat{A}_{left}
+        '''
+        result = ''
+        for i, part in enumerate(split_sup_sub(self.name)):
+            first_part = False
+            if i == 0:
+                first_part = True
+            if part.startswith('_') or part.startswith('^'):
+                result += part[0]; part = part[1:]
+                if part.startswith('{') and part.endswith('}'):
+                    part = part[1:-1] # strip braces
+                if re.match(r'[A-Za-z]{2,}', part):
+                    result += '{'+ (self.tex_str % part) + '}'
+                else:
+                    result += '{'+part+'}'
+            else: # not a super- or sub-script
+                if part.startswith('\\') or re.search(r'\d', part):
+                    result += part
+                else:
+                    if (len(part) == 1) and (first_part):
+                        result += self.tex_op % part
+                    else:
+                        result += self.tex_str % part
+        return result
 
     def __array_finalize__(self, obj):
         """
