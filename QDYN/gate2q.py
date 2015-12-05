@@ -267,7 +267,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         \end{pmatrix}
 
         >>> print(CNOT.to_latex(include_name=True))
-        CNOT = \begin{pmatrix}
+        \text{CNOT} = \begin{pmatrix}
         1 & 0 & 0 & 0 \\
         0 & 1 & 0 & 0 \\
         0 & 0 & 0 & 1 \\
@@ -276,7 +276,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         """
         name = None
         if include_name:
-            name = self.name
+            name = self.latex_name
         return matrix_to_latex(self, name=name)
 
     def to_mathematica(self):
