@@ -13,7 +13,8 @@ from numpy import pi, cos, sin
 import re
 from warnings import warn
 from six.moves import xrange
-from .io import tempinput, open_file, matrix_to_latex, matrix_to_mathematica
+from .io import (tempinput, open_file, matrix_to_latex, matrix_to_mathematica,
+    split_sup_sub)
 from .linalg import inner, norm, vectorize
 from .memoize import memoize
 from scipy.optimize import leastsq
@@ -84,6 +85,9 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
     CNOT
     """
 
+    tex_op = r'\Op{%s}'
+    tex_str = r'\text{%s}'
+
     def __new__(cls, *args, **kwargs):
         """
         Return a new instance of Gate2Q
@@ -132,6 +136,65 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         gate.name = name
 
         return gate
+
+    @property
+    def latex_name(self):
+        r'''the `name` attribute, auto-formatted for LaTeX
+
+        * Single-letter names are typeset as operators
+        * Strings (letters only) are typeset as text
+        * Subscripts and superscripts are translated to LaTeX syntax (no
+          nesting)
+        * LaTeX commands prefixed with backslash, or groups in braces are kept
+          unchanged
+
+        >>> print(Gate2Q(np.eye(4), name='A_1').latex_name)
+        \Op{A}_{1}
+        >>> print(Gate2Q(np.eye(4), name='A_left').latex_name)
+        \Op{A}_{\text{left}}
+        >>> print(Gate2Q(np.eye(4), name='CNOT_left').latex_name)
+        \text{CNOT}_{\text{left}}
+        >>> print(Gate2Q(np.eye(4), name=r'\CNOT_\left').latex_name)
+        \CNOT_{\left}
+        >>> print(Gate2Q(np.eye(4), name=r'\CNOT_2d+1').latex_name)
+        \CNOT_{2d+1}
+        >>> print(Gate2Q(np.eye(4), name=r'\CNOT_{2d+1}').latex_name)
+        \CNOT_{2d+1}
+
+        You may set the tex_op and tex_str class attributes to control how
+        operators and strings are typeset
+        >>> orig_patterns = Gate2Q.tex_op, Gate2Q.tex_str
+        >>> Gate2Q.tex_op = r'\hat{%s}'
+        >>> Gate2Q.tex_str = r'%s'
+        >>> print(Gate2Q(np.eye(4), name='A_left').latex_name)
+        \hat{A}_{left}
+        >>> Gate2Q.tex_op, Gate2Q.tex_str = orig_patterns
+        '''
+        result = ''
+        if self.name is None:
+            return None
+        is_string = lambda s: bool(re.match(r'[a-zA-Z]{2,}', s))
+        for i, part in enumerate(split_sup_sub(self.name)):
+            is_first_part = False
+            if i == 0:
+                is_first_part = True
+            if part.startswith('_') or part.startswith('^'):
+                result += part[0]; part = part[1:]
+                if part.startswith('{') and part.endswith('}'):
+                    part = part[1:-1] # strip braces
+                if re.match(r'[A-Za-z]{2,}', part):
+                    result += '{'+ (self.tex_str % part) + '}'
+                else:
+                    result += '{'+part+'}'
+            else: # not a super- or sub-script
+                if (len(part) == 1) and (is_first_part):
+                    result += self.tex_op % part
+                else:
+                    if is_string(part):
+                        result += self.tex_str % part
+                    else:
+                        result += part
+        return result
 
     def __array_finalize__(self, obj):
         """
@@ -189,13 +252,14 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
     def _repr_latex_(self):
         """Alias for self.to_latex; used for IPython Notebook display"""
-        return self.to_latex()
+        return self.to_latex(include_name=True)
 
-    def to_latex(self):
+    def to_latex(self, include_name=False):
         r"""
         Return a LaTeX representation of the gate
 
-        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
+        >>> CNOT = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'),
+        ...               name='CNOT')
         >>> print(CNOT.to_latex())
         \begin{pmatrix}
         1 & 0 & 0 & 0 \\
@@ -203,8 +267,19 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         0 & 0 & 0 & 1 \\
         0 & 0 & 1 & 0 \\
         \end{pmatrix}
+
+        >>> print(CNOT.to_latex(include_name=True))
+        \text{CNOT} = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 0 \\
+        \end{pmatrix}
         """
-        return matrix_to_latex(self)
+        name = None
+        if include_name:
+            name = self.latex_name
+        return matrix_to_latex(self, name=name)
 
     def to_mathematica(self):
         """

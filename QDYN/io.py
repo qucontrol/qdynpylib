@@ -401,13 +401,66 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
-def matrix_to_latex(M):
+def split_sup_sub(name):
+    """Split a (pseudo-) LaTeX string at top-level
+    subscripts/superscripts/groups
+
+    >>> assert split_sup_sub('CNOT') == ['CNOT', ]
+    >>> assert split_sup_sub('CNOT_system') == ['CNOT', '_system']
+    >>> assert split_sup_sub('A_1^2') == ['A', '_1', '^2']
+    >>> assert split_sup_sub('A_{1^2}^2') == ['A', '_{1^2}', '^2']
+    >>> assert split_sup_sub('^1A_1{B}') == ['^1A', '_1', '{B}']
+    >>> assert split_sup_sub('^1A_{1}B{C}') == ['^1A', '_{1}', 'B', '{C}']
+    >>> assert split_sup_sub('{A}B{C}') == ['{A}', 'B', '{C}']
+    """
+    parts = []
+    part = ''
+    bracelevel = 0
+    prev_letter = None
+    for letter in name:
+        if letter in ['^', '_']:
+            if (bracelevel == 0) and (len(part) > 0):
+                parts.append(part)
+                part = ''
+            part += letter
+        elif letter == "{":
+            if ((bracelevel == 0) and (len(part) > 0)
+                    and (prev_letter not in ['^', '_'])):
+                parts.append(part)
+                part = ''
+            bracelevel += 1
+            part += '{'
+        elif letter == "}":
+            bracelevel -= 1
+            if (bracelevel == 0) and (len(part) > 0):
+                parts.append(part+letter)
+                part = ''
+            else:
+                part += letter
+        else:
+            part += letter
+        prev_letter = letter
+    # rest of string
+    if len(part) > 0:
+        parts.append(part)
+    return parts
+
+
+def matrix_to_latex(M, name=None):
     r"""
     Return matrix M as LaTeX Code
 
     >>> from . gate2q import CNOT
     >>> print(matrix_to_latex(CNOT))
     \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 \\
+    \end{pmatrix}
+
+    >> print(matrix_to_latex(CNOT, name='CNOT'))
+    CNOT = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 1 \\
@@ -422,7 +475,10 @@ def matrix_to_latex(M):
         entries = [latex(nsimplify(v)) for v in line]
         lines.append(" & ".join(entries) + r' \\')
     lines.append(r'\end{pmatrix}')
-    return "\n".join(lines)
+    if name is None:
+        return "\n".join(lines)
+    else:
+        return name + " = " + "\n".join(lines)
 
 
 def mathematica_number(val):
