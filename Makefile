@@ -39,6 +39,7 @@ clean:
 	@rm -f QDYN/*.pyc
 	@rm -f QDYN/prop/*.pyc
 	@rm -f tests/*.pyc
+	@rm -f tests/__pycache__
 	@rm -f QDYN/__git__.py
 	@rm -f test_octconvergences.html
 	@rm -f tests/result_images/*
