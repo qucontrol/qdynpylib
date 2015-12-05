@@ -163,10 +163,12 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
         You may set the tex_op and tex_str class attributes to control how
         operators and strings are typeset
+        >>> orig_patterns = Gate2Q.tex_op, Gate2Q.tex_str
         >>> Gate2Q.tex_op = r'\hat{%s}'
         >>> Gate2Q.tex_str = r'%s'
         >>> print(Gate2Q(np.eye(4), name='A_left').latex_name)
         \hat{A}_{left}
+        >>> Gate2Q.tex_op, Gate2Q.tex_str = orig_patterns
         '''
         result = ''
         if self.name is None:
