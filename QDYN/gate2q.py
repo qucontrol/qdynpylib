@@ -169,10 +169,13 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         \hat{A}_{left}
         '''
         result = ''
+        if self.name is None:
+            return None
+        is_string = lambda s: bool(re.match(r'[a-zA-Z]{2,}', s))
         for i, part in enumerate(split_sup_sub(self.name)):
-            first_part = False
+            is_first_part = False
             if i == 0:
-                first_part = True
+                is_first_part = True
             if part.startswith('_') or part.startswith('^'):
                 result += part[0]; part = part[1:]
                 if part.startswith('{') and part.endswith('}'):
@@ -182,13 +185,13 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
                 else:
                     result += '{'+part+'}'
             else: # not a super- or sub-script
-                if part.startswith('\\') or re.search(r'\d', part):
-                    result += part
+                if (len(part) == 1) and (is_first_part):
+                    result += self.tex_op % part
                 else:
-                    if (len(part) == 1) and (first_part):
-                        result += self.tex_op % part
-                    else:
+                    if is_string(part):
                         result += self.tex_str % part
+                    else:
+                        result += part
         return result
 
     def __array_finalize__(self, obj):
