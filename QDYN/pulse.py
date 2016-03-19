@@ -744,7 +744,12 @@ class Pulse(object):
             ax.set_ylim(0, spec_max)
         if mark_freqs is not None:
             for freq in mark_freqs:
-                ax.axvline(x=float(freq), ls='--', color='black')
+                kwargs = {'ls': '--', 'color': 'black'}
+                try:
+                    freq, kwargs = freq
+                except TypeError:
+                    pass
+                ax.axvline(x=float(freq), **kwargs)
 
     def plot(self, fig=None, show_pulse=True, show_spectrum=True, zoom=True,
     wmin=None, wmax=None, spec_scale=None, spec_max=None, freq_unit=None,
@@ -782,8 +787,11 @@ class Pulse(object):
         freq_unit : str
             Unit in which to show the frequency axis in the spectrum. If not
             given, use the `freq_unit` attribute
-        mark_freqs : None, array of floats
-            Array of frequencies to mark in spectrum as vertical dashed lines
+        mark_freqs : None, array of floats, array of tuples (float, dict)
+            Array of frequencies to mark in spectrum as vertical dashed lines.
+            If list of tuples (float, dict), the float value is the frequency
+            to mark, and the dict gives the keyword arguments that are passed
+            to the matplotlib `axvline` method.
         mark_freq_points: None, or matplotlib marker (see `matplotlib.markers`)
             Marker to be used to indicate the individual points in the
             spectrum.
