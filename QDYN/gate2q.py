@@ -919,9 +919,9 @@ def F_sm(U, O):
 def F_re(U, O):
     """Calculate the phase-sensitive overlap of the gate U with respect to the
     optimal gate O
-    """"
+    """
     n = O.shape[0]
-    return inner(O,U)).real() / n
+    return inner(O,U).real() / n
 
 
 ###############################################################################
