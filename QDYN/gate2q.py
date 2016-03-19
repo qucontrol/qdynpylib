@@ -650,8 +650,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
 
     def F_avg(self, O, closest_unitary=False):
-        """
-        Return the average gate fidelity of the current gate with respect to
+        """Return the average gate fidelity of the current gate with respect to
         the gate O.
 
         >>> U = 0.95*CNOT
@@ -669,6 +668,24 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
             return F_avg(self.closest_unitary(), O)
         else:
             return F_avg(self, O)
+
+    def F_sm(self, O, closest_unitary=False):
+        """Return the square-modulus fidelity of the current gate with respect
+        to the gate O.
+        """
+        if closest_unitary:
+            return F_sm(self.closest_unitary(), O)
+        else:
+            return F_sm(self, O)
+
+    def F_sm(self, O, closest_unitary=False):
+        """Return the phase-sensitive overlap of the current gate with respect
+        to the gate O.
+        """
+        if closest_unitary:
+            return F_sm(self.closest_unitary(), O)
+        else:
+            return F_sm(self, O)
 
     def cartan_decomposition(self):
         """
@@ -882,8 +899,7 @@ def logical_pops(A):
 
 
 def F_avg(U, O):
-    """
-    Calculate the average gate fidelity of of the gate U with respect to the
+    """Calculate the average gate fidelity of the gate U with respect to the
     optimal gate O.
     """
     n = O.shape[0]
@@ -892,6 +908,20 @@ def F_avg(U, O):
     Udagger_O = Udagger.dot(O)
     F_TW_avg = inner(Udagger_O, Udagger_O)
     return (F_TW_avg + F_U_avg).real / (n*(n+1))
+
+def F_sm(U, O):
+    """Calculate the square-modulus fidelity of the gate U with respect to
+    the optimal gate O.
+    """
+    n = O.shape[0]
+    return abs(inner(O,U))**2 / n**2
+
+def F_re(U, O):
+    """Calculate the phase-sensitive overlap of the gate U with respect to the
+    optimal gate O
+    """"
+    n = O.shape[0]
+    return inner(O,U)).real() / n
 
 
 ###############################################################################
