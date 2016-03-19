@@ -684,10 +684,9 @@ class Pulse(object):
         ax.set_xlabel("time (%s)" % self.time_unit)
 
     def render_spectrum(self, ax, zoom=True, wmin=None, wmax=None,
-    spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None):
-        """
-        Render spectrum onto the given axis, see `plot` for arguments
-        """
+            spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None,
+            mark_freq_points=None):
+        """Render spectrum onto the given axis, see `plot` for arguments"""
         freq, spectrum = self.spectrum(mode='abs', sort=True,
                                         freq_unit=freq_unit)
         # normalizing the spectrum makes it independent of the number of
@@ -739,7 +738,8 @@ class Pulse(object):
         ax.set_ylabel("abs(spec) (arb. un.)")
         if spec_scale is None:
             spec_scale = 1.0
-        ax.plot(freq, spec_scale*spectrum, label='spectrum')
+        ax.plot(freq, spec_scale*spectrum, marker=mark_freq_points,
+                label='spectrum')
         if spec_max is not None:
             ax.set_ylim(0, spec_max)
         if mark_freqs is not None:
@@ -748,7 +748,7 @@ class Pulse(object):
 
     def plot(self, fig=None, show_pulse=True, show_spectrum=True, zoom=True,
     wmin=None, wmax=None, spec_scale=None, spec_max=None, freq_unit=None,
-    mark_freqs=None, **figargs):
+    mark_freqs=None, mark_freq_points=None, **figargs):
         """
         Generate a plot of the pulse on a given figure
 
@@ -784,6 +784,9 @@ class Pulse(object):
             given, use the `freq_unit` attribute
         mark_freqs : None, array of floats
             Array of frequencies to mark in spectrum as vertical dashed lines
+        mark_freq_points: None, or matplotlib marker (see `matplotlib.markers`)
+            Marker to be used to indicate the individual points in the
+            spectrum.
 
         The remaining figargs are passed to matplotlib.pyplot.figure to create
         a new figure if `fig` is None.
@@ -819,7 +822,8 @@ class Pulse(object):
         if show_spectrum:
             ax_spectrum = fig.add_subplot(gs[-1], label='spectrum')
             self.render_spectrum(ax_spectrum, zoom, wmin, wmax, spec_scale,
-                                 spec_max, freq_unit, mark_freqs)
+                                 spec_max, freq_unit, mark_freqs,
+                                 mark_freq_points)
         if show_pulse:
             # plot pulse amplitude
             ax_pulse = fig.add_subplot(gs[0], label='pulse')
