@@ -9,11 +9,13 @@ from matplotlib.gridspec import GridSpec
 import matplotlib.pyplot as plt
 from scipy import signal
 import scipy.fftpack
+from scipy.interpolate import UnivariateSpline
 import re
 import logging
 from six.moves import xrange
 
 from .units import NumericConverter
+from .linalg import reg_diff
 convert = NumericConverter()
 
 
@@ -488,6 +490,67 @@ class Pulse(object):
         deriv_pulse._shift()
         return deriv_pulse
 
+    def phase(self, unwrap=False, s=None, derivative=False, freq_unit=None,
+            reg_alph=None, reg_itern=100):
+        """Return the pulse's complex phase, or derivative of the phase
+
+        Parameters:
+            unwrap (bool): If False, report the phase in ``[-pi:pi]``. If True,
+                the phase may take any real value, avoiding the discontinuous
+                jumps introduced by limiting the phase to a 2 pi interval.
+            s (float or None): smoothing parameter, see
+                :cls:`scipy.interpolate.UnivariateSpline`. If None, no
+                smoothing is performed.
+            derivative (bool): If False, return the (smoothed) phase directly.
+                If True, return the derivative of the (smoothed) phase.
+            freq_unit (str or None): If `derivative` is True, the unit in which
+                the derivative should be calculated. If None, `self.freq_unit`
+                is used.
+            reg_alph (float or None): If not None, and ``derivative=True``,
+                `ignore the paremters `s` and instead use regularized
+                differentiation (see `alph` in :func:`~QDYN.linalg.reg_diff`).
+            reg_itern (int): If using regularized differntiation, number of
+                iterations to perform (see `itern` in
+                :func:`~QDYN.linalg.reg_diff`)
+
+        Note:
+            When calculating the derivative, some smoothing is generally
+            required. There are two possibilities. Either the smoothing
+            parameters `s` should be given, in which case the phase is smoothed
+            before calculating the derivative. Alternatively, regularized
+            differentiation can be used, by giving a value to `reg_alpha`.
+
+            When calculating the phase directly (instead of the derivative),
+            smoothing should only be used when also unwrapping the phase.
+        """
+
+        phase = np.angle(self.amplitude)
+        if unwrap or derivative:
+            phase = np.unwrap(phase)
+        tgrid = self.tgrid * convert.to_au(1, self.time_unit)
+
+        if derivative:
+
+            if freq_unit is None:
+                freq_unit = self.freq_unit
+            if reg_alph is None: # smoothed spline differentiation
+                if s is None:
+                    s = 1
+                spl = UnivariateSpline(tgrid, phase, s=s)
+                deriv = spl.derivative()(tgrid)
+            else:
+                deriv = reg_diff(phase, itern=reg_itern, alph=reg_alph,
+                                 dx=tgrid[1]-tgrid[0])
+            return deriv * convert.from_au(1, freq_unit)
+
+        else: # direct phase
+
+            if s is not None:
+                spl = UnivariateSpline(tgrid, phase, s=s)
+                return spl(tgrid)
+            else:
+                return phase
+
     def write(self, filename=None, mode=None):
         """
         Write a pulse to file, in the same format as the QDYN `write_pulse`
@@ -576,22 +639,28 @@ class Pulse(object):
         self.amplitude = pulse_new
         self._check()
 
-    def _shift(self):
+    def _shift(self, data=None):
         """
         Inverse of _unshift
         """
         dt = self.dt
         tgrid_new = np.linspace(self.tgrid[0]  + dt/2.0,
                                 self.tgrid[-1] - dt/2.0, len(self.tgrid)-1)
-        pulse_new = np.zeros(len(self.amplitude)-1,
-                             dtype=self.amplitude.dtype.type)
-        pulse_new[0] = self.amplitude[0]
-        for i in xrange(1, len(pulse_new)-1):
-            pulse_new[i] = 2.0 * self.amplitude[i] - pulse_new[i-1]
-        pulse_new[-1] = self.amplitude[-1]
-        self.tgrid     = tgrid_new
-        self.amplitude = pulse_new
-        self._check()
+        if data is None:
+            data_old = self.amplitude
+        else:
+            data_old = data
+        data_new = np.zeros(len(data_old)-1, dtype=data_old.dtype.type)
+        data_new[0] = data_old[0]
+        for i in xrange(1, len(data_new)-1):
+            data_new[i] = 2.0 * data_old[i] - data_new[i-1]
+        data_new[-1] = data_old[-1]
+        if data is None:
+            self.tgrid     = tgrid_new
+            self.amplitude = data_new
+            self._check()
+        else:
+            return data_new
 
     def resample(self, upsample=None, downsample=None, num=None, window=None):
         """
