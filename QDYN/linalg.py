@@ -7,11 +7,11 @@ from __future__ import print_function, division, absolute_import, \
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
+import logging
 
 
 def inner(v1, v2):
-    """
-    Calculate the inner product of the two vectors or matrices v1, v2
+    """Calculate the inner product of the two vectors or matrices v1, v2
 
     For vectors, the inner product is the standard Euclidian inner product
 
@@ -69,23 +69,20 @@ def inner(v1, v2):
 
 
 def trace(m):
-    """
-    Return the trace of the given matrix
-    """
+    """Return the trace of the given matrix"""
     return (np.asarray(m)).trace()
 
 
 def norm(v):
-    """
-    Calculate the norm of a vector or matrix v, matching the inner product
+    """Calculate the norm of a vector or matrix `v`, matching the inner product
     defined in the `inner` routine. An algorithm like
     Gram-Schmidt-Orthonormalization will only work if the choice of norm and
     inner product are compatible.
 
-    If v is a vector, the norm is the 2-norm (i.e. the standard Euclidian
+    If `v` is a vector, the norm is the 2-norm (i.e. the standard Euclidian
     vector norm).
 
-    If v is a matrix, the norm is the Hilbert-Schmidt (aka Frobenius) norm.
+    If `v` is a matrix, the norm is the Hilbert-Schmidt (aka Frobenius) norm.
     Note that the HS norm of a matrix is identical to the 2-norm of any
     vectorization of that matrix (e.g. writing the columns of the matrix
     underneat each other). Also, the HS norm of the m x 1 matrix is the same as
@@ -97,10 +94,9 @@ def norm(v):
 
 
 def get_op_matrix(apply_op, state_shape, t):
-    """
-    Return the explicit matrix for the operator encoded in apply_op, assuming
-    that apply_op takes a numpy array or matrix of the given `state_shape` as
-    its first argument
+    """Return the explicit matrix for the operator encoded in `apply_op`,
+    assuming that `apply_op` takes a numpy array or matrix of the given
+    `state_shape` as its first argument
 
     Arguments
     ---------
@@ -159,8 +155,7 @@ def get_op_matrix(apply_op, state_shape, t):
 
 
 def vectorize(a, order='F'):
-    """
-    Return vectorization of multi-dimensional numpy array or matrix a
+    """Return vectorization of multi-dimensional numpy array or matrix `a`
 
     Examples
     --------
@@ -185,9 +180,7 @@ def vectorize(a, order='F'):
 
 
 def is_hermitian(matrix):
-    """
-    Return True if matrix is Hermitian, False otherwise
-    """
+    """Return True if matrix is Hermitian, False otherwise"""
     n, m = matrix.shape
     for i in xrange(n):
         if (matrix[i,i].imag != 0.0):
@@ -197,3 +190,111 @@ def is_hermitian(matrix):
             if (abs(matrix[i,j] - matrix[j,i].conjugate()) > 1.0e-15):
                 return False
     return True
+
+
+def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
+    """Perform regularized numerical differentiation for a large data array,
+    based on the method outlined in Rick Chartrand, "Numerical differentiation
+    of noisy, nonsmooth data, ISRN Applied Mathematics, Vol. 2011, Article ID
+    164564, 2011. We use the variant of the algorithm for large `data` arrays.
+
+    Arguments:
+        data (numpy array): Vector of data to be differentiated.
+        itern (int): Number of iterations to run the main loop.  A stopping
+            condition based on the norm of the gradient vector g below would be
+            an easy modification.  No default value.
+        alph (float): Regularization parameter.  This is the main parameter to
+            fiddle with.  Start by varying by orders of magnitude until
+            reasonable results are obtained.  A value to the nearest power of
+            10 is usually adequate.  No default value.  Higher values increase
+            regularization strength and improve conditioning.
+        u0 (numpy array): Initialization of the iteration.  Default value is
+            the naive derivative (without scaling), of appropriate length (this
+            being different for the two methods).  Although the solution is
+            theoretically independent of the initialization, a poor choice can
+            exacerbate conditioning issues when the linear system is solved.
+        ep (float): Parameter for avoiding division by zero.  Default value is
+            1e-6.  Results should not be very sensitive to the value.  Larger
+            values improve conditioning and therefore speed, while smaller
+            values give more accurate results with sharper jumps.
+        dx (float): Grid spacing, used in the definition of the derivative
+            operators.  Default is the reciprocal of the data size.
+
+    Returns:
+        u (numpy array): Estimate of the regularized derivative of data.
+    """
+
+    logger = logging.getLogger(__name__)
+
+    # Make sure we have a column vector
+    data = np.array(data)
+    if (len(data.shape) != 1):
+        logger.error("data is not a column vector")
+        return
+    # Get the data size.
+    n = len(data)
+
+    # Default checking. (u0 is done separately within each method.)
+    if dx is None:
+        dx = 1.0 / n
+
+    # Construct antidifferentiation operator and its adjoint.
+    A = lambda v: np.cumsum(v)
+    AT = lambda w: (sum(w) * np.ones(len(w))
+                    - np.transpose(np.concatenate(([0.0], np.cumsum(w[:-1])))))
+    # Construct differentiation matrix.
+    c = np.ones(n)
+    D = sparse.spdiags([-c, c], [0, 1], n, n) / dx
+    mask = np.ones((n, n))
+    mask[-1, -1] = 0.0
+    D = sparse.dia_matrix(D.multiply(mask))
+    DT = D.transpose()
+    # Since Au(0) = 0, we need to adjust.
+    data = data - data[0]
+    # Default initialization is naive derivative.
+    if u0 is None:
+        u0 = np.concatenate(([0], np.diff(data)))
+    u = u0
+    # Precompute.
+    ATd = AT(data)
+
+    # Main loop.
+    for ii in range(1, itern + 1):
+
+        # Diagonal matrix of weights, for linearizing E-L equation.
+        Q = sparse.spdiags(1.0/np.sqrt((D*u)**2.0+ep), 0, n, n)
+        # Linearized diffusion matrix, also approximation of Hessian.
+        L = DT*Q*D
+        # Gradient of functional.
+        g = AT(A(u)) - ATd
+        g = g + alph * L * u
+        # Build preconditioner.
+        c = np.cumsum(range(n, 0, -1))
+        B = alph * L + sparse.spdiags(c[::-1], 0, n, n)
+        # droptol = 1.0e-2
+        R = sparse.dia_matrix(np.linalg.cholesky(B.todense()))
+        # Prepare to solve linear equation.
+        tol = 1.0e-4
+        maxit = 100
+
+        linop = lambda v: (alph * L * v + AT(A(v)))
+        linop = scipy.linalg.LinearOperator((n, n), linop)
+
+        [s, info_i] = sparse.linalg.cg(linop, -g, None, tol, maxit, None,
+                                       np.dot(R.transpose(), R))
+        logger.debug(('iteration {0:4d}: relative change = {1:.3e}, '
+                      'gradient norm = {2:.3e}\n').format(
+                      ii, np.linalg.norm(s[0])/np.linalg.norm(u),
+                      np.linalg.norm(g)))
+        if (info_i > 0):
+            logger.debug("WARNING - convergence to tolerance not achieved!")
+        elif (info_i < 0):
+            logger.debug("WARNING - illegal input or breakdown")
+        else:
+            [s, info_i] = sparse.linalg.cg(linop, -g, None, tol, maxit, None,
+                                           np.dot(R.transpose(), R))
+        # Update current solution
+        u = u + s
+        u = u/dx
+
+    return u
