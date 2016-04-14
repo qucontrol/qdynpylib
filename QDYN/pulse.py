@@ -14,10 +14,8 @@ import re
 import logging
 from six.moves import xrange
 
-from .units import NumericConverter
+from .units import UnitConvert
 from .linalg import reg_diff
-convert = NumericConverter()
-
 
 class Pulse(object):
     """
@@ -82,6 +80,7 @@ class Pulse(object):
     tgrid: n = 1
      1: t_start = 0_au, t_stop = 10_au, nt = 100
     """
+    unit_convert = UnitConvert()
 
     def __init__(self, filename=None, tgrid=None, amplitude=None,
                  time_unit='au', ampl_unit='au', freq_unit=None,
@@ -179,11 +178,11 @@ class Pulse(object):
         "length of tgrid and amplitudes do not match"
         assert self.mode in ['complex', 'abs', 'real'], \
         "Illegal value for mode: %s" % self.mode
-        assert self.ampl_unit in convert.au_convfactors.keys(), \
+        assert self.ampl_unit in self.unit_convert.units, \
         "Unknown ampl_unit %s" % self.ampl_unit
-        assert self.time_unit in convert.au_convfactors.keys(), \
+        assert self.time_unit in self.unit_convert.units, \
         "Unknown time_unit %s" % self.time_unit
-        assert self.freq_unit in convert.au_convfactors.keys(), \
+        assert self.freq_unit in self.unit_convert.units, \
         "Unknown freq_unit %s" % self.freq_unit
         if self.mode == 'real':
             if np.max(np.abs(self.amplitude.imag)) > 0.0:
@@ -306,14 +305,14 @@ class Pulse(object):
         if freq_unit is None:
             freq_unit = self.freq_unit
         n = len(self.tgrid)
-        dt = convert.to_au(self.dt, self.time_unit)
+        dt = self.unit_convert.convert(self.dt, self.time_unit, 'iu')
         if n % 2 == 1:
             # odd
             w_max = ((n - 1) * np.pi) / (n * dt)
         else:
             # even
             w_max = np.pi / dt
-        return convert.from_au(w_max, freq_unit)
+        return self.unit_convert.convert(w_max, 'iu', freq_unit)
 
     def dw(self, freq_unit=None):
         """
@@ -354,15 +353,13 @@ class Pulse(object):
 
     def convert(self, time_unit=None, ampl_unit=None, freq_unit=None):
         """Convert the pulse data to different units"""
-        if not time_unit is None:
-            c = convert.to_au(1, self.time_unit) \
-                * convert.from_au(1, time_unit)
-            self.tgrid *= c
+        if time_unit is not None:
+            factor = self.unit_convert.convert(1.0, self.time_unit, time_unit)
+            self.tgrid *= factor
             self.time_unit = time_unit
-        if not ampl_unit is None:
-            c = convert.to_au(1, self.ampl_unit) \
-                * convert.from_au(1, ampl_unit)
-            self.amplitude *= c
+        if ampl_unit is not None:
+            factor = self.unit_convert.convert(1.0, self.ampl_unit, ampl_unit)
+            self.amplitude *= factor
             self.ampl_unit = ampl_unit
         if not freq_unit is None:
             self.freq_unit = freq_unit
@@ -459,11 +456,10 @@ class Pulse(object):
             freq_unit = self.freq_unit
         s = fft(self.amplitude) # spectrum amplitude
         n = len(self.amplitude)
-        dt = self.dt
-        dt = convert.to_au(dt, self.time_unit)
-        f = fftfreq(n, d=dt/(2.0*np.pi)) # spectrum frequencies
-        c = convert.from_au(1, freq_unit)
-        f *= c # convert to desired unit
+        dt = self.unit_convert.convert(self.dt, self.time_unit, 'iu')
+        f = self.unitconvert.convert(
+                fftfreq(n, d=dt/(2.0*np.pi)), # spectrum frequencies
+                'iu', freq_unit)
         modifier = {
             'abs'    : lambda s: np.abs(s),
             'real'   : lambda s: np.real(s),
@@ -1049,7 +1045,8 @@ def tgrid_from_config(config, pulse_grid=True):
                             unit = m.group(2)
                             if unit is not None:
                                 timeunit = unit[1:]
-                                value = convert.to_au(value, timeunit)
+                                value = self.unit_convert.convert(value,
+                                        timeunit, 'iu')
                             params[param] = value
                         else:
                             value = int(m.group(1))
@@ -1074,9 +1071,9 @@ def tgrid_from_config(config, pulse_grid=True):
             assert ((t_start is not None) and (nt is not None)
             and (t_stop is not None)), "tgrid not fully specified in config"
             dt = (t_stop - t_start) / float(nt - 1)
-        t_start = convert.from_au(t_start, timeunit)
-        t_stop = convert.from_au(t_stop, timeunit)
-        dt = convert.from_au(dt, timeunit)
+        t_start = self.unit_convert.convert(t_start, 'iu', timeunit)
+        t_stop = self.unit_convert.convert(t_stop, 'iu', timeunit)
+        dt = self.unit_convert.convert(dt, 'iu', timeunit)
         if pulse_grid:
             # convert to pulse parameters
             t_start += 0.5*dt
@@ -1148,7 +1145,8 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
         signal = np.zeros(len(t), dtype=np.complex128)
         assert type(t) == np.ndarray, "t must be numpy array"
         assert t.dtype.type is np.float64, "t must be double precision real"
-    c = convert.to_au(1, time_unit) * convert.to_au(1, freq_unit)
+    c = ( self.unit_convert.convert(1, time_unit, 'iu')
+        * self.unit_convert.convert(1, freq_unit, 'iu'))
     if np.isscalar(freq):
         if complex:
             signal += np.exp(1j*c*freq*t) # element-wise
