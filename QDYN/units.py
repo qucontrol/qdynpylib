@@ -278,10 +278,7 @@ class UnitFloat(object):
         Cannot compare UnitFloat to 1
         """
         if isinstance(other, UnitFloat):
-            if self.val == 0 and self.val == other.val:
-                return True
-            else:
-                return self.check_same_unit(other) and (self.val == other.val)
+            return repr(self) == repr(other)
         else: # we'll try other as string, tuple and float
             try:
                 try:
@@ -477,6 +474,10 @@ class UnitFloat(object):
         1.1
         """
         return float(self.val)
+
+    def __hash__(self):
+        return hash(repr(self))
+
 
 
 class UnitConvert(object):
