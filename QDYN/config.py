@@ -1,4 +1,4 @@
-""" Module containing utitlities for managing QDYN config files """
+""" Module containing utilities for managing QDYN config files """
 from __future__ import print_function, division, absolute_import
 import os
 import json
@@ -78,6 +78,7 @@ def escape_str(s):
         ("\t", "\\t"),
         ("\b", "\\b"),
     ]
+    s = str(s)
     bs_protect = ''.join([chr(random.randint(33,127)) for i in range(15)])
     while bs_protect in s:
         bs_protect = ''.join([chr(random.randint(33,127)) for i in range(15)])
@@ -126,7 +127,7 @@ class ConfigReader(object):
 
     Arguments:
         filename (str or file handle): Name of a file (or open file handle)
-        from which to read the raw config file.
+            from which to read the raw config file.
 
     Example:
 
@@ -155,12 +156,14 @@ class ConfigReader(object):
         user_string: A = "x**2", B = 'B_{"avg"}'
 
     Note:
-        if `filename` is an open filename, the filehandle is closed if
+        If `filename` is an open filename, the filehandle is closed if
         `ConfigReader` is used as a config manager, it is not closed if the
         `ConfigReader` is used directly as an iterator,
         ``for line in ConfigReader(config_file)): print(line)`` in the above
         example. If `filename` is a string (i.e. the name of a file), the
         `ConfigReader` *must* be used as a context manager.
+
+        The returned lines do *not* have have a newline.
     """
     def __init__(self, filename):
         self.filename = filename
@@ -217,17 +220,141 @@ class ConfigReader(object):
         return self.next()
 
 
+class ConfigWriter(object):
+    r"""Writer for a config file, taking care of splitting lines at a
+    reasonable line width
+
+    Arguments:
+        filename (str or file handle): Name of a file (or open file handle)
+            to which to write the config file.
+        linewidth (int): Approximate linewidth after which a line should be
+        truncated
+
+    Note: See :class:`ConfigReader` for caveats on using an open file handle
+    for `filename`.
+    """
+
+    def __init__(self, filename, linewidth=80):
+        self.filename = filename
+        self.fh = None
+        self.linewidth = linewidth
+        self.line_nr = 0
+
+    def __enter__(self):
+        self.line_nr = 0
+        try:
+            self.fh = open(self.filename, 'w')
+        except TypeError:
+            self.fh = self.filename
+        return self
+
+    def write(self, line):
+        """Write a single line. The line may be broken into several lines
+        shorter than `linewidth`. Trailing newlines in `line` are ignored."""
+        full_line, replacements = protect_quotes(line.strip())
+        if len(full_line) == 0:
+            self.fh.write("\n")
+            self.line_nr += 1
+            return
+        rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+\s*,?\s*)')
+        parts = [part for part in rx_item.split(full_line) if len(part) > 0]
+        current_line = ''
+        while len(parts) > 0:
+            current_line += parts.pop(0)
+            try:
+                while len(current_line) + len(parts[0]) <= self.linewidth - 1:
+                    current_line += parts.pop(0)
+            except IndexError:
+                pass # We've exhausted all parts
+            else:
+                if len(parts) > 0:
+                    current_line += '&'
+            current_line = unprotect_quotes(current_line, replacements)
+            self.fh.write(current_line.strip() + "\n")
+            self.line_nr += 1
+            current_line = '  ' # indent for continuing line
+
+    def writelines(self, lines):
+        """Write a list of lines. The elements of `lines` should not have
+        trailing newlines"""
+        for line in lines:
+            self.write(line)
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        self.fh.close()
+        return False
+
+
+def render_config_lines(section_name, section_data):
+    r'''Render `section_data` into a list of lines.
+
+    Example:
+        >>> section_data = [
+        ...     OrderedDict([
+        ...         ('type', 'gauss'),
+        ...         ('t_FWHM', UnitFloat.from_str('1.8_ns')),
+        ...         ('E_0', UnitFloat.from_str('1_GHz')),
+        ...         ('id', 1), ('oct_outfile', 'pulse1.dat')]),
+        ...     OrderedDict([
+        ...         ('type', 'gauss'),
+        ...         ('t_FWHM', UnitFloat.from_str('1.8_ns')),
+        ...         ('E_0', UnitFloat.from_str('1_GHz')),
+        ...         ('id', 2), ('oct_outfile', 'pulse2.dat')])
+        ... ]
+        >>> for line in render_config_lines('pulse', section_data):
+        ...     print(line)
+        pulse: type = gauss, t_FWHM = 1.8_ns, E_0 = 1_GHz
+        * id = 1, oct_outfile = pulse1.dat
+        * id = 2, oct_outfile = pulse2.dat
+    '''
+    # Passing `section_name` and `section_data` separately (instead of a full
+    # `config_data` dict) allows this routine to be used for creating multiple
+    # "blocks" of the same section, each with a different "label"
+    lines = []
+    if isinstance(section_data, list):
+        # section name and common items
+        if len(section_data) > 1:
+            common_items = dict(set(section_data[0].items()).intersection(
+                                *[set(d.items()) for d in section_data[1:]]))
+        line = "%s:" % section_name
+        for key in section_data[0]:
+            # we *do not* iterate over keys in common_items, so that items
+            # are ordered the same as in section_data[0], instead of randomly
+            if key in common_items:
+                line += " %s = %s," % (key, escape_str(common_items[key]))
+        if line.endswith(","):
+            lines.append(line[:-1].strip())
+        else:
+            lines.append(line.strip())
+        # item lines
+        for item_line in section_data:
+            line = "*"
+            for key in item_line:
+                if key not in common_items:
+                    line += " %s = %s," % (key, escape_str(item_line[key]))
+            if line.endswith(","):
+                lines.append(line[:-1].strip())
+            else:
+                lines.append(line.strip())
+    else: # section does not contain item lines, but key-value pairs only
+        line = "%s:" % section_name
+        for key in section_data:
+            line += " %s = %s," % (key, escape_str(section_data[key]))
+        lines.append(line[:-1].strip())
+    return lines
+
+
 def read_config(filename):
     """Parse the given config file and return a nested data structure to
     represent it.
 
     Return a dict containing the following mapping::
 
-        section name => dict of key => value
+        section name => dict(key => value)
 
     or::
 
-        section name => list of dicts key => value
+        section name => list of dicts(key => value)
     """
     rx_sec = re.compile(r'''
         (?P<section>[a-z_A-Z]+) \s*:\s*
@@ -316,75 +443,30 @@ def read_config(filename):
     return config_data
 
 
-def write_config(config_data, filename='config_new'):
-    """Write a config file to the given filename, based on the given
-    config_data, where config_data is a dict as returned by `read_config`
+def write_config(config_data, filename):
+    """Write out a config file
+
+    Arguments:
+        config_data (dict): data structure as returned by :func:`read_config`.
+        filename (str): name of file to which to write config
     """
     lines = []
-    line_break = 80
-
-    # Part for non-user defined reals, integers or logicals section
-    for sec_name in config_data:
-        if sec_name.startswith('user'):
-            continue
-        line = sec_name + r':'
-        item_line = '* '
-        has_items = False
-        for element in config_data[sec_name]:
-            is_item_line = re.compile(r'^\d+$').match(str(element).strip())
-            if is_item_line: # Corresponds to an item line
-                if not has_items: # Only write section name once
-                    lines.append(line)
-                has_items = True
-                item_line = '*'
-                for item in config_data[sec_name][element]:
-                    val = config_data[sec_name][element][item]
-                    if len(item_line + r' ' + item + r' = ' + val + r',')\
-                    > line_break:
-                        lines.append(item_line + r' &')
-                        item_line = ' '
-                    item_line = item_line + r' ' + item + r' = ' + val + r','
-                if item_line.endswith(','):
-                    item_line = item_line[:-1]
-                lines.append(item_line)
-            else: # Corresponds to a non-allocatable section
-                val = config_data[sec_name][element]
-                if len(line + r' ' + element + r' = ' + val + r',')\
-                > line_break:
-                    lines.append(line + r' &')
-                    line = ' ' * (len(sec_name)+1)
-                line = line + r' ' + element + r' = ' + val + r','
-        if line.endswith(','):
-            line = line[:-1]
-        if not is_item_line:
-            lines.append(line)
-        lines.append('')
-
-    # Part for user defined reals, integers and logicals
-    for sec_name in config_data:
-        if not sec_name.startswith('user'):
-            continue
-        line = sec_name + r':'
-        for element in config_data[sec_name]:
-            element = str(element).strip()
-            val = config_data[sec_name][element]
-            if len(line + r' ' + element + r' = ' + val + r',')\
-            > line_break:
-                lines.append(line + r' &')
-                line = ' ' * (len(sec_name)+1)
-            line = line + r' ' + element + r' = ' + val + r','
-        if line.endswith(','):
-            line = line[:-1]
-        lines.append(line)
-        lines.append('')
-
-    # If last line is empty, remove it
-    while lines[-1] == '':
-        del lines[-1]
-
-    with open(filename, 'w') as out_fh:
-        for line in lines:
-            out_fh.write('%s\n' % line)
+    for section in config_data:
+        if isinstance(config_data[section], list):
+            label_groups = OrderedDict([])
+            for itemline in config_data[section]:
+                label = itemline.get('label')
+                if label not in label_groups:
+                    label_groups[label] = []
+                label_groups[label].append(itemline)
+            for group in label_groups.values():
+                lines.extend(render_config_lines(section, group))
+                lines.append('')
+        else:
+            lines.extend(render_config_lines(section, config_data[section]))
+            lines.append('')
+    with ConfigWriter(filename) as config:
+        config.writelines(lines)
 
 
 def get_new_config_structure(filename):
