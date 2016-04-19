@@ -157,13 +157,13 @@ class ConfigReader(object):
 
     Note:
         If `filename` is an open filename, the filehandle is closed if
-        `ConfigReader` is used as a config manager, it is not closed if the
+        `ConfigReader` is used as a context manager, it is not closed if the
         `ConfigReader` is used directly as an iterator,
         ``for line in ConfigReader(config_file)): print(line)`` in the above
         example. If `filename` is a string (i.e. the name of a file), the
         `ConfigReader` *must* be used as a context manager.
 
-        The returned lines do *not* have have a newline.
+        The returned lines do *not* have a newline.
     """
     def __init__(self, filename):
         self.filename = filename
@@ -344,6 +344,29 @@ def render_config_lines(section_name, section_data):
     return lines
 
 
+def _item_rxs():
+    # the following regexes are encapsulated in this function to make the them
+    # accessible to the config_conversion module
+    logical_mapping = {
+        'T': True, 'true': True, '.true.': True,
+        'F': False, 'false': False, '.false.': False,
+    }
+    item_rxs = [
+        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
+        lambda v: UnitFloat.from_str(v)),
+        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\d+-]+)$'),
+        lambda v: int(v)),
+        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+)$'),
+        lambda v: float(v)),
+        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
+                    r'\.true\.|\.false\.))$'),
+        lambda v: logical_mapping[v]),
+        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>.+)$'),
+        lambda v: unescape_str(v)),
+    ]
+    return item_rxs
+
+
 def read_config(filename):
     """Parse the given config file and return a nested data structure to
     represent it.
@@ -371,23 +394,7 @@ def read_config(filename):
         )
         ''', re.X)
     rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+)')
-    logical_mapping = {
-        'T': True, 'true': True, '.true.': True,
-        'F': False, 'false': False, '.false.': False,
-    }
-    item_rxs = [
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
-        lambda v: UnitFloat.from_str(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\d+-]+)$'),
-        lambda v: int(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+)$'),
-        lambda v: float(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
-                    r'\.true\.|\.false\.))$'),
-        lambda v: logical_mapping[v]),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>.+)$'),
-        lambda v: unescape_str(v)),
-    ]
+    item_rxs = _item_rxs()
 
     # first pass: identify sections, list of lines in each section
     config_data = OrderedDict([])

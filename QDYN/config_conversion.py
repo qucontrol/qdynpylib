@@ -1,4 +1,10 @@
 """Converting the "old" config file format to the "new" format"""
+import re
+import os
+import json
+from collections import OrderedDict
+
+from .config import ConfigReader, _item_rxs, protect_quotes, unprotect_quotes
 
 
 def get_old_config_structure(foldername):
@@ -57,114 +63,78 @@ def read_old_config(filename):
         section name => dict of key => value; or
         section name => list of dicts key => value
     """
-    config_data = {}
+    rx_sec = re.compile(r'''
+        (?P<section>[a-z_A-Z]+) \s*:\s*
+        (?P<items>
+            (\w+ \s*=\s* [\w.+-]+ [\s,]+)*
+            (\w+ \s*=\s* [\w.+-]+ \s*)
+        )?
+        ''', re.X)
+    rx_itemline = re.compile(r'''
+        [\d]+ \s*:\s*
+        (?P<items>
+            (\w+ \s*=\s* [\w.+-]+ [\s,]+)*
+            (\w+ \s*=\s* [\w.+-]+ \s*)
+        )
+        ''', re.X)
+    rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+)')
+    item_rxs = _item_rxs()
 
-    # Local regular expression filters
-    RX = {
-        'section': re.compile(
-            r'^(?P<sec_name>[^\d]\w+)\s*:\s*(?P<sec_line>.+)$'),
-        'item_line': re.compile(
-            r'^(?P<item_num>\d+)\s*:\s*(?P<item_line>.+)$'),
-        'item': re.compile(
-            r'^(?P<item_name>.+)\s*=\s*(?P<item_val>.+)$'),
-        'continue_line': re.compile(
-            r'^(?P<line>.*)\&$')
-    }
+    # first pass: identify sections, list of lines in each section
+    config_data = OrderedDict([])
+    with ConfigReader(filename) as config:
+        current_section = ''
+        for line in config:
+            line, replacements = protect_quotes(line)
+            m_sec = rx_sec.match(line)
+            m_itemline = rx_itemline.match(line)
+            if m_sec:
+                current_section = m_sec.group('section')
+                config_data[current_section] = None
+            elif m_itemline:
+                if config_data[current_section] is None:
+                    config_data[current_section]  = []
+                config_data[current_section].append(OrderedDict([]))
 
-    # Collect all existing section types
-    file = open(filename)
-    for line in file:
-        line = line.strip()
-        m = RX['section'].match(line)
-        if m:
-            sec_name = m.group('sec_name')
-            if not sec_name in config_data:
-                config_data[sec_name]               = {}
-                config_data[sec_name]['item_lines'] = {}
-                config_data[sec_name]['num_lines']  = 0
-
-    # Get lines and items for each section
-    sec_name = ''
-    has_line_break = False
-
-    file = open(filename)
-    for line in file:
-        has_comment = False
-        if '!' in line:
-            has_comment = True
-            line = line[0:line.index('!')]
-        line = line.strip()
-        if line.startswith('&'):
-            line = line[1:]
-        line = line.strip()
-        if line == '':
-            continue
-        if not has_line_break:
-            curr_line = ''
-
-        m = RX['continue_line'].match(line)
-        if m and not has_comment:
-            has_line_break = True
-            curr_line = curr_line + m.group('line')
-            continue
-        else:
-            has_line_break = False
-        curr_line = curr_line + line
-
-        m = RX['section'].match(curr_line)
-        if m:
-            sec_name = m.group('sec_name').strip()
-            sec_line_array = m.group('sec_line').strip().split(',')
-
-        m = RX['item_line'].match(curr_line)
-        if m: # Section item line
-            config_data[sec_name]['num_lines'] += 1
-            item_num = 1
-            while item_num in config_data[sec_name]['item_lines']:
-                item_num += 1
-            config_data[sec_name]['item_lines'][item_num] = {}
-            item_line_array = m.group('item_line').strip().split(',')
-            # If 'item_num = 0' has been added in case of a section with item
-            # lines, remove it from config_data, since we want the item lines
-            # to start with 1 in that case
-            if 0 in config_data[sec_name]['item_lines']:
-                del config_data[sec_name]['item_lines'][0]
-        else: # No section item line
-            item_num = 0
-            config_data[sec_name]['item_lines'][item_num] = {}
-            item_line_array = []
-
-        # If item line, remove entry 'n = {number}' from sec_line_array,
-        # since this only indicates the number of following item lines.
-        # This information is gathered in 'num_lines'
-        for item in sec_line_array:
-            m = RX['item'].match(item)
-            if m:
-                if ('n' == m.group('item_name').strip()):
-                    sec_line_array.remove(item)
-                    break
-        # Join arrays with all necessary items
-        item_array = sec_line_array + item_line_array
-
-        for item in item_array:
-            item = item.strip()
-            # Check for missing ',' => otherwise additional '=' signs
-            # will appear
-            if item.count('=') != 1:
-                print('Line |' + line)
-                raise AssertionError("Number of '=' differs from one. "
-                "Missing or too much '=' signs?")
-            m_item = RX['item'].match(item)
-            if m_item:
-                item_name = m_item.group('item_name').strip()
-                item_val  = m_item.group('item_val').strip()
-                config_data[sec_name]['item_lines'][item_num]\
-                    [item_name] = item_val
+    # second pass: set items
+    with ConfigReader(filename) as config:
+        current_section = ''
+        current_itemline = 0
+        for line in config:
+            line, replacements = protect_quotes(line)
+            m_sec = rx_sec.match(line)
+            m_itemline = rx_itemline.match(line)
+            line_items = OrderedDict([])
+            for item in rx_item.findall(line):
+                matched = False
+                for rx, setter in item_rxs:
+                    m = rx.match(item)
+                    if m:
+                        val = unprotect_quotes(m.group('value'), replacements)
+                        line_items[m.group('key')] = setter(val)
+                        matched = True
+                        break
+                if not matched:
+                    raise ValueError("Could not parse item '%s'" % str(item))
+            if m_sec:
+                current_itemline = 0
+                current_section = m_sec.group('section')
+                if config_data[current_section] is None:
+                    config_data[current_section] = [line_items, ]
+                else:
+                    try:
+                        del line_items['n']
+                    except KeyError:
+                        pass
+                    for line_dict in config_data[current_section]:
+                        line_dict.update(line_items)
+                    pass
+            elif m_itemline:
+                config_data[current_section][current_itemline].update(
+                        line_items)
+                current_itemline += 1
             else:
-                print('Line |' + line)
-                raise AssertionError("Item name and value have to be separated"
-                " by a '=' sign")
-
+                raise ValueError("Could not parse line %d" % config.line_nr)
     return config_data
 
 
@@ -321,7 +291,7 @@ def get_mappings(old_config_structure_file='old_config_structure.json',
     return mappings
 
 
-def convert_config(filename, mappings):
+def convert_config(old_config_data, mappings):
     """Convert the old_config_data, as returned by `read_old_config` into
     a data structure compatible with the current config file. The conversion is
     performed using a list of mappings, where is encoded to which section and
@@ -330,24 +300,22 @@ def convert_config(filename, mappings):
     """
     new_config_data = {}
 
-    old_config_data = read_old_config(filename)
-
     obsolete_sec_items = [
         ('pulse', 'ftrt')
     ]
 
-    ham_line = 0
+    ham_index = 0
     for sec_name in old_config_data:
         if sec_name.startswith('user') or sec_name == 'misc':
             continue
 
-        for item_line in old_config_data[sec_name]['item_lines']:
-            curr_item_line = item_line
+        for i in range(len(old_config_data[sec_name])):
+            item_index = i
             if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser', 'spin']:
-                ham_line += 1
-                curr_item_line = ham_line
+                ham_index += 1
+                item_index = ham_index
 
-            for item in old_config_data[sec_name]['item_lines'][item_line]:
+            for item in old_config_data[sec_name][i]:
                 # Check for obsolete items, will be ignored since they have to
                 # be replaced by hand anyways
                 curr_item = item
@@ -359,19 +327,17 @@ def convert_config(filename, mappings):
                 # Check for cases which require a special treatment
                 if sec_name == 'oct' and curr_item == 'max_hours':
                     print("***** Converting 'max_hours' to 'max_seconds'")
-                    item_val = str(int(old_config_data[sec_name]['item_lines']\
-                               [item_line][curr_item])*3600)
+                    item_val = str(int(old_config_data[sec_name]\
+                               [i][curr_item])*3600)
                     curr_item = 'max_seconds'
                 elif sec_name == 'grid' and curr_item == 'coord_type':
-                    item_val = old_config_data[sec_name]['item_lines']\
-                               [item_line][curr_item]
+                    item_val = old_config_data[sec_name][i][curr_item]
                     if item_val.startswith('cartesian'):
                         item_val = 'cartesian'
                 else:
                     if not sec_name in mappings:
                         raise KeyError("Unknown section name: '%s'" % sec_name)
-                    item_val = old_config_data[sec_name]['item_lines']\
-                               [item_line][curr_item]
+                    item_val = old_config_data[sec_name][i][curr_item]
                 new_sec_name, new_item_name = mappings[sec_name][curr_item]
 
                 # Add section if necessary
@@ -380,15 +346,15 @@ def convert_config(filename, mappings):
 
                 # Sections that doesn't allow for lines
                 if new_sec_name in ['tgrid', 'oct', 'prop', 'numerov']:
-                    curr_item_line = 0
+                    item_index = 0
 
-                if curr_item_line > 0 and\
-                not curr_item_line in new_config_data[new_sec_name]:
-                    new_config_data[new_sec_name][curr_item_line] = {}
+                if item_index > 0 and\
+                not item_index in new_config_data[new_sec_name]:
+                    new_config_data[new_sec_name][item_index] = {}
 
                 # Add item to section or to section line
-                if curr_item_line > 0:
-                    new_config_data[new_sec_name][curr_item_line]\
+                if item_index > 0:
+                    new_config_data[new_sec_name][item_index]\
                         [new_item_name] = item_val
                 else:
                     new_config_data[new_sec_name][new_item_name] = item_val
@@ -396,21 +362,21 @@ def convert_config(filename, mappings):
                 # Add `op_type` if necessary
                 if sec_name in ['pot', 'dip', 'stark', 'so', 'cwlaser',\
                                 'spin']:
-                    new_config_data[new_sec_name][curr_item_line]['op_type']\
+                    new_config_data[new_sec_name][item_index]['op_type']\
                         = sec_name
                     if not 'type' in\
-                    new_config_data[new_sec_name][curr_item_line]:
-                        new_config_data[new_sec_name][curr_item_line]['type']\
+                    new_config_data[new_sec_name][item_index]:
+                        new_config_data[new_sec_name][item_index]['type']\
                             = 'op'
 
     # Add parameters from former 'misc' section to respective new section. If
     # they allow for lines, add the item to each line
     if 'misc' in old_config_data:
-        for item in old_config_data['misc']['item_lines'][0]:
+        for item in old_config_data['misc'][0]:
             new_sec_name, new_item_name = mappings['misc'][item]
             if not 'misc' in mappings:
                 raise KeyError("Unknown section name: '%s'" % sec_name)
-            item_val = old_config_data['misc']['item_lines'][0][item]
+            item_val = old_config_data['misc'][0][item]
             if not new_sec_name in new_config_data:
                 new_config_data[new_sec_name] = {}
             if new_sec_name in ['tgrid', 'oct', 'prop', 'numerov']:
@@ -420,16 +386,15 @@ def convert_config(filename, mappings):
                 if not new_config_data[new_sec_name]:
                     new_config_data[new_sec_name][1] = {}
                 for item_line in new_config_data[new_sec_name]:
-                    new_config_data[new_sec_name][item_line][new_item_name]\
-                        = item_val
+                    item_line[new_item_name] = item_val
 
     # User defined parameters stay unaltered in the new config structure
     for sec_name in old_config_data:
         if sec_name.startswith('user'):
-            for item in old_config_data[sec_name]['item_lines'][0]:
+            for item in old_config_data[sec_name][0]:
                 new_sec_name  = sec_name
                 new_item_name = item
-                item_val = old_config_data[sec_name]['item_lines'][0][item]
+                item_val = old_config_data[sec_name][0][item]
                 if not new_sec_name in new_config_data:
                     new_config_data[new_sec_name] = {}
                 new_config_data[new_sec_name][new_item_name]\
@@ -437,10 +402,9 @@ def convert_config(filename, mappings):
 
     # Set 'dim' parameter in for each grid line
     if 'grid' in new_config_data:
-        for item_line in new_config_data['grid']:
-            new_config_data['grid'][item_line]['dim'] = str(item_line)
-            if not 'coord_type' in new_config_data['grid'][item_line]:
-                new_config_data['grid'][item_line]['coord_type']\
-                    = 'cartesian'
+        for i, item_line in enumerate(new_config_data['grid']):
+            item_line['dim'] = str(i)
+            if not 'coord_type' in new_config_data['grid'][i]:
+                new_config_data['grid'][i]['coord_type'] = 'cartesian'
 
     return new_config_data
