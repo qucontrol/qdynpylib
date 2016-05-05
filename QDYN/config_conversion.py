@@ -4,7 +4,7 @@ import os
 import json
 from collections import OrderedDict
 
-from .config import ConfigReader, _item_rxs, protect_quotes, unprotect_quotes
+from .config import _process_raw_lines, _item_rxs, _protect_quotes, _unprotect_quotes
 
 
 def get_old_config_structure(foldername):
@@ -82,10 +82,10 @@ def read_old_config(filename):
 
     # first pass: identify sections, list of lines in each section
     config_data = OrderedDict([])
-    with ConfigReader(filename) as config:
+    with open(filename) as in_fh:
         current_section = ''
-        for line in config:
-            line, replacements = protect_quotes(line)
+        for line in _process_raw_lines(in_fh):
+            line, replacements = _protect_quotes(line)
             m_sec = rx_sec.match(line)
             m_itemline = rx_itemline.match(line)
             if m_sec:
@@ -97,11 +97,11 @@ def read_old_config(filename):
                 config_data[current_section].append(OrderedDict([]))
 
     # second pass: set items
-    with ConfigReader(filename) as config:
+    with open(filename) as in_fh:
         current_section = ''
         current_itemline = 0
-        for line in config:
-            line, replacements = protect_quotes(line)
+        for line in _process_raw_lines(in_fh):
+            line, replacements = _protect_quotes(line)
             m_sec = rx_sec.match(line)
             m_itemline = rx_itemline.match(line)
             line_items = OrderedDict([])
@@ -110,7 +110,7 @@ def read_old_config(filename):
                 for rx, setter in item_rxs:
                     m = rx.match(item)
                     if m:
-                        val = unprotect_quotes(m.group('value'), replacements)
+                        val = _unprotect_quotes(m.group('value'), replacements)
                         line_items[m.group('key')] = setter(val)
                         matched = True
                         break
