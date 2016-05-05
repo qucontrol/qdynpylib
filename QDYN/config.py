@@ -423,6 +423,49 @@ def write_config(config_data, filename):
             out_fh.write(_split_config_line(line))
 
 
+def get_config_value(config_data, key_tuple):
+    """Extract value from `config_data` by the given `key_tuple`
+
+    Arguments:
+        config_data (dict): data structure as returned by :func:`read_config`.
+        key_tuple (tuple): tuple of keys. For example if `key_tuple` is
+            ``('pulse', 0, 'id')``, then the returned value would be
+            ``config_data['pulse'][0]['id']``
+
+    Raises:
+        ValueError: if any of the keys in `key_tuple` are invalid or cannot be
+            found
+    """
+    try:
+        key = key_tuple[0]
+    except IndexError:
+        raise ValueError("key_tuple must be a with at least one element")
+    try:
+        val = config_data[key]
+        for key in key_tuple[1:]:
+            val = val[key]
+    except (TypeError, IndexError) as exc_info:
+        raise ValueError("Invalid key '%s': %s" % (key, str(exc_info)))
+    except KeyError:
+        raise ValueError("Invalid key '%s'" % (key, ))
+    return val
+
+
+def set_config_value(config_data, key_tuple, value):
+    """Set a value in `config_data`, cf. `get_config_value`"""
+    if len(key_tuple) < 2:
+        raise ValueError("key_tuple must have at least two elements")
+    try:
+        item = config_data[key_tuple[0]]
+        for key in key_tuple[1:-1]:
+            item = item[key]
+        item[key_tuple[-1]] = value
+    except (TypeError, IndexError) as exc_info:
+        raise ValueError("Invalid key '%s': %s" % (key, str(exc_info)))
+    except KeyError:
+        raise ValueError("Invalid key '%s'" % (key, ))
+
+
 def get_config_structure(def_f90, outfile='new_config_structure.json'):
     """Get a dumped .json-file with all the allowed section names and
     correspondig items of the new config structure genereated by reading the
