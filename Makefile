@@ -2,8 +2,8 @@ PROJECT_NAME = QDYN
 PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest
 TESTPYPI = https://testpypi.python.org/pypi
 
-TESTOPTIONS = -x -s --doctest-modules
-TESTS = QDYN/config.py tests/test_config.py # slow_tests
+TESTOPTIONS = --doctest-modules
+TESTS = QDYN tests slow_tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
 
