@@ -78,12 +78,12 @@ class Pulse(object):
     9.94949
     >>> print(p.config_tgrid)
     tgrid: n = 1
-     1: t_start = 0_au, t_stop = 10_au, nt = 100
+     1: t_start = 0_iu, t_stop = 10_iu, nt = 100
     """
     unit_convert = UnitConvert()
 
     def __init__(self, filename=None, tgrid=None, amplitude=None,
-                 time_unit='au', ampl_unit='au', freq_unit=None,
+                 time_unit='iu', ampl_unit='iu', freq_unit=None,
                  mode='complex'):
         """
         Initialize a pulse, either from a file or by explicitly passing the
@@ -138,7 +138,7 @@ class Pulse(object):
         self.mode = mode
         self.time_unit = time_unit
         self.ampl_unit = ampl_unit
-        self.freq_unit = 'au'
+        self.freq_unit = 'iu'
 
         self.preamble = []
         self.postamble = []
@@ -154,7 +154,7 @@ class Pulse(object):
         try:
             self.freq_unit = freq_units[self.time_unit]
         except KeyError:
-            self.freq_unit = 'au'
+            self.freq_unit = 'iu'
         if freq_unit is not None:
             self.freq_unit = freq_unit
 
@@ -263,9 +263,9 @@ class Pulse(object):
                         logger.info("Set ampl_unit = %s", self.ampl_unit)
                     else:
                         logger.warn("Could not identify units. Setting to "
-                                    "atomic units.")
-                        self.time_unit = 'au'
-                        self.ampl_unit = 'au'
+                                    "'internal' units.")
+                        self.time_unit = 'iu'
+                        self.ampl_unit = 'iu'
             except IndexError:
                 raise IOError("Pulse file does not contain a preamble")
         self.tgrid = t
@@ -523,7 +523,8 @@ class Pulse(object):
         phase = np.angle(self.amplitude)
         if unwrap or derivative:
             phase = np.unwrap(phase)
-        tgrid = self.tgrid * convert.to_au(1, self.time_unit)
+
+        tgrid = self.unit_convert.convert(self.tgrid, self.time_unit, 'iu')
 
         if derivative:
 
@@ -537,7 +538,7 @@ class Pulse(object):
             else:
                 deriv = reg_diff(phase, itern=reg_itern, alph=reg_alph,
                                  dx=tgrid[1]-tgrid[0])
-            return deriv * convert.from_au(1, freq_unit)
+            return self.unit_convert.convert(deriv, 'iu', self.freq_unit)
 
         else: # direct phase
 
@@ -1029,7 +1030,7 @@ def tgrid_from_config(config, pulse_grid=True):
             'dt': re.compile(r'dt\s*=\s*([\d.de]+)(_\w+)?', re.I),
             'nt': re.compile(r'nt\s*=\s*(\d+)'),
         }
-        timeunit = 'au'
+        timeunit = 'iu'
         for line in in_fh:
             line = line.strip()
             if line.startswith('tgrid'):
@@ -1139,14 +1140,15 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
 
      .. math:: f = E / (\\hbar * 2 * pi)
     '''
+    unit_convert = UnitConvert()
     if np.isscalar(t):
         signal = 0.0
     else:
         signal = np.zeros(len(t), dtype=np.complex128)
         assert type(t) == np.ndarray, "t must be numpy array"
         assert t.dtype.type is np.float64, "t must be double precision real"
-    c = ( self.unit_convert.convert(1, time_unit, 'iu')
-        * self.unit_convert.convert(1, freq_unit, 'iu'))
+    c = ( unit_convert.convert(1, time_unit, 'iu')
+        * unit_convert.convert(1, freq_unit, 'iu'))
     if np.isscalar(freq):
         if complex:
             signal += np.exp(1j*c*freq*t) # element-wise
