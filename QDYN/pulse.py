@@ -578,45 +578,46 @@ class Pulse(object):
         postamble = self.postamble
         if not hasattr(postamble, '__getitem__'):
             postamble = [str(postamble), ]
-        with open(filename, 'w') as out_fh:
-            # preamble
-            for line in preamble:
-                line = str(line).strip()
-                if line.startswith('#'):
-                    out_fh.write("%s\n" % line)
-                else:
-                    out_fh.write('# %s\n' % line)
-            # header and data
-            time_header     = "time [%s]" % self.time_unit
-            ampl_re_header  = "Re(ampl) [%s]" % self.ampl_unit
-            ampl_im_header  = "Im(ampl) [%s]" % self.ampl_unit
-            ampl_abs_header = "Abs(ampl) [%s]" % self.ampl_unit
-            if mode == 'abs':
-                out_fh.write("# %23s%25s\n" % (time_header, ampl_abs_header))
-                for i, t in enumerate(self.tgrid):
-                    out_fh.write("%25.17E%25.17E\n"
-                                 % (t, abs(self.amplitude[i])))
-            elif mode == 'real':
-                out_fh.write("# %23s%25s\n" % (time_header, ampl_re_header))
-                for i, t in enumerate(self.tgrid):
-                    out_fh.write("%25.17E%25.17E\n"
-                                 % (t, self.amplitude.real[i]))
-            elif mode == 'complex':
-                out_fh.write("# %23s%25s%25s\n" % (time_header, ampl_re_header,
-                      ampl_im_header))
-                for i, t in enumerate(self.tgrid):
-                    out_fh.write("%25.17E%25.17E%25.17E\n"
-                                 % (t, self.amplitude.real[i],
-                                       self.amplitude.imag[i]))
+        buffer = ''
+        # preamble
+        for line in preamble:
+            line = str(line).strip()
+            if line.startswith('#'):
+                buffer += "%s\n" % line
             else:
-                raise ValueError("mode must be 'abs', 'real', or 'complex'")
-            # postamble
-            for line in self.postamble:
-                line = str(line).strip()
-                if line.startswith('#'):
-                    out_fh.write("%s\n" % line)
-                else:
-                    out_fh.write('# %s' % line)
+                buffer +='# %s\n' % line
+        # header and data
+        time_header     = "time [%s]" % self.time_unit
+        ampl_re_header  = "Re(ampl) [%s]" % self.ampl_unit
+        ampl_im_header  = "Im(ampl) [%s]" % self.ampl_unit
+        ampl_abs_header = "Abs(ampl) [%s]" % self.ampl_unit
+        if mode == 'abs':
+            buffer += "# %23s%25s\n" % (time_header, ampl_abs_header)
+            for i, t in enumerate(self.tgrid):
+                buffer += "%25.17E%25.17E\n" % (t, abs(self.amplitude[i]))
+        elif mode == 'real':
+            buffer += "# %23s%25s\n" % (time_header, ampl_re_header)
+            for i, t in enumerate(self.tgrid):
+                buffer += "%25.17E%25.17E\n" % (t, self.amplitude.real[i])
+        elif mode == 'complex':
+            buffer += "# %23s%25s%25s\n" % (time_header, ampl_re_header,
+                        ampl_im_header)
+            for i, t in enumerate(self.tgrid):
+                buffer += "%25.17E%25.17E%25.17E\n" \
+                                % (t, self.amplitude.real[i],
+                                    self.amplitude.imag[i])
+        else:
+            raise ValueError("mode must be 'abs', 'real', or 'complex'")
+        # postamble
+        for line in self.postamble:
+            line = str(line).strip()
+            if line.startswith('#'):
+                buffer += "%s\n" % line
+            else:
+                buffer += '# %s' % line
+
+        with open(filename, 'w') as out_fh:
+            out_fh.write(buffer)
 
     def _unshift(self):
         """
