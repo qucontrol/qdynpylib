@@ -5,6 +5,7 @@ import json
 import re
 import base64
 import random
+import copy
 from collections import OrderedDict
 
 import six
@@ -206,9 +207,9 @@ def _split_config_line(line, linewidth):
             if len(parts) > 0:
                 current_line += '&'
         current_line = _unprotect_quotes(current_line, replacements)
-        lines.append(current_line.strip())
+        lines.append(current_line.rstrip())
         current_line = '  ' # indent for continuing line
-    return "\n".join(lines)
+    return "\n".join(lines)+"\n"
 
 
 def _render_config_lines(section_name, section_data):
@@ -403,6 +404,12 @@ def write_config(config_data, filename):
         config_data (dict): data structure as returned by :func:`read_config`.
         filename (str): name of file to which to write config
     """
+    with open(filename, 'w') as out_fh:
+        out_fh.write(config_data_to_str(config_data))
+
+
+def config_data_to_str(config_data):
+    """Inverse of :func:`read_config_str`"""
     lines = []
     for section in config_data:
         if isinstance(config_data[section], list):
@@ -418,9 +425,10 @@ def write_config(config_data, filename):
         else:
             lines.extend(_render_config_lines(section, config_data[section]))
             lines.append('')
-    with open(filename, 'w') as out_fh:
-        for line in lines:
-            out_fh.write(_split_config_line(line))
+    result = ''
+    for line in lines[:-1]: # we ignore the trailing blank line
+        result += _split_config_line(line, 80)
+    return result
 
 
 def get_config_value(config_data, key_tuple):
@@ -464,6 +472,129 @@ def set_config_value(config_data, key_tuple, value):
         raise ValueError("Invalid key '%s': %s" % (key, str(exc_info)))
     except KeyError:
         raise ValueError("Invalid key '%s'" % (key, ))
+
+
+def generate_make_config(config_template, variables, dependencies=None,
+        checks=None):
+    r'''Generate a routine, e.g. `make_config`, that may be used to generate
+    config file data based on the given template.
+
+    Arguments:
+        config_template (dict): data structure as returned by
+            :func:`read_config` that will serve as a template
+        variables (dict): mapping of a keyword variable name to a key-tuple
+            in the config (cf. :func:`set_config_value`)
+        dependencies (dict): mapping of a key-tuple to a callable that
+            calculates a value for that entry in the config file.
+        checks (dict): mapping of a keyword variable name to a callable that
+            checks whether a given value is acceptable.
+
+    Example:
+
+        >>> config_template = read_config_str(r"""
+        ...     pulse: type = gauss, t_FWHM = 1.8, E_0 = 1.0, w_L = 0.2, &
+        ...     & oct_shape = flattop, ftrt = 0.2, oct_lambda_a = 100, &
+        ...     & oct_increase_factor = 10
+        ...     * id = 1, t_0 = 0, oct_outfile = pulse1.dat    ! pulse 1
+        ...     * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat  ! pulse 2
+        ...     * id = 3, t_0 = 5, oct_outfile = pulse3.dat    ! pulse 3""")
+
+        >>> make_config = generate_make_config(config_template,
+        ...     variables={'E_0': ('pulse', 0, 'E_0'), },
+        ...     dependencies={
+        ...         ('pulse', 1, 'E_0'): lambda kwargs: kwargs['E_0'],
+        ...         ('pulse', 2, 'E_0'): lambda kwargs: kwargs['E_0']},
+        ...     checks={'E_0': lambda val: val >= 0.0})
+
+        >>> print(make_config.__doc__)
+        Generate config file data (``config_data``) based on the given keyword parameters.
+        <BLANKLINE>
+        Keyword Arguments:
+            E_0: Set ``config_data['pulse'][0]['E_0']`` (default: 1.0)
+        <BLANKLINE>
+        Also, the following will be set to values that depend on the given keyword arguments:
+        <BLANKLINE>
+        * ``config_data['pulse'][0]['E_0']``
+        * ``config_data['pulse'][0]['E_0']``
+        <BLANKLINE>
+        If called without arguments, data equivalent to the following config file is returned::
+        <BLANKLINE>
+            pulse: type = gauss, t_FWHM = 1.8, E_0 = 1.0, w_L = 0.2, oct_shape = flattop, &
+              ftrt = 0.2, oct_lambda_a = 100, oct_increase_factor = 10
+            * id = 1, t_0 = 0, oct_outfile = pulse1.dat
+            * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat
+            * id = 3, t_0 = 5, oct_outfile = pulse3.dat
+        <BLANKLINE>
+        Raises:
+            TypeError: if an invalid keyword is passed.
+            ValueError: if any value fails to pass checks.
+        <BLANKLINE>
+
+        >>> config = make_config(E_0=0.1)
+        >>> print(config_data_to_str(config))
+        pulse: type = gauss, t_FWHM = 1.8, E_0 = 0.1, w_L = 0.2, oct_shape = flattop, &
+          ftrt = 0.2, oct_lambda_a = 100, oct_increase_factor = 10
+        * id = 1, t_0 = 0, oct_outfile = pulse1.dat
+        * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat
+        * id = 3, t_0 = 5, oct_outfile = pulse3.dat
+        <BLANKLINE>
+    '''
+    if dependencies is None:
+        dependencies = {}
+    if checks is None:
+        checks = {}
+    defaults = {}
+    for varname, key_tuple in variables.items():
+        defaults[varname] = get_config_value(config_template, key_tuple)
+    for key_tuple in dependencies.keys():
+        # rely on get_config_value to throw Exception for invalid key_tuple
+        get_config_value(config_template, key_tuple)
+    def make_config(**kwargs):
+        config_data = copy.deepcopy(config_template)
+        for varname in defaults:
+            if varname not in kwargs:
+                kwargs[varname] = defaults[varname]
+        for varname, value in kwargs.items():
+            if varname not in variables:
+                raise TypeError(("Got unexpected keyword argument '%s'. "
+                        "Valid keyword arguments are: %s")
+                        % (varname, ", ".join(variables.keys())))
+            if varname in checks:
+                if not checks[varname](value):
+                    raise ValueError("Value %s for '%s' does not pass check"
+                                     % (value, varname))
+            key_tuple = variables[varname]
+            set_config_value(config_data, key_tuple, value)
+        for key_tuple, eval_dependency in dependencies.items():
+            value = eval_dependency(kwargs)
+            set_config_value(config_data, key_tuple, value)
+        return config_data
+    # Set the docstring of `make_config`
+    make_config.__doc__ = ("Generate config file data (``config_data``) "
+                           "based on the given keyword parameters.\n\n")
+    make_config.__doc__ += "Keyword Arguments:\n"
+    for varname in variables:
+        make_config.__doc__ += "    %s: Set ``%s`` (default: %s)\n" % (
+                varname, 'config_data'+''.join(
+                    ["[%s]" % repr(k) for k in variables[varname]]),
+                repr(defaults[varname]))
+    make_config.__doc__ += ("\nAlso, the following will be set to values "
+                            "that depend on the given keyword arguments:\n\n")
+    for key_tuple in dependencies:
+        make_config.__doc__ += ("* ``config_data"
+                                +''.join(["[%s]" % repr(k)
+                                          for k in variables[varname]])+"``\n")
+    make_config.__doc__ += ("\nIf called without arguments, data equivalent "
+                            "to the following config file is returned::"
+                            "\n\n    " + "\n    ".join(
+                                config_data_to_str(make_config()).splitlines()
+                            ))
+    make_config.__doc__ += "\n\nRaises:\n"
+    make_config.__doc__ += "    TypeError: if an invalid keyword is passed.\n"
+    if len(checks) > 0:
+        make_config.__doc__ += ("    ValueError: if any value fails to "
+                                "pass checks.\n")
+    return make_config
 
 
 def get_config_structure(def_f90, outfile='new_config_structure.json'):
