@@ -1170,6 +1170,70 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     return signal
 
 
+def CRAB_carrier(t, time_unit, freq, freq_unit, a, b, normalize=False,
+    complex=False):
+    r'''
+    Construct a "carrier" based on the CRAB formula
+
+        .. math::
+        E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))
+
+    where :math:`a_n` is the n'th element of `a`, :math:`b_n` is the n'th
+    element of `b`, and :math:`\omega_n` is the n'th element of freq.
+
+    Parameters
+    ----------
+    t  (array-like):
+        time grid values
+    time_unit  (str):
+        Unit of `t`
+    freq  (scalar, ndarray(float64)):
+        Carrier frequency or frequencies
+    freq_unit  (str):
+        Unit of `freq`
+    a (array-like):
+        Coefficients for cosines
+    b (array-line):
+        Coefficients for sines
+    normalize (logical, optional):
+        If True, normalize the resulting carrier such that its values are in
+        [-1,1]
+    complex (logical, optional):
+        If True, oscillate in the complex plane
+
+        .. math::
+        E(t) = \sum_{n} (a_n - i b_n) \exp(i \omega_n t)
+
+    Notes
+    -----
+
+    `freq_unit` can be Hz (GHz, MHz, etc), describing the frequency directly,
+    or any energy unit, in which case the energy value E (given through the
+    freq parameter) is converted to an actual frequency as
+
+     .. math:: f = E / (\\hbar * 2 * pi)
+    '''
+    unit_convert = UnitConvert()
+    c = ( unit_convert.convert(1, time_unit, 'iu')
+        * unit_convert.convert(1, freq_unit, 'iu'))
+    assert len(a) == len(b) == len(freq), \
+    "freq, a, b must all be of the same length"
+    if complex:
+        signal = np.zeros(len(t), dtype=np.complex128)
+    else:
+        signal = np.zeros(len(t), dtype=np.float64)
+    for w_n, a_n, b_n in zip(freq, a, b):
+        if complex:
+            signal += (a_n -1j*b_n) * np.exp(1j*c*w_n*t)
+        else:
+            signal += a_n * np.cos(c*w_n*t) + b_n * np.sin(c*w_n*t)
+    if normalize:
+        nrm = np.abs(signal).max()
+        if nrm > 1.0e-16:
+            signal *= 1.0 / nrm
+    return signal
+
+
 def gaussian(t, t0, sigma):
     """
     Return a Gaussian shape with peak amplitude 1.0
