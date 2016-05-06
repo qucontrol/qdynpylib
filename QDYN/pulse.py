@@ -1,8 +1,7 @@
 """
 Working with (real-valued) pulses
 """
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
 import numpy as np
 from numpy.fft import fftfreq, fft
 from matplotlib.gridspec import GridSpec
@@ -584,41 +583,40 @@ class Pulse(object):
             for line in preamble:
                 line = str(line).strip()
                 if line.startswith('#'):
-                    print(line, file=out_fh)
+                    out_fh.write("%s\n" % line)
                 else:
-                    print('# ', line, file=out_fh)
+                    out_fh.write('# %s\n' % line)
             # header and data
             time_header     = "time [%s]" % self.time_unit
             ampl_re_header  = "Re(ampl) [%s]" % self.ampl_unit
             ampl_im_header  = "Im(ampl) [%s]" % self.ampl_unit
             ampl_abs_header = "Abs(ampl) [%s]" % self.ampl_unit
             if mode == 'abs':
-                print("# %23s%25s" % (time_header, ampl_abs_header),
-                      file=out_fh)
+                out_fh.write("# %23s%25s\n" % (time_header, ampl_abs_header))
                 for i, t in enumerate(self.tgrid):
-                    print("%25.17E%25.17E" % (t, abs(self.amplitude[i])),
-                          file=out_fh)
+                    out_fh.write("%25.17E%25.17E\n"
+                                 % (t, abs(self.amplitude[i])))
             elif mode == 'real':
-                print("# %23s%25s" % (time_header, ampl_re_header),
-                      file=out_fh)
+                out_fh.write("# %23s%25s\n" % (time_header, ampl_re_header))
                 for i, t in enumerate(self.tgrid):
-                    print("%25.17E%25.17E" % (t, self.amplitude.real[i]),
-                          file=out_fh)
+                    out_fh.write("%25.17E%25.17E\n"
+                                 % (t, self.amplitude.real[i]))
             elif mode == 'complex':
-                print("# %23s%25s%25s" % (time_header, ampl_re_header,
-                      ampl_im_header), file=out_fh)
+                out_fh.write("# %23s%25s%25s\n" % (time_header, ampl_re_header,
+                      ampl_im_header))
                 for i, t in enumerate(self.tgrid):
-                    print("%25.17E%25.17E%25.17E" % (t, self.amplitude.real[i],
-                          self.amplitude.imag[i]), file=out_fh)
+                    out_fh.write("%25.17E%25.17E%25.17E\n"
+                                 % (t, self.amplitude.real[i],
+                                       self.amplitude.imag[i]))
             else:
                 raise ValueError("mode must be 'abs', 'real', or 'complex'")
             # postamble
             for line in self.postamble:
                 line = str(line).strip()
                 if line.startswith('#'):
-                    print(line, file=out_fh)
+                    out_fh.write("%s\n" % line)
                 else:
-                    print('# ', line, file=out_fh)
+                    out_fh.write('# %s' % line)
 
     def _unshift(self):
         """
