@@ -221,7 +221,7 @@ class UnitConvert(object):
 
         # handle a float of 0.0, which is 0.0 in any unit
         try:
-            if (float(value) == 0.0) and not isinstance(value, UnitFloat):
+            if (float(value) == 0.0):
                 from_unit = to_unit
         except TypeError:
             pass # numpy arrays cannot be converted to float
@@ -330,18 +330,52 @@ class UnitConvert(object):
 
 class UnitFloat(object):
     """Class for a float value with a physical unit. Behaves like a float in
-    most contexts"""
+    most contexts.
+
+    Parameters:
+        val (float, UnitFloat): The value. If `val` is an instance of
+            `UnitFloat` and `unit` is given also, the value will be converted.
+        unit (str, None): The unit. If None, the unit is take from `val` if
+            `val` is an instance  of `UnitFloat`, or else the unit is set to
+            ``unitless``. Any unit known to to the unternal unit convert may be
+            used. Using internal units (``unit='iu'``) is valid, but should be
+            avoided.
+
+    Attributes:
+        val (float): Value
+        unit (str): Unit
+
+    Class Attributes:
+        unit_convert (UnitConvert): internal unit converter
+
+    Examples:
+
+        >>> v = UnitFloat(1.0, 'GHz')
+        >>> print(v)
+        1_GHz
+
+        >>> v = UnitFloat(1.0)
+        >>> print(v)
+        1_unitless
+
+        >>> v2 = UnitFloat(1.0, 'GHz')
+        >>> v = UnitFloat(v2, 'MHz')
+        >>> print(v)
+        1000_MHz
+    """
 
     _str_pattern = re.compile(r'^\s*(?P<val>[\d.Ee+-]+)(_(?P<unit>\w+))?\s*$')
     unit_convert = UnitConvert()
 
     def __init__(self, val=0.0, unit=None):
-        """Initialize value
-
-        >>> v = UnitFloat(1.0, 'GHz')
-        >>> v = UnitFloat(1.0)
-        """
-        self.val = float(val)
+        if isinstance(val, UnitFloat):
+            if unit is None:
+                unit = val.unit
+            self.val = float(val.convert(unit))
+        else:
+            self.val = float(val)
+            if unit is None:
+                unit = 'unitless'
         self.unit = unit
 
     @classmethod
@@ -398,12 +432,16 @@ class UnitFloat(object):
         @wraps(f)
         def wrapped(self, other):
             if not isinstance(other, UnitFloat):
-                raise TypeError("All arguments must be instances of UnitFloat")
+                if float(other) == 0.0:
+                    other = UnitFloat(0.0, self.unit)
+                else:
+                    raise TypeError("All arguments must be instances of "
+                                    "UnitFloat")
             return f(self, other.convert(self.unit))
         return wrapped
 
     def __str__(self):
-        """Return string representation
+        """String representation. Equivalent to :meth:`to_str`.
 
         >>> f = UnitFloat(1.0, 'GHz')
         >>> print(f)
@@ -423,7 +461,7 @@ class UnitFloat(object):
         >>> print(UnitFloat(0))
         0
         >>> print(UnitFloat(1.2))
-        1.2
+        1.2_unitless
         """
         if self.val == 0:
             return "0"
@@ -431,12 +469,12 @@ class UnitFloat(object):
     __repr__ = __str__
 
     def __eq__(self, other):
-        """Test equality
+        """Test equality. Two instances of `UnitFloat` are the same if their
+        string representation is the same, making the equality check robust
+        against conversion rounding errors.
 
         >>> UnitFloat(1.0, 'GHz') == UnitFloat(1.0, 'GHz')
         True
-        >>> UnitFloat(1.0, 'GHz') == UnitFloat(1.0)
-        False
         >>> UnitFloat(1.0, 'GHz') == UnitFloat(2.0, 'GHz')
         False
         >>> UnitFloat(1.0, 'GHz') != UnitFloat(2.0, 'GHz')
@@ -449,11 +487,6 @@ class UnitFloat(object):
         True
         >>> UnitFloat(1.0) == 1
         True
-        >>> try:
-        ...     UnitFloat(1.0, 'GHz') == 1
-        ... except TypeError as e:
-        ...     print(e)
-        Cannot compare UnitFloat to 1
         """
         if isinstance(other, UnitFloat):
             return repr(self) == repr(other.convert(self.unit))
@@ -465,10 +498,7 @@ class UnitFloat(object):
                     try:
                         return self == UnitFloat(other[0], other[1])
                     except (TypeError, IndexError):
-                        if self.unit is None:
-                            return self.val == float(other)
-                        else:
-                            raise
+                        return self == UnitFloat(other)
             except (TypeError, ValueError):
                 raise TypeError("Cannot compare UnitFloat to %s" % other)
 

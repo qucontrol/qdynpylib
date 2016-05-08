@@ -18,6 +18,24 @@ def test_unit_float_round():
     else:
         assert math.ceil(UnitFloat(1.11, 'GHz')) == UnitFloat(2, 'GHz')
 
+
+def test_none_unit():
+    v = UnitFloat(1.0, None)
+    assert v == UnitFloat(1.0, 'unitless')
+
+
+def test_eq():
+    assert UnitFloat(1.0+1e-12, 'GHz') == (1, 'GHz')
+    v = UnitFloat(1.0)
+    assert v == 1
+    with pytest.raises(TypeError) as exc_info:
+        UnitFloat(1.0, 'GHz') == 1
+    assert "Cannot compare UnitFloat to 1" in str(exc_info)
+    with pytest.raises(ValueError) as exc_info:
+        UnitFloat(1.0, 'GHz') == UnitFloat(1.0)
+    assert "Incompatible units in conversion: unitless, GHz" in str(exc_info)
+
+
 def test_unit_convert():
     # Note: we compare strings instead of instances of UnitFloat to deal with
     # rounding errors
@@ -35,17 +53,13 @@ def test_unit_convert():
 
     # we can leave out both from_unit and to_unit, but then in the converted
     # result, we have no explicit 'iu' unit
-    assert c.convert(v).unit is None
+    assert c.convert(v).unit == 'unitless'
     assert float(c.convert(v)) - v2.val < 1.0e-12
     assert str(c.convert(v2, to_unit=v.unit)) == str(v)
 
     # using the default internal units, we can convert anything to au
     v2 = c.convert(v, to_unit='au')
     assert str(v) == str(c.convert(v2, from_unit='au',  to_unit='GHz'))
-
-    # a UnitFloat with unit None is equivalent in the conversion to unit 'iu'
-    v2 = c.convert(UnitFloat(float(c.convert(2.5, 'GHz'))), to_unit='MHz')
-    assert str(v2) == '2500_MHz'
 
     # Invalid units produces ValueErrors
     with pytest.raises(ValueError) as excinfo:
