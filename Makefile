@@ -1,8 +1,8 @@
 PROJECT_NAME = QDYN
-PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest
+PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage
 TESTPYPI = https://testpypi.python.org/pypi
 
-TESTOPTIONS = --doctest-modules
+TESTOPTIONS = --doctest-modules --cov=QDYN
 TESTS = QDYN tests slow_tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
@@ -38,11 +38,13 @@ clean:
 	@rm -rf QDYN.egg-info
 	@rm -f QDYN/*.pyc
 	@rm -f QDYN/prop/*.pyc
+	@rm -rf QDYN/__pycache__
 	@rm -f tests/*.pyc
 	@rm -rf tests/__pycache__
 	@rm -f QDYN/__git__.py
 	@rm -f test_octconvergences.html
 	@rm -f tests/result_images/*
+	@rm -f .coverage
 
 .venv/py27/bin/py.test:
 	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
@@ -67,5 +69,9 @@ test34: .venv/py34/bin/py.test
 
 test: test27 test33 test34
 
+coverage: test34
+	@rm -rf htmlcov/index.html
+	.venv/py34/bin/coverage html
+
 .PHONY: install develop uninstall upload test-upload test-install sdist clean \
-test test27 test33 test34
+test test27 test33 test34 coverage

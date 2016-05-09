@@ -26,7 +26,7 @@ setup(name='QDYN',
           'bokeh>=0.8',
           'click>=5.0',
       ],
-      extras_require={'dev': ['pytest',]},
+      extras_require={'dev': ['pytest', 'coverage', 'pytest-cov']},
       packages=['QDYN', 'QDYN.prop'],
       scripts=[],
       classifiers=[
