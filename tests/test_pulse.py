@@ -1,6 +1,7 @@
 import QDYN
+import numpy as np
 from QDYN.units import UnitFloat
-from QDYN.pulse import tgrid_from_config
+from QDYN.pulse import tgrid_from_config, Pulse, pulse_tgrid, gaussian
 import pytest
 
 config_str = r'''
@@ -77,3 +78,15 @@ def test_tgrid_from_config():
     with pytest.raises(ValueError) as exc_info:
         tgrid = tgrid_from_config(tgrid_dict, time_unit=None)
     assert "Incompatible units in conversion: ns, unitless" in str(exc_info)
+
+
+def test_pulse_derivative():
+    tgrid = pulse_tgrid(10, 100)
+    ampl = gaussian(tgrid, 5, 1)
+    pulse = Pulse(tgrid=tgrid, amplitude=ampl, ampl_unit='MHz', time_unit='ns')
+    deriv = pulse.derivative()
+    assert deriv.dt == pulse.dt
+    assert deriv.ampl_unit == 'unitless'
+    assert deriv.time_unit == 'ns'
+    assert "%.3f" % abs(np.max(deriv.amplitude)) == '0.613'
+    assert "%.3f" % abs(np.min(deriv.amplitude)) == '0.613'
