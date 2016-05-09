@@ -442,8 +442,8 @@ class Pulse(object):
             freq_unit = self.freq_unit
         s = fft(self.amplitude) # spectrum amplitude
         n = len(self.amplitude)
-        dt = self.unit_convert.convert(self.dt, self.time_unit, 'iu')
-        f = self.unitconvert.convert(
+        dt = float(self.unit_convert.convert(self.dt, self.time_unit, 'iu'))
+        f = self.unit_convert.convert(
                 fftfreq(n, d=dt/(2.0*np.pi)), # spectrum frequencies
                 'iu', freq_unit)
         modifier = {
@@ -460,13 +460,14 @@ class Pulse(object):
 
     def derivative(self):
         """Calculate the derivative of the current pulse and return it as a new
-        pulse. Note that the derivative is in units of `ampl_unit`/`time_unit`.
+        pulse. Note that the derivative is in units of `ampl_unit`/`time_unit`,
+        but will be marked as 'unitless'.
         """
-        self._unshift() # TODO: make a copy
+        self._unshift()
         T = self.tgrid[-1] - self.tgrid[0]
         deriv = scipy.fftpack.diff(self.amplitude) * (2.0*np.pi / T)
         deriv_pulse = Pulse(tgrid=self.tgrid, amplitude=deriv,
-                            time_unit=self.time_unit, ampl_unit=self.ampl_unit)
+                            time_unit=self.time_unit, ampl_unit='unitless')
         self._shift()
         deriv_pulse._shift()
         return deriv_pulse
@@ -599,7 +600,8 @@ class Pulse(object):
         """Move the pulse onto the unshifted time grid. This increases the number
         of points by one
         """
-        tgrid_new = np.linspace(self.t0, self.T, len(self.tgrid)+1)
+        tgrid_new = np.linspace(float(self.t0), float(self.T),
+                                len(self.tgrid)+1)
         pulse_new = np.zeros(len(self.amplitude)+1,
                              dtype=self.amplitude.dtype.type)
         pulse_new[0] = self.amplitude[0]
@@ -612,7 +614,7 @@ class Pulse(object):
 
     def _shift(self, data=None):
         """Inverse of _unshift"""
-        dt = self.dt
+        dt = float(self.dt)
         tgrid_new = np.linspace(self.tgrid[0]  + dt/2.0,
                                 self.tgrid[-1] - dt/2.0, len(self.tgrid)-1)
         if data is None:
