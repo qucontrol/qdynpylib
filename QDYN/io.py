@@ -72,7 +72,7 @@ header=None, hermitian=True):
     Arguments
     ---------
 
-    matrix: numpy matrix, 2D ndarray, or any scipy sparse matrix
+    matrix: numpy matrix, 2D ndarray, qutip.Qobj, or any scipy sparse matrix
         Matrix to write to file
 
     filename: str
@@ -111,6 +111,9 @@ header=None, hermitian=True):
         return "%8d%8d%25.16E" % (i, j, v.real)
     def complex_formatter(i, j, v):
         return "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
+    if repr(matrix).startswith('Quantum object'):
+        # handle qutip Qobj (without importing the qutip package)
+        matrix = matrix.data
     if line_formatter is None:
         if np.iscomplexobj(matrix):
             line_formatter = complex_formatter
