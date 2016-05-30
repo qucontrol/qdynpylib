@@ -7,7 +7,7 @@ import numpy as np
 from numpy import pi
 import re
 from .io import read_complex
-from .linalg import norm
+from .linalg import norm, vectorize
 from six.moves import xrange
 
 
@@ -21,6 +21,9 @@ class State(object):
     """
 
     def __init__(self, data):
+        if repr(data).startswith('Quantum object'):
+            # handle qutip Qobj (without importing the qutip package)
+            data = vectorize(data.full())
         self.psi = data
 
     def distance(self, other):
