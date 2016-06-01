@@ -180,16 +180,30 @@ def vectorize(a, order='F'):
 
 
 def is_hermitian(matrix):
-    """Return True if matrix is Hermitian, False otherwise"""
-    n, m = matrix.shape
-    for i in xrange(n):
-        if (matrix[i,i].imag != 0.0):
-            return False
-            raise ValueError("Matrix has complex entries on diagonal")
-        for j in xrange(i+1, m):
-            if (abs(matrix[i,j] - matrix[j,i].conjugate()) > 1.0e-15):
-                return False
-    return True
+    """Return True if matrix is Hermitian, False otherwise. The `matrix` be a
+    numpy array or matrix, a scipy sparse matrix, or a `qutip.Qobj` instance.
+
+    >>> m = np.matrix([[0, 1j], [-1j, 1]])
+    >>> is_hermitian(m)
+    True
+
+    >>> m = np.matrix([[0, 1j], [-1j, 1j]])
+    >>> is_hermitian(m)
+    False
+
+    >>> m = np.array([[0, -1j], [-1j, 1]])
+    >>> is_hermitian(m)
+    False
+
+    >>> from scipy.sparse import coo_matrix
+    >>> m  = coo_matrix(np.matrix([[0, 1j], [-1j, 0]]))
+    >>> is_hermitian(m)
+    True
+    """
+    if hasattr(matrix, 'isherm'): # qutip.Qobj
+        return matrix.isherm
+    else: # any numpy matrix/array or scipy sparse matrix)
+        return (abs(matrix - matrix.conjugate().transpose())).max() < 1e-14
 
 
 def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
