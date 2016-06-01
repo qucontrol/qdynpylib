@@ -3,12 +3,14 @@ Utiltiy routines for working with states (wave functions or density matrices)
 """
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
+import re
+
 import numpy as np
 from numpy import pi
-import re
-from .io import read_complex
-from .linalg import norm, vectorize
 from six.moves import xrange
+
+from .io import read_complex
+from .linalg import norm
 
 
 def read_dumped_ascii_psi(dump_file):
@@ -16,9 +18,9 @@ def read_dumped_ascii_psi(dump_file):
     return numpy array"""
     int_line = re.compile(r'^\d+$')
     complex_line = re.compile(r'^[\dE.+-]+\s+[\dE.+-]+$')
-    psi = None
+    psi = np.zeros(0, dtype=np.complex128)
+    in_psi = False
     with open(dump_file) as in_fh:
-        in_psi = False
         i = 0
         for line in in_fh:
             line = line.strip()
