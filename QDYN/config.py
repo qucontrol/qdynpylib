@@ -1,6 +1,5 @@
 """ Module containing utilities for managing QDYN config files """
 from __future__ import print_function, division, absolute_import
-import os
 import json
 import re
 import base64
@@ -243,6 +242,8 @@ def _render_config_lines(section_name, section_data):
         if len(section_data) > 1:
             common_items = dict(set(section_data[0].items()).intersection(
                                 *[set(d.items()) for d in section_data[1:]]))
+        else:
+            common_items = {}
         line = "%s:" % section_name
         for key in section_data[0]:
             # we *do not* iterate over keys in common_items, so that items
@@ -386,13 +387,12 @@ def _read_config_lines(lines):
             else:
                 for line_dict in config_data[current_section]:
                     line_dict.update(line_items)
-                pass
         elif m_itemline:
             config_data[current_section][current_itemline].update(
                     line_items)
             current_itemline += 1
         else:
-            raise ValueError("Could not parse line %d" % config.line_nr)
+            raise ValueError("Could not parse line '%s'" % line)
 
     return config_data
 
@@ -550,6 +550,7 @@ def generate_make_config(config_template, variables, dependencies=None,
         # rely on get_config_value to throw Exception for invalid key_tuple
         get_config_value(config_template, key_tuple)
     def make_config(**kwargs):
+        """Generate config file data"""
         config_data = copy.deepcopy(config_template)
         for varname in defaults:
             if varname not in kwargs:
@@ -605,7 +606,7 @@ def get_config_structure(def_f90, outfile='new_config_structure.json'):
     config_structure = {}
 
     # Local regular expression filters
-    RX = {
+    rx = {
         'get_pt_type' : re.compile(
             r'^type\s*\((?P<sec_name>[^\s]\w+)_pt\).*$'),
         'start_pt_sec' : re.compile(
@@ -627,7 +628,7 @@ def get_config_structure(def_f90, outfile='new_config_structure.json'):
         if m:
             in_para_t = False
         if in_para_t:
-            m = RX['get_pt_type'].match(line)
+            m = rx['get_pt_type'].match(line)
             if m:
                 sec_name = m.group('sec_name').strip()
                 if sec_name == 'user':
@@ -644,16 +645,16 @@ def get_config_structure(def_f90, outfile='new_config_structure.json'):
             m = re.compile(r'^end\s*type\s+(\w+)_pt$').match(line)
             if m:
                 in_pt_sec = False
-        m = RX['start_pt_sec'].match(line)
+        m = rx['start_pt_sec'].match(line)
         if m:
             if in_pt_sec:
                 raise AssertionError("Couldn't find end of last *_pt section")
             in_pt_sec = True
             sec_name = m.group('sec_name')
         if in_pt_sec and sec_name in config_sec_list:
-            if not sec_name in config_structure:
+            if sec_name not in config_structure:
                 config_structure[sec_name] = []
-            m = RX['get_pt_item'].match(line)
+            m = rx['get_pt_item'].match(line)
             if m:
                 config_structure[sec_name].append(m.group('item_name').strip())
 
