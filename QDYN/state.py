@@ -54,11 +54,12 @@ def write_psi_amplitudes(psi, filename):
         else:
             out_fh.write("#%9s%25s\n" % ('index', 'Re[Psi]'))
         for i, val in enumerate(psi):
-            if is_complex:
-                out_fh.write("%10d%25.16E%25.16E\n"
-                                % (i+1, val.real, val.imag))
-            else:
-                out_fh.write("%10d%25.16E\n" % (i+1, val.real))
+            if np.abs(val) > 1e-16:
+                if is_complex:
+                    out_fh.write("%10d%25.16E%25.16E\n"
+                                    % (i+1, val.real, val.imag))
+                else:
+                    out_fh.write("%10d%25.16E\n" % (i+1, val.real))
 
 
 def read_psi_amplitudes(filename, n):
