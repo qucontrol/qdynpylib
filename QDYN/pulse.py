@@ -2,6 +2,11 @@
 Working with (real-valued) pulses
 """
 from __future__ import print_function, division, absolute_import
+
+from collections import OrderedDict
+import re
+import logging
+
 import numpy as np
 from numpy.fft import fftfreq, fft
 from matplotlib.gridspec import GridSpec
@@ -9,8 +14,6 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import scipy.fftpack
 from scipy.interpolate import UnivariateSpline
-import re
-import logging
 from six.moves import xrange
 
 from .units import UnitConvert, UnitFloat
@@ -53,6 +56,8 @@ class Pulse(object):
             when writing the pulse to file. Each line should start with '# '
         postamble (array): Array of lines that are written after all data
             lines. Each line should start with '# '
+        config_attribs (dict): Additional config data, for the `config_line`
+            method (e.g. `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
 
     Class Attributes:
         unit_convert (QDYN.units.UnitConvert): converter to be used for any
@@ -119,6 +124,7 @@ class Pulse(object):
 
         self.preamble = []
         self.postamble = []
+        self.config_attribs = OrderedDict({})
 
         freq_units = { # map time_unit to most suitable freq_unit
             'ns' : 'GHz',
@@ -140,8 +146,8 @@ class Pulse(object):
         logger = logging.getLogger(__name__)
         assert self.tgrid is not None, "Pulse is not initialized"
         assert self.amplitude is not None, "Pulse is not initialized"
-        assert type(self.tgrid) == np.ndarray, "tgrid must be numpy array"
-        assert type(self.amplitude) == np.ndarray, \
+        assert isinstance(self.tgrid, np.ndarray), "tgrid must be numpy array"
+        assert isinstance(self.amplitude, np.ndarray), \
         "amplitude must be numpy array"
         assert self.tgrid.dtype.type is np.float64, \
         "tgrid must be double precision"
@@ -159,8 +165,8 @@ class Pulse(object):
         "Unknown freq_unit %s" % self.freq_unit
         if self.mode == 'real':
             if np.max(np.abs(self.amplitude.imag)) > 0.0:
-                logger.warn("mode is 'real', but pulse has non-zero imaginary "
-                            "part")
+                logger.warning("mode is 'real', but pulse has non-zero "
+                               "imaginary part")
 
     @classmethod
     def read(cls, filename, time_unit=None, ampl_unit=None, freq_unit=None,
@@ -248,7 +254,7 @@ class Pulse(object):
                         file_ampl_unit = match.group('ampl_unit')
                         break
                 if mode is None:
-                    logger.warn("Non-standard header in pulse file."
+                    logger.warning("Non-standard header in pulse file."
                             "Check that pulse was read with correct units")
                     if y is None:
                         mode = 'abs'
@@ -365,7 +371,7 @@ class Pulse(object):
         """Does any element of the pulse amplitude have a non-zero imaginary
         part
         """
-        return (np.max(np.abs(self.amplitude.imag)) > 0.0)
+        return np.max(np.abs(self.amplitude.imag)) > 0.0
 
     def get_timegrid_point(self, t, move="left"):
         """Return the next point to the left (or right) of the given `t` which
@@ -595,6 +601,18 @@ class Pulse(object):
 
         with open(filename, 'w') as out_fh:
             out_fh.write(buffer)
+
+    def config_line(self, filename, pulse_id, label=''):
+        """Return an OrderedDict of attributes for a config file line
+        describing the pulse"""
+        result = OrderedDict(self.config_attribs)
+        result.update(
+            {'type': 'file', 'filename': filename, 'pulse_id': pulse_id,
+             'time_unit': self.time_unit, 'ampl_unit': self.ampl_unit}
+        )
+        if label != '':
+            result['label'] = label
+        return result
 
     def _unshift(self):
         """Move the pulse onto the unshifted time grid. This increases the number
@@ -1051,7 +1069,7 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
         signal = 0.0
     else:
         signal = np.zeros(len(t), dtype=np.complex128)
-        assert type(t) == np.ndarray, "t must be numpy array"
+        assert isinstance(type(t), np.ndarray), "t must be numpy array"
         assert t.dtype.type is np.float64, "t must be double precision real"
     c = ( unit_convert.convert(1, time_unit, 'iu')
         * unit_convert.convert(1, freq_unit, 'iu'))
@@ -1233,9 +1251,9 @@ def flattop(t, t_start, t_stop, t_rise, t_fall=None):
         f = 1.0
         if t_fall is None:
             t_fall = t_rise
-        if (t <= t_start + t_rise):
+        if t <= t_start + t_rise:
             f = np.sin(np.pi * (t-t_start) / (2.0*t_rise))**2
-        elif (t >= t_stop - t_fall):
+        elif t >= t_stop - t_fall:
             f = np.sin(np.pi * (t-t_stop) / (2.0*t_fall))**2
         return f
     else:

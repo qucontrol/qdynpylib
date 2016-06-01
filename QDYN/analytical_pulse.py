@@ -4,6 +4,7 @@ from __future__ import print_function, division, absolute_import
 import re
 import json
 import inspect
+from collections import OrderedDict
 
 import numpy as np
 
@@ -36,6 +37,7 @@ class NumpyAwareJSONDecoder(json.JSONDecoder):
         json.JSONDecoder.__init__(self, object_hook=self.dict_to_object,
                                   *args, **kargs)
     def dict_to_object(self, d):
+        """Convert (type, vals) to type(vals) for numpy-array-types"""
         inst = d
         if (len(d) == 2) and ('type' in d) and ('vals' in d):
             type = d['type']
@@ -69,6 +71,8 @@ class AnalyticalPulse(object):
             depending on the whether the formula returns real or complex
             values. When set explicitly, the formula *must* give matching
             values
+        config_attribs (dict): Additional config data, for the `config_line`
+            method (e.g. `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
     """
     _formulas = {} # formula name => formula callable, see `register_formula()`
     _allowed_args = {}  # formula name => allowed arguments
@@ -85,6 +89,7 @@ class AnalyticalPulse(object):
                 array of amplitude values
         """
         argspec = inspect.getargspec(formula)
+        # TODO: use https://github.com/aliles/funcsigs
         if len(argspec.args) < 1:
             raise ValueError("formula has zero arguments, must take at least "
                              "a tgrid parameter")
@@ -97,7 +102,7 @@ class AnalyticalPulse(object):
 
 
     def __init__(self, formula, T, nt, parameters, t0=0.0, time_unit='iu',
-        ampl_unit='iu', freq_unit=None, mode=None):
+        ampl_unit='iu', freq_unit=None, mode=None, config_attribs=None):
         """Instantiate a new analytical pulse
 
         The `formula` parameter must be the name of a previously registered
@@ -115,12 +120,15 @@ class AnalyticalPulse(object):
         self.ampl_unit = ampl_unit
         self.freq_unit = freq_unit
         self.mode = mode
+        self.config_attribs = OrderedDict({})
+        if config_attribs is not None:
+            self.config_attribs = config_attribs
 
     def copy(self):
         """Return a copy of the analytical pulse"""
         return AnalyticalPulse(self._formula, self.T, self.nt, self.parameters,
-                self.t0, self.time_unit, self.ampl_unit, self.freq_unit,
-                self.mode)
+                               self.t0, self.time_unit, self.ampl_unit,
+                               self.freq_unit, self.mode)
 
     def array_to_parameters(self, array, keys=None):
         """Unpack the given array (numpy array or regular list) into the pulse
@@ -266,5 +274,18 @@ class AnalyticalPulse(object):
         pulse = Pulse(tgrid=tgrid, amplitude=amplitude, time_unit=time_unit,
                       ampl_unit=ampl_unit, freq_unit=freq_unit, mode=mode)
         pulse.preamble = [self.header, ]
+        pulse.config_attribs = OrderedDict(self.config_attribs)
         return pulse
+
+    def config_line(self, filename, pulse_id, label=''):
+        """Return an OrderedDict of attributes for a config file line
+        describing the pulse"""
+        result = OrderedDict(self.config_attribs)
+        result.update(
+            {'type': 'file', 'filename': filename, 'pulse_id': pulse_id,
+             'time_unit': self.time_unit, 'ampl_unit': self.ampl_unit}
+        )
+        if label != '':
+            result['label'] = label
+        return result
 
