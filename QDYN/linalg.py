@@ -146,11 +146,11 @@ def get_op_matrix(apply_op, state_shape, t):
     # Columns of L = results of applying the Liouville operator on basis
     # elements of the Liouville space (rho)
     for j in xrange(N):
-            v = np.zeros(N)
-            v[j] = 1.0 # j'th basis vector
-            ov = vectorize(apply_op(reshape(v), t))
-            for i in xrange(N):
-                O[i,j] = ov[i]
+        v = np.zeros(N)
+        v[j] = 1.0 # j'th basis vector
+        ov = vectorize(apply_op(reshape(v), t))
+        for i in xrange(N):
+            O[i,j] = ov[i]
     return O
 
 
