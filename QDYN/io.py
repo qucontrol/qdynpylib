@@ -1,20 +1,19 @@
-"""
-Module containing routines for reading and writing files compatible with QDYN
-"""
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
-import numpy as np
+"""Routines for reading and writing files compatible with QDYN"""
+from __future__ import print_function, division, absolute_import
+
 import sys
 import re
 import os
-import scipy.sparse
-from click.utils import open_file
 # import for doctests
 from contextlib import contextmanager
 import tempfile
+import json
+
+import scipy.sparse
+import numpy as np
 import six
 from six.moves import xrange
-import json
+from click.utils import open_file
 
 
 @contextmanager
@@ -65,7 +64,7 @@ def tempinput(data, binary=False):
 
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
-header=None, hermitian=True):
+        header=None, hermitian=True):
     """
     Write the given matrix to file in indexed format (1-based indexing)
 
@@ -152,7 +151,7 @@ header=None, hermitian=True):
         # write data
         sparse_h = scipy.sparse.coo_matrix(matrix)
         for i_val in xrange(sparse_h.nnz):
-            i = sparse_h.row[i_val] + 1 # 1-based indexing
+            i = sparse_h.row[i_val] + 1  # 1-based indexing
             j = sparse_h.col[i_val] + 1
             v = sparse_h.data[i_val]
             if (not hermitian) or (j >= i):
@@ -164,7 +163,7 @@ header=None, hermitian=True):
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,
-expand_hermitian=True, val_real=False):
+        expand_hermitian=True, val_real=False):
     """
     Read in a matrix from the file with the given filename
 
@@ -250,7 +249,7 @@ expand_hermitian=True, val_real=False):
         val = np.zeros(nnz, dtype=np.complex128)
     l = 0
     for k in xrange(len(file_real_val)):
-        i = file_row[k] - 1 # adjust for zero-based indexing in Python
+        i = file_row[k] - 1  # adjust for zero-based indexing in Python
         j = file_col[k] - 1
         v = file_real_val[k]
         if not val_is_real:
@@ -268,11 +267,11 @@ expand_hermitian=True, val_real=False):
     if format == 'coo':
         return m
     else:
-        return getattr(m, 'to'+format)() # e.g. format='dense' -> m.todense()
+        return getattr(m, 'to'+format)()  # e.g. format='dense' -> m.todense()
 
 
 def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
-    out=None):
+        out=None):
     """
     Print a numpy complex matrix to screen, or to a file if outfile is given.
     Values below the given limit are printed as zero
@@ -336,9 +335,9 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     width = 9
     if fmt_m:
         width = int(fmt_m.group('width'))
-        zero_fmt   = '%' + ("%dd" % width)
-        zero_fmt   = "%s,%s" % (zero_fmt, zero_fmt)
-        zero = zero_fmt % (0,0)
+        zero_fmt = '%' + ("%dd" % width)
+        zero_fmt = "%s,%s" % (zero_fmt, zero_fmt)
+        zero = zero_fmt % (0, 0)
         small_fmt = '%' + ("%d.1f" % width)
         small = small_fmt % 0
     else:
@@ -377,23 +376,21 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
 
 
 def fix_fortran_exponent(num_str):
-    """
-    In 3-digit exponents, Fortran drops the 'E'. Return a string with the 'E'
-    restored.
+    """In 3-digit exponents, Fortran drops the 'E'. Return a string with the
+    'E' restored.
 
     >>> print(fix_fortran_exponent("1.0-100"))
     1.0E-100
     >>> print(fix_fortran_exponent("1.0E-99"))
     1.0E-99
     """
-    if not 'E' in num_str:
+    if 'E' not in num_str:
         return re.sub('(\d)([+-]\d)', r'\1E\2', num_str)
     return num_str
 
 
 def read_complex(str):
-    """
-    Convert a string to a complex number
+    """Convert a string to a complex number
 
     >>> read_complex("1.0 -2.0-100")
     (1-2e-100j)

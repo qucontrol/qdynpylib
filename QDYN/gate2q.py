@@ -5,21 +5,23 @@ Also defines common two-qubit gates as Gate2Q objects.
 """
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
-import numpy as np
-import scipy
 import cmath
 import os
-from numpy import pi, cos, sin
 import re
 from warnings import warn
+import logging
+
+import numpy as np
+from numpy import pi, cos, sin
+import scipy
+from scipy.optimize import leastsq
 from six.moves import xrange
+
 from .io import (tempinput, open_file, matrix_to_latex, matrix_to_mathematica,
-    split_sup_sub)
+                 split_sup_sub)
 from .linalg import inner, norm, vectorize
 from .memoize import memoize
-from scipy.optimize import leastsq
-from scipy.linalg import expm
-import logging
+
 
 class Gate2Q(np.matrixlib.defmatrix.matrix):
     """
@@ -117,13 +119,13 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
         # Allow to read from file
         if 'file' in kwargs:
-            file = kwargs['file'] # delay until after construction
+            file = kwargs['file']  # delay until after construction
             del kwargs['file']
 
         # Allow to set name
         name = None
         if 'name' in kwargs:
-            name = kwargs['name'] # delay until after construction
+            name = kwargs['name']  # delay until after construction
             del kwargs['name']
 
         gate = np.matrixlib.defmatrix.matrix.__new__(cls, *args, **kwargs)
@@ -181,12 +183,12 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
             if part.startswith('_') or part.startswith('^'):
                 result += part[0]; part = part[1:]
                 if part.startswith('{') and part.endswith('}'):
-                    part = part[1:-1] # strip braces
+                    part = part[1:-1]  # strip braces
                 if re.match(r'[A-Za-z]{2,}', part):
-                    result += '{'+ (self.tex_str % part) + '}'
+                    result += '{' + (self.tex_str % part) + '}'
                 else:
-                    result += '{'+part+'}'
-            else: # not a super- or sub-script
+                    result += '{' + part + '}'
+            else:  # not a super- or sub-script
                 if (len(part) == 1) and (is_first_part):
                     result += self.tex_op % part
                 else:
@@ -333,13 +335,13 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         n = 4
         for i in xrange(n):
             for j in xrange(n):
-                if j==n-1:
+                if j == n - 1:
                     eol = r'\\'
                 else:
                     eol = r'&'
                 r, phi = cmath.polar(self[i,j])
                 phi = int(phi * 114.5915590262)
-                if (r > 1.0e-3):
+                if r > 1.0e-3:
                     lines.append(
                     "\\scalebox{%f}{\\rotatebox{%d}{$\\rightarrow$}} %s"
                     % (r, phi, eol))
@@ -414,8 +416,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         def arrow_pos(row, col, length, phi, head_length=0.0):
             """Return x, y, dx, dy"""
             center = ( col+0.5, 4.0-row-0.5)
-            x = center[0] - 0.5* length * np.cos(phi)
-            y = center[1] - 0.5* length * np.sin(phi)
+            x = center[0] - 0.5 * length * np.cos(phi)
+            y = center[1] - 0.5 * length * np.sin(phi)
             dy = (length-head_length) * np.sin(phi)
             dx = (length-head_length) * np.cos(phi)
             return x, y, dx, dy
@@ -455,7 +457,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
             i = 0
             for line in fh:
                 items = re.split("[(){}]+", line.strip())[1:-1]
-                if len(items) != 4: continue
+                if len(items) != 4:
+                    continue
                 j = 0
                 for item in items:
                     if "," in item:
@@ -567,7 +570,6 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         >>> print(A2Gate.weyl_region())
         W0*
         """
-        logger = logging.getLogger(__name__)
         from .weyl import get_region
         # by definition, if we start from a proper gate, the Weyl coordinates
         # are in the Weyl chamber. Thus, we could only be tripped up by
@@ -648,7 +650,6 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         from .weyl import g1g2g3
         return g1g2g3(self)
 
-
     def F_avg(self, O, closest_unitary=False):
         """Return the average gate fidelity of the current gate with respect to
         the gate O.
@@ -678,14 +679,14 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         else:
             return F_sm(self, O)
 
-    def F_sm(self, O, closest_unitary=False):
+    def F_re(self, O, closest_unitary=False):
         """Return the phase-sensitive overlap of the current gate with respect
         to the gate O.
         """
         if closest_unitary:
-            return F_sm(self.closest_unitary(), O)
+            return F_re(self.closest_unitary(), O)
         else:
-            return F_sm(self, O)
+            return F_re(self, O)
 
     def cartan_decomposition(self):
         """
@@ -806,7 +807,7 @@ def closest_SQ(U, method='Powell', limit=1.0e-6):
         return U_unitary
     def f_U(p):
         return _SQ_unitary(*p)
-    return _closest_gate(U, f_U, n=8, method=method, limit=1.0e-6)
+    return _closest_gate(U, f_U, n=8, method=method, limit=limit)
 
 
 @memoize
@@ -859,8 +860,7 @@ def random_Gate2Q(region=None):
 
 
 def pop_loss(A):
-    """
-    Assuming that A is a matrix obtained from projecting a unitary matrix
+    r'''Assuming that A is a matrix obtained from projecting a unitary matrix
     to a smaller subspace, return the loss of population from the subspace
     (averaged over all basis states).
 
@@ -872,7 +872,7 @@ def pop_loss(A):
     >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
     >>> abs( (1 - (0.9 * 0.9 + 3) / 4) - pop_loss(U) ) < 1.0e-15
     True
-    """
+    '''
     N = A.shape[0]
     A = np.asarray(A)
     A_H = A.conjugate().transpose()
@@ -881,11 +881,10 @@ def pop_loss(A):
 
 
 def logical_pops(A):
-    """
-    Return a numpy array of four values that give the total population of the
-    states A |00>, A |01> A |10> A |11>. If A is unitary, all values are 1.0.
-    If there is loss from the logical subspace, the values are between 0.0 and
-    1.0.
+    """Return a numpy array of four values that give the total population of
+    the states A |00>, A |01> A |10> A |11>. If A is unitary, all values are
+    1.0.  If there is loss from the logical subspace, the values are between
+    0.0 and 1.0.
 
     >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
     >>> logical_pops(U)
@@ -909,12 +908,14 @@ def F_avg(U, O):
     F_TW_avg = inner(Udagger_O, Udagger_O)
     return (F_TW_avg + F_U_avg).real / (n*(n+1))
 
+
 def F_sm(U, O):
     """Calculate the square-modulus fidelity of the gate U with respect to
     the optimal gate O.
     """
     n = O.shape[0]
     return abs(inner(O,U))**2 / n**2
+
 
 def F_re(U, O):
     """Calculate the phase-sensitive overlap of the gate U with respect to the
@@ -927,15 +928,15 @@ def F_re(U, O):
 ###############################################################################
 # Standard two-qubit gates
 
-CNOT   = Gate2Q([[ 1,  0,  0,  0],
-                 [ 0,  1,  0,  0],
-                 [ 0,  0,  0,  1],
-                 [ 0,  0,  1,  0]], name='CNOT')
+CNOT = Gate2Q([[1, 0, 0, 0],
+               [0, 1, 0, 0],
+               [0, 0, 0, 1],
+               [0, 0, 1, 0]], name='CNOT')
 
-CPHASE  = Gate2Q([[ 1,  0,  0,   0],
-                  [  0,  1,  0,   0],
-                  [  0,  0,  1,   0],
-                  [  0,  0,  0,  -1]], name='CPHASE')
+CPHASE = Gate2Q([[1, 0, 0,  0],
+                 [0, 1, 0,  0],
+                 [0, 0, 1,  0],
+                 [0, 0, 0, -1]], name='CPHASE')
 
 
 def cphase(phi=pi, state='00'):
@@ -952,8 +953,8 @@ def cphase(phi=pi, state='00'):
             [ 0.00000000+0.j        ,  0.00000000+0.j        ,
               0.00000000+0.j        ,  1.00000000+0.j        ]])
     """
-    logical_basis = {'00':0, '01':1, '10':2, '11':3}
-    gate  = Gate2Q(np.identity(4))
+    logical_basis = {'00': 0, '01': 1, '10': 2, '11': 3}
+    gate = Gate2Q(np.identity(4))
     if state not in logical_basis:
         raise ValueError("state must be in [%s]"
                          % ", ".join(logical_basis.keys()))
@@ -963,15 +964,15 @@ def cphase(phi=pi, state='00'):
     return gate
 
 
-SWAP    = Gate2Q([[ 1,  0,  0,   0],
-                  [  0,  0,  1,   0],
-                  [  0,  1,  0,   0],
-                  [  0,  0,  0,   1]], name='CPHASE')
+SWAP    = Gate2Q([[ 1,  0,  0, 0],
+                  [ 0,  0,  1, 0],
+                  [ 0,  1,  0, 0],
+                  [ 0,  0,  0, 1]], name='SWAP')
 
-DCNOT   = Gate2Q([[ 1,  0,  0,   0],
-                  [  0,  0, 1j,   0],
-                  [  0, 1j,  0,   0],
-                  [  0,  0,  0,   1]], name='DCNOT')
+DCNOT   = Gate2Q([[ 1,  0,  0, 0],
+                  [ 0,  0, 1j, 0],
+                  [ 0, 1j,  0, 0],
+                  [ 0,  0,  0, 1]], name='DCNOT')
 
 iSWAP = DCNOT.copy()
 iSWAP.name = 'iSWAP'
