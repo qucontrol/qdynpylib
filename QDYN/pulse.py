@@ -607,7 +607,7 @@ class Pulse(object):
         describing the pulse"""
         result = OrderedDict(self.config_attribs)
         result.update(
-            {'type': 'file', 'filename': filename, 'pulse_id': pulse_id,
+            {'type': 'file', 'filename': filename, 'id': pulse_id,
              'time_unit': self.time_unit, 'ampl_unit': self.ampl_unit}
         )
         if label != '':
