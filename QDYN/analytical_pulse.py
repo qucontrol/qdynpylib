@@ -9,6 +9,7 @@ from collections import OrderedDict
 import numpy as np
 
 from .pulse import Pulse, pulse_tgrid
+from .units import UnitConvert
 
 
 class NumpyAwareJSONEncoder(json.JSONEncoder):
@@ -77,6 +78,7 @@ class AnalyticalPulse(object):
     _formulas = {} # formula name => formula callable, see `register_formula()`
     _allowed_args = {}  # formula name => allowed arguments
     _required_args = {} # formula name => required arguments
+    unit_convert = UnitConvert()
 
     @classmethod
     def register_formula(cls, name, formula):
@@ -101,13 +103,8 @@ class AnalyticalPulse(object):
         cls._required_args[name] = argspec.args[1:-n_opt]
 
 
-    def __init__(self, formula, T, nt, parameters, t0=0.0, time_unit='iu',
-        ampl_unit='iu', freq_unit=None, mode=None, config_attribs=None):
-        """Instantiate a new analytical pulse
-
-        The `formula` parameter must be the name of a previously registered
-        formula. All other parameters set the corresponding attribute.
-        """
+    def __init__(self, formula, T, nt, parameters, time_unit,
+        ampl_unit, t0=0.0, freq_unit=None, mode=None, config_attribs=None):
         if not formula in self._formulas:
             raise ValueError("Unknown formula '%s'" % formula)
         self._formula = formula
@@ -255,6 +252,11 @@ class AnalyticalPulse(object):
         if mode is None:
             mode = self.mode
         amplitude = self._formulas[self._formula](tgrid, **self.parameters)
+        if time_unit != self.time_unit:
+            tgrid = self.unit_convert.convert(tgrid, self.time-unit, time_unit)
+        if ampl_unit != self.ampl_unit:
+            amplitude = self.unit_convert.convert(amplitude, self.ampl_unit,
+                                                  ampl_unit)
         if (not isinstance(amplitude, np.ndarray)
         and amplitude.ndim != 1):
             raise TypeError(('Formula "%s" returned type %s instead of the '
