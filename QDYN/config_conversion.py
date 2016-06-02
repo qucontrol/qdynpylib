@@ -4,7 +4,8 @@ import os
 import json
 from collections import OrderedDict
 
-from .config import _process_raw_lines, _item_rxs, _protect_quotes, _unprotect_quotes
+from .config import (_process_raw_lines, _item_rxs, _protect_str_vals,
+                     _unprotect_str_vals)
 
 
 def get_old_config_structure(foldername):
@@ -85,7 +86,7 @@ def read_old_config(filename):
     with open(filename) as in_fh:
         current_section = ''
         for line in _process_raw_lines(in_fh):
-            line, replacements = _protect_quotes(line)
+            line, replacements = _protect_str_vals(line)
             m_sec = rx_sec.match(line)
             m_itemline = rx_itemline.match(line)
             if m_sec:
@@ -101,7 +102,7 @@ def read_old_config(filename):
         current_section = ''
         current_itemline = 0
         for line in _process_raw_lines(in_fh):
-            line, replacements = _protect_quotes(line)
+            line, replacements = _protect_str_vals(line)
             m_sec = rx_sec.match(line)
             m_itemline = rx_itemline.match(line)
             line_items = OrderedDict([])
@@ -110,7 +111,8 @@ def read_old_config(filename):
                 for rx, setter in item_rxs:
                     m = rx.match(item)
                     if m:
-                        val = _unprotect_quotes(m.group('value'), replacements)
+                        val = _unprotect_str_vals(
+                                    m.group('value'), replacements)
                         line_items[m.group('key')] = setter(val)
                         matched = True
                         break
@@ -134,7 +136,7 @@ def read_old_config(filename):
                         line_items)
                 current_itemline += 1
             else:
-                raise ValueError("Could not parse line %d" % config.line_nr)
+                raise ValueError("Could not parse line")
     return config_data
 
 

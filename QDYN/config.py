@@ -11,23 +11,36 @@ import six
 
 from .units import UnitFloat
 
-def _protect_quotes(str_line):
-    r'''Replace quoted expressions in the given `str_line` by a base-64 string
-    which is guaranteed to contain only letters and numbers. Return the
-    "protected" string and a list of tuples (base-64 replacement, quoted
-    expression). Nested and escaped quotes are handled.
+def _protect_str_vals(str_line):
+    r'''Parsing is greatly simplified if it can be assumed that key-value pairs
+    in the config match the regular expression '\w+\s*=\s*[\w.+-]+'. That is,
+    the values do not contain spaces, quotes, or escaped characters. This
+    function replaces values in the given `str_line` by a base-64 string
+    which is guaranteed to contain only letters and numbers. It returns the
+    "protected" string and a list of replacement tuples. The protected string
+    is guaranteed to not be shorter than the original string.
 
     >>> s_in = r'a = "text", '+"b = 'text'"
     >>> print(s_in)
     a = "text", b = 'text'
-    >>> s, r = _protect_quotes(s_in)
+    >>> s, r = _protect_str_vals(s_in)
     >>> print(s)
     a = InRleHQi, b = J3RleHQn
     >>> print(r)
     [('InRleHQi', '"text"'), ('J3RleHQn', "'text'")]
+
+    >>> s_in = r'a = this\ is\ an\ unquoted\ string, b = "text"'
+    >>> print(s_in)
+    a = this\ is\ an\ unquoted\ string, b = "text"
+    >>> s, r = _protect_str_vals(s_in)
+    >>> print(s)
+    a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi
+    >>> print(r)
+    [('InRleHQi', '"text"'), ('dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n', 'this\\ is\\ an\\ unquoted\\ string')]
     '''
-    rx_dq = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')
-    rx_sq = re.compile(r"'[^'\\]*(?:\\.[^'\\]*)*'")
+    # handle quoted strings
+    rx_dq = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')  # search for ...
+    rx_sq = re.compile(r"'[^'\\]*(?:\\.[^'\\]*)*'")  # ... balanced quotes
     replacements = []
     n_replacements = -1
     while n_replacements < len(replacements):
@@ -42,14 +55,33 @@ def _protect_quotes(str_line):
                     .decode('ascii').replace("=", '')
             replacements.append((b64, quoted_str))
             str_line = str_line.replace(quoted_str, b64)
+
+    # handle un-quoted, but escaped strings
+    rx_escaped_word = re.compile(
+            # any string of characters that does not include spaces or any
+            # of the characters ,:!&=\, except when they are escaped (preceded
+            # by a backslash)
+            r'(([^\s,:!&=\\]|\\\s|\\\\|\\,|\\:|\\!|\\&|\\=|\\n|\\r|\\t|\\b)+)')
+    rx_good_word = re.compile(r'^[\w.+-]+$')
+    for match in rx_escaped_word.finditer(str_line):
+        word = match.group(0)
+        if not (rx_good_word.match(word) or (word == '*')):
+            if six.PY2:
+                b64 = base64.b64encode(word).replace("=", '')
+            else:
+                b64 = base64.b64encode(bytes(word, 'utf8'))\
+                      .decode('ascii').replace("=", '')
+            replacements.append((b64, word))
+            str_line = str_line.replace(word, b64)
+
     return str_line, replacements
 
 
-def _unprotect_quotes(str_line, replacements):
-    r'''Inverse to :func:`_protect_quotes`
+def _unprotect_str_vals(str_line, replacements):
+    r'''Inverse to :func:`_protect_str_vals`
 
-    >>> s, r = _protect_quotes(r'a = "text", '+"b = 'text'")
-    >>> print(_unprotect_quotes(s, r))
+    >>> s, r = _protect_str_vals(r'a = "text", '+"b = 'text'")
+    >>> print(_unprotect_str_vals(s, r))
     a = "text", b = 'text'
     '''
     for (b64, quoted_str) in replacements:
@@ -121,6 +153,18 @@ def _unescape_str(s):
     return s
 
 
+def _val_to_str(val):
+    """Convert `val` to a string that can be written directly to the config
+    file"""
+    logical_mapping = {True: 'T', False: 'F'}
+    if isinstance(val, bool):
+        return logical_mapping[val]
+    elif isinstance(val, str):
+        return _escape_str(val)
+    else:
+        return str(val)
+
+
 def _process_raw_lines(raw_lines):
     r'''Return an iterator over the "processed" lines of a config file, based
     on the given raw lines. The processing of the raw lines consists of
@@ -163,12 +207,12 @@ def _process_raw_lines(raw_lines):
     while True: # stops when next(raw_lines) throws StopIteration
         raw_line = next(raw_lines)
         line_nr += 1
-        line, replacements = _protect_quotes(raw_line.strip())
+        line, replacements = _protect_str_vals(raw_line.strip())
         # strip out out comments
         line = re.sub('!.*$', '', line).strip()
         while line.endswith('&'):
             line = line[:-1] # strip out trailing '&' in continued line
-            line2, replacements2 = _protect_quotes(next(raw_lines).strip())
+            line2, replacements2 = _protect_str_vals(next(raw_lines).strip())
             line_nr += 1
             replacements.extend(replacements2)
             # strip out comments
@@ -177,7 +221,7 @@ def _process_raw_lines(raw_lines):
             if line2.startswith('&') and len(line2) > 1:
                 line2 = line2[1:]
             line += line2
-        line = _unprotect_quotes(line, replacements)
+        line = _unprotect_str_vals(line, replacements)
         if len(line) == 0:
             continue
         else:
@@ -188,7 +232,7 @@ def _split_config_line(line, linewidth):
     """Split the given line into a multi-line string of continued lines, trying
     to keep the length of each line under `linewidth`. Trailing newlines in
     `line` are ignored."""
-    full_line, replacements = _protect_quotes(line.strip())
+    full_line, replacements = _protect_str_vals(line.strip())
     if len(full_line) == 0:
         return "\n"
     rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+\s*,?\s*)')
@@ -205,7 +249,7 @@ def _split_config_line(line, linewidth):
         else:
             if len(parts) > 0:
                 current_line += '&'
-        current_line = _unprotect_quotes(current_line, replacements)
+        current_line = _unprotect_str_vals(current_line, replacements)
         lines.append(current_line.rstrip())
         current_line = '  ' # indent for continuing line
     return "\n".join(lines)+"\n"
@@ -249,7 +293,7 @@ def _render_config_lines(section_name, section_data):
             # we *do not* iterate over keys in common_items, so that items
             # are ordered the same as in section_data[0], instead of randomly
             if key in common_items:
-                line += " %s = %s," % (key, _escape_str(common_items[key]))
+                line += " %s = %s," % (key, _val_to_str(common_items[key]))
         if line.endswith(","):
             lines.append(line[:-1].strip())
         else:
@@ -259,7 +303,7 @@ def _render_config_lines(section_name, section_data):
             line = "*"
             for key in item_line:
                 if key not in common_items:
-                    line += " %s = %s," % (key, _escape_str(item_line[key]))
+                    line += " %s = %s," % (key, _val_to_str(item_line[key]))
             if line.endswith(","):
                 lines.append(line[:-1].strip())
             else:
@@ -267,7 +311,7 @@ def _render_config_lines(section_name, section_data):
     else: # section does not contain item lines, but key-value pairs only
         line = "%s:" % section_name
         for key in section_data:
-            line += " %s = %s," % (key, _escape_str(section_data[key]))
+            line += " %s = %s," % (key, _val_to_str(section_data[key]))
         lines.append(line[:-1].strip())
     return lines
 
@@ -349,7 +393,7 @@ def _read_config_lines(lines):
     # first pass: identify sections, list of lines in each section
     current_section = ''
     for line in lines:
-        line, replacements = _protect_quotes(line)
+        line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
         m_itemline = rx_itemline.match(line)
         if m_sec:
@@ -364,7 +408,7 @@ def _read_config_lines(lines):
     current_section = ''
     current_itemline = 0
     for line in lines:
-        line, replacements = _protect_quotes(line)
+        line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
         m_itemline = rx_itemline.match(line)
         line_items = OrderedDict([])
@@ -373,7 +417,7 @@ def _read_config_lines(lines):
             for rx, setter in item_rxs:
                 m = rx.match(item)
                 if m:
-                    val = _unprotect_quotes(m.group('value'), replacements)
+                    val = _unprotect_str_vals(m.group('value'), replacements)
                     line_items[m.group('key')] = setter(val)
                     matched = True
                     break
