@@ -283,10 +283,9 @@ class AnalyticalPulse(object):
         """Return an OrderedDict of attributes for a config file line
         describing the pulse"""
         result = OrderedDict(self.config_attribs)
-        result.update(
-            {'type': 'file', 'filename': filename, 'id': pulse_id,
-             'time_unit': self.time_unit, 'ampl_unit': self.ampl_unit}
-        )
+        result.update(OrderedDict([
+            ('type', 'file'), ('filename', filename), ('id', pulse_id),
+            ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
         if label != '':
             result['label'] = label
         return result
