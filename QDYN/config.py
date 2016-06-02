@@ -8,6 +8,7 @@ import copy
 from collections import OrderedDict
 
 import six
+import numpy as np
 
 from .units import UnitFloat
 
@@ -157,7 +158,7 @@ def _val_to_str(val):
     """Convert `val` to a string that can be written directly to the config
     file"""
     logical_mapping = {True: 'T', False: 'F'}
-    if isinstance(val, bool):
+    if isinstance(val, (bool, np.bool_)):
         return logical_mapping[val]
     elif isinstance(val, str):
         return _escape_str(val)
