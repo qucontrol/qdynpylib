@@ -182,8 +182,8 @@ def vectorize(a, order='F'):
 
 
 def is_hermitian(matrix):
-    """Return True if matrix is Hermitian, False otherwise. The `matrix` be a
-    numpy array or matrix, a scipy sparse matrix, or a `qutip.Qobj` instance.
+    """Return True if matrix is Hermitian, False otherwise. The `matrix` can be
+    a numpy array or matrix, a scipy sparse matrix, or a `qutip.Qobj` instance.
 
     >>> m = np.matrix([[0, 1j], [-1j, 1]])
     >>> is_hermitian(m)
@@ -205,7 +205,14 @@ def is_hermitian(matrix):
     if hasattr(matrix, 'isherm'): # qutip.Qobj
         return matrix.isherm
     else: # any numpy matrix/array or scipy sparse matrix)
-        return (abs(matrix - matrix.conjugate().transpose())).max() < 1e-14
+        #pylint: disable=simplifiable-if-statement
+        if (abs(matrix - matrix.conjugate().transpose())).max() < 1e-14:
+            # If we were to "simplify the if statement" and return the above
+            # expression directly, we might get an instance of numpy.bool_
+            # instead of the builtin bool that we want.
+            return True
+        else:
+            return False
 
 
 def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
