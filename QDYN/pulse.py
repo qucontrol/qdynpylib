@@ -1069,7 +1069,7 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
         signal = 0.0
     else:
         signal = np.zeros(len(t), dtype=np.complex128)
-        assert isinstance(type(t), np.ndarray), "t must be numpy array"
+        assert isinstance(t, np.ndarray), "t must be numpy array"
         assert t.dtype.type is np.float64, "t must be double precision real"
     c = ( unit_convert.convert(1, time_unit, 'iu')
         * unit_convert.convert(1, freq_unit, 'iu'))
