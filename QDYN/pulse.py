@@ -296,6 +296,7 @@ class Pulse(object):
                     ampl_unit=ampl_unit, freq_unit=freq_unit, mode=mode)
         pulse.preamble = preamble
         pulse.postamble = postamble
+        return pulse
 
     @property
     def dt(self):
