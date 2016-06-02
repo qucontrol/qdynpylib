@@ -4,10 +4,12 @@ Linear algebra helper routines
 """
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
+import logging
+
 import numpy as np
 import scipy.linalg
+import scipy.sparse
 from six.moves import xrange
-import logging
 
 
 def inner(v1, v2):
@@ -52,7 +54,7 @@ def inner(v1, v2):
     >>> inner(m1, m2)
     (2+2j)
     """
-    assert (type(v1) == type(v2)), \
+    assert (type(v1) is type(v2)), \
     "v1 and v2 must be of the same type: types are %s vs %s" \
     % (type(v1), type(v2))
     # numpy matrices are sub-types of ndarray
@@ -62,7 +64,7 @@ def inner(v1, v2):
         return trace(np.dot(v1.H, v2))
     else:
         assert (len(v1.shape) <= 2), "v1, v2 must be matrix or vector"
-        if (len(v1.shape) == 1): # vector
+        if len(v1.shape) == 1:  # vector
             return np.vdot(v1, v2)
         else: # matrix as 2D array
             return trace(np.dot(v1.conjugate().transpose(), v2))
@@ -212,7 +214,7 @@ def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
     of noisy, nonsmooth data, ISRN Applied Mathematics, Vol. 2011, Article ID
     164564, 2011. We use the variant of the algorithm for large `data` arrays.
 
-    Arguments:
+    Args:
         data (numpy array): Vector of data to be differentiated.
         itern (int): Number of iterations to run the main loop.  A stopping
             condition based on the norm of the gradient vector g below would be
@@ -242,7 +244,7 @@ def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
 
     # Make sure we have a column vector
     data = np.array(data)
-    if (len(data.shape) != 1):
+    if len(data.shape) != 1:
         logger.error("data is not a column vector")
         return
     # Get the data size.
@@ -258,10 +260,10 @@ def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
                     - np.transpose(np.concatenate(([0.0], np.cumsum(w[:-1])))))
     # Construct differentiation matrix.
     c = np.ones(n)
-    D = sparse.spdiags([-c, c], [0, 1], n, n) / dx
+    D = scipy.sparse.spdiags([-c, c], [0, 1], n, n) / dx
     mask = np.ones((n, n))
     mask[-1, -1] = 0.0
-    D = sparse.dia_matrix(D.multiply(mask))
+    D = scipy.sparse.dia_matrix(D.multiply(mask))
     DT = D.transpose()
     # Since Au(0) = 0, we need to adjust.
     data = data - data[0]
@@ -272,11 +274,15 @@ def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
     # Precompute.
     ATd = AT(data)
 
+    def linop_matvec(v):
+        return alph * L * v + AT(A(v))
+    linop = scipy.sparse.linalg.LinearOperator((n, n), linop_matvec)
+
     # Main loop.
     for ii in range(1, itern + 1):
 
         # Diagonal matrix of weights, for linearizing E-L equation.
-        Q = sparse.spdiags(1.0/np.sqrt((D*u)**2.0+ep), 0, n, n)
+        Q = scipy.sparse.spdiags(1.0/np.sqrt((D*u)**2.0+ep), 0, n, n)
         # Linearized diffusion matrix, also approximation of Hessian.
         L = DT*Q*D
         # Gradient of functional.
@@ -284,29 +290,26 @@ def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
         g = g + alph * L * u
         # Build preconditioner.
         c = np.cumsum(range(n, 0, -1))
-        B = alph * L + sparse.spdiags(c[::-1], 0, n, n)
+        B = alph * L + scipy.sparse.spdiags(c[::-1], 0, n, n)
         # droptol = 1.0e-2
-        R = sparse.dia_matrix(np.linalg.cholesky(B.todense()))
+        R = scipy.sparse.dia_matrix(np.linalg.cholesky(B.todense()))
         # Prepare to solve linear equation.
         tol = 1.0e-4
         maxit = 100
 
-        linop = lambda v: (alph * L * v + AT(A(v)))
-        linop = scipy.linalg.LinearOperator((n, n), linop)
-
-        [s, info_i] = sparse.linalg.cg(linop, -g, None, tol, maxit, None,
-                                       np.dot(R.transpose(), R))
-        logger.debug(('iteration {0:4d}: relative change = {1:.3e}, '
-                      'gradient norm = {2:.3e}\n').format(
-                      ii, np.linalg.norm(s[0])/np.linalg.norm(u),
-                      np.linalg.norm(g)))
-        if (info_i > 0):
+        [s, info_i] = scipy.sparse.linalg.cg(linop, -g, None, tol, maxit, None,
+                                             np.dot(R.transpose(), R))
+        logger.debug("iteration %4d: relative change = %.3e, gradient "
+                     "norm = %.3e", ii,
+                     np.linalg.norm(s[0])/np.linalg.norm(u),
+                     np.linalg.norm(g))
+        if info_i > 0:
             logger.debug("WARNING - convergence to tolerance not achieved!")
-        elif (info_i < 0):
+        elif info_i < 0:
             logger.debug("WARNING - illegal input or breakdown")
         else:
-            [s, info_i] = sparse.linalg.cg(linop, -g, None, tol, maxit, None,
-                                           np.dot(R.transpose(), R))
+            [s, info_i] = scipy.sparse.linalg.cg(linop, -g, None, tol, maxit,
+                                                None, np.dot(R.transpose(), R))
         # Update current solution
         u = u + s
         u = u/dx
