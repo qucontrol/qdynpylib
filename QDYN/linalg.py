@@ -4,6 +4,7 @@ Linear algebra helper routines
 """
 from __future__ import print_function, division, absolute_import, \
                        unicode_literals
+import warnings
 import logging
 
 import numpy as np
@@ -213,6 +214,69 @@ def is_hermitian(matrix):
             return True
         else:
             return False
+
+
+def choose_sparsity_model(matrix):
+    """Return one of 'full', 'banded', 'dia', or 'indexed', depending on an
+    estimate of white might be the best storage format for the given `matrix`.
+
+    >>> m = scipy.sparse.random(100, 100, 0.01)
+    >>> choose_sparsity_model(m)
+    'indexed'
+
+    >>> m = scipy.sparse.random(100, 100, 0.5)
+    >>> choose_sparsity_model(m)
+    'full'
+
+    >>> m = np.diag(np.ones(20))
+    >>> choose_sparsity_model(m)
+    'banded'
+
+    >>> m = np.diag(np.zeros(20))
+    >>> m[2,2] = m[10,10] = m[11,11] = 1
+    >>> choose_sparsity_model(m)
+    'indexed'
+
+    >>> td_data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)
+    >>> off = np.array([0, -1, 1])
+    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(5,5)).todense()
+    >>> choose_sparsity_model(m)
+    'dia'
+
+    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(20,20)).todense()
+    >>> m[19,19] = 1
+    >>> choose_sparsity_model(m)
+    'indexed'
+    """
+    if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
+        matrix = matrix.data
+    n, m = matrix.shape
+    assert n == m
+    size = n * m
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        try:
+            dia_matrix = scipy.sparse.dia_matrix(matrix)
+            if len(dia_matrix.data) == 1: # diagonal matrix
+                nnz = (dia_matrix.data != 0).sum()
+                if nnz < n / 4:
+                    return 'indexed'
+                else:
+                    return 'banded'
+            elif len(dia_matrix.data) <= 5:
+                nnz = (dia_matrix.data != 0).sum()
+                if nnz < dia_matrix.data.size / 4:
+                    return 'indexed'
+                else:
+                    return 'dia'
+        except scipy.sparse.SparseEfficiencyWarning:
+            pass # continue on to coo_matrix
+    coo_matrix = scipy.sparse.coo_matrix(matrix)
+    if coo_matrix.nnz <= size / 10:
+        return 'indexed'
+    else:
+        return 'full'
+
 
 
 def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
