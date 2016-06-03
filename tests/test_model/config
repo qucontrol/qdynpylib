@@ -6,11 +6,11 @@ pulse:
 * type = file, filename = pulse1.dat, id = 1, time_unit = ns, &
   ampl_unit = unitless
 
-ham: type = matrix, n_surf = 4, sparsity_model = indexed
-* filename = H0.dat
-* filename = H1.dat, pulse_id = 1
+ham: type = matrix, n_surf = 4
+* sparsity_model = banded, filename = H0.dat
+* sparsity_model = dia, filename = H1.dat, pulse_id = 1
 
-dissipator: type = lindblad_ops, conv_to_superop = F, add_to_H_jump = indexed
+dissipator: type = lindblad_ops, conv_to_superop = F, add_to_H_jump = banded
 * filename = L1.dat
 * filename = L2.dat
 
@@ -18,6 +18,6 @@ psi:
 * type = file, filename = psi0.dat
 
 observables: outfile = pops.dat, exp_unit = unitless, is_real = T, &
-  time_unit = ns, type = matrix, n_surf = 4, sparsity_model = indexed
+  time_unit = ns, type = matrix, n_surf = 4, sparsity_model = banded
 * column_label = "<P_1> (q1)", filename = O1.dat
 * column_label = "<P_1> (q2)", filename = O2.dat

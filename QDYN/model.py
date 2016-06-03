@@ -15,7 +15,7 @@ from .config import write_config
 from .state import write_psi_amplitudes
 from .shutil import mkdir
 from .units import UnitFloat
-from .linalg import is_hermitian
+from .linalg import is_hermitian, choose_sparsity_model
 
 
 class LevelModel(object):
@@ -277,10 +277,10 @@ class LevelModel(object):
             write_indexed_matrix(H,
                     filename=os.path.join(runfolder, filename),
                     hermitian=False)
+            sparsity_model = choose_sparsity_model(H)
             self._config_data['ham'].append(
-                    # TODO: determine optimal sparsity_model
                     OrderedDict([('type', 'matrix'), ('n_surf', H.shape[0]),
-                                 ('sparsity_model', 'indexed'),
+                                 ('sparsity_model', sparsity_model),
                                  ('filename', filename)]))
             if pulse is not None:
                 self._config_data['ham'][-1]['pulse_id'] \
@@ -315,10 +315,10 @@ class LevelModel(object):
                 self._config_data['observables'] = []
             self._config_data['observables'].append(
                     OrderedDict(self._obs_config_attribs[i]))
+            sparsity_model = choose_sparsity_model(O)
             self._config_data['observables'][-1].update(
-                    # TODO: determine optimal sparsity_model
                     OrderedDict([('type', 'matrix'), ('n_surf', O.shape[0]),
-                                    ('sparsity_model', 'indexed'),
+                                    ('sparsity_model', sparsity_model),
                                     ('filename', filename)]))
             if pulse is not None:
                 self._config_data['observables'][-1]['pulse_id'] \
@@ -356,9 +356,8 @@ class LevelModel(object):
                                  ('conv_to_superop', False),
                                  ('filename', filename)]))
             if self.construct_mcwf_ham:
-                # TODO: determine optimal sparsity_model
                 self._config_data['dissipator'][-1]['add_to_H_jump'] \
-                        = 'indexed'
+                        = choose_sparsity_model(L)
             if pulse is not None:
                 self._config_data['dissipator'][-1]['pulse_id'] \
                 = self._pulse_ids[pulse]
