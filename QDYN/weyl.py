@@ -2,8 +2,8 @@
 Routines for calculating local invariants, concurrence, and related quantities
 for two-qubit gates
 """
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 from numpy import cos, sin, exp, pi
 from numpy import less, greater
@@ -12,15 +12,15 @@ from numpy import logical_or as Or
 from numpy import less_equal as less_eq
 from numpy import greater_equal as greater_eq
 from mpl_toolkits.mplot3d import Axes3D # required to activate 2D plotting
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
+import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
+from scipy.linalg import expm
 from six.moves import xrange
+
 from .gate2q import Gate2Q
 from .linalg import vectorize
 from .memoize import memoize
-from scipy.optimize import leastsq
-from scipy.linalg import expm
 
 DEFAULT_WEYL_PRECISSION = 8
 

@@ -1,8 +1,8 @@
 """
 Utiltiy routines for working with states (wave functions or density matrices)
 """
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 import re
 
 import numpy as np

@@ -3,8 +3,8 @@ Module that contains the Gate2Q class for working with two-qubit gates.
 
 Also defines common two-qubit gates as Gate2Q objects.
 """
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 import cmath
 import os
 import re
