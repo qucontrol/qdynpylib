@@ -1,5 +1,5 @@
 PROJECT_NAME = QDYN
-PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage
+PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage click sphinx
 TESTPYPI = https://testpypi.python.org/pypi
 
 TESTOPTIONS = --doctest-modules --cov=QDYN
@@ -46,6 +46,13 @@ clean:
 	@rm -f tests/result_images/*
 	@rm -f .coverage
 
+clean-doc:
+	@rm -rf docs/build
+	@rm -rf doc
+
+distclean: clean clean-doc
+	@rm -rf .venv
+
 .venv/py27/bin/py.test:
 	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
 	@.venv/py27/bin/pip install -e .[dev]
@@ -58,6 +65,10 @@ clean:
 	@conda create -y -m -p .venv/py34 python=3.4 $(PACKAGES)
 	@.venv/py34/bin/pip install -e .[dev]
 
+.venv/py35/bin/py.test:
+	@conda create -y -m -p .venv/py35 python=3.5 $(PACKAGES)
+	@.venv/py35/bin/pip install -e .[dev]
+
 test27: .venv/py27/bin/py.test
 	$< -v $(TESTOPTIONS) $(TESTS)
 
@@ -67,7 +78,15 @@ test33: .venv/py33/bin/py.test
 test34: .venv/py34/bin/py.test
 	$< -v $(TESTOPTIONS) $(TESTS)
 
+test35: .venv/py35/bin/py.test
+	$< -v $(TESTOPTIONS) $(TESTS)
+
 test: test27 test33 test34
+
+doc: .venv/py35/bin/py.test
+	@rm -f docs/source/API/qdynpylib.*
+	$(MAKE) -C docs SPHINXBUILD=../.venv/py35/bin/sphinx-build SPHINXAPIDOC=../.venv/py35/bin/sphinx-apidoc html
+	@ln -sf docs/build/html doc
 
 coverage: test34
 	@rm -rf htmlcov/index.html
