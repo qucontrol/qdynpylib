@@ -481,7 +481,7 @@ class Pulse(object):
                 the phase may take any real value, avoiding the discontinuous
                 jumps introduced by limiting the phase to a 2 pi interval.
             s (float or None): smoothing parameter, see
-                :cls:`scipy.interpolate.UnivariateSpline`. If None, no
+                :py:class:`scipy.interpolate.UnivariateSpline`. If None, no
                 smoothing is performed.
             derivative (bool): If False, return the (smoothed) phase directly.
                 If True, return the derivative of the (smoothed) phase.

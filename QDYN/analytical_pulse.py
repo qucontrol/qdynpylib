@@ -233,7 +233,7 @@ class AnalyticalPulse(object):
 
     def to_num_pulse(self, tgrid=None, time_unit=None, ampl_unit=None,
             freq_unit=None, mode=None):
-        """Return a :cls:`QDYN.pulse.Pulse` instance that contains the
+        """Return a :py:class:`QDYN.pulse.Pulse` instance that contains the
         corresponding numerical pulse"""
         self._check_parameters()
         if tgrid is None:

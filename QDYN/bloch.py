@@ -206,15 +206,23 @@ class Bloch():
         ----------
         convention : string
             One of the following:
+
             - "original"
+
             - "xyz01"
+
             - "xyz"
+
             - "sx sy sz"
+
             - "01"
+
             - "polarization jones"
-            - "polarization jones letters"
+
+            - "polarization jones letters",
               see also: http://en.wikipedia.org/wiki/Jones_calculus
-            - "polarization stokes"
+
+            - "polarization stokes",
               see also: http://en.wikipedia.org/wiki/Stokes_parameters
         """
         ketex = "$\\left.|%s\\right\\rangle$"
