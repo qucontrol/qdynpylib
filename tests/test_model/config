@@ -7,10 +7,11 @@ pulse:
   ampl_unit = unitless
 
 ham: type = matrix, n_surf = 4
-* sparsity_model = banded, filename = H0.dat
-* sparsity_model = dia, filename = H1.dat, pulse_id = 1
+* filename = H0.dat, sparsity_model = banded, op_type = potential
+* filename = H1.dat, sparsity_model = dia, op_type = dipole, pulse_id = 1
 
-dissipator: type = lindblad_ops, conv_to_superop = F, add_to_H_jump = banded
+dissipator: type = lindblad_ops, sparsity_model = banded, conv_to_superop = F, &
+  add_to_H_jump = banded
 * filename = L1.dat
 * filename = L2.dat
 

@@ -28,13 +28,15 @@ class LevelModel(object):
     Attributes:
         label (str): label to be used for all config file items
         ham (matrix or list): the system Hamiltonian. Must be either a matrix
-        or similar object (numpy matrix, numpy 2D array, scipy sparse matrix,
-            `qutip.Qobj`) or a list. If a list, the total Hamiltonian is the
-            sum of all list items. Each list item must be either a matrix
-            (time-independent), or a list/tuple ``(matrix, pulse)`` for a
-            time-dependent operator. The ``pulse`` must be an instance of
+            or similar object (numpy matrix, numpy 2D array, scipy sparse
+            matrix, `qutip.Qobj`) or a list. If a list, the total Hamiltonian
+            is the sum of all list items. Each list item must be either a
+            matrix (time-independent), or a list/tuple ``(matrix, pulse)`` for
+            a time-dependent operator. The ``pulse`` must be an instance of
             `QDYN.pulse.Pulse`, `QDYN.pulse.AnalyticalPulse`, or a callable
             that takes a time value as a float and returns a pulse amplitude.
+            It is recommended not to set the `ham` attribute directly, but to
+            construct it using :meth:`add_ham`.
         t0 (float or QDYN.units.UnitFloat): Initial time.
         T (float or QDYN.units.UnitFloat): Final time.
         nt (int): Number of points in the time grid.
@@ -66,6 +68,7 @@ class LevelModel(object):
             raise ValueError("Invalid label: %s" % label)
         self.label = label
         self.ham = None
+        self._ham_config_attribs = []
         self._observables = []
         self._obs_config_attribs = []
         self._lindblad_ops = []
@@ -90,6 +93,62 @@ class LevelModel(object):
     def lindblad_ops(self):
         """List of all Lindblad operators"""
         return list(self._lindblad_ops)
+
+    def add_ham(self, H, pulse=None, op_unit=None, sparsity_mode=None,
+            op_type=None, **kwargs):
+        """Add a term to the system Hamiltonian. If called repeatedly, the
+        total Hamiltonian is the sum of all added terms.
+
+        Args:
+            H: Hamiltonian matrix. Can be a numpy matrix or array,
+                scipy sparse matrix, or `qutip.Qobj`
+            pulse: if not None, `H` will couple to `pulse`. Can be an instance
+                of `QDYN.analytical_pulse.AnalyticalPulse` (preferred, this is
+                the only option to fully specify units), `QDYN.pulse.Pulse`, or
+                a callable ``pulse(t)`` that returns a pulse value for a given
+                float ``t`` (time)
+            op_unit (None or str): Unit of the values in `H`.
+            sparsity_mode (None or str): sparsity mode that QDYN should use
+                to encode the data in `H`. If None, will be determined
+                automatically
+            op_type (None or str): the value for ``op_type`` in the config file
+                that should be used for `H`. This determines how exactly `H`
+                couples to `pulse`
+
+        All other keyword arguments set options for `H` in the config file
+        (e.g. `specrad_method`)
+        """
+        if not hasattr(H, 'shape'):
+            # we take the existence of the 'shape' attribute as a least-effort
+            # indication that H is one of the acceptable types
+            raise TypError('H must be a matrix')
+        if pulse is not None:
+            if not (isinstance(pulse, (Pulse, AnalyticalPulse))
+                    or callable(pulse)):
+                raise TypeError("pulse must be an instance of "
+                        "QDYN.analytical_pulse.AnalyticalPulse, "
+                        "QDYN.pulse.Pulse, or a callable.")
+        if self.ham is None:
+            self.ham = []
+        elif hasattr(self.ham, 'shape'):
+            self.ham = [self.ham, ]
+            self._ham_config_attribs = [OrderedDict([]), ]
+        if pulse is None:
+            self.ham.append(H)
+        else:
+            self.ham.append([H, pulse])
+        config_attribs = OrderedDict([])
+        if op_unit is not None:
+            config_attribs['op_unit'] = op_unit
+        if sparsity_mode is not None:
+            config_attribs['sparsity_mode'] = sparsity_mode
+        if op_type is not None:
+            config_attribs['op_type'] = op_type
+        for key in kwargs:
+            config_attribs[key] = kwargs[key]
+        self._ham_config_attribs.append(config_attribs)
+        assert len(self._ham_config_attribs) == len(self.ham)
+
 
     def add_observable(self, O, outfile, exp_unit, time_unit, col_label,
             square=None):
@@ -260,7 +319,7 @@ class LevelModel(object):
         op_counter = 0
         if 'ham' not in self._config_data:
             self._config_data['ham'] = []
-        for element in ham:
+        for i, element in enumerate(ham):
             if isinstance(element, (list, tuple)):
                 try:
                     H, pulse = element
@@ -277,16 +336,25 @@ class LevelModel(object):
             write_indexed_matrix(H,
                     filename=os.path.join(runfolder, filename),
                     hermitian=False)
-            sparsity_model = choose_sparsity_model(H)
             self._config_data['ham'].append(
                     OrderedDict([('type', 'matrix'), ('n_surf', H.shape[0]),
-                                 ('sparsity_model', sparsity_model),
-                                 ('filename', filename),
-                                 ('op_type', 'potential')]))
+                                 ('filename', filename)]))
+            try:
+                config_attribs = self._ham_config_attribs[i]
+            except IndexError:
+                config_attribs = OrderedDict([])
+            if 'sparsity_model' not in config_attribs:
+                config_attribs['sparsity_model'] = choose_sparsity_model(H)
+            if 'op_type' not in config_attribs:
+                config_attribs['op_type'] = 'potential'
+                if pulse is not None:
+                    config_attribs['op_type'] = 'dipole'
+            for key, val in config_attribs.items():
+                if key not in self._config_data['ham'][-1]:
+                    self._config_data['ham'][-1][key] = val
             if pulse is not None:
                 self._config_data['ham'][-1]['pulse_id'] \
                 = self._pulse_ids[pulse]
-                self._config_data['ham'][-1]['op_type'] = 'dipole'
             if self.label != '':
                 self._config_data['ham'][-1]['label'] = self.label
             op_counter +=1

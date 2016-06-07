@@ -55,7 +55,8 @@ def test_level_model(tmpdir, request):
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
 
     model = LevelModel()
-    model.ham = [H0, [H1, pulse]]
+    model.add_ham(H0)
+    model.add_ham(H1, pulse)
     model.add_lindblad_op(L1)
     model.add_lindblad_op(L2)
     model.set_propagation(psi, T=50, nt=1001, time_unit='ns', use_mcwf=True)
