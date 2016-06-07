@@ -281,10 +281,12 @@ class LevelModel(object):
             self._config_data['ham'].append(
                     OrderedDict([('type', 'matrix'), ('n_surf', H.shape[0]),
                                  ('sparsity_model', sparsity_model),
-                                 ('filename', filename)]))
+                                 ('filename', filename),
+                                 ('op_type', 'potential')]))
             if pulse is not None:
                 self._config_data['ham'][-1]['pulse_id'] \
                 = self._pulse_ids[pulse]
+                self._config_data['ham'][-1]['op_type'] = 'dipole'
             if self.label != '':
                 self._config_data['ham'][-1]['label'] = self.label
             op_counter +=1
@@ -351,8 +353,10 @@ class LevelModel(object):
                     hermitian=False)
             if 'dissipator' not in self._config_data:
                 self._config_data['dissipator'] = []
+            sparsity_model = choose_sparsity_model(L)
             self._config_data['dissipator'].append(
                     OrderedDict([('type', 'lindblad_ops'),
+                                 ('sparsity_model', sparsity_model),
                                  ('conv_to_superop', False),
                                  ('filename', filename)]))
             if self.construct_mcwf_ham:
