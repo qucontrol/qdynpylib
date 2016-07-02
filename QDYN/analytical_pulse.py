@@ -288,5 +288,8 @@ class AnalyticalPulse(object):
             ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
         if label != '':
             result['label'] = label
+        if self.mode == 'complex':
+            result['is_complex'] = True
+
         return result
 

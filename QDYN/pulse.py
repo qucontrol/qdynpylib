@@ -612,6 +612,8 @@ class Pulse(object):
             ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
         if label != '':
             result['label'] = label
+        if self.is_complex:
+            result['is_complex'] = True
         return result
 
     def _unshift(self):
