@@ -152,12 +152,13 @@ class LevelModel(object):
 
 
     def add_observable(self, O, outfile, exp_unit, time_unit, col_label,
-            square=None):
+            square=None, exp_surf=None, is_real=None):
         """Add an observable
 
         Args:
-            O (tuple, matrix): Observable to add. Must be a matrix
-                or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.
+            O (tuple, matrix, str): Observable to add. Must be a matrix
+                or a tuple ``(matrix, pulse)`` (cf. the `ham` attribute), or
+                one of "ham", "norm", "pop"
             outfile (str): Name of output file to which to write expectation
                 values of `O`
             exp_unit (str): The unit in which to write the expectation value in
@@ -169,19 +170,38 @@ class LevelModel(object):
             square (str or None): If not None, label for the column in
                 `outfile` containing the expectation value for the square of
                 `O`
+            exp_surf: The surface number the expectation value; only if `O` is
+                a string
+            is_real: Whether or not the expectation value is real. If not
+                given, this should be set automatically
         """
         self._observables.append(O)
         try:
             O, pulse = O
-        except TypeError:
+        except (TypeError, ValueError):
             pass # O stays O
-        is_real = is_hermitian(O)
+        if isinstance(O, str):
+            if O not in ["ham", "norm", "pop"]:
+                raise ValueError("String expectation value must be one of"
+                        "'ham', 'norm', or 'pop'")
+        if is_real is None:
+            if isinstance(O, str):
+                if O in ["norm", "pop"]:
+                    is_real = Tue
+                elif O == "ham":
+                    is_real = False
+                else:
+                    raise ValueError("Invalid O")
+            else:
+                is_real = is_hermitian(O)
         self._obs_config_attribs.append(OrderedDict(
             [('outfile', outfile), ('exp_unit', exp_unit),
              ('is_real', is_real), ('time_unit', time_unit),
              ('column_label', col_label)]))
         if square is not None:
             self._obs_config_attribs[-1]['square'] = square
+        if exp_surf is not None:
+            self._obs_config_attribs[-1]['exp_surf'] = exp_surf
 
     def add_lindblad_op(self, L, op_unit=None, sparsity_model=None,
             add_to_H_jump=None, **kwargs):
@@ -389,29 +409,34 @@ class LevelModel(object):
         and add observables data to self._config_data"""
         op_counter = 1
         for i, element in enumerate(self._observables):
-            if isinstance(element, (list, tuple)):
-                try:
-                    O, pulse = element
-                except ValueError:
-                    raise ValueError("Each observable must either be an "
-                            "operator or a two-element list consisting "
-                            "of an operator and a pulse")
-            else:
-                O = element
-                pulse = None
-            if self.label == '':
-                filename = "O%d.dat" % op_counter
-            else:
-                filename = "O_%s_%d.dat" % (self.label, op_counter)
-            write_indexed_matrix(O,
-                    filename=os.path.join(runfolder, filename),
-                    hermitian=False)
             if 'observables' not in self._config_data:
                 self._config_data['observables'] = []
             self._config_data['observables'].append(
                     OrderedDict(self._obs_config_attribs[i]))
-            sparsity_model = choose_sparsity_model(O)
-            self._config_data['observables'][-1].update(
+            if isinstance(element, str):
+                assert element in ["ham", "norm", "pop"]
+                pulse = None
+                self._config_data['observables'][-1]['type'] = element
+            else:
+                if isinstance(element, (list, tuple)):
+                    try:
+                        O, pulse = element
+                    except ValueError:
+                        raise ValueError("Each observable must either be an "
+                                "operator or a two-element list consisting "
+                                "of an operator and a pulse")
+                else:
+                    O = element
+                    pulse = None
+                if self.label == '':
+                    filename = "O%d.dat" % op_counter
+                else:
+                    filename = "O_%s_%d.dat" % (self.label, op_counter)
+                write_indexed_matrix(O,
+                        filename=os.path.join(runfolder, filename),
+                        hermitian=False)
+                sparsity_model = choose_sparsity_model(O)
+                self._config_data['observables'][-1].update(
                     OrderedDict([('type', 'matrix'), ('n_surf', O.shape[0]),
                                     ('sparsity_model', sparsity_model),
                                     ('filename', filename)]))
