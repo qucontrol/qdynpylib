@@ -240,8 +240,8 @@ def choose_sparsity_model(matrix):
     >>> td_data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)
     >>> off = np.array([0, -1, 1])
     >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(5,5)).todense()
-    >>> choose_sparsity_model(m)
-    'dia'
+    >>> choose_sparsity_model(m) # should eventually be 'dia'
+    'indexed'
 
     >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(20,20)).todense()
     >>> m[19,19] = 1
@@ -268,7 +268,8 @@ def choose_sparsity_model(matrix):
                 if nnz < dia_matrix.data.size / 4:
                     return 'indexed'
                 else:
-                    return 'dia'
+                    #return 'dia' # 'dia' is not yet fully implemented in QDYN
+                    return 'indexed'
         except scipy.sparse.SparseEfficiencyWarning:
             pass # continue on to coo_matrix
     coo_matrix = scipy.sparse.coo_matrix(matrix)
