@@ -69,6 +69,7 @@ class LevelModel(object):
         self.label = label
         self.ham = None
         self._ham_config_attribs = []
+        self._lindblad_config_attribs = []
         self._observables = []
         self._obs_config_attribs = []
         self._lindblad_ops = []
@@ -94,7 +95,7 @@ class LevelModel(object):
         """List of all Lindblad operators"""
         return list(self._lindblad_ops)
 
-    def add_ham(self, H, pulse=None, op_unit=None, sparsity_mode=None,
+    def add_ham(self, H, pulse=None, op_unit=None, sparsity_model=None,
             op_type=None, **kwargs):
         """Add a term to the system Hamiltonian. If called repeatedly, the
         total Hamiltonian is the sum of all added terms.
@@ -108,7 +109,7 @@ class LevelModel(object):
                 a callable ``pulse(t)`` that returns a pulse value for a given
                 float ``t`` (time)
             op_unit (None or str): Unit of the values in `H`.
-            sparsity_mode (None or str): sparsity mode that QDYN should use
+            sparsity_model (None or str): sparsity model that QDYN should use
                 to encode the data in `H`. If None, will be determined
                 automatically
             op_type (None or str): the value for ``op_type`` in the config file
@@ -121,7 +122,7 @@ class LevelModel(object):
         if not hasattr(H, 'shape'):
             # we take the existence of the 'shape' attribute as a least-effort
             # indication that H is one of the acceptable types
-            raise TypError('H must be a matrix')
+            raise TypeError('H must be a matrix')
         if pulse is not None:
             if not (isinstance(pulse, (Pulse, AnalyticalPulse))
                     or callable(pulse)):
@@ -140,8 +141,8 @@ class LevelModel(object):
         config_attribs = OrderedDict([])
         if op_unit is not None:
             config_attribs['op_unit'] = op_unit
-        if sparsity_mode is not None:
-            config_attribs['sparsity_mode'] = sparsity_mode
+        if sparsity_model is not None:
+            config_attribs['sparsity_model'] = sparsity_model
         if op_type is not None:
             config_attribs['op_type'] = op_type
         for key in kwargs:
@@ -170,6 +171,10 @@ class LevelModel(object):
                 `O`
         """
         self._observables.append(O)
+        try:
+            O, pulse = O
+        except TypeError:
+            pass # O stays O
         is_real = is_hermitian(O)
         self._obs_config_attribs.append(OrderedDict(
             [('outfile', outfile), ('exp_unit', exp_unit),
@@ -178,14 +183,34 @@ class LevelModel(object):
         if square is not None:
             self._obs_config_attribs[-1]['square'] = square
 
-    def add_lindblad_op(self, L):
+    def add_lindblad_op(self, L, op_unit=None, sparsity_model=None,
+            add_to_H_jump=None, **kwargs):
         """Add Lindblad operator.
 
         Args:
             L (tuple, matrix): Lindblad operator to  add. Must be a matrix
                 or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.
+            op_unit (None or str): Unit of the values in `L`.
+            sparsity_model (None or str): sparsity model that QDYN should use
+                to encode the data in `L`. If None, will be determined
+                automatically
+            add_to_H_jump (None, str): sparsity model to be set for
+                `add_to_H_jump`, i.e. for the decay term in the effective MCWF
+                Hamiltonian. If None, will be de determined automatically.
+
+        All other keyword arguments set options for `L` in the config file.
         """
+        config_attribs = OrderedDict([])
+        if op_unit is not None:
+            config_attribs['op_unit'] = op_unit
+        if sparsity_model is not None:
+            config_attribs['sparsity_model'] = sparsity_model
+        if add_to_H_jump is not None:
+            config_attribs['add_to_H_jump'] = add_to_H_jump
+        for key in kwargs:
+            config_attribs[key] = kwargs[key]
         self._lindblad_ops.append(L)
+        self._lindblad_config_attribs.append(config_attribs)
 
     def set_propagation(self, initial_state, T, nt, time_unit, t0=0.0,
             prop_method='newton', use_mcwf=False, construct_mcwf_ham=True):
@@ -265,18 +290,18 @@ class LevelModel(object):
         self._config_data, and build the self._pulse_ids dict so that at some
         later point, operators may find the pulse ID for a pulse they are
         connected to"""
-        nested_ops = [self.ham, ] + self._observables + self._lindblad_ops
-        for nested_op in nested_ops:
-            for element in nested_op:
-                if isinstance(element, (list, tuple)):
-                    try:
-                        pulse = element[1]
-                    except ValueError:
-                        raise ValueError("nested_op must be either an "
-                                "operator, or a list of operators or lists "
-                                "`[Op, pulse]`")
-                    if pulse not in self._pulse_ids:
-                        self._write_pulse(pulse, runfolder)
+        ops = []
+        if isinstance(self.ham, (list, tuple)):
+            ops.extend(self.ham)
+        else:
+            ops = [self.ham, ]
+        ops.extend(self._observables)
+        ops.extend(self._lindblad_ops)
+        for element in ops:
+            if isinstance(element, (list, tuple)):
+                pulse = element[1]
+                if pulse not in self._pulse_ids:
+                    self._write_pulse(pulse, runfolder)
 
     def _write_pulse(self, pulse, runfolder):
         tgrid = pulse_tgrid(self.T, self.nt, self.t0)
@@ -401,7 +426,7 @@ class LevelModel(object):
         """Write operators describing all Lindblad operators to the runfolder,
         and add dissipator data to self._config_data"""
         op_counter = 1
-        for element in self._lindblad_ops:
+        for i, element in enumerate(self._lindblad_ops):
             if isinstance(element, (list, tuple)):
                 try:
                     L, pulse = element
@@ -421,15 +446,28 @@ class LevelModel(object):
                     hermitian=False)
             if 'dissipator' not in self._config_data:
                 self._config_data['dissipator'] = []
-            sparsity_model = choose_sparsity_model(L)
             self._config_data['dissipator'].append(
                     OrderedDict([('type', 'lindblad_ops'),
-                                 ('sparsity_model', sparsity_model),
-                                 ('conv_to_superop', False),
                                  ('filename', filename)]))
+            try:
+                config_attribs = self._lindblad_config_attribs[i]
+            except IndexError:
+                config_attribs = OrderedDict([])
+            if 'sparsity_model' not in config_attribs:
+                config_attribs['sparsity_model'] = choose_sparsity_model(L)
             if self.construct_mcwf_ham:
-                self._config_data['dissipator'][-1]['add_to_H_jump'] \
-                        = choose_sparsity_model(L)
+                if 'add_to_H_jump' not in config_attribs:
+                    # TODO: choose sparsity model that is optimal for the
+                    # entire decay term
+                    config_attribs['add_to_H_jump'] = choose_sparsity_model(L)
+                config_attribs['conv_to_superop'] = False
+            else:
+                if 'add_to_H_jump' in config_attribs:
+                    # add_to_H_jump should never be defined outside of the MCWF
+                    # method
+                    del config_attribs['add_to_H_jump']
+            for key, val in config_attribs.items():
+                self._config_data['dissipator'][-1][key] = val
             if pulse is not None:
                 self._config_data['dissipator'][-1]['pulse_id'] \
                 = self._pulse_ids[pulse]
