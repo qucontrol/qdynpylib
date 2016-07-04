@@ -152,7 +152,8 @@ class LevelModel(object):
 
 
     def add_observable(self, O, outfile, exp_unit, time_unit, col_label,
-            square=None, exp_surf=None, is_real=None):
+            square=None, exp_surf=None, is_real=None, in_lab_frame=False,
+            op_unit=None):
         """Add an observable
 
         Args:
@@ -162,7 +163,7 @@ class LevelModel(object):
             outfile (str): Name of output file to which to write expectation
                 values of `O`
             exp_unit (str): The unit in which to write the expectation value in
-                `outfile`
+                `outfile`, as well as the default value for `op_unit`
             time_unit (str):  The unit in which to write the time grid in
                 `outfile`
             col_label (str): The label for the column in `outfile` containing
@@ -170,10 +171,16 @@ class LevelModel(object):
             square (str or None): If not None, label for the column in
                 `outfile` containing the expectation value for the square of
                 `O`
-            exp_surf: The surface number the expectation value; only if `O` is
-                a string
-            is_real: Whether or not the expectation value is real. If not
-                given, this should be set automatically
+            exp_surf (int or None): The surface number the expectation value;
+                only if `O` is a string
+            is_real (bool or None): Whether or not the expectation value is
+                real. If not given, this is determined  automatically
+            in_lab_frame (bool): If True, indicates that the observable is
+                defined in the lab frame. When expectation values are
+                calculated, this should not be done with states in the rotating
+                frame.
+            op_unit (str or None): The unit in which the entries of `O` are
+                given. By default, this is the same as `exp_unit`.
         """
         self._observables.append(O)
         try:
@@ -202,6 +209,12 @@ class LevelModel(object):
             self._obs_config_attribs[-1]['square'] = square
         if exp_surf is not None:
             self._obs_config_attribs[-1]['exp_surf'] = exp_surf
+        if in_lab_frame:
+            self._obs_config_attribs[-1]['in_lab_frame'] = True
+        if op_unit is None:
+            self._obs_config_attribs[-1]['op_unit'] = exp_unit
+        else:
+            self._obs_config_attribs[-1]['op_unit'] = op_unit
 
     def add_lindblad_op(self, L, op_unit=None, sparsity_model=None,
             add_to_H_jump=None, **kwargs):
