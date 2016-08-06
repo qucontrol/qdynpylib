@@ -15,4 +15,4 @@ from . import memoize
 from . import config
 from . import model
 
-__version__ = "1.2.dev"
+__version__ = "0.1.4"
