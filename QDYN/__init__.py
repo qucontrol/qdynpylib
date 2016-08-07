@@ -1,5 +1,5 @@
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 from . import io
 from . import gate2q
 from . import weyl
@@ -13,5 +13,6 @@ from . import shutil
 from . import octutils
 from . import memoize
 from . import config
+from . import model
 
-__version__ = "1.1.0"
+__version__ = "0.2.0"

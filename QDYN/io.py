@@ -1,20 +1,19 @@
-"""
-Module containing routines for reading and writing files compatible with QDYN
-"""
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
-import numpy as np
+"""Routines for reading and writing files compatible with QDYN"""
+from __future__ import print_function, division, absolute_import
+
 import sys
 import re
 import os
-import scipy.sparse
-from click.utils import open_file
 # import for doctests
 from contextlib import contextmanager
 import tempfile
+import json
+
+import scipy.sparse
+import numpy as np
 import six
 from six.moves import xrange
-import json
+from click.utils import open_file
 
 
 @contextmanager
@@ -65,14 +64,14 @@ def tempinput(data, binary=False):
 
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
-header=None, hermitian=True):
+        header=None, hermitian=True):
     """
     Write the given matrix to file in indexed format (1-based indexing)
 
     Arguments
     ---------
 
-    matrix: numpy matrix, 2D ndarray, or any scipy sparse matrix
+    matrix: numpy matrix, 2D ndarray, qutip.Qobj, or any scipy sparse matrix
         Matrix to write to file
 
     filename: str
@@ -111,6 +110,9 @@ header=None, hermitian=True):
         return "%8d%8d%25.16E" % (i, j, v.real)
     def complex_formatter(i, j, v):
         return "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
+    if repr(matrix).startswith('Quantum object'):
+        # handle qutip Qobj (without importing the qutip package)
+        matrix = matrix.data
     if line_formatter is None:
         if np.iscomplexobj(matrix):
             line_formatter = complex_formatter
@@ -149,7 +151,7 @@ header=None, hermitian=True):
         # write data
         sparse_h = scipy.sparse.coo_matrix(matrix)
         for i_val in xrange(sparse_h.nnz):
-            i = sparse_h.row[i_val] + 1 # 1-based indexing
+            i = sparse_h.row[i_val] + 1  # 1-based indexing
             j = sparse_h.col[i_val] + 1
             v = sparse_h.data[i_val]
             if (not hermitian) or (j >= i):
@@ -161,7 +163,7 @@ header=None, hermitian=True):
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,
-expand_hermitian=True, val_real=False):
+        expand_hermitian=True, val_real=False):
     """
     Read in a matrix from the file with the given filename
 
@@ -247,7 +249,7 @@ expand_hermitian=True, val_real=False):
         val = np.zeros(nnz, dtype=np.complex128)
     l = 0
     for k in xrange(len(file_real_val)):
-        i = file_row[k] - 1 # adjust for zero-based indexing in Python
+        i = file_row[k] - 1  # adjust for zero-based indexing in Python
         j = file_col[k] - 1
         v = file_real_val[k]
         if not val_is_real:
@@ -265,11 +267,11 @@ expand_hermitian=True, val_real=False):
     if format == 'coo':
         return m
     else:
-        return getattr(m, 'to'+format)() # e.g. format='dense' -> m.todense()
+        return getattr(m, 'to'+format)()  # e.g. format='dense' -> m.todense()
 
 
 def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
-    out=None):
+        out=None):
     """
     Print a numpy complex matrix to screen, or to a file if outfile is given.
     Values below the given limit are printed as zero
@@ -333,9 +335,9 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     width = 9
     if fmt_m:
         width = int(fmt_m.group('width'))
-        zero_fmt   = '%' + ("%dd" % width)
-        zero_fmt   = "%s,%s" % (zero_fmt, zero_fmt)
-        zero = zero_fmt % (0,0)
+        zero_fmt = '%' + ("%dd" % width)
+        zero_fmt = "%s,%s" % (zero_fmt, zero_fmt)
+        zero = zero_fmt % (0, 0)
         small_fmt = '%' + ("%d.1f" % width)
         small = small_fmt % 0
     else:
@@ -374,23 +376,21 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
 
 
 def fix_fortran_exponent(num_str):
-    """
-    In 3-digit exponents, Fortran drops the 'E'. Return a string with the 'E'
-    restored.
+    """In 3-digit exponents, Fortran drops the 'E'. Return a string with the
+    'E' restored.
 
     >>> print(fix_fortran_exponent("1.0-100"))
     1.0E-100
     >>> print(fix_fortran_exponent("1.0E-99"))
     1.0E-99
     """
-    if not 'E' in num_str:
+    if 'E' not in num_str:
         return re.sub('(\d)([+-]\d)', r'\1E\2', num_str)
     return num_str
 
 
 def read_complex(str):
-    """
-    Convert a string to a complex number
+    """Convert a string to a complex number
 
     >>> read_complex("1.0 -2.0-100")
     (1-2e-100j)
@@ -401,13 +401,66 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
-def matrix_to_latex(M):
+def split_sup_sub(name):
+    """Split a (pseudo-) LaTeX string at top-level
+    subscripts/superscripts/groups
+
+    >>> assert split_sup_sub('CNOT') == ['CNOT', ]
+    >>> assert split_sup_sub('CNOT_system') == ['CNOT', '_system']
+    >>> assert split_sup_sub('A_1^2') == ['A', '_1', '^2']
+    >>> assert split_sup_sub('A_{1^2}^2') == ['A', '_{1^2}', '^2']
+    >>> assert split_sup_sub('^1A_1{B}') == ['^1A', '_1', '{B}']
+    >>> assert split_sup_sub('^1A_{1}B{C}') == ['^1A', '_{1}', 'B', '{C}']
+    >>> assert split_sup_sub('{A}B{C}') == ['{A}', 'B', '{C}']
+    """
+    parts = []
+    part = ''
+    bracelevel = 0
+    prev_letter = None
+    for letter in name:
+        if letter in ['^', '_']:
+            if (bracelevel == 0) and (len(part) > 0):
+                parts.append(part)
+                part = ''
+            part += letter
+        elif letter == "{":
+            if ((bracelevel == 0) and (len(part) > 0)
+                    and (prev_letter not in ['^', '_'])):
+                parts.append(part)
+                part = ''
+            bracelevel += 1
+            part += '{'
+        elif letter == "}":
+            bracelevel -= 1
+            if (bracelevel == 0) and (len(part) > 0):
+                parts.append(part+letter)
+                part = ''
+            else:
+                part += letter
+        else:
+            part += letter
+        prev_letter = letter
+    # rest of string
+    if len(part) > 0:
+        parts.append(part)
+    return parts
+
+
+def matrix_to_latex(M, name=None):
     r"""
     Return matrix M as LaTeX Code
 
     >>> from . gate2q import CNOT
     >>> print(matrix_to_latex(CNOT))
     \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 \\
+    \end{pmatrix}
+
+    >> print(matrix_to_latex(CNOT, name='CNOT'))
+    CNOT = \begin{pmatrix}
     1 & 0 & 0 & 0 \\
     0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 1 \\
@@ -422,7 +475,10 @@ def matrix_to_latex(M):
         entries = [latex(nsimplify(v)) for v in line]
         lines.append(" & ".join(entries) + r' \\')
     lines.append(r'\end{pmatrix}')
-    return "\n".join(lines)
+    if name is None:
+        return "\n".join(lines)
+    else:
+        return name + " = " + "\n".join(lines)
 
 
 def mathematica_number(val):

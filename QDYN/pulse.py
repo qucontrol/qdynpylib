@@ -1,173 +1,153 @@
 """
 Working with (real-valued) pulses
 """
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
+from collections import OrderedDict
+import re
+import logging
+
 import numpy as np
 from numpy.fft import fftfreq, fft
 from matplotlib.gridspec import GridSpec
 import matplotlib.pyplot as plt
 from scipy import signal
 import scipy.fftpack
-import re
-import logging
+from scipy.interpolate import UnivariateSpline
 from six.moves import xrange
 
-from .units import NumericConverter
-convert = NumericConverter()
-
+from .units import UnitConvert, UnitFloat
+from .linalg import reg_diff
 
 class Pulse(object):
-    """
-    Class describing Pulse
+    """Numerical real or complex control pulse
 
-    Attributes
-    ----------
+    Arguments:
 
-    tgrid : ndarray(float64)
-        time points at which the pulse values are defined
-    amplitude : ndarray(float64), ndarray(complex128)
-        array of real or complex pulse values
-    filename : str
-        Name of file from which pulse was read (if any). Also default name of
-        file to which the pulse will be written.
-    mode : str
-        How to write the pulse values to file. Can be `complex`, `real`, or
-        `abs`. There will be three columns in the file for `mode='complex'`,
-        and two columns for `mode='real'` or `mode='abs'`
-    time_unit : str
-        Unit of values in `tgrid`
-    ampl_unit : str
-        Unit of values in `amplitude`
-    freq_unit : str
-        Unit to use for frequency when calculating the spectrum
-    dt : scalar
-        Time step (in `time_unit`)
-    preamble  : array
-        Array of lines that are written before the header when writing the
-        pulse to file. Each line should start with '# '
-    postamble : array
-        Array of lines that are written after all data lines. Each line
-        should start with '# '
+        tgrid (ndarray(float64)):
+            Time grid values
+        amplitude (ndarray(float64), ndarray(complex128)):
+            Amplitude values. If not given, amplitude will be zero
+        time_unit (str): Unit of values in `tgrid`. Will be ignored when
+            reading from file.
+        ampl_unit (str): Unit of values in `amplitude`. Will be ignored when
+            reading from file.
+        freq_unit (str): Unit of frequencies when calculating spectrum. If not
+            given, an appropriate unit based on `time_unit` will be chosen, if
+            possible (or a `TypeError` will be raised.
+        mode (str): Value the `mode` attribute.
 
-    Notes and examples
-    ------------------
+    Attributes:
 
-    It is important to remember that the QDYN Fortran library considers pulses
-    to be defined on the intervals of the propagation time grid (i.e. for a
-    time grid with n time steps of dt, the pulse will have n-1 points, defined
-    at points shifted by dt/2)
+        tgrid (ndarray(float64)): time points at which the pulse values are
+            defined
+        amplitude (ndarray(float64), ndarray(complex128)): array of real or
+            complex pulse values
+        mode (str): How to write the pulse values to file. Can be ``complex``,
+            ``real``, or ``abs``. There will be three columns in the file for
+            ``mode='complex'``, and two columns for ``mode='real'`` or
+            ``mode='abs'``
+        time_unit (str): Unit of values in `tgrid`
+        ampl_unit (str): Unit of values in `amplitude`
+        freq_unit (str): Unit to use for frequency when calculating the
+            spectrum
+        dt (scalar): Time step (in `time_unit`)
+        preamble (array): Array of lines that are written before the header
+            when writing the pulse to file. Each line should start with '# '
+        postamble (array): Array of lines that are written after all data
+            lines. Each line should start with '# '
+        config_attribs (dict): Additional config data, for the `config_line`
+            method (e.g. `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
 
-    The `pulse_tgrid` and `tgrid_from_config` routine may be used to obtain the
-    proper pulse time grid from the propagation time grid, whereas the
-    `config_tgrid` attribute provides the inverse
+    Class Attributes:
+        unit_convert (QDYN.units.UnitConvert): converter to be used for any
+            unit conversion within any methods
 
-    >>> import numpy as np
-    >>> p = Pulse(tgrid=pulse_tgrid(10, 100))
-    >>> len(p.tgrid)
-    99
-    >>> print("%.5f" % p.dt)
-    0.10101
-    >>> p.t0
-    0.0
-    >>> print("%.5f" % p.tgrid[0])
-    0.05051
-    >>> print("%.5f" % p.T)
-    10.00000
-    >>> print("%.5f" % p.tgrid[-1])
-    9.94949
-    >>> print(p.config_tgrid)
-    tgrid: n = 1
-     1: t_start = 0_au, t_stop = 10_au, nt = 100
-    """
-
-    def __init__(self, filename=None, tgrid=None, amplitude=None,
-                 time_unit='au', ampl_unit='au', freq_unit=None,
-                 mode='complex'):
-        """
-        Initialize a pulse, either from a file or by explicitly passing the
-        data.
+    Example:
 
         >>> tgrid = pulse_tgrid(10, 100)
         >>> amplitude = 100 * gaussian(tgrid, 50, 10)
         >>> p = Pulse(tgrid=tgrid, amplitude=amplitude, time_unit='ns',
         ...           ampl_unit='MHz')
         >>> p.write('pulse.dat')
-        >>> p2 = Pulse('pulse.dat')
+        >>> p2 = Pulse.read('pulse.dat')
         >>> from os import unlink; unlink('pulse.dat')
 
-        Arguments
-        ---------
-        filename : None, str
-            Name of file from which to read pulse. If given, `tgrid`,
-            `amplitude`, `time_unit`, `ampl_unit`, `mode` are ignored.
-        tgrid : None, ndarray(float64)
-            Time grid values
-        amplitude : None, ndarray(float64), ndarray(complex128)
-            Amplitude values. If not given, amplitude will be zero
-        time_unit : str
-            Unit of values in `tgrid`. Will be ignored when reading from file.
-        ampl_unit : str
-            Unit of values in `amplitude`. Will be ignored when reading from
-            file.
-        freq_unit : str
-            Unit of frequencies when calculating spectrum. If not given, an
-            appropriate unit based on `time_unit` will be chosen
-        mode : str
-            Value the `mode` attribute (indicating format of file when pulse is
-            written out
-        """
-        if filename is None:
-            assert (tgrid is not None), \
-            "Either filename or tgrid must be present"
-            tgrid = np.array(tgrid, dtype=np.float64)
-            if amplitude is None:
-                amplitude = np.zeros(len(tgrid))
-            if mode == 'complex':
-                amplitude = np.array(amplitude, dtype=np.complex128)
-            else:
-                amplitude = np.array(amplitude, dtype=np.float64)
-            self.filename = None
+    Notes:
+
+        It is important to remember that the QDYN Fortran library considers
+        pulses to be defined on the intervals of the propagation time grid
+        (i.e. for a time grid with n time steps of dt, the pulse will have n-1
+        points, defined at points shifted by dt/2)
+
+        The `pulse_tgrid` and `tgrid_from_config` routine may be used to obtain
+        the proper pulse time grid from the propagation time grid.
+
+        >>> import numpy as np
+        >>> p = Pulse(tgrid=pulse_tgrid(10, 100), ampl_unit='MHz',
+        ...           time_unit='ns')
+        >>> len(p.tgrid)
+        99
+        >>> print(str(p.dt))
+        0.10101_ns
+        >>> p.t0
+        0
+        >>> print("%.5f" % p.tgrid[0])
+        0.05051
+        >>> print(str(p.T))
+        10_ns
+        >>> print("%.5f" % p.tgrid[-1])
+        9.94949
+    """
+    unit_convert = UnitConvert()
+
+    def __init__(self, tgrid, amplitude=None, time_unit=None, ampl_unit=None,
+                freq_unit=None, mode='complex'):
+        tgrid = np.array(tgrid, dtype=np.float64)
+        if amplitude is None:
+            amplitude = np.zeros(len(tgrid))
+        if mode == 'complex':
+            amplitude = np.array(amplitude, dtype=np.complex128)
         else:
-            self.filename = None
-            assert tgrid is None and amplitude is None, \
-            "Either filename or tgrid and amplitude must be present"
+            amplitude = np.array(amplitude, dtype=np.float64)
         self.tgrid = tgrid
         self.amplitude = amplitude
         self.mode = mode
-        self.time_unit = time_unit
-        self.ampl_unit = ampl_unit
-        self.freq_unit = 'au'
+        if time_unit is None:
+            raise TypeError("time_unit must be given as a string")
+        else:
+            self.time_unit = time_unit
+        if ampl_unit is None:
+            raise TypeError("ampl_unit must be given as a string")
+        else:
+            self.ampl_unit = ampl_unit
 
         self.preamble = []
         self.postamble = []
-        if filename is not None:
-            self.read(filename)
+        self.config_attribs = OrderedDict({})
 
         freq_units = { # map time_unit to most suitable freq_unit
             'ns' : 'GHz',
             'ps' : 'cminv',
             'fs' : 'eV',
             'microsec' : 'MHz',
+            'au' : 'au',
         }
-        try:
-            self.freq_unit = freq_units[self.time_unit]
-        except KeyError:
-            self.freq_unit = 'au'
-        if freq_unit is not None:
-            self.freq_unit = freq_unit
-
+        self.freq_unit = freq_unit
+        if freq_unit is None:
+            try:
+                self.freq_unit = freq_units[self.time_unit]
+            except KeyError:
+                raise TypeError("freq_unit must be specified")
         self._check()
 
     def _check(self):
-        """
-        Check self-consistency of pulse
-        """
+        """Assert self-consistency of pulse"""
         logger = logging.getLogger(__name__)
         assert self.tgrid is not None, "Pulse is not initialized"
         assert self.amplitude is not None, "Pulse is not initialized"
-        assert type(self.tgrid) == np.ndarray, "tgrid must be numpy array"
-        assert type(self.amplitude) == np.ndarray, \
+        assert isinstance(self.tgrid, np.ndarray), "tgrid must be numpy array"
+        assert isinstance(self.amplitude, np.ndarray), \
         "amplitude must be numpy array"
         assert self.tgrid.dtype.type is np.float64, \
         "tgrid must be double precision"
@@ -177,27 +157,50 @@ class Pulse(object):
         "length of tgrid and amplitudes do not match"
         assert self.mode in ['complex', 'abs', 'real'], \
         "Illegal value for mode: %s" % self.mode
-        assert self.ampl_unit in convert.au_convfactors.keys(), \
+        assert self.ampl_unit in self.unit_convert.units, \
         "Unknown ampl_unit %s" % self.ampl_unit
-        assert self.time_unit in convert.au_convfactors.keys(), \
+        assert self.time_unit in self.unit_convert.units, \
         "Unknown time_unit %s" % self.time_unit
-        assert self.freq_unit in convert.au_convfactors.keys(), \
+        assert self.freq_unit in self.unit_convert.units, \
         "Unknown freq_unit %s" % self.freq_unit
         if self.mode == 'real':
             if np.max(np.abs(self.amplitude.imag)) > 0.0:
-                logger.warn("mode is 'real', but pulse has non-zero imaginary "
-                            "part")
+                logger.warning("mode is 'real', but pulse has non-zero "
+                               "imaginary part")
 
-
-    def read(self, filename):
+    @classmethod
+    def read(cls, filename, time_unit=None, ampl_unit=None, freq_unit=None,
+            ignore_header=False):
         """
         Read a pulse from file, in the format generated by the QDYN
-        `write_pulse` routine.
+        ``write_pulse`` routine.
 
-        Notes
-        -----
+        Parameters:
 
-        The `write` method allows to restore *exactly* the original pulse file
+            filename (str): Path and name of file from which to read the pulse
+            time_unit (str or None): The unit of the time grid
+            ampl_unit (str or None): The unit of the pulse amplitude.
+            freq_unit (str or None): Intended value for the `freq_unit`
+                attribute. If None, a `freq_unit` will be chosen automatically,
+                if possible (or a `TypeError` will be raised)
+            ignore_header (bool): If True, the file header will be ignored.
+
+        Note:
+
+            By default, the file is assumed to contain a header that
+            identifies the columns and their units, as a comment line
+            immediately preceding the data. If `time_unit` or `ampl_unit` are
+            None, and `ignore_header` is False, the respective unites are
+            extracted from the header line. If `time_unit` or `ampl_unit` are
+            not None, the respective values will be converted from the unit
+            specified in the file header. If `ignore_header` is True, both
+            `time_unit` and `ampl_unit` must be given. This can be used to read
+            in pulses that were not generated by the QDYN ``write_pulse``
+            routine.  Note that if `ignore_header` is True, *all* comment lines
+            preceding the data will be included in the `preamble` attribute.
+
+            The `write` method allows to restore *exactly* the original pulse
+            file.
         """
         logger = logging.getLogger(__name__)
         header_rx = {
@@ -220,106 +223,119 @@ class Pulse(object):
         except ValueError:
             t, x = np.genfromtxt(filename, unpack=True, dtype=np.float64)
             y = None
+        preamble = []
+        postamble = []
         with open(filename) as in_fh:
             in_preamble = True
             for line in in_fh:
                 if line.startswith('#'):
                     if in_preamble:
-                        self.preamble.append(line.strip())
+                        preamble.append(line.strip())
                     else:
-                        self.postamble.append(line.strip())
+                        postamble.append(line.strip())
                 else:
                     if in_preamble:
                         in_preamble = False
             # the last line of the preamble *must* be the header line. We will
-            # process it and remove it from self.preamble
-            try:
-                header_line = self.preamble.pop()
-                found_mode = False
-                for mode, pattern in header_rx.items():
+            # process it and remove it from preamble
+            mode = None
+            file_time_unit = None
+            file_ampl_unit = None
+            if not ignore_header:
+                try:
+                    header_line = preamble.pop()
+                except IndexError:
+                    raise IOError("Pulse file does not contain a preamble")
+                for file_mode, pattern in header_rx.items():
                     match = pattern.match(header_line)
                     if match:
-                        self.mode = mode
-                        self.time_unit = match.group('time_unit')
-                        self.ampl_unit = match.group('ampl_unit')
-                        found_mode = True
+                        mode = file_mode
+                        file_time_unit = match.group('time_unit')
+                        file_ampl_unit = match.group('ampl_unit')
                         break
-                if not found_mode:
-                    logger.warn("Non-standard header in pulse file."
-                                "Check that pulse was read with correct units")
+                if mode is None:
+                    logger.warning("Non-standard header in pulse file."
+                            "Check that pulse was read with correct units")
                     if y is None:
-                        self.mode = 'abs'
+                        mode = 'abs'
                     else:
-                        self.mode = 'complex'
+                        mode = 'complex'
                     free_pattern = re.compile(r'''
                     ^\# .* \[\s*(?P<time_unit>\w+)\s*\]
                         .* \[\s*(?P<ampl_unit>\w+)\s*\]''', re.X)
                     match = free_pattern.search(header_line)
                     if match:
-                        self.time_unit = match.group('time_unit')
-                        self.ampl_unit = match.group('ampl_unit')
-                        logger.info("Set time_unit = %s", self.time_unit)
-                        logger.info("Set ampl_unit = %s", self.ampl_unit)
-                    else:
-                        logger.warn("Could not identify units. Setting to "
-                                    "atomic units.")
-                        self.time_unit = 'au'
-                        self.ampl_unit = 'au'
-            except IndexError:
-                raise IOError("Pulse file does not contain a preamble")
-        self.tgrid = t
-        if self.mode == 'abs':
-            self.amplitude = x
-        elif self.mode == 'real':
-            self.amplitude = x
-        elif self.mode == 'complex':
-            self.amplitude = x + 1j * y
+                        file_time_unit = match.group('time_unit')
+                        file_ampl_unit = match.group('ampl_unit')
+                        logger.info("Identify time_unit = %s", file_time_unit)
+                        logger.info("Identify ampl_unit = %s", file_ampl_unit)
+                if file_time_unit is None or file_ampl_unit is None:
+                    raise ValueError("Could not identify units from header")
+
+        if mode == 'abs':
+            amplitude = x
+        elif mode == 'real':
+            amplitude = x
+        elif mode == 'complex':
+            amplitude = x + 1j * y
         else:
             raise ValueError("mode must be 'abs', 'real', or 'complex'")
-        self._check()
+
+        if not ignore_header:
+            if time_unit is None:
+                time_unit = file_time_unit
+            else:
+                t = cls.unit_convert.convert(t, file_time_unit, time_unit)
+            if ampl_unit is None:
+                ampl_unit = file_ampl_unit
+            else:
+                amplitude = cls.unit_convert.convert(
+                                amplitude, file_ampl_unit, ampl_unit)
+
+        pulse = cls(tgrid=t, amplitude=amplitude, time_unit=time_unit,
+                    ampl_unit=ampl_unit, freq_unit=freq_unit, mode=mode)
+        pulse.preamble = preamble
+        pulse.postamble = postamble
+        return pulse
 
     @property
     def dt(self):
-        """
-        Time grid step
-        """
-        return self.tgrid[1] - self.tgrid[0]
+        """Time grid step, as instance of `UnitFloat`"""
+        return UnitFloat(self.tgrid[1] - self.tgrid[0], unit=self.time_unit)
 
     @property
     def t0(self):
+        """Time at which the pulse begins (dt/2 before the first point in the
+        pulse), as instance of `UnitFloat`
         """
-        Time at which the pulse begins (dt/2 before the first point in the
-        pulse)
-        """
-        result = self.tgrid[0] - 0.5 * self.dt
+        result = self.tgrid[0] - 0.5 * float(self.dt)
         if abs(result) < 1.0e-15*self.tgrid[-1]:
             result = 0.0
-        return result
+        return UnitFloat(result, self.time_unit)
 
-    def w_max(self, freq_unit=None):
+    @property
+    def w_max(self):
+        """Maximum frequency that can be represented with the
+        current sampling rate.
         """
-        Return the maximum frequency that can be represented with the current
-        sampling rate
-        """
-        if freq_unit is None:
-            freq_unit = self.freq_unit
         n = len(self.tgrid)
-        dt = convert.to_au(self.dt, self.time_unit)
+        dt = float(self.unit_convert.convert(self.dt, self.time_unit, 'iu'))
         if n % 2 == 1:
             # odd
             w_max = ((n - 1) * np.pi) / (n * dt)
         else:
             # even
             w_max = np.pi / dt
-        return convert.from_au(w_max, freq_unit)
+        return self.unit_convert.convert(w_max, 'iu', self.freq_unit)
 
-    def dw(self, freq_unit=None):
-        """
-        Return the step width in the spectrum (i.e. the spectral resolution)
-        based on the current pulse duration
+    @property
+    def dw(self):
+        """Step width in the spectrum (i.e. the spectral resolution)
+        based on the current pulse duration, as an instance of
+        :obj:`UnitFloat`.
         """
         n = len(self.tgrid)
-        w_max = self.w_max(freq_unit)
+        w_max = self.w_max
         if n % 2 == 1:
             # odd
             return  2.0 * w_max / float(n-1)
@@ -329,38 +345,23 @@ class Pulse(object):
 
     @property
     def T(self):
+        """Time at which the pulse ends (dt/2 after the last point in the
+        pulse), as an instance of :obj:`UnitFloat`
         """
-        Time at which the pulse ends (dt/2 after the last point in the pulse)
-        """
-        result = self.tgrid[-1] + 0.5 * self.dt
+        result = self.tgrid[-1] + 0.5 * float(self.dt)
         if abs(round(result) - result) < (1.0e-15 * result):
             result = round(result)
-        return result
-
-    @property
-    def config_tgrid(self):
-        """
-        Multiline string describing a time grid in a QDYN config file
-        that is appropriate to the pulse
-        """
-        unit = self.time_unit
-        nt = len(self.tgrid) + 1
-        result = ['tgrid: n = 1',]
-        result.append(' 1: t_start = %g_%s, t_stop = %g_%s, nt = %d'
-                      % (self.t0, unit, self.T, unit, nt))
-        return "\n".join(result)
+        return UnitFloat(result, unit=self.time_unit)
 
     def convert(self, time_unit=None, ampl_unit=None, freq_unit=None):
         """Convert the pulse data to different units"""
-        if not time_unit is None:
-            c = convert.to_au(1, self.time_unit) \
-                * convert.from_au(1, time_unit)
-            self.tgrid *= c
+        if time_unit is not None:
+            factor = self.unit_convert.convert(1.0, self.time_unit, time_unit)
+            self.tgrid *= factor
             self.time_unit = time_unit
-        if not ampl_unit is None:
-            c = convert.to_au(1, self.ampl_unit) \
-                * convert.from_au(1, ampl_unit)
-            self.amplitude *= c
+        if ampl_unit is not None:
+            factor = self.unit_convert.convert(1.0, self.ampl_unit, ampl_unit)
+            self.amplitude *= factor
             self.ampl_unit = ampl_unit
         if not freq_unit is None:
             self.freq_unit = freq_unit
@@ -369,13 +370,13 @@ class Pulse(object):
     @property
     def is_complex(self):
         """Does any element of the pulse amplitude have a non-zero imaginary
-        part"""
-        return (np.max(np.abs(self.amplitude.imag)) > 0.0)
+        part
+        """
+        return np.max(np.abs(self.amplitude.imag)) > 0.0
 
     def get_timegrid_point(self, t, move="left"):
-        """
-        Return the next point to the left (or right) of the given `t` which is
-        on the pulse time grid
+        """Return the next point to the left (or right) of the given `t` which
+        is on the pulse time grid
         """
         t_start = self.tgrid[0]
         t_stop = self.tgrid[-1]
@@ -392,19 +393,16 @@ class Pulse(object):
 
     @property
     def fluence(self):
-        """
-        Fluence (integrated pulse energy) for the pulse
+        """Fluence (integrated pulse energy) for the pulse
 
         .. math:: \\int_{-\\infty}^{\\infty} \\vert|E(t)\\vert^2 dt
         """
-        return np.sum(self.amplitude**2) * self.dt
+        return np.sum(self.amplitude**2) * float(self.dt)
 
     @property
     def oct_iter(self):
-        """
-        OCT iteration number from the pulse preamble, if available. If not
-        available, 0
-        """
+        """OCT iteration number from the pulse preamble, if available. If not
+        available, 0"""
         iter_rx = re.compile(r'OCT iter[\s:]*(\d+)', re.I)
         for line in self.preamble:
             iter_match = iter_rx.search(line)
@@ -413,38 +411,32 @@ class Pulse(object):
         return 0
 
     def spectrum(self, freq_unit=None, mode='complex', sort=False):
-        """
-        Calculate the spectrum of the pulse
+        """Calculate the spectrum of the pulse
 
-        Parameters
-        ----------
+        Parameters:
 
-        freq_unit : str, optional
-            Desired unit of the `freq` output array. Can Hz (GHz, Mhz, etc) to
-            obtain frequencies, or any energy unit, using the correspondence
-            `f = E/h`. If not given, defaults to the `freq_unit` attribtue
-        mode : str, optional
-            Wanted mode for `spectrum` output array.
-            Possible values are 'complex', 'abs', 'real', 'imag'
-        sort : bool, optional
-            Sort the output `freq` array (and the output `spectrum` array) so
-            that frequecies are ordered from `-w_max .. 0 .. w_max`, instead of
-            the direct output from the FFT. This is good for plotting, but does
-            not allow to do an inverse Fourier transform afterwards
+            freq_unit (str, optional): Desired unit of the `freq` output array.
+                Can Hz (GHz, Mhz, etc) to obtain frequencies, or any energy
+                unit, using the correspondence ``f = E/h``. If not given,
+                defaults to the `freq_unit` attribtue
+            mode (str, optional): Wanted mode for `spectrum` output array.
+                Possible values are 'complex', 'abs', 'real', 'imag'
+            sort (bool, optional): Sort the output `freq` array (and the output
+                `spectrum` array) so that frequecies are ordered from
+                ``-w_max .. 0 .. w_max``, instead of the direct output from the
+                FFT. This is good for plotting, but does not allow to do an
+                inverse Fourier transform afterwards
 
-        Returns
-        -------
+        Returns:
 
-        freq : ndarray(float64)
-            Frequency values associated with the amplitude values in
-            `spectrum`, i.e. the x-axis of the spectrogram. The values are in
-            the unit `freq_unit`
-        spectrum : ndarray(float64), ndarray(complex128)
-            Real (`mode in ['abs', 'real', 'imag']`) or complex
-            (`mode='complex'`) amplitude of each frequency component
+            freq (ndarray(float64)): Frequency values associated with the
+                amplitude values in `spectrum`, i.e. the x-axis of the
+                spectrogram. The values are in the unit `freq_unit`
+            spectrum (ndarray(float64), ndarray(complex128)):
+                Real (`mode in ['abs', 'real', 'imag']`) or complex
+                (`mode='complex'`) amplitude of each frequency component
 
-        Notes
-        -----
+        Notes:
 
             If `sort=False` and `mode='complex'`, the original pulse
             values can be obtained by simply calling `np.fft.ifft`
@@ -457,11 +449,10 @@ class Pulse(object):
             freq_unit = self.freq_unit
         s = fft(self.amplitude) # spectrum amplitude
         n = len(self.amplitude)
-        dt = self.dt
-        dt = convert.to_au(dt, self.time_unit)
-        f = fftfreq(n, d=dt/(2.0*np.pi)) # spectrum frequencies
-        c = convert.from_au(1, freq_unit)
-        f *= c # convert to desired unit
+        dt = float(self.unit_convert.convert(self.dt, self.time_unit, 'iu'))
+        f = self.unit_convert.convert(
+                fftfreq(n, d=dt/(2.0*np.pi)), # spectrum frequencies
+                'iu', freq_unit)
         modifier = {
             'abs'    : lambda s: np.abs(s),
             'real'   : lambda s: np.real(s),
@@ -475,43 +466,95 @@ class Pulse(object):
         return f, modifier[mode](s)
 
     def derivative(self):
-        """
-        Calculate the derivative of the current pulse and return it as a new
-        pulse. Note that derivative is in units of `ampl_unit`/`time_unit`.
+        """Calculate the derivative of the current pulse and return it as a new
+        pulse. Note that the derivative is in units of `ampl_unit`/`time_unit`,
+        but will be marked as 'unitless'.
         """
         self._unshift()
         T = self.tgrid[-1] - self.tgrid[0]
         deriv = scipy.fftpack.diff(self.amplitude) * (2.0*np.pi / T)
         deriv_pulse = Pulse(tgrid=self.tgrid, amplitude=deriv,
-                            time_unit=self.time_unit, ampl_unit=self.ampl_unit)
+                            time_unit=self.time_unit, ampl_unit='unitless')
         self._shift()
         deriv_pulse._shift()
         return deriv_pulse
 
-    def write(self, filename=None, mode=None):
+    def phase(self, unwrap=False, s=None, derivative=False, freq_unit=None,
+            reg_alph=None, reg_itern=100):
+        """Return the pulse's complex phase, or derivative of the phase
+
+        Parameters:
+            unwrap (bool): If False, report the phase in ``[-pi:pi]``. If True,
+                the phase may take any real value, avoiding the discontinuous
+                jumps introduced by limiting the phase to a 2 pi interval.
+            s (float or None): smoothing parameter, see
+                :cls:`scipy.interpolate.UnivariateSpline`. If None, no
+                smoothing is performed.
+            derivative (bool): If False, return the (smoothed) phase directly.
+                If True, return the derivative of the (smoothed) phase.
+            freq_unit (str or None): If `derivative` is True, the unit in which
+                the derivative should be calculated. If None, `self.freq_unit`
+                is used.
+            reg_alph (float or None): If not None, and ``derivative=True``,
+                `ignore the paremters `s` and instead use regularized
+                differentiation (see `alph` in :func:`~QDYN.linalg.reg_diff`).
+            reg_itern (int): If using regularized differntiation, number of
+                iterations to perform (see `itern` in
+                :func:`~QDYN.linalg.reg_diff`)
+
+        Note:
+            When calculating the derivative, some smoothing is generally
+            required. There are two possibilities. Either the smoothing
+            parameters `s` should be given, in which case the phase is smoothed
+            before calculating the derivative. Alternatively, regularized
+            differentiation can be used, by giving a value to `reg_alpha`.
+
+            When calculating the phase directly (instead of the derivative),
+            smoothing should only be used when also unwrapping the phase.
         """
-        Write a pulse to file, in the same format as the QDYN `write_pulse`
+
+        phase = np.angle(self.amplitude)
+        if unwrap or derivative:
+            phase = np.unwrap(phase)
+
+        tgrid = self.unit_convert.convert(self.tgrid, self.time_unit, 'iu')
+
+        if derivative:
+
+            if freq_unit is None:
+                freq_unit = self.freq_unit
+            if reg_alph is None: # smoothed spline differentiation
+                if s is None:
+                    s = 1
+                spl = UnivariateSpline(tgrid, phase, s=s)
+                deriv = spl.derivative()(tgrid)
+            else:
+                deriv = reg_diff(phase, itern=reg_itern, alph=reg_alph,
+                                 dx=tgrid[1]-tgrid[0])
+            return self.unit_convert.convert(deriv, 'iu', self.freq_unit)
+
+        else: # direct phase
+
+            if s is not None:
+                spl = UnivariateSpline(tgrid, phase, s=s)
+                return spl(tgrid)
+            else:
+                return phase
+
+    def write(self, filename, mode=None):
+        """Write a pulse to file, in the same format as the QDYN `write_pulse`
         routine
 
-        Parameters
-        ----------
+        Parameters:
 
-        filename : str, optional
-            Name of file to which to write the pulse
-        mode : str, optional
-           Mode in which to write files. Possible values are 'abs', 'real', or
-           'complex'. The former two result in a two-column file, the latter in
-           a three-column file. If not given, the value of the `mode` attribute
-           is used.
+            filename (str, optional): Name of file to which to write the pulse
+            mode (str, optional): Mode in which to write files. Possible values
+                are 'abs', 'real', or 'complex'. The former two result in a
+                two-column file, the latter in a three-column file. If not
+                given, the value of the `mode` attribute is used.
         """
         if mode is None:
             mode = self.mode
-        if filename is None:
-            filename = self.filename
-        if filename is None:
-            raise ValueError("You must give a filename to write the pulse, "
-            "either by setting the filename attribute or by passing a "
-            "filename to the write method")
         self._check()
         preamble = self.preamble
         if not hasattr(preamble, '__getitem__'):
@@ -519,53 +562,66 @@ class Pulse(object):
         postamble = self.postamble
         if not hasattr(postamble, '__getitem__'):
             postamble = [str(postamble), ]
-        with open(filename, 'w') as out_fh:
-            # preamble
-            for line in preamble:
-                line = str(line).strip()
-                if line.startswith('#'):
-                    print(line, file=out_fh)
-                else:
-                    print('# ', line, file=out_fh)
-            # header and data
-            time_header     = "time [%s]" % self.time_unit
-            ampl_re_header  = "Re(ampl) [%s]" % self.ampl_unit
-            ampl_im_header  = "Im(ampl) [%s]" % self.ampl_unit
-            ampl_abs_header = "Abs(ampl) [%s]" % self.ampl_unit
-            if mode == 'abs':
-                print("# %23s%25s" % (time_header, ampl_abs_header),
-                      file=out_fh)
-                for i, t in enumerate(self.tgrid):
-                    print("%25.17E%25.17E" % (t, abs(self.amplitude[i])),
-                          file=out_fh)
-            elif mode == 'real':
-                print("# %23s%25s" % (time_header, ampl_re_header),
-                      file=out_fh)
-                for i, t in enumerate(self.tgrid):
-                    print("%25.17E%25.17E" % (t, self.amplitude.real[i]),
-                          file=out_fh)
-            elif mode == 'complex':
-                print("# %23s%25s%25s" % (time_header, ampl_re_header,
-                      ampl_im_header), file=out_fh)
-                for i, t in enumerate(self.tgrid):
-                    print("%25.17E%25.17E%25.17E" % (t, self.amplitude.real[i],
-                          self.amplitude.imag[i]), file=out_fh)
+        buffer = ''
+        # preamble
+        for line in preamble:
+            line = str(line).strip()
+            if line.startswith('#'):
+                buffer += "%s\n" % line
             else:
-                raise ValueError("mode must be 'abs', 'real', or 'complex'")
-            # postamble
-            for line in self.postamble:
-                line = str(line).strip()
-                if line.startswith('#'):
-                    print(line, file=out_fh)
-                else:
-                    print('# ', line, file=out_fh)
+                buffer +='# %s\n' % line
+        # header and data
+        time_header     = "time [%s]" % self.time_unit
+        ampl_re_header  = "Re(ampl) [%s]" % self.ampl_unit
+        ampl_im_header  = "Im(ampl) [%s]" % self.ampl_unit
+        ampl_abs_header = "Abs(ampl) [%s]" % self.ampl_unit
+        if mode == 'abs':
+            buffer += "# %23s%25s\n" % (time_header, ampl_abs_header)
+            for i, t in enumerate(self.tgrid):
+                buffer += "%25.17E%25.17E\n" % (t, abs(self.amplitude[i]))
+        elif mode == 'real':
+            buffer += "# %23s%25s\n" % (time_header, ampl_re_header)
+            for i, t in enumerate(self.tgrid):
+                buffer += "%25.17E%25.17E\n" % (t, self.amplitude.real[i])
+        elif mode == 'complex':
+            buffer += "# %23s%25s%25s\n" % (time_header, ampl_re_header,
+                        ampl_im_header)
+            for i, t in enumerate(self.tgrid):
+                buffer += "%25.17E%25.17E%25.17E\n" \
+                                % (t, self.amplitude.real[i],
+                                    self.amplitude.imag[i])
+        else:
+            raise ValueError("mode must be 'abs', 'real', or 'complex'")
+        # postamble
+        for line in self.postamble:
+            line = str(line).strip()
+            if line.startswith('#'):
+                buffer += "%s\n" % line
+            else:
+                buffer += '# %s' % line
+
+        with open(filename, 'w') as out_fh:
+            out_fh.write(buffer)
+
+    def config_line(self, filename, pulse_id, label=''):
+        """Return an OrderedDict of attributes for a config file line
+        describing the pulse"""
+        result = OrderedDict(self.config_attribs)
+        result.update(OrderedDict([
+            ('type', 'file'), ('filename', filename), ('id', pulse_id),
+            ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
+        if label != '':
+            result['label'] = label
+        if self.is_complex:
+            result['is_complex'] = True
+        return result
 
     def _unshift(self):
-        """
-        Move the pulse onto the unshifted time grid. This increases the number
+        """Move the pulse onto the unshifted time grid. This increases the number
         of points by one
         """
-        tgrid_new = np.linspace(self.t0, self.T, len(self.tgrid)+1)
+        tgrid_new = np.linspace(float(self.t0), float(self.T),
+                                len(self.tgrid)+1)
         pulse_new = np.zeros(len(self.amplitude)+1,
                              dtype=self.amplitude.dtype.type)
         pulse_new[0] = self.amplitude[0]
@@ -576,55 +632,54 @@ class Pulse(object):
         self.amplitude = pulse_new
         self._check()
 
-    def _shift(self):
-        """
-        Inverse of _unshift
-        """
-        dt = self.dt
+    def _shift(self, data=None):
+        """Inverse of _unshift"""
+        dt = float(self.dt)
         tgrid_new = np.linspace(self.tgrid[0]  + dt/2.0,
                                 self.tgrid[-1] - dt/2.0, len(self.tgrid)-1)
-        pulse_new = np.zeros(len(self.amplitude)-1,
-                             dtype=self.amplitude.dtype.type)
-        pulse_new[0] = self.amplitude[0]
-        for i in xrange(1, len(pulse_new)-1):
-            pulse_new[i] = 2.0 * self.amplitude[i] - pulse_new[i-1]
-        pulse_new[-1] = self.amplitude[-1]
-        self.tgrid     = tgrid_new
-        self.amplitude = pulse_new
-        self._check()
+        if data is None:
+            data_old = self.amplitude
+        else:
+            data_old = data
+        data_new = np.zeros(len(data_old)-1, dtype=data_old.dtype.type)
+        data_new[0] = data_old[0]
+        for i in xrange(1, len(data_new)-1):
+            data_new[i] = 2.0 * data_old[i] - data_new[i-1]
+        data_new[-1] = data_old[-1]
+        if data is None:
+            self.tgrid     = tgrid_new
+            self.amplitude = data_new
+            self._check()
+        else:
+            return data_new
 
     def resample(self, upsample=None, downsample=None, num=None, window=None):
         """
         Resample the pulse, either by giving an upsample ratio, a downsample
         ration, or a number of sampling points
 
-        Parameters
-        ----------
+        Parameters:
 
-        upsample : int, optional
-           Factor by which to increase the number of samples. Afterwards, those
-           points extending beyond the original end point of the pulse are
-           discarded.
-        downsample : int, optional
-            For `downsample=n` keep only every n'th point of the original
-            pulse. This may cause the resampled pulse to end earlier than the
-            original pulse
-        num : int, optional
-            Resample with `num` sampling points. This may case the end point of
-            the resampled pulse to change
-        window : array_like, callable, string, float, or tuple, optional
-            Specifies the window applied to the signal in the Fourier
-            domain.  See `sympy.signal.resample`
+            upsample (int, optional): Factor by which to increase the number of
+                samples. Afterwards, those points extending beyond the original
+                end point of the pulse are discarded.
+            downsample (int, optional): For ``downsample=n``, keep only every
+                n'th point of the original pulse. This may cause the resampled
+                pulse to end earlier than the original pulse
+            num (int, optional): Resample with `num` sampling points. This may
+                case the end point of the resampled pulse to change
+            window (array_like, callable, string, float, or tuple, optional):
+                Specifies the window applied to the signal in the Fourier
+                domain.  See `sympy.signal.resample`.
 
-        Notes
-        -----
+        Notes:
 
-        Exactly one of `upsample`, `downsample`, or `num` must be given.
+            Exactly one of `upsample`, `downsample`, or `num` must be given.
 
-        Upsampling will maintain the pulse start and end point (as returned by
-        the `T` and `t0` properties), up to some rounding errors.
-        Downsampling, or using an arbitrary number will change the end point of
-        the pulse in general.
+            Upsampling will maintain the pulse start and end point (as returned
+            by the `T` and `t0` properties), up to some rounding errors.
+            Downsampling, or using an arbitrary number will change the end
+            point of the pulse in general.
         """
         self._unshift()
         nt = len(self.tgrid)
@@ -658,9 +713,7 @@ class Pulse(object):
         self._shift()
 
     def render_pulse(self, ax):
-        """
-        Render the pulse amplitude on the given axes.
-        """
+        """Render the pulse amplitude on the given axes."""
         if np.max(np.abs(self.amplitude.imag)) > 0.0:
             ampl_line, = ax.plot(self.tgrid, np.abs(self.amplitude),
                                  label='pulse')
@@ -674,9 +727,7 @@ class Pulse(object):
         ax.set_xlabel("time (%s)" % self.time_unit)
 
     def render_phase(self, ax):
-        """
-        Render the complex phase of the pulse on the given axes.
-        """
+        """Render the complex phase of the pulse on the given axes."""
         ax.axhline(y=0.0, ls='-', color='black')
         phase_line, = ax.plot(self.tgrid, np.angle(self.amplitude) / np.pi,
                               ls='-', color='black', label='phase')
@@ -684,10 +735,9 @@ class Pulse(object):
         ax.set_xlabel("time (%s)" % self.time_unit)
 
     def render_spectrum(self, ax, zoom=True, wmin=None, wmax=None,
-    spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None):
-        """
-        Render spectrum onto the given axis, see `plot` for arguments
-        """
+            spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None,
+            mark_freq_points=None):
+        """Render spectrum onto the given axis, see `plot` for arguments"""
         freq, spectrum = self.spectrum(mode='abs', sort=True,
                                         freq_unit=freq_unit)
         # normalizing the spectrum makes it independent of the number of
@@ -739,54 +789,59 @@ class Pulse(object):
         ax.set_ylabel("abs(spec) (arb. un.)")
         if spec_scale is None:
             spec_scale = 1.0
-        ax.plot(freq, spec_scale*spectrum, label='spectrum')
+        ax.plot(freq, spec_scale*spectrum, marker=mark_freq_points,
+                label='spectrum')
         if spec_max is not None:
             ax.set_ylim(0, spec_max)
         if mark_freqs is not None:
             for freq in mark_freqs:
-                ax.axvline(x=float(freq), ls='--', color='black')
+                kwargs = {'ls': '--', 'color': 'black'}
+                try:
+                    freq, kwargs = freq
+                except TypeError:
+                    pass
+                ax.axvline(x=float(freq), **kwargs)
 
     def plot(self, fig=None, show_pulse=True, show_spectrum=True, zoom=True,
-    wmin=None, wmax=None, spec_scale=None, spec_max=None, freq_unit=None,
-    mark_freqs=None, **figargs):
-        """
-        Generate a plot of the pulse on a given figure
+            wmin=None, wmax=None, spec_scale=None, spec_max=None,
+            freq_unit=None, mark_freqs=None, mark_freq_points=None, **figargs):
+        """Generate a plot of the pulse on a given figure
 
-        Parameters
-        ----------
+        Parameters:
 
-        fig : Instance of matplotlib.figure.Figure
-            The figure onto which to plot. If not given, create a new figure
-            from `matplotlib.pyplot.figure
-        show_pulse : bool
-            Include a plot of the pulse amplitude? If the pulse has a vanishing
-            imaginary part, the plot will show the real part of the amplitude,
-            otherwise, there will be one plot for the absolute value of the
-            amplitude and one showing the complex phase in units of pi
-        show_spectrum : bool
-            Include a plot of the spectrum?
-        zoom : bool
-            If `True`, only show the part of the spectrum that has
-            amplitude of at least 0.1% of the maximum peak in the spectrum.
-            For real pulses, only the positive part of the spectrum is shown
-        wmin: float
-            Lowest frequency to show. Overrides zoom options. Must be given
-            together with wmax.
-        wmax: float
-            Higherst frequency to show. Overrides zoom options.
-            Must be given together with wmin
-        spec_scale: float
-            Factor by which to scale the amplitudes in the spectrum
-        spec_max: float
-            Maximum amplitude in the spectrum, after spec_scale has been applied
-        freq_unit : str
-            Unit in which to show the frequency axis in the spectrum. If not
-            given, use the `freq_unit` attribute
-        mark_freqs : None, array of floats
-            Array of frequencies to mark in spectrum as vertical dashed lines
+            fig (matplotlib.figure.Figure): The figure onto which to plot. If
+                not given, create a new figure from `matplotlib.pyplot.figure`
+            show_pulse (bool): Include a plot of the pulse amplitude? If the
+                pulse has a vanishing imaginary part, the plot will show the
+                real part of the amplitude, otherwise, there will be one plot
+                for the absolute value of the amplitude and one showing the
+                complex phase in units of pi
+            show_spectrum (bool): Include a plot of the spectrum?
+            zoom (bool): If `True`, only show the part of the spectrum that has
+                amplitude of at least 0.1% of the maximum peak in the spectrum.
+                For real pulses, only the positive part of the spectrum is
+                shown
+            wmin (float): Lowest frequency to show. Overrides zoom options.
+                Must be given together with `wmax`.
+            wmax (float): Highest frequency to show. Overrides zoom options.
+                Must be given together with `wmin`.
+            spec_scale (float): Factor by which to scale the amplitudes in the
+                spectrum
+            spec_max (float): Maximum amplitude in the spectrum, after
+                spec_scale has been applied
+            freq_unit (str): Unit in which to show the frequency axis in the
+                spectrum. If not given, use the `freq_unit` attribute
+            mark_freqs (None, array of floats, array of tuples (float, dict)):
+                Array of frequencies to mark in spectrum as vertical dashed
+                lines.  If list of tuples (float, dict), the float value is the
+                frequency to mark, and the dict gives the keyword arguments
+                that are passed to the matplotlib `axvline` method.
+            mark_freq_points (None, or matplotlib marker (see
+                `matplotlib.markers`)): Marker to be used to indicate the
+                individual points in the spectrum.
 
-        The remaining figargs are passed to matplotlib.pyplot.figure to create
-        a new figure if `fig` is None.
+        The remaining figargs are passed to `matplotlib.pyplot.figure` to
+        create a new figure if `fig` is None.
         """
         if fig is None:
             fig = plt.figure(**figargs)
@@ -819,7 +874,8 @@ class Pulse(object):
         if show_spectrum:
             ax_spectrum = fig.add_subplot(gs[-1], label='spectrum')
             self.render_spectrum(ax_spectrum, zoom, wmin, wmax, spec_scale,
-                                 spec_max, freq_unit, mark_freqs)
+                                 spec_max, freq_unit, mark_freqs,
+                                 mark_freq_points)
         if show_pulse:
             # plot pulse amplitude
             ax_pulse = fig.add_subplot(gs[0], label='pulse')
@@ -862,24 +918,21 @@ class Pulse(object):
             return fig_data
 
     def show(self, **kwargs):
-        """
-        Show a plot of the pulse and its spectrum. All arguments will be passed
-        to the plot method
+        """Show a plot of the pulse and its spectrum. All arguments will be
+        passed to the plot method
         """
         self.plot(**kwargs) # uses plt.figure()
         plt.show()
 
     def show_pulse(self, **kwargs):
-        """
-        Show a plot of the pulse amplitude; alias for
+        """Show a plot of the pulse amplitude; alias for
         `show(show_spectrum=False)`. All other arguments will be passed to the
         `show` method
         """
         self.show(show_spectrum=False, **kwargs)
 
     def show_spectrum(self, zoom=True, freq_unit=None, **kwargs):
-        """
-        Show a plot of the pulse spectrum; alias for
+        """Show a plot of the pulse spectrum; alias for
         `show(show_pulse=False, zoom=zoom, freq_unit=freq_unit)`. All other
         arguments will be passed to the `show` method
         """
@@ -887,8 +940,7 @@ class Pulse(object):
 
 
 def pulse_tgrid(T, nt, t0=0.0):
-    """
-    Return a pulse time grid suitable for an equidistant time grid of the
+    """Return a pulse time grid suitable for an equidistant time grid of the
     states between t0 and T with nt intervals. The values of the pulse are
     defined in the intervals of the time grid, so the pulse time grid will be
     shifted by dt/2 with respect to the time grid of the states. Also, the
@@ -900,109 +952,70 @@ def pulse_tgrid(T, nt, t0=0.0):
     The limits of the states time grid are defined as the starting and end
     points of the pulse, however:
 
-    >>> p = Pulse(tgrid=pulse_tgrid(1.5, 4))
+    >>> p = Pulse(tgrid=pulse_tgrid(1.5, 4), time_unit='ns', ampl_unit='MHz')
     >>> p.t0
-    0.0
+    0
     >>> p.T
-    1.5
+    1.5_ns
     """
-    dt = (T - t0) / (nt - 1)
-    t_first_pulse = t0 + 0.5*dt
-    t_last_pulse  =  T - 0.5*dt
+    dt = float(T - t0) / (nt - 1)
+    t_first_pulse = float(t0) + 0.5*dt
+    t_last_pulse  =  float(T) - 0.5*dt
     nt_pulse = nt - 1
     return np.linspace(t_first_pulse, t_last_pulse, nt_pulse)
 
 
+def tgrid_from_config(tgrid_dict, time_unit, pulse_grid=True):
+    """Extract the time grid from the given config file
 
-def tgrid_from_config(config, pulse_grid=True):
+    >>> tgrid_dict = dict([('t_start', 0.0), ('t_stop', UnitFloat(10.0, 'ns')),
+    ...                    ('dt', UnitFloat(20, 'ps')), ('fixed', True)])
+    >>> tgrid = tgrid_from_config(tgrid_dict, time_unit='ns')
+    >>> print("%.2f" % tgrid[0])
+    0.01
+    >>> print("%.2f" % tgrid[-1])
+    9.99
     """
-    Extract the time grid from the given config file
-
-    Paramters
-    ---------
-
-    config : str
-        Path to config file
-    pulse_grid : bool, optional
-        If True (default), return the time grid for pulse values, which is
-        shifted by dt/2 with respect to the time grid for the states.
-        If False, return the time grid for the states, directly as it is
-        defined in the config file
-
-
-    Returns
-    -------
-
-    tgrid : ndarray(float64)
-        Time grid values
-    timeunit : str
-        Unit of values in `tgrid`
-    """
-    with open(config) as in_fh:
-        in_tgrid = False
-        params = {
-            't_start': None,
-            't_stop': None,
-            'dt': None,
-            'nt': None,
-        }
-        rxs = {
-            't_start': re.compile(r't_start\s*=\s*([\d.de]+)(_\w+)?', re.I),
-            't_stop': re.compile(r't_stop\s*=\s*([\d.de]+)(_\w+)?', re.I),
-            'dt': re.compile(r'dt\s*=\s*([\d.de]+)(_\w+)?', re.I),
-            'nt': re.compile(r'nt\s*=\s*(\d+)'),
-        }
-        timeunit = 'au'
-        for line in in_fh:
-            line = line.strip()
-            if line.startswith('tgrid'):
-                in_tgrid = True
-            elif re.match(r'^\w+:', line):
-                in_tgrid = False
-            if in_tgrid:
-                for param, rx in rxs.items():
-                    m = rx.search(line)
-                    if m:
-                        if len(m.groups()) == 2: # value and unit in match
-                            value = float(m.group(1))
-                            unit = m.group(2)
-                            if unit is not None:
-                                timeunit = unit[1:]
-                                value = convert.to_au(value, timeunit)
-                            params[param] = value
-                        else:
-                            value = int(m.group(1))
-                            params[param] = value
-        t_start = params['t_start']
-        t_stop = params['t_stop']
-        dt = params['dt']
-        nt = params['nt']
-        if t_start is None:
-            assert ((t_stop is not None) and (dt is not None)
-            and (nt is not None)), "tgrid not fully specified in config"
-            t_start = t_stop - (nt-1) * dt
-        if t_stop is None:
-            assert ((t_start is not None) and (dt is not None)
-            and (nt is not None)), "tgrid not fully specified in config"
-            t_stop = t_start + (nt-1)*dt
-        if nt is None:
-            assert ((t_start is not None) and (dt is not None)
-            and (t_stop is not None)), "tgrid not fully specified in config"
-            nt = int( (t_stop - t_start)/ dt ) + 1
-        if dt is None:
-            assert ((t_start is not None) and (nt is not None)
-            and (t_stop is not None)), "tgrid not fully specified in config"
-            dt = (t_stop - t_start) / float(nt - 1)
-        t_start = convert.from_au(t_start, timeunit)
-        t_stop = convert.from_au(t_stop, timeunit)
-        dt = convert.from_au(dt, timeunit)
-        if pulse_grid:
-            # convert to pulse parameters
-            t_start += 0.5*dt
-            t_stop  -= 0.5*dt
-            nt      -= 1
-        tgrid = np.linspace(t_start, t_stop, nt)
-        return tgrid, timeunit
+    if time_unit is None:
+        time_unit = 'unitless'
+    t_start = None
+    t_stop = None
+    nt = None
+    dt = None
+    if 't_start' in tgrid_dict:
+        t_start = tgrid_dict['t_start']
+    if 't_stop' in tgrid_dict:
+        t_stop = tgrid_dict['t_stop']
+    if 'nt' in tgrid_dict:
+        nt = tgrid_dict['nt']
+    if 'dt' in tgrid_dict:
+        dt = tgrid_dict['dt']
+    if t_start is None:
+        assert ((t_stop is not None) and (dt is not None)
+        and (nt is not None)), "tgrid not fully specified in config"
+        t_start = t_stop - (nt-1) * dt
+    if t_stop is None:
+        assert ((t_start is not None) and (dt is not None)
+        and (nt is not None)), "tgrid not fully specified in config"
+        t_stop = t_start + (nt-1)*dt
+    if nt is None:
+        assert ((t_start is not None) and (dt is not None)
+        and (t_stop is not None)), "tgrid not fully specified in config"
+        nt = int( (t_stop - t_start)/ dt ) + 1
+    if dt is None:
+        assert ((t_start is not None) and (nt is not None)
+        and (t_stop is not None)), "tgrid not fully specified in config"
+        dt = (t_stop - t_start) / float(nt - 1)
+    t_start = UnitFloat(t_start).convert(time_unit)
+    t_stop = UnitFloat(t_stop).convert(time_unit)
+    dt = UnitFloat(dt).convert(time_unit)
+    if pulse_grid:
+        # convert to pulse parameters
+        t_start += 0.5*dt
+        t_stop  -= 0.5*dt
+        nt      -= 1
+    tgrid = np.linspace(float(t_start), float(t_stop), nt)
+    return tgrid
 
 
 ###############################################################################
@@ -1012,101 +1025,145 @@ def tgrid_from_config(config, pulse_grid=True):
 
 def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
     complex=False):
-    r'''
-    Create the "carrier" of the pulse as a weighted superposition of cosines at
-    different frequencies.
+    r'''Create the "carrier" of the pulse as a weighted superposition of
+    cosines at different frequencies.
 
-    Parameters
-    ----------
-    t : scalar, ndarray(float64)
-        Time value or time grid
-    time_unit : str
-        Unit of `t`
-    freq : scalar, ndarray(float64)
-        Carrier frequency or frequencies
-    freq_unit : str
-        Unit of `freq`
-    weights : array-like, optional
-        If `freq` is an array, weights for the different frequencies. If not
-        given, all weights are 1. The weights are normalized to sum to one.
-    phases: array-line, optional
-        If `phases` is an array, phase shift for each frequency component, in
-        units of pi. If not given, all phases are 0.
-    complex : bool
-        If `True`, oscillate in the complex plane
+    Parameters:
 
-    Returns
-    -------
+        t (scalar, ndarray(float64)): Time value or time grid
+        time_unit (str): Unit of `t`
+        freq (scalar, ndarray(float64)): Carrier frequency or frequencies
+        freq_unit (str): Unit of `freq`
+        weights (array-like, optional): If `freq` is an array, weights for the
+            different frequencies. If not given, all weights are 1. The weights
+            are normalized to sum to one.  Any weight smaller than machine
+            precision is assumed zero.
+        phases (array-line, optional): If `phases` is an array, phase shift for
+            each frequency component, in units of pi. If not given, all phases
+            are 0.
+        complex (bool): If `True`, oscillate in the complex plane
 
-    signal : scalar, ndarray(complex128)
-        Depending on whether `complex` is `True` or `False`,
-        .. math::
-            s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
-            s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))
+    Returns:
 
-        with :math:`\omega_j = 2 * \pi * f_j`, and frequency `f_j` where
-        `f_j` is the j'th value in `freq`. The value of `\phi_j` is the j'th
-        value in `phases`
+        signal (scalar, ndarray(complex128)): Depending on whether `complex` is
+            `True` or `False`,
+                .. math::
+                    s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
+                    s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))
 
-        `signal` is a scalar if `t` is a scalar, and and array if `t` is an
-        array
+                with:math:`\omega_j = 2 * \pi * f_j`, and frequency `f_j` where
+                `f_j` is the j'th value in `freq`. The value of `\phi_j` is the
+                j'th value in `phases`
 
-    Notes
-    -----
+                `signal` is a scalar if `t` is a scalar, and and array if `t`
+                is an array
 
-    `freq_unit` can be Hz (GHz, MHz, etc), describing the frequency directly,
-    or any energy unit, in which case the energy value E (given through the
-    freq parameter) is converted to an actual frequency as
+    Notes:
 
-     .. math:: f = E / (\\hbar * 2 * pi)
+        `freq_unit` can be Hz (GHz, MHz, etc), describing the frequency
+        directly, or any energy unit, in which case the energy value E (given
+        through the freq parameter) is converted to an actual frequency as
+
+        .. math:: f = E / (\\hbar * 2 * pi)
     '''
+    unit_convert = UnitConvert()
     if np.isscalar(t):
         signal = 0.0
     else:
         signal = np.zeros(len(t), dtype=np.complex128)
-        assert type(t) == np.ndarray, "t must be numpy array"
+        assert isinstance(t, np.ndarray), "t must be numpy array"
         assert t.dtype.type is np.float64, "t must be double precision real"
-    c = convert.to_au(1, time_unit) * convert.to_au(1, freq_unit)
+    c = ( unit_convert.convert(1, time_unit, 'iu')
+        * unit_convert.convert(1, freq_unit, 'iu'))
     if np.isscalar(freq):
         if complex:
             signal += np.exp(1j*c*freq*t) # element-wise
         else:
             signal += np.cos(c*freq*t) # element-wise
     else:
+        eps = 1.0e-16 # machine precision
         if weights is None:
             weights = np.ones(len(freq))
         if phases is None:
             phases = np.zeros(len(freq))
         norm = float(sum(weights))
-        for (w, weight, phase) in zip(freq, weights, phases):
-            if complex:
-                signal += (weight/norm) * np.exp(1j*(c*w*t+phase*np.pi))
-            else:
-                signal += (weight/norm) * np.cos(c*w*t+phase*np.pi)
+        if norm > eps:
+            for (w, weight, phase) in zip(freq, weights, phases):
+                if weight > eps:
+                    weight = weight/norm
+                    if complex:
+                        signal += weight * np.exp(1j*(c*w*t+phase*np.pi))
+                    else:
+                        signal += weight * np.cos(c*w*t+phase*np.pi)
+    return signal
+
+
+def CRAB_carrier(t, time_unit, freq, freq_unit, a, b, normalize=False,
+    complex=False):
+    r'''Construct a "carrier" based on the CRAB formula
+
+        .. math::
+        E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))
+
+    where :math:`a_n` is the n'th element of `a`, :math:`b_n` is the n'th
+    element of `b`, and :math:`\omega_n` is the n'th element of freq.
+
+    Parameters:
+        t (array-like): time grid values
+        time_unit (str): Unit of `t`
+        freq (scalar, ndarray(float64)): Carrier frequency or frequencies
+        freq_unit (str): Unit of `freq`
+        a (array-like): Coefficients for cosines
+        b (array-line): Coefficients for sines
+        normalize (logical, optional): If True, normalize the resulting carrier
+            such that its values are in [-1,1]
+        complex (logical, optional): If True, oscillate in the complex
+            plane
+
+            .. math::
+            E(t) = \sum_{n} (a_n - i b_n) \exp(i \omega_n t)
+
+    Notes:
+
+        `freq_unit` can be Hz (GHz, MHz, etc), describing the frequency
+        directly, or any energy unit, in which case the energy value E (given
+        through the freq parameter) is converted to an actual frequency as
+
+        .. math:: f = E / (\\hbar * 2 * pi)
+    '''
+    unit_convert = UnitConvert()
+    c = ( unit_convert.convert(1, time_unit, 'iu')
+        * unit_convert.convert(1, freq_unit, 'iu'))
+    assert len(a) == len(b) == len(freq), \
+    "freq, a, b must all be of the same length"
+    if complex:
+        signal = np.zeros(len(t), dtype=np.complex128)
+    else:
+        signal = np.zeros(len(t), dtype=np.float64)
+    for w_n, a_n, b_n in zip(freq, a, b):
+        if complex:
+            signal += (a_n -1j*b_n) * np.exp(1j*c*w_n*t)
+        else:
+            signal += a_n * np.cos(c*w_n*t) + b_n * np.sin(c*w_n*t)
+    if normalize:
+        nrm = np.abs(signal).max()
+        if nrm > 1.0e-16:
+            signal *= 1.0 / nrm
     return signal
 
 
 def gaussian(t, t0, sigma):
-    """
-    Return a Gaussian shape with peak amplitude 1.0
+    """Return a Gaussian shape with peak amplitude 1.0
 
-    Parameters
-    ----------
+    Parameters:
 
-    t : float, ndarray
-        time value or grid
+        t (float, ndarray): time value or grid
+        t0 (float): center of peak
+        sigma (float): width of Gaussian
 
-    t0: float
-        center of peak
+    Returns:
 
-    sigma: float
-        width of Gaussian
-
-    Returns
-    -------
-
-    gaussian : scalar, ndarray
-        Gaussian shape of same type as `t`
+        gaussian (scalar, ndarray): Gaussian shape of same type as `t`
 
     """
     return np.exp(-(t-t0)**2/(2*sigma**2))
@@ -1114,27 +1171,21 @@ def gaussian(t, t0, sigma):
 
 @np.vectorize
 def box(t, t_start, t_stop):
-    """
-    Return a box-shape (Theta-function) that is zero before `t_start` and after
-    `t_stop` and one elsewehere
+    """Return a box-shape (Theta-function) that is zero before `t_start` and
+    after `t_stop` and one elsewehere.
 
-    Parameters
-    ----------
+    Parameters:
 
-    t : scalar, ndarray
-        Time point or time grid
-    t_start : scalar
-        First value of `t` for which the box has value 1
-    t_stop : scalar
-        Last value of `t` for which the box has value 1
+        t (scalar, ndarray): Time point or time grid
+        t_start (scalar): First value of `t` for which the box has value 1
+        t_stop (scalar): Last value of `t` for which the box has value 1
 
-    Returns
-    -------
+    Returns:
 
-    box_shape : ndarray(float64)
-        If `t` is an array, `box_shape` is an array of the same size as `t`
-        If `t` is scalar, `box_shape` is an array of size 1 (which for all
-        intents and purposes can be used like a float)
+        box_shape (ndarray(float64)): If `t` is an array, `box_shape` is an
+            array of the same size as `t` If `t` is scalar, `box_shape` is an
+            array of size 1 (which for all intents and purposes can be used
+            like a float)
     """
     if t < t_start:
         return 0.0
@@ -1144,8 +1195,7 @@ def box(t, t_start, t_stop):
 
 
 def blackman(t, t_start, t_stop, a=0.16):
-    """
-    Return a Blackman function between `t_start` and `t_stop`,
+    """Return a Blackman function between `t_start` and `t_stop`,
     see http://en.wikipedia.org/wiki/Window_function#Blackman_windows
 
     A Blackman shape looks nearly identical to a Gaussian with a 6-sigma
@@ -1153,28 +1203,23 @@ def blackman(t, t_start, t_stop, a=0.16):
     however, it will go exactly to zero at the edges. Thus, Blackman pulses
     are often preferable to Gaussians.
 
-    Parameters
-    ----------
-    t : scalar, ndarray
-        Time point or time grid
-    t_start : scalar
-        Starting point of Blackman shape
-    t_stop : scalar
-        End point of Blackman shape
+    Parameters:
 
-    Returns
-    -------
+        t (scalar, ndarray): Time point or time grid
+        t_start (scalar): Starting point of Blackman shape
+        t_stop (scalar): End point of Blackman shape
 
-    blackman_shape: scalar, ndarray(float64)
-        If `t` is a scalar, `blackman_shape` is the scalar value of the
-        Blackman shape at `t`.
-        If `t` is an array, `blackman_shape` is an array of same size as `t`,
-        containing the values for the Blackman shape (zero before `t_start` and
-        after `t_stop`)
+    Returns:
 
-    See Also
-    --------
-    numpy.blackman
+        blackman_shape (scalar, ndarray(float64)):
+            If `t` is a scalar, `blackman_shape` is the scalar value of the
+            Blackman shape at `t`.  If `t` is an array, `blackman_shape` is an
+            array of same size as `t`, containing the values for the Blackman
+            shape (zero before `t_start` and after `t_stop`)
+
+    See Also:
+
+        numpy.blackman
     """
     T = t_stop - t_start
     return 0.5 * (1.0 - a - np.cos(2.0*np.pi * (t-t_start)/T)
@@ -1184,40 +1229,33 @@ def blackman(t, t_start, t_stop, a=0.16):
 
 @np.vectorize
 def flattop(t, t_start, t_stop, t_rise, t_fall=None):
-    """
-    Return flattop shape, starting at `t_start` with a sine-squared ramp that
-    goes to 1 within `t_rise`, and ramps down to 0 again within `t_fall` from
-    `t_stop`
+    """Return flattop shape, starting at `t_start` with a sine-squared ramp
+    that goes to 1 within `t_rise`, and ramps down to 0 again within `t_fall`
+    from `t_stop`
 
-    Parameters
-    ----------
-    t : scalar, ndarray
-        Time  point or time grid
-    t_start : scalar
-        Start of flattop window
-    t_stop : scalar
-        Stop of flattop window
-    t_rise : scalar
-        Duration of ramp-up, starting at `t_start`
-    t_fall : scalar, optional
-        Duration of ramp-down, ending at `t_stop`. If not given,
-        `t_fall=t_rise`.
+    Parameters:
 
-    Returns
-    -------
+        t (scalar, ndarray): Time  point or time grid
+        t_start (scalar): Start of flattop window
+        t_stop (scalar): Stop of flattop window
+        t_rise (scalar): Duration of ramp-up, starting at `t_start`
+        t_fall (scalar): Duration of ramp-down, ending at `t_stop`.
+            If not given, `t_fall=t_rise`.
 
-    flattop_shape : ndarray(float64)
-        If `t` is an array, `flattop_shape` is an array of the same size as `t`
-        If `t` is scalar, `flattop_ox_shape` is an array of size 1 (which for
-        all intents and purposes can be used like a float)
+    Returns:
+
+        flattop_shape (ndarray(float64)): If `t` is an array, `flattop_shape`
+            is an array of the same size as `t` If `t` is scalar,
+            `flattop_ox_shape` is an array of size 1 (which for all intents and
+            purposes can be used like a float)
     """
     if (t >= t_start) and (t <= t_stop):
         f = 1.0
         if t_fall is None:
             t_fall = t_rise
-        if (t <= t_start + t_rise):
+        if t <= t_start + t_rise:
             f = np.sin(np.pi * (t-t_start) / (2.0*t_rise))**2
-        elif (t >= t_stop - t_fall):
+        elif t >= t_stop - t_fall:
             f = np.sin(np.pi * (t-t_stop) / (2.0*t_fall))**2
         return f
     else:
