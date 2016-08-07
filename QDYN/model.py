@@ -79,6 +79,7 @@ class LevelModel(object):
         self.nt = 0
         self.prop_method = 'newton'
         self.use_mcwf = False
+        self.mcwf_order = 2
         self.construct_mcwf_ham = False
         self._config_data = OrderedDict([])
         self._pulse_id = 0 # last used pulse_id
@@ -194,7 +195,7 @@ class LevelModel(object):
         if is_real is None:
             if isinstance(O, str):
                 if O in ["norm", "pop"]:
-                    is_real = Tue
+                    is_real = True
                 elif O == "ham":
                     is_real = False
                 else:
@@ -246,7 +247,8 @@ class LevelModel(object):
         self._lindblad_config_attribs.append(config_attribs)
 
     def set_propagation(self, initial_state, T, nt, time_unit, t0=0.0,
-            prop_method='newton', use_mcwf=False, construct_mcwf_ham=True):
+            prop_method='newton', use_mcwf=False, mcwf_order=2,
+            construct_mcwf_ham=True):
         """Set the time grid and other propagation-specific settings
 
         Args:
@@ -258,6 +260,7 @@ class LevelModel(object):
             prop_method (str): method to be used for propagation
             use_mcwf (bool): If True, prepare for Monte-Carlo wave function
                 propagation
+            mcwf_order (int): Order for MCWF, must be 1 or 2
             construct_mcwf_ham (bool): When using MCWF (`use_mcwf=True`), by
                 default an additional inhomogeneous decay term is added to the
                 Hamiltonian, based on the Lindblad operators. By passing
@@ -265,6 +268,17 @@ class LevelModel(object):
                 user's responsibility then to ensure the Hamiltonian in the
                 model is the correct "effective" Hamiltonian for a MCWF
                 propagation.
+
+        Notes:
+            When setting up an MCWF propagation, using the `mcwf_order=2` is
+            usually the right thing to do. In some cases of strong dissipation,
+            it may be numerically more efficient to use a first-order MCWF
+            method, where in each time interval `dt` between two time grids
+            there is at most one quantum jump, and the jumps takes place over
+            the entire duration `dt`. The time steps must be very small
+            accordingly. In contrast, for `mcwf_order=2`, all jumps are
+            instantaneous, and there can be multiple jumps per time step, but
+            the numerical overhead is larger.
         """
         self._psi = initial_state
         self.T = UnitFloat(T, time_unit)
@@ -273,6 +287,7 @@ class LevelModel(object):
         self.prop_method = prop_method
         if use_mcwf:
             self.use_mcwf = use_mcwf
+            self.mcwf_order = mcwf_order
         if construct_mcwf_ham is None:
             construct_mcwf_ham = use_mcwf
         if use_mcwf:
@@ -295,9 +310,13 @@ class LevelModel(object):
         # propagation
         self._config_data['prop'] = OrderedDict([
             ('method', self.prop_method), ('use_mcwf', self.use_mcwf)])
+        if self.use_mcwf:
+            if self.mcwf_order not in [1, 2]:
+                raise ValueError('mcwf_order must be in [1,2]')
+            self._config_data['prop']['mcwf_order'] = self.mcwf_order
 
         # pulses
-        self._write_pulses(runfolder) # also sets self._pulse_ids
+        self._write_pulses(runfolder)  # also sets self._pulse_ids
 
         # Hamiltonian
         if self.ham is not None:
