@@ -1,6 +1,6 @@
 tgrid: t_start = 0, t_stop = 50_ns, nt = 1001
 
-prop: method = newton, use_mcwf = T
+prop: method = newton, use_mcwf = T, mcwf_order = 2
 
 pulse:
 * type = file, filename = pulse1.dat, id = 1, time_unit = ns, &
