@@ -216,6 +216,12 @@ def is_hermitian(matrix):
             return False
 
 
+def iscomplexobj(array_like):
+    """Check whether the (multidimensional `array_like` object) has a type that
+    allows for complex entries."""
+    return issubclass(array_like.dtype.type, np.core.numeric.complexfloating)
+
+
 def choose_sparsity_model(matrix):
     """Return one of 'full', 'banded', 'dia', or 'indexed', depending on an
     estimate of white might be the best storage format for the given `matrix`.
