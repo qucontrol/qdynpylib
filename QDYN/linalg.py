@@ -216,10 +216,29 @@ def is_hermitian(matrix):
             return False
 
 
-def iscomplexobj(array_like):
-    """Check whether the (multidimensional `array_like` object) has a type that
-    allows for complex entries."""
-    return issubclass(array_like.dtype.type, np.core.numeric.complexfloating)
+def iscomplexobj(x):
+    """Check whether the (multidimensional `x` object) has a type that
+    allows for complex entries.
+
+    >>> iscomplexobj(1)
+    False
+    >>> iscomplexobj(1+0j)
+    True
+    >>> iscomplexobj([3, 1+0j, True])
+    True
+    >>> iscomplexobj(np.array([3, 1j]))
+    True
+    >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5]]))
+    False
+    >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5j]]))
+    True
+    """
+    # This is a workaround for numpy bug #7924
+    try:
+        dtype = x.dtype
+    except AttributeError:
+        dtype = np.asarray(x).dtype
+    return issubclass(dtype.type, np.core.numeric.complexfloating)
 
 
 def choose_sparsity_model(matrix):
