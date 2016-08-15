@@ -238,7 +238,10 @@ def iscomplexobj(x):
         dtype = x.dtype
     except AttributeError:
         dtype = np.asarray(x).dtype
-    return issubclass(dtype.type, np.core.numeric.complexfloating)
+    try:
+        return issubclass(dtype.type, np.core.numeric.complexfloating)
+    except AttributeError:
+        return False
 
 
 def choose_sparsity_model(matrix):
