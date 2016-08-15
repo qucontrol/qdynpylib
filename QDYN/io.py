@@ -15,6 +15,8 @@ import six
 from six.moves import xrange
 from click.utils import open_file
 
+from .linalg import iscomplexobj
+
 
 @contextmanager
 def tempinput(data, binary=False):
@@ -64,7 +66,7 @@ def tempinput(data, binary=False):
 
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
-        header=None, hermitian=True):
+        header=None, hermitian=True, limit=0.0):
     """
     Write the given matrix to file in indexed format (1-based indexing)
 
@@ -103,6 +105,9 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
 
     hermitian: boolean, optional
         If True, write only entries from the upper triangle
+
+    limit: float, optional
+        Only values with an absolute value greater than `limit` are written
     """
 
     # set line formatter
@@ -113,15 +118,18 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
     if repr(matrix).startswith('Quantum object'):
         # handle qutip Qobj (without importing the qutip package)
         matrix = matrix.data
-    if line_formatter is None:
-        if np.iscomplexobj(matrix):
+    if iscomplexobj(matrix):
+        is_real = False
+        if line_formatter is None:
             line_formatter = complex_formatter
-        else:
+    else:
+        is_real = True
+        if line_formatter is None:
             line_formatter = real_formatter
 
     # set header
     if header is None:
-        if np.iscomplexobj(matrix):
+        if iscomplexobj(matrix):
             header = "# %6s%8s%25s%25s\n" \
                      % ('row', 'column', 'Re(val)', 'Im(val)')
         else:
@@ -155,11 +163,14 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
             j = sparse_h.col[i_val] + 1
             v = sparse_h.data[i_val]
             if (not hermitian) or (j >= i):
-                line = line_formatter(i, j, v)
-                if line is not None:
-                    out_fh.write(line)
-                    if not line.endswith("\n"):
-                        out_fh.write("\n")
+                if (abs(v) > limit):
+                    if is_real:
+                        assert v.imag == 0
+                    line = line_formatter(i, j, v)
+                    if line is not None:
+                        out_fh.write(line)
+                        if not line.endswith("\n"):
+                            out_fh.write("\n")
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,

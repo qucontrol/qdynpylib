@@ -42,6 +42,18 @@ def get_mpi_implementation(configure_log):
     return None
 
 
+def get_qdyn_compiler(configure_log):
+    """Return the name the Fortran compiler that QDYN was compiled with"""
+    with open(configure_log) as in_fh:
+        for line in in_fh:
+            if line.startswith("FC"):
+                m = re.search(r'FC\s*:\s*(.*)', line)
+                if m:
+                    fc = m.group(1)
+                    return fc
+    return None
+
+
 def mpirun(cmd, procs=1, implementation='openmpi', hostfile=None):
     """Return a modified `cmd` that runs the given `cmd` (list) using MPI.
 
