@@ -15,7 +15,7 @@ from .config import write_config
 from .state import write_psi_amplitudes
 from .shutil import mkdir
 from .units import UnitFloat
-from .linalg import is_hermitian, choose_sparsity_model
+from .linalg import is_hermitian, choose_sparsity_model, iscomplexobj
 
 
 class LevelModel(object):
@@ -415,7 +415,8 @@ class LevelModel(object):
                     hermitian=False)
             self._config_data['ham'].append(
                     OrderedDict([('type', 'matrix'), ('n_surf', H.shape[0]),
-                                 ('filename', filename)]))
+                                 ('filename', filename),
+                                 ('real_op', (not iscomplexobj(H)))]))
             try:
                 config_attribs = self._ham_config_attribs[i]
             except IndexError:
@@ -471,7 +472,8 @@ class LevelModel(object):
                 self._config_data['observables'][-1].update(
                     OrderedDict([('type', 'matrix'), ('n_surf', O.shape[0]),
                                     ('sparsity_model', sparsity_model),
-                                    ('filename', filename)]))
+                                    ('filename', filename),
+                                    ('real_op', (not iscomplexobj(O)))]))
             if pulse is not None:
                 self._config_data['observables'][-1]['pulse_id'] \
                 = self._pulse_ids[pulse]
@@ -505,7 +507,8 @@ class LevelModel(object):
                 self._config_data['dissipator'] = []
             self._config_data['dissipator'].append(
                     OrderedDict([('type', 'lindblad_ops'),
-                                 ('filename', filename)]))
+                                 ('filename', filename),
+                                 ('real_op', (not iscomplexobj(L)))]))
             try:
                 config_attribs = self._lindblad_config_attribs[i]
             except IndexError:
