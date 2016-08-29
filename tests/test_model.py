@@ -5,6 +5,7 @@ import filecmp
 from functools import partial
 
 import numpy as np
+import pytest
 
 from QDYN.model import LevelModel
 from QDYN.pulse import Pulse, blackman
@@ -13,47 +14,68 @@ from QDYN.linalg import norm
 from QDYN.state import read_psi_amplitudes
 # built-in fixtures: tmpdir, request
 
-def test_level_model(tmpdir, request):
-    """Test a simple two-qubit model"""
-    filename = request.module.__file__
-    test_dir, _ = os.path.splitext(filename)
 
+@pytest.fixture
+def H0():
     MHz = 2 * np.pi * 1e-3
     w1 = 0   * MHz
     w2 = 500 * MHz
-    kappa1 = 0.01  * MHz
-    kappa2 = 0.012 * MHz
-    H0 = np.array(np.diag([0, w2, w1, w1+w2]), dtype=np.complex128)
-    H1 = np.array(
+    return np.array(np.diag([0, w2, w1, w1+w2]), dtype=np.complex128)
+
+
+@pytest.fixture
+def H1():
+    return np.array(
          [[0, 1, 1, 0],
           [1, 0, 0, 1],
           [1, 0, 0, 1],
           [0, 1, 1, 0]], dtype=np.complex128)
-    pulse = partial(blackman, t_start=0, t_stop=50)
-    L1 = np.sqrt(kappa1) * np.array(
+
+
+@pytest.fixture
+def L1():
+    MHz = 2 * np.pi * 1e-3
+    kappa1 = 0.01 * MHz
+    return np.sqrt(kappa1) * np.array(
          [[0, 0, 1, 0],
           [0, 0, 0, 1],
           [0, 0, 0, 0],
           [0, 0, 0, 0]], dtype=np.complex128)
-    L2 = np.sqrt(kappa2) * np.array(
+
+
+@pytest.fixture
+def L2():
+    MHz = 2 * np.pi * 1e-3
+    kappa2 = 0.012 * MHz
+    return np.sqrt(kappa2) * np.array(
          [[0, 1, 0, 0],
           [0, 0, 0, 0],
           [0, 0, 0, 1],
           [0, 0, 0, 0]], dtype=np.complex128)
 
-    pop1 = np.array(
+
+@pytest.fixture
+def pop1():
+    return np.array(
          [[0, 0, 0, 0],
           [0, 0, 0, 0],
           [0, 0, 1, 0],
           [0, 0, 0, 1]], dtype=np.complex128)
-    pop2 = np.array(
+
+
+@pytest.fixture
+def pop2():
+    return np.array(
          [[0, 0, 0, 0],
           [0, 1, 0, 0],
           [0, 0, 0, 0],
           [0, 0, 0, 1]], dtype=np.complex128)
 
-    psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
 
+def two_level_model(H0, H1, L1, L2, pop1, pop2, psi):
+    """Construct model for two-qubit system"""
+    # Not a fixture!
+    pulse = partial(blackman, t_start=0, t_stop=50)
     model = LevelModel()
     model.add_ham(H0)
     model.add_ham(H1, pulse)
@@ -62,9 +84,18 @@ def test_level_model(tmpdir, request):
     model.set_propagation(psi, T=50, nt=1001, time_unit='ns', use_mcwf=True)
     model.add_observable(pop1, 'pops.dat', 'unitless', 'ns', '<P_1> (q1)')
     model.add_observable(pop2, 'pops.dat', 'unitless', 'ns', '<P_1> (q2)')
+    return model
+
+
+def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
+    """Test a simple two-qubit model"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+
+    psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, psi)
     model.write_to_runfolder(str(tmpdir.join('model_rf')))
 
-    print(str(tmpdir.join('model_rf')))
     assert filecmp.cmp(os.path.join(test_dir, 'config'),
                        str(tmpdir.join('model_rf', 'config')), shallow=False)
 
@@ -96,3 +127,19 @@ def test_level_model(tmpdir, request):
                                   t_stop=float(num_pulse.T))
     assert np.max(np.abs(num_pulse.amplitude - expected_amplitude)) < 1e-15
 
+
+def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
+    """Test that we can add another 'target' state to the config file"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+
+    psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, psi)
+    model.add_state(np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0),
+                    label='target')
+    model.write_to_runfolder(str(tmpdir.join('model_rf')),
+                             config='target.config')
+
+    assert filecmp.cmp(os.path.join(test_dir, 'target.config'),
+                       str(tmpdir.join('model_rf', 'target.config')),
+                       shallow=False)

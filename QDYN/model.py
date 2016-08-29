@@ -341,6 +341,12 @@ class LevelModel(object):
         else:
             self.construct_mcwf_ham = False
 
+    def add_state(self, state, label):
+        """Add a state (amplitude array) for the given label. Note that there
+        can only be one state per label. Thus calling `add_state` with the same
+        `label` of an earlier call will replace the `state`"""
+        self._psi[label] = state
+
     def write_to_runfolder(self, runfolder, config='config'):
         """Write the model to the given runfolder. This will create a config
         file (`config`) in the runfolder, as well as all dependent data file
