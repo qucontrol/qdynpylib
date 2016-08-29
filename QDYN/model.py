@@ -466,7 +466,7 @@ class LevelModel(object):
     def _write_lindblad_ops(self, runfolder, config_data):
         """Write operators describing all Lindblad operators to the
         `runfolder`, and add dissipator data to `config_data`"""
-        lindblad_ops = self._lindblad_ops.copy()
+        lindblad_ops = list(self._lindblad_ops)  # copy
         for L, attribs in lindblad_ops:
             if self.construct_mcwf_ham:
                 if 'add_to_H_jump' not in attribs:
