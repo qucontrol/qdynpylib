@@ -2,7 +2,7 @@
 as a config file and dependent data"""
 
 from __future__ import print_function, division, absolute_import
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import os
 
 import numpy as np
@@ -42,19 +42,20 @@ class LevelModel(object):
 
     def __init__(self):
         self._ham = []  # list of (matrix, config_attribs)
-        self._pulses = []  # list of (pulse, partial config_attribs)
+        self._pulses = []  # list of (pulse, config_attribs: label, pulse_id,
+                           #                                 filename)
         self._lindblad_ops = []  # list of (matrix, config_attribs)
         self._observables = []  # list of (matrix, config_attribs)
         self._psi = OrderedDict([])  # dict(label => vector)
-        self.t0 = 0.0
-        self.T = 0.0
+        self.t0 = UnitFloat(0, 'iu')
+        self.T = UnitFloat(0, 'iu')
         self.nt = 0
         self.prop_method = 'newton'
         self.use_mcwf = False
         self.mcwf_order = 2
         self.construct_mcwf_ham = False
-        self._pulse_id = 0  # last used pulse_id
-        self._pulse_ids = {}  # pulse -> pulse_id
+        self._pulse_id = defaultdict(int)  # last used pulse_id, per label
+        self._pulse_ids = {}  # (pulse, label) -> pulse_id
 
     @staticmethod
     def _obj_list(obj_list, label=None, with_attribs=False):
@@ -116,24 +117,52 @@ class LevelModel(object):
         if label is not None:
             config_attribs['label'] = label
         if pulse is not None:
-            self._add_pulse(pulse, label)
-            config_attribs['pulse_id'] = self._pulse_ids[pulse]
+            pulse_id = self._add_pulse(pulse, system_label=label)
+            config_attribs['pulse_id'] = pulse_id
         add_target.append(
             (matrix, config_attribs)
         )
 
-    def _add_pulse(self, pulse, label):
-        if pulse not in self._pulse_ids:
-            self._pulse_id += 1
-            pulse_id = self._pulse_id
-            self._pulse_ids[pulse] = pulse_id
-            config_attribs = OrderedDict([])
-            if label is not None:
-                config_attribs['label'] = label
-            config_attribs['id'] = pulse_id
+    def _add_pulse(self, pulse, system_label):
+        """Determine the `config_attribs` ``label``, ``id``, and ``filename``
+        from the given `pulse`. The ``label`` is taken either from
+        ``pulse.config_attribs['label']`` or from `system_label`. The
+        ``filename`` is taken from either ``pulse.config_attribs['filename']``
+        or it is chosen internally. If the combination ``(pulse, label)`` has
+        not been encountered before, store ``(pulse, config_attribs)`` in
+        `_pulses`. Increments ``self._pulse_id[label]`` and sets
+        ``self._pulse_ids[(pulse, label)]``
+
+        Return `pulse_id`
+        """
+        try:
+            label = pulse.config_attribs['label']
+        except (AttributeError, KeyError):
+            label = system_label
+        if label is None:
+            label = ''
+        key = (pulse, label)
+        try:
+            pulse_id = self._pulse_ids[key]
+        except KeyError:
+            self._pulse_id[label] += 1
+            pulse_id = self._pulse_id[label]
+        try:
+            filename = pulse.config_attribs['filename']
+        except (AttributeError, KeyError):
+            if label == '':
+                filename = "pulse%d.dat" % pulse_id
+            else:
+                filename = "pulse%d_%s.dat" % (pulse_id, label)
+        if key not in self._pulse_ids:
+            config_attribs = OrderedDict([
+                ('label', label), ('id', pulse_id), ('filename', filename)
+            ])
             self._pulses.append(
                 (pulse, config_attribs)
             )
+            self._pulse_ids[key] = pulse_id
+        return pulse_id
 
     def add_ham(self, H, pulse=None, op_unit=None, sparsity_model=None,
             op_type=None, label=None, **kwargs):
@@ -395,12 +424,9 @@ class LevelModel(object):
         if 'pulse' not in config_data:
             config_data['pulse'] = []
         for pulse, attribs in self._pulses:
-            label = attribs.get('label', '')
+            label = attribs['label']
             pulse_id = attribs['id']
-            try:
-                filename = pulse.config_attribs['filename']
-            except (AttributeError, KeyError):
-                filename = "pulse%d.dat" % pulse_id
+            filename = attribs['filename']
             if isinstance(pulse, AnalyticalPulse):
                 p = pulse.to_num_pulse(tgrid)
                 p.write(os.path.join(runfolder, filename))

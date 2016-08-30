@@ -9,6 +9,7 @@ import pytest
 
 from QDYN.model import LevelModel
 from QDYN.pulse import Pulse, blackman
+from QDYN.analytical_pulse import AnalyticalPulse
 from QDYN.io import read_indexed_matrix
 from QDYN.linalg import norm
 from QDYN.state import read_psi_amplitudes
@@ -72,10 +73,9 @@ def pop2():
           [0, 0, 0, 1]], dtype=np.complex128)
 
 
-def two_level_model(H0, H1, L1, L2, pop1, pop2, psi):
+def two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi):
     """Construct model for two-qubit system"""
     # Not a fixture!
-    pulse = partial(blackman, t_start=0, t_stop=50)
     model = LevelModel()
     model.add_ham(H0)
     model.add_ham(H1, pulse)
@@ -93,7 +93,8 @@ def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     test_dir, _ = os.path.splitext(filename)
 
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
-    model = two_level_model(H0, H1, L1, L2, pop1, pop2, psi)
+    pulse = partial(blackman, t_start=0, t_stop=50)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     model.write_to_runfolder(str(tmpdir.join('model_rf')))
 
     assert filecmp.cmp(os.path.join(test_dir, 'config'),
@@ -134,7 +135,8 @@ def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     test_dir, _ = os.path.splitext(filename)
 
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
-    model = two_level_model(H0, H1, L1, L2, pop1, pop2, psi)
+    pulse = partial(blackman, t_start=0, t_stop=50)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     model.add_state(np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0),
                     label='target')
     model.write_to_runfolder(str(tmpdir.join('model_rf')),
@@ -142,4 +144,62 @@ def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
 
     assert filecmp.cmp(os.path.join(test_dir, 'target.config'),
                        str(tmpdir.join('model_rf', 'target.config')),
+                       shallow=False)
+
+
+def test_ensemble(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
+    """Test ensemble of multiple Hamiltonians"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+    pulse = partial(blackman, t_start=0, t_stop=50)
+
+    psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
+    pulse = partial(blackman, t_start=0, t_stop=50)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
+    for i in range(5):
+        r1 = (np.random.rand() - 0.5) * 0.01
+        r2 = (np.random.rand() - 0.5) * 0.01
+        ens = "ens%d" % (i+1)
+        H0_fn = "H0_%s.dat" % ens
+        H1_fn = "H1_%s.dat" % ens
+        model.add_ham(H0+r1*H0, label=ens, filename=H0_fn)
+        model.add_ham(H1+r2*H1, pulse, label=ens, filename=H1_fn)
+    model.write_to_runfolder(str(tmpdir.join('model_rf')),
+                             config='ensemble.config')
+    assert filecmp.cmp(os.path.join(test_dir, 'ensemble.config'),
+                       str(tmpdir.join('model_rf', 'ensemble.config')),
+                       shallow=False)
+
+
+def test_ensemble_shared_pulse(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
+    """Test ensemble of multiple Hamiltonians that all share the same pulse"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+
+    class MyAP(AnalyticalPulse):
+        # We don't want register_formula to modify the underlying
+        # AnalyticalPulse class, as this might leak into other tests
+        _formulas = {}
+        _allowed_args = {}
+        _required_args = {}
+
+    MyAP.register_formula('blackman', blackman)
+    pulse = MyAP('blackman', T=50, nt=1000,
+                 parameters={'t_start': 0, 't_stop': 50},
+                 time_unit='ns', ampl_unit='unitless',
+                 config_attribs={'label': ''})
+    psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
+    for i in range(5):
+        r1 = (np.random.rand() - 0.5) * 0.01
+        r2 = (np.random.rand() - 0.5) * 0.01
+        ens = "ens%d" % (i+1)
+        H0_fn = "H0_%s.dat" % ens
+        H1_fn = "H1_%s.dat" % ens
+        model.add_ham(H0+r1*H0, label=ens, filename=H0_fn)
+        model.add_ham(H1+r2*H1, pulse, label=ens, filename=H1_fn)
+    model.write_to_runfolder(str(tmpdir.join('model_rf')),
+                             config='ensemble_shared.config')
+    assert filecmp.cmp(os.path.join(test_dir, 'ensemble_shared.config'),
+                       str(tmpdir.join('model_rf', 'ensemble_shared.config')),
                        shallow=False)
