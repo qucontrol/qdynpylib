@@ -2,6 +2,7 @@
 
 import os
 import filecmp
+from collections import OrderedDict
 from functools import partial
 
 import numpy as np
@@ -116,6 +117,31 @@ def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
 
     assert file_matches_matrix('H0.dat', H0)
     assert file_matches_matrix('H1.dat', H1)
+    assert model.ham() == [H0, H1]
+    assert model.ham(with_attribs=True) == [
+            (H0, OrderedDict([])),
+            (H1, OrderedDict([('pulse_id', 1)]))
+    ]
+    assert model.observables() == [pop1, pop2]
+    assert model.observables(with_attribs=True) == [
+            (pop1, OrderedDict([('outfile', 'pops.dat'),
+                                ('exp_unit', 'unitless'), ('is_real', True),
+                                ('time_unit', 'ns'),
+                                ('column_label', '<P_1> (q1)'),
+                                ('op_unit', 'unitless')])),
+            (pop2, OrderedDict([('outfile', 'pops.dat'),
+                                ('exp_unit', 'unitless'), ('is_real', True),
+                                ('time_unit', 'ns'),
+                                ('column_label', '<P_1> (q2)'),
+                                ('op_unit', 'unitless')]))
+    ]
+    assert model.lindblad_ops() == [L1, L2]
+    assert model.lindblad_ops(with_attribs=True) == [
+            (L1, OrderedDict([('add_to_H_jump', 'banded'),
+                              ('conv_to_superop', False)])),
+            (L2, OrderedDict([('add_to_H_jump', 'banded'),
+                              ('conv_to_superop', False)]))
+    ]
     assert file_matches_matrix('L1.dat', L1)
     assert file_matches_matrix('L2.dat', L2)
     assert file_matches_matrix('O1.dat', pop1)
@@ -164,6 +190,9 @@ def test_ensemble(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
         H1_fn = "H1_%s.dat" % ens
         model.add_ham(H0+r1*H0, label=ens, filename=H0_fn)
         model.add_ham(H1+r2*H1, pulse, label=ens, filename=H1_fn)
+
+    assert len(model.ham()) == 2
+    assert len(model.ham(label='ens1')) == 2
     model.write_to_runfolder(str(tmpdir.join('model_rf')),
                              config='ensemble.config')
     assert filecmp.cmp(os.path.join(test_dir, 'ensemble.config'),
