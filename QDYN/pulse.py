@@ -603,15 +603,18 @@ class Pulse(object):
         with open(filename, 'w') as out_fh:
             out_fh.write(buffer)
 
-    def config_line(self, filename, pulse_id, label=''):
+    def config_line(self, filename, pulse_id, label=None):
         """Return an OrderedDict of attributes for a config file line
         describing the pulse"""
         result = OrderedDict(self.config_attribs)
         result.update(OrderedDict([
             ('type', 'file'), ('filename', filename), ('id', pulse_id),
             ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
-        if label != '':
+        if label is not None:
             result['label'] = label
+        if 'label' in result:
+            if result['label'] == '':
+                del result['label']
         if self.is_complex:
             result['is_complex'] = True
         return result
