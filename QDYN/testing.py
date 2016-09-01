@@ -11,7 +11,8 @@ import sh
 
 FEATURES = ['check-cheby', 'no-check-cheby', 'check-newton', 'no-check-newton',
             'parallel-ham', 'no-parallel-ham', 'use-mpi', 'use-mkl',
-            'parallel-oct', 'no-parallel-oct', 'backtraces', 'no-backtraces']
+            'parallel-oct', 'no-parallel-oct', 'backtraces', 'no-backtraces',
+            'debug', 'no-debug']
 
 
 def qdyn_feature(configure_log, feature):
