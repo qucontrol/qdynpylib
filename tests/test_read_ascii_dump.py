@@ -19,12 +19,14 @@ def test_read_para_dump(request):
         'ham', 'observables', 'dissipator', 'eigensystem', 'psi', 'pulse',
         'oct', 'prop', 'bwr', 'numerov', 'user', 'is_set'
     ]
+    assert para.typename == 'para_t'
     assert list(para.keys()) == expected_keys
     assert para['runfolder'] == 'multi_config_run'
     assert para['initialized']
     assert isinstance(para['ham'], list)
     assert len(para['ham']) == 32
     assert para['ham'][1]['op_type'] == 'pot'
+    assert para['ham'][1].typename == 'ham_pt'
     assert isinstance(para['user'], OrderedDict)
     assert isinstance(para['user']['reals_vals'], list)
 

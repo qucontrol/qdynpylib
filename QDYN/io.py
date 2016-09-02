@@ -670,7 +670,8 @@ def obj_to_json(obj, classkey=None, attr_filter=None, depth=10, sort_keys=True,
 
 def read_ascii_dump(filename, convert_boolean=True, flatten=False):
     """Read a file in the format written by the QDYN `dump_ascii_*` routines
-    and return its data as a nested OrderedDict
+    and return its data as a nested OrderedDict. The QDYN type of the dumped
+    data structure is recorded in the `typename` attribute of the result.
 
     Args:
         filename (str): name of file from which to read data
@@ -691,7 +692,7 @@ def read_ascii_dump(filename, convert_boolean=True, flatten=False):
 
 
 def _read_ascii_dump(data, convert_boolean=True, flatten=False,
-                     read_first_line=True):
+                     typename=None):
     """Recursive implementation of `read_ascci_dump`
 
     Args:
@@ -736,11 +737,13 @@ def _read_ascii_dump(data, convert_boolean=True, flatten=False,
         rx_converters.append((rx_boolean, lambda m: bool_map[m.group('val')]))
     rx_converters.append((rx_str, lambda m: m.group('val')))
 
-    if read_first_line:
+    if typename is None:
         first_line = next(data)
         logger.debug("FIRST LINE: %s", first_line.rstrip())
         if not first_line.startswith("# ASCII DUMP"):
             raise ValueError("Invalid dump format")
+        typename = first_line[13:].strip()
+    result.typename = typename
 
     field = None
     value = None
@@ -785,10 +788,11 @@ def _read_ascii_dump(data, convert_boolean=True, flatten=False,
             # obtain value
             if line.startswith('# ASCII DUMP'):
                 logger.debug("  (value is sub-dump, recurse)")
+                typename = line[13:].strip()
                 value = _read_ascii_dump(data,
                                          convert_boolean=convert_boolean,
                                          flatten=flatten,
-                                         read_first_line=False)
+                                         typename=typename)
             else:
                 matched = False
                 for rx, conv in rx_converters:
