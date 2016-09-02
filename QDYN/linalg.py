@@ -233,11 +233,15 @@ def iscomplexobj(x):
     >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5j]]))
     True
     """
-    # This is a workaround for numpy bug #7924
+    # This is a workaround for numpy bug #7924. It also works for qutip objects
     try:
         dtype = x.dtype
     except AttributeError:
-        dtype = np.asarray(x).dtype
+        try:
+            # qutip.Qobj
+            dtype = x.data.dtype
+        except AttributeError:
+            dtype = np.asarray(x).dtype
     try:
         return issubclass(dtype.type, np.core.numeric.complexfloating)
     except AttributeError:
