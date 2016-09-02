@@ -4,6 +4,8 @@ from __future__ import print_function, division, absolute_import
 import sys
 import re
 import os
+from collections import OrderedDict
+import logging
 # import for doctests
 from contextlib import contextmanager
 import tempfile
@@ -111,10 +113,13 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
     """
 
     # set line formatter
+
     def real_formatter(i, j, v):
         return "%8d%8d%25.16E" % (i, j, v.real)
+
     def complex_formatter(i, j, v):
         return "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
+
     if repr(matrix).startswith('Quantum object'):
         # handle qutip Qobj (without importing the qutip package)
         matrix = matrix.data
@@ -661,3 +666,172 @@ def obj_to_json(obj, classkey=None, attr_filter=None, depth=10, sort_keys=True,
         obj_to_data(obj, classkey=classkey, attr_filter=attr_filter,
                     depth=depth),
         sort_keys=sort_keys, indent=indent, separators=separators)
+
+
+def read_ascii_dump(filename, convert_boolean=True, flatten=False):
+    """Read a file in the format written by the QDYN `dump_ascii_*` routines
+    and return its data as a nested OrderedDict
+
+    Args:
+        filename (str): name of file from which to read data
+        convert_boolean (bool): Convert strings 'T', 'F' to Boolean values True
+            and False
+        flatten (bool):  If True, numerical array data is returned flattend
+            (one-dimensional). If False, it is reshaped to the shape defined in
+            the dump file.
+    """
+    with open(filename) as in_fh:
+        try:
+            return _read_ascii_dump(in_fh, convert_boolean=convert_boolean,
+                                    flatten=flatten)
+        except StopIteration:
+            # If the file properly ended in '# END ASCII DUMP', we should have
+            # returned cleanly instead of running into the end of the file
+            raise ValueError("Premature file end")
+
+
+def _read_ascii_dump(data, convert_boolean=True, flatten=False,
+                     read_first_line=True):
+    """Recursive implementation of `read_ascci_dump`
+
+    Args:
+        data (iterator): An iterator of lines (e.g., an open file handle).
+        convert_boolean (bool): Convert 'T', 'F' to boolean values?
+        flatten (bool):  If True, numerical array data is returned flattend
+            (one-dimensional). If False, it is reshaped to the shape defined in
+            the dump file.
+        read_first_line (bool): The first line in `data` *must* start with "#
+            ASCII DUMP" unless `read_first_line` is True
+    """
+    logger = logging.getLogger(__name__)
+    logger.debug("ENTERING READ_ASCII_DUMP")
+    result = OrderedDict([])
+    rx_field = re.compile(r'^# (?P<field>\w+)$')
+    rx_arraybounds = re.compile(r'^(\s+\d+){2,}$')
+    rx_item = re.compile(r'^# item\s+\d+')
+    rx_int = re.compile(r'^\s*(?P<val>[0-9+-]+)$')
+    rx_float = re.compile(r'^\s*(?P<val>([+-]?\d+\.[\dEe+-]+))$')
+    rx_complex = re.compile(r'^\s*(?P<re>([+-]?\d+\.[\dEe+-]+))\s+'
+                            r'(?P<im>([+-]?\d+\.[\dEe+-]+))$')
+    rx_boolean = re.compile(r'^(?P<val>[T|F])$')
+    rx_str = re.compile(r'^(?P<val>.*)$')
+    bool_map = {'T': True, 'F': False}
+
+    def ftfloat(num_str):
+        return float(fix_fortran_exponent(num_str))
+
+    def get_shape(line):
+        bounds = [int(i) for i in line.split()]
+        lbounds = np.array(bounds[:(len(bounds)//2)])
+        ubounds = np.array(bounds[(len(bounds)//2):])
+        return tuple(ubounds - lbounds + 1)
+
+    rx_converters = [
+            (rx_int, lambda m: int(m.group('val'))),
+            (rx_float, lambda m: ftfloat(m.group('val'))),
+            (rx_complex, lambda m: complex(ftfloat(m.group('re')),
+                                           ftfloat(m.group('im')))),
+    ]
+    if convert_boolean:
+        rx_converters.append((rx_boolean, lambda m: bool_map[m.group('val')]))
+    rx_converters.append((rx_str, lambda m: m.group('val')))
+
+    if read_first_line:
+        first_line = next(data)
+        logger.debug("FIRST LINE: %s", first_line.rstrip())
+        if not first_line.startswith("# ASCII DUMP"):
+            raise ValueError("Invalid dump format")
+
+    field = None
+    value = None
+    array_size = 0
+    array = []
+    looking_for_field_name = True
+
+    while True:
+        line = next(data)
+        logger.debug("LINE: %s", line.rstrip())
+        if rx_item.match(line):
+            logger.debug("  (skipped as item line)")
+            continue  # skip line
+        if looking_for_field_name:
+            m = rx_field.match(line)
+        else:
+            m = None
+        if m:  # field name line
+            field = m.group('field')
+            logger.debug("  (matched as field-name line, %s)", field)
+            value = None
+            result[field] = None  # so we can detect fixed-sized arrays
+            array_size = 0
+            array = []
+            looking_for_field_name = False
+            # Not looking for two consecutive field name lines means we could
+            # have string values that start with '#'
+        else:  # value-line, array bound line, or end of dump
+            if line.startswith('# END ASCII DUMP'):
+                logger.debug("  (end dump -> return)")
+                return result
+            # array bounds?
+            if rx_arraybounds.match(line):
+                array_size = int(value) #  what we thought was a simple int ...
+                result[field] = None    #  ... value is actually the array_size
+                shape = get_shape(line)
+                logger.debug("  (array bound line -> value will be array "
+                             "of size %d)", array_size)
+                # note that only allocatable components have an array bound
+                # line. Fixed-sized arrays are handled separately (below)
+                continue
+            # obtain value
+            if line.startswith('# ASCII DUMP'):
+                logger.debug("  (value is sub-dump, recurse)")
+                value = _read_ascii_dump(data,
+                                         convert_boolean=convert_boolean,
+                                         flatten=flatten,
+                                         read_first_line=False)
+            else:
+                matched = False
+                for rx, conv in rx_converters:
+                    m = rx.match(line)
+                    if m:
+                        matched = True
+                        value = conv(m)
+                        logger.debug("  (value: %s)", value)
+                        break
+                assert matched
+            # append value to array, or set result
+            if array_size > 0:
+                array.append(value)
+                array_size -= 1
+                logger.debug("  (appended value %s, %d remaining)",
+                             value, array_size)
+                if array_size == 0:
+                    if np.isscalar(array[0]):
+                        if flatten:
+                            logger.debug("  (set result for %s as flat "
+                                         "np.array)", field)
+                            result[field] = np.array(array)
+                        else:
+                            logger.debug("  (set result for %s as reshaped "
+                                         "np.array)", field)
+                            result[field] = np.array(array).reshape(shape,
+                                                                    order='F')
+                    else:
+                        result[field] = array
+                        logger.debug("  (set result for %s as list)",
+                                     field)
+            else:  # not an array (or at least not an allocatable array)
+                if result[field] is None:
+                    logger.debug("  (set result for %s as simple value %s)",
+                                 field, value)
+                    result[field] = value
+                elif isinstance(result[field], list):
+                    logger.debug("  (append simple value %s to fixed-sized "
+                                 "array for %s)", value, field)
+                    result[field].append(value)
+                else:
+                    logger.debug("  (append simple value %s to fixed-sized "
+                                 "array for %s [new])", value, field)
+                    result[field] = [result[field], value]
+            if array_size == 0:
+                looking_for_field_name = True  # next line may be a field name
