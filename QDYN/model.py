@@ -47,6 +47,7 @@ class LevelModel(object):
         self._lindblad_ops = []  # list of (matrix, config_attribs)
         self._observables = []  # list of (matrix, config_attribs)
         self._psi = OrderedDict([])  # dict(label => vector)
+        self._oct = OrderedDict([]) # keys -> vals for OCT section
         self.t0 = UnitFloat(0, 'iu')
         self.T = UnitFloat(0, 'iu')
         self.nt = 0
@@ -370,6 +371,43 @@ class LevelModel(object):
         else:
             self.construct_mcwf_ham = False
 
+    def set_oct(self, method, J_T_conv, **kwargs):
+        """Set the OCT section in the config file
+
+        Args:
+            method     Optimization method. Allowed values are 'krotovpk',
+                       'krotov2', 'krotovbwr', and 'lbfgs'
+            J_T_conv   The value of the final time functional
+
+        All other keyword arguments directly specify keys and value. Allowed
+        keys are `iter_start`, `iter_stop`, `max_ram_mb`, `max_disk_mb`,
+        `lbfgs_memory`, `linesearch`, `grad_order`, `iter_dat`, `tau_dat`,
+        `params_file`, `krotov2_conv_dat`, `ABC_dat`, `delta_J_conv`,
+        `delta_J_T_conv`, `A`, `B`, `C`, `dynamic_sigma`, `dynamic_lambda_a`,
+        `strict_convergence`, `limit_pulses`, `sigma_form`, `max_seconds`,
+        `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`,
+        `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN
+        documentation for details.
+        """
+        allowed_keys = [
+            'iter_start', 'iter_stop', 'max_ram_mb', 'max_disk_mb',
+            'lbfgs_memory', 'linesearch', 'grad_order', 'iter_dat', 'tau_dat',
+            'params_file', 'krotov2_conv_dat', 'ABC_dat', 'delta_J_conv',
+            'delta_J_T_conv', 'A', 'B', 'C', 'dynamic_sigma',
+            'dynamic_lambda_a', 'strict_convergence', 'limit_pulses',
+            'sigma_form', 'max_seconds', 'lambda_b', 'keep_pulses',
+            're_init_prop', 'continue', 'storage_folder', 'bwr_nint',
+            'bwr_base', 'g_a'
+        ]
+        self._oct = OrderedDict([('method', method), ('J_T_conv', J_T_conv)])
+        for key, val in kwargs.items():
+            if key in allowed_keys:
+                self._oct[key] = val
+            else:
+                raise TypeError("got an unexpected keyword argument '%s'"
+                                % key)
+
+
     def add_state(self, state, label):
         """Add a state (amplitude array) for the given label. Note that there
         can only be one state per label. Thus calling `add_state` with the same
@@ -414,6 +452,10 @@ class LevelModel(object):
         # states
         if len(self._psi) > 0:
             self._write_psi(runfolder, config_data)
+
+        # OCT
+        if len(self._oct) > 0:
+            config_data['oct'] = self._oct
 
         write_config(config_data, os.path.join(runfolder, config))
 

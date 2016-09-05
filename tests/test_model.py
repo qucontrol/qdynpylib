@@ -172,6 +172,24 @@ def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
                        str(tmpdir.join('model_rf', 'target.config')),
                        shallow=False)
 
+def test_oct(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
+    """Test definition of OCT section"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+
+    psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
+    pulse = partial(blackman, t_start=0, t_stop=50)
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
+    with pytest.raises(TypeError):
+        model.set_oct(method='krotovpk', J_T_conv=1e-3, bogus='val')
+    model.set_oct(method='krotovpk', J_T_conv=1e-3, iter_stop=10)
+    model.write_to_runfolder(str(tmpdir.join('model_rf')),
+                             config='oct.config')
+
+    assert filecmp.cmp(os.path.join(test_dir, 'oct.config'),
+                       str(tmpdir.join('model_rf', 'oct.config')),
+                       shallow=False)
+
 
 def test_ensemble(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     """Test ensemble of multiple Hamiltonians"""
