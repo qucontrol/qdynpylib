@@ -8,7 +8,7 @@ from collections import OrderedDict
 
 import numpy as np
 
-from .pulse import Pulse, pulse_tgrid
+from .pulse import Pulse, pulse_tgrid, pulse_config_line
 from .linalg import iscomplexobj
 from .units import UnitConvert
 
@@ -292,18 +292,6 @@ class AnalyticalPulse(object):
 
     def config_line(self, filename, pulse_id, label=None):
         """Return an OrderedDict of attributes for a config file line
-        describing the pulse"""
-        result = OrderedDict(self.config_attribs)
-        result.update(OrderedDict([
-            ('type', 'file'), ('filename', filename), ('id', pulse_id),
-            ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
-        if label is not None:
-            result['label'] = label
-        if 'label' in result:
-            if result['label'] == '':
-                del result['label']
-        if self.mode == 'complex':
-            result['is_complex'] = True
-
-        return result
+        describing the pulse. See :func:`pulse.pulse_config_line`"""
+        return pulse_config_line(self, filename, pulse_id, label)
 

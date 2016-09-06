@@ -370,7 +370,7 @@ class Pulse(object):
     @property
     def is_complex(self):
         """Does any element of the pulse amplitude have a non-zero imaginary
-        part
+        part?
         """
         return np.max(np.abs(self.amplitude.imag)) > 0.0
 
@@ -605,19 +605,8 @@ class Pulse(object):
 
     def config_line(self, filename, pulse_id, label=None):
         """Return an OrderedDict of attributes for a config file line
-        describing the pulse"""
-        result = OrderedDict(self.config_attribs)
-        result.update(OrderedDict([
-            ('type', 'file'), ('filename', filename), ('id', pulse_id),
-            ('time_unit', self.time_unit), ('ampl_unit', self.ampl_unit)]))
-        if label is not None:
-            result['label'] = label
-        if 'label' in result:
-            if result['label'] == '':
-                del result['label']
-        if self.is_complex:
-            result['is_complex'] = True
-        return result
+        describing the pulse. See :func:`pulse_config_line`"""
+        return pulse_config_line(self, filename, pulse_id, label)
 
     def _unshift(self):
         """Move the pulse onto the unshifted time grid. This increases the number
@@ -1019,6 +1008,46 @@ def tgrid_from_config(tgrid_dict, time_unit, pulse_grid=True):
         nt      -= 1
     tgrid = np.linspace(float(t_start), float(t_stop), nt)
     return tgrid
+
+
+def pulse_config_line(pulse, filename, pulse_id, label=None,
+        config_attribs=None):
+    """Return an OrderedDict of attributes for a config file line
+    describing the pulse
+
+    Args:
+        pulse: Pulse for which to generate the config line attributes. Should
+            be an instance of `Pulse` or any other compatible class (e.g.
+            `AnalyticalPulse`)
+        filename (str): The name of the file from which the pulse will be read.
+            It is assumed that the numerical data of `pulse` will be written to
+            `filename`
+        pulse_id (int): The pulse ID that should be used in the config file
+        label (str or None): The label that should be used in the config file.
+            Both None and an empty string will omit the label from the config
+        config_attribs (dict): A dictionary of additional attributes (beyond,
+            or as an alternative to the data in `pulse.config_attribs`).
+            Preferably, this should be an OrderedDict
+
+    The config attributes 'type', 'filename', 'id', 'time_unit', 'aml_unit',
+    'label', and 'is_complex' will be set based on the `pulse` attributes and
+    the above arguments. Further config attributes may be defined (first) in
+    `pulse.config_attribs`, and (second) in the `config_attribs` argument
+    """
+    result = OrderedDict(pulse.config_attribs)
+    if config_attribs is not None:
+        result.update(config_attribs)
+    result.update(OrderedDict([
+        ('type', 'file'), ('filename', filename), ('id', int(pulse_id)),
+        ('time_unit', pulse.time_unit), ('ampl_unit', pulse.ampl_unit)]))
+    if label is not None:
+        result['label'] = label
+    if 'label' in result:
+        if result['label'] == '':
+            del result['label']
+    if pulse.is_complex:
+        result['is_complex'] = True
+    return result
 
 
 ###############################################################################
