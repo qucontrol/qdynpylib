@@ -213,6 +213,8 @@ def test_ensemble(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     assert len(model.ham()) == 2
     assert len(model.ham(label='ens1')) == 2
     assert len(model.ham(label='*')) == 12
+    assert len(model.pulses(label='ens1')) == 1
+    assert len(model.pulses(label='*')) == 6
     model.write_to_runfolder(str(tmpdir.join('model_rf')),
                              config='ensemble.config')
     assert filecmp.cmp(os.path.join(test_dir, 'ensemble.config'),

@@ -9,12 +9,26 @@ import numpy as np
 
 from .io import write_indexed_matrix
 from .analytical_pulse import AnalyticalPulse
-from .pulse import Pulse, pulse_tgrid
+from .pulse import Pulse, pulse_tgrid, pulse_config_line
 from .config import write_config
 from .state import write_psi_amplitudes
 from .shutil import mkdir
 from .units import UnitFloat
 from .linalg import is_hermitian, choose_sparsity_model, iscomplexobj
+
+
+class SimpleNamespace:
+    """Implementation of types.SimpleNamespace for Python 2"""
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def __repr__(self):
+        keys = sorted(self.__dict__)
+        items = ("{}={!r}".format(k, self.__dict__[k]) for k in keys)
+        return "{}({})".format(type(self).__name__, ", ".join(items))
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class LevelModel(object):
@@ -97,6 +111,35 @@ class LevelModel(object):
         dictionary of config file attributes
         """
         return self._obj_list(self._ham, label, with_attribs)
+
+    def pulses(self, label=None, with_attribs=False):
+        """Return a list of a pulses with the matching label (or all labels if
+        `label` is '*'). If `with_attribs` is True, the resul is a list of
+        tuples ``(pulse, attributes)`` where ``attributes`` is a dictionary of
+        config file attributes
+        """
+        if label is None:
+            label = ''
+        result = []
+        for pulse, attribs in self._pulses:
+            pulse_label = attribs['label']
+            pulse_id = attribs['id']
+            filename = attribs['filename']
+            if (pulse_label == label) or (label == '*'):
+                if with_attribs:
+                    if callable(pulse):
+                        p = SimpleNamespace(
+                                time_unit=self.T.unit, ampl_unit='unitless',
+                                is_complex=iscomplexobj(pulse(0)),
+                                config_attribs=[])
+                    else:
+                        p = pulse
+                    config_attribs = pulse_config_line(p, filename, pulse_id,
+                                                       pulse_label)
+                    result.append((pulse, config_attribs))
+                else:
+                    result.append(pulse)
+        return result
 
     def _add_matrix(self, add_target, matrix, label, pulse=None,
                     check_matrix=True, kwargs=None):
@@ -413,6 +456,8 @@ class LevelModel(object):
         """Add a state (amplitude array) for the given label. Note that there
         can only be one state per label. Thus calling `add_state` with the same
         `label` of an earlier call will replace the `state`"""
+        if label is None:
+            label = ''
         self._psi[label] = state
 
     def write_to_runfolder(self, runfolder, config='config'):
@@ -466,28 +511,23 @@ class LevelModel(object):
         tgrid = pulse_tgrid(self.T, self.nt, self.t0)
         if 'pulse' not in config_data:
             config_data['pulse'] = []
-        for pulse, attribs in self._pulses:
-            label = attribs['label']
-            pulse_id = attribs['id']
+        for pulse, attribs in self.pulses(label='*', with_attribs=True):
             filename = attribs['filename']
             if isinstance(pulse, AnalyticalPulse):
                 p = pulse.to_num_pulse(tgrid)
                 p.write(os.path.join(runfolder, filename))
-                config_data['pulse'].append(
-                        p.config_line(filename, pulse_id, label))
+                config_data['pulse'].append(attribs)
             elif isinstance(pulse, Pulse):
                 if np.max(np.abs(tgrid - pulse.tgrid)) > 1e-12:
                     raise ValueError("Mismatch of tgrid with pulse tgrid")
                 pulse.write(os.path.join(runfolder, filename))
-                config_data['pulse'].append(
-                        pulse.config_line(filename, pulse_id, label))
+                config_data['pulse'].append(attribs)
             elif callable(pulse):
                 ampl = np.array([pulse(t) for t in tgrid])
                 p = Pulse(tgrid, amplitude=ampl, time_unit=self.T.unit,
                           ampl_unit='unitless', freq_unit='iu')
                 p.write(os.path.join(runfolder, filename))
-                config_data['pulse'].append(
-                        p.config_line(filename, pulse_id, label))
+                config_data['pulse'].append(attribs)
             else:
                 raise TypeError("Invalid pulse type")
 
