@@ -82,7 +82,8 @@ def two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi):
     model.add_ham(H1, pulse)
     model.add_lindblad_op(L1)
     model.add_lindblad_op(L2)
-    model.set_propagation(psi, T=50, nt=1001, time_unit='ns', use_mcwf=True)
+    model.set_propagation(initial_state=psi, T=50, nt=1001, time_unit='ns',
+                          use_mcwf=True)
     model.add_observable(pop1, 'pops.dat', 'unitless', 'ns', '<P_1> (q1)')
     model.add_observable(pop2, 'pops.dat', 'unitless', 'ns', '<P_1> (q2)')
     return model

@@ -318,13 +318,12 @@ class LevelModel(object):
         self._add_matrix(self._lindblad_ops, L, label, pulse=pulse,
                          kwargs=config_attribs)
 
-    def set_propagation(self, initial_state, T, nt, time_unit, t0=0.0,
+    def set_propagation(self, T, nt, time_unit, t0=0.0,
             prop_method='newton', use_mcwf=False, mcwf_order=2,
-            construct_mcwf_ham=True, label=None):
+            construct_mcwf_ham=True, label=None, initial_state=None):
         """Set the time grid and other propagation-specific settings
 
         Args:
-            initial_state (array): Initial wave function
             T (float): final time
             nt (int): number of points in the time grid
             time_unit (str): physical unit of `T`, `t0`
@@ -341,6 +340,7 @@ class LevelModel(object):
                 model is the correct "effective" Hamiltonian for a MCWF
                 propagation.
             label (str or None): The label for `initial_state`
+            initial_state (array or None): Initial wave function
 
         Notes:
             When setting up an MCWF propagation, using the `mcwf_order=2` is
@@ -353,10 +353,8 @@ class LevelModel(object):
             instantaneous, and there can be multiple jumps per time step, but
             the numerical overhead is larger.
         """
-        if label is None:
-            self._psi[''] = initial_state
-        else:
-            self._psi[label] = initial_state
+        if initial_state is not None:
+            self.add_state(initial_state, label)
         self.T = UnitFloat(T, time_unit)
         self.nt = nt
         self.t0 = UnitFloat(t0, time_unit)
