@@ -67,7 +67,7 @@ class LevelModel(object):
         result = []
         for (obj, attribs) in obj_list:
             obj_label = attribs.get("label", "")
-            if obj_label == label:
+            if (obj_label == label) or (label == '*'):
                 if with_attribs:
                     result.append((obj, attribs))
                 else:
@@ -75,24 +75,27 @@ class LevelModel(object):
         return result
 
     def observables(self, label=None, with_attribs=False):
-        """Return list of all observables with the matching label. If
-        `with_attribs` is True, the result is a list of tuples ``(observable,
-        attributes``) where ``attributes`` is a dictionary of config file
-        attributes"""
+        """Return list of all observables with the matching label (or all
+        labels if `label` is '*'). If `with_attribs` is True, the result is a
+        list of tuples ``(observable, attributes``) where ``attributes`` is a
+        dictionary of config file attributes
+        """
         return self._obj_list(self._observables, label, with_attribs)
 
     def lindblad_ops(self, label=None, with_attribs=False):
-        """Return list of all Lindblad operators with the matching label. If
-        `with_attribs` is True, the result is a list of tuples ``(operator,
-        attributes``) where ``attributes`` is a dictionary of config file
-        attributes"""
+        """Return list of all Lindblad operators with the matching label (or
+        all labels if `label` is '*'). If `with_attribs` is True, the result is
+        a list of tuples ``(operator, attributes``) where ``attributes`` is a
+        dictionary of config file attributes
+        """
         return self._obj_list(self._lindblad_ops, label, with_attribs)
 
     def ham(self, label=None, with_attribs=False):
-        """Return list of all Hamiltonain operators with the matching label. If
-        `with_attribs` is True, the result is a list of tuples ``(ham,
-        attributes``) where ``attributes`` is a dictionary of config file
-        attributes"""
+        """Return list of all Hamiltonian operators with the matching label (or
+        all labels if `label` is '*'). If `with_attribs` is True, the result is
+        a list of tuples ``(ham, attributes``) where ``attributes`` is a
+        dictionary of config file attributes
+        """
         return self._obj_list(self._ham, label, with_attribs)
 
     def _add_matrix(self, add_target, matrix, label, pulse=None,
