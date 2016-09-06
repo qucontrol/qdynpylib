@@ -2,7 +2,7 @@ PROJECT_NAME = QDYN
 PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage sh
 TESTPYPI = https://testpypi.python.org/pypi
 
-TESTOPTIONS = --doctest-modules --cov=QDYN
+TESTOPTIONS = --doctest-modules --cov=QDYN -n auto
 TESTS = QDYN tests slow_tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
@@ -59,13 +59,13 @@ clean:
 	@.venv/py34/bin/pip install -e .[dev]
 
 test27: .venv/py27/bin/py.test
-	$< -v $(TESTOPTIONS) $(TESTS)
+	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
 
 test33: .venv/py33/bin/py.test
-	$< -v $(TESTOPTIONS) $(TESTS)
+	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
 
 test34: .venv/py34/bin/py.test
-	$< -v $(TESTOPTIONS) $(TESTS)
+	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
 
 test: test27 test33 test34
 
