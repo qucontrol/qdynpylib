@@ -9,6 +9,7 @@ from collections import OrderedDict
 import numpy as np
 
 from .pulse import Pulse, pulse_tgrid
+from .linalg import iscomplexobj
 from .units import UnitConvert
 
 
@@ -120,6 +121,16 @@ class AnalyticalPulse(object):
         self.config_attribs = OrderedDict({})
         if config_attribs is not None:
             self.config_attribs = config_attribs
+
+    @property
+    def is_complex(self):
+        """Is the pulse amplitude complex?"""
+        if self.mode is None:
+            return iscomplexobj(self.evaluate_formula(self.t0,
+                                                      **self.parameters))
+        else:
+            return (self.mode == 'complex')
+        return np.max(np.abs(self.amplitude.imag)) > 0.0
 
     def copy(self):
         """Return a copy of the analytical pulse"""
@@ -263,12 +274,12 @@ class AnalyticalPulse(object):
                              'required 1-D numpy array')%(
                              self._formula, type(amplitude)))
         if mode is None:
-            if np.isrealobj(amplitude):
-                mode = 'real'
-            else:
+            if iscomplexobj(amplitude):
                 mode = 'complex'
+            else:
+                mode = 'real'
         else:
-            if mode == 'real' and not np.isrealobj(amplitude):
+            if mode == 'real' and iscomplexobj(amplitude):
                 if np.max(np.abs(amplitude.imag)) > 0.0:
                     raise ValueError("mode is 'real', but amplitude has "
                                      "non-zero imaginary part")
