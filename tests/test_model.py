@@ -14,6 +14,7 @@ from QDYN.analytical_pulse import AnalyticalPulse
 from QDYN.io import read_indexed_matrix
 from QDYN.linalg import norm
 from QDYN.state import read_psi_amplitudes
+from QDYN.units import UnitFloat
 # built-in fixtures: tmpdir, request
 
 
@@ -173,6 +174,7 @@ def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
                        str(tmpdir.join('model_rf', 'target.config')),
                        shallow=False)
 
+
 def test_oct(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     """Test definition of OCT section"""
     filename = request.module.__file__
@@ -181,9 +183,27 @@ def test_oct(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
     pulse = partial(blackman, t_start=0, t_stop=50)
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
+    with pytest.raises(KeyError) as exc_info:
+        model.set_oct({}, method='krotovpk', J_T_conv=1e-3)
+    assert "must contain settings for all pulses" in str(exc_info)
+    with pytest.raises(KeyError) as exc_info:
+        model.set_oct({pulse: {}}, method='krotovpk', J_T_conv=1e-3)
+    assert "Key 'oct_lambda_a' is required" in str(exc_info)
+    with pytest.raises(KeyError) as exc_info:
+        model.set_oct({pulse: {'oct_lambda_a': 1e-3, 'bogus': 1}},
+                      method='krotovpk', J_T_conv=1e-3)
+    assert "Invalid key 'bogus'" in str(exc_info)
+    pulse_oct_settings = {
+        pulse: OrderedDict([
+            ('oct_lambda_a', 1e-3), ('oct_shape', 'flattop'),
+            ('t_rise', UnitFloat(5, 'ns')), ('t_fall', UnitFloat(5, 'ns'))
+        ])
+    }
     with pytest.raises(TypeError):
-        model.set_oct(method='krotovpk', J_T_conv=1e-3, bogus='val')
-    model.set_oct(method='krotovpk', J_T_conv=1e-3, iter_stop=10)
+        model.set_oct(pulse_oct_settings, method='krotovpk', J_T_conv=1e-3,
+                      bogus='val')
+    model.set_oct(pulse_oct_settings, method='krotovpk', J_T_conv=1e-3,
+                  iter_stop=10)
     model.write_to_runfolder(str(tmpdir.join('model_rf')),
                              config='oct.config')
 

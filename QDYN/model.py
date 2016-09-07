@@ -17,18 +17,10 @@ from .units import UnitFloat
 from .linalg import is_hermitian, choose_sparsity_model, iscomplexobj
 
 
-class SimpleNamespace:
+class _SimpleNamespace:
     """Implementation of types.SimpleNamespace for Python 2"""
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
-
-    def __repr__(self):
-        keys = sorted(self.__dict__)
-        items = ("{}={!r}".format(k, self.__dict__[k]) for k in keys)
-        return "{}({})".format(type(self).__name__, ", ".join(items))
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
 
 
 class LevelModel(object):
@@ -49,19 +41,29 @@ class LevelModel(object):
             user's responsibility to ensure that `ham` is the proper effective
             Hamiltonian.
 
-    Note:
-        The attributes `t0`, `T`, `nt`, `prop_method`, `use-mcwf`, and
-        `construct_mcwf_ham` are all set via :meth:`set_propagation`.
+        After instantiation, the attributes `t0`, `T`, `nt`, `prop_method`,
+        `use-mcwf`, and `construct_mcwf_ham` are all set via
+        :meth:`set_propagation`.  Operators and pulses are added to the system
+        through :meth:`add_ham`, :meth:`add_observable`, and
+        :meth:`add_lindblad_op`. States are added through :meth:`add_state`.
+        Both the general OCT settings (OCT section in the QDYN config file) and
+        OCT-related settings for each control pulse are controlled through
+        :meth:`set_oct`. After the model has been constructed, a config file
+        and all dependent data input files for the operators, pulses, and
+        states can be written via :meth:`write_to_runfolder`.
     """
 
     def __init__(self):
         self._ham = []  # list of (matrix, config_attribs)
-        self._pulses = []  # list of (pulse, config_attribs: label, pulse_id,
-                           #                                 filename)
+        self._pulses = []  # list of (pulse, config_attribs)
+        # the pulse config_attribs store the label, id, and filename, as well
+        # as any attributes set by the `set_oct` method. Additional attributes
+        # may exist in `pulse.config_attribs` of each pulse. All of these are
+        # collected in the `pulses` method
         self._lindblad_ops = []  # list of (matrix, config_attribs)
         self._observables = []  # list of (matrix, config_attribs)
-        self._psi = OrderedDict([])  # dict(label => vector)
-        self._oct = OrderedDict([]) # keys -> vals for OCT section
+        self._psi = OrderedDict([])  # label => amplitude array
+        self._oct = OrderedDict([])  # key => val for OCT section
         self.t0 = UnitFloat(0, 'iu')
         self.T = UnitFloat(0, 'iu')
         self.nt = 0
@@ -113,10 +115,12 @@ class LevelModel(object):
         return self._obj_list(self._ham, label, with_attribs)
 
     def pulses(self, label=None, with_attribs=False):
-        """Return a list of a pulses with the matching label (or all labels if
-        `label` is '*'). If `with_attribs` is True, the resul is a list of
-        tuples ``(pulse, attributes)`` where ``attributes`` is a dictionary of
-        config file attributes
+        """Return a list of all known pulses with the matching label (or all
+        labels if `label` is '*'). The pulses originate from calls to e.g.
+        `add_ham`. That is, they are introduced to the system via operators
+        that couple to them. If `with_attribs` is True, the result is a list of
+        tuples ``(pulse, attributes)`` where ``attributes`` is a (combined,
+        read-only) dictionary of all config file attributes for the pulse.
         """
         if label is None:
             label = ''
@@ -128,14 +132,15 @@ class LevelModel(object):
             if (pulse_label == label) or (label == '*'):
                 if with_attribs:
                     if callable(pulse):
-                        p = SimpleNamespace(
+                        p = _SimpleNamespace(
                                 time_unit=self.T.unit, ampl_unit='unitless',
                                 is_complex=iscomplexobj(pulse(0)),
                                 config_attribs=[])
                     else:
                         p = pulse
                     config_attribs = pulse_config_line(p, filename, pulse_id,
-                                                       pulse_label)
+                                                       pulse_label,
+                                                       config_attribs=attribs)
                     result.append((pulse, config_attribs))
                 else:
                     result.append(pulse)
@@ -146,6 +151,7 @@ class LevelModel(object):
         """Common implementation of `add_ham`, `add_observable`,
         `add_lindblad_op`"""
         if kwargs is None:
+            # Note: we do not use **kwargs to preserve an OrderedDict
             kwargs = {}
         if check_matrix:
             if not hasattr(matrix, 'shape'):
@@ -235,9 +241,8 @@ class LevelModel(object):
             label (str or None): Multiple Hamiltonians may be defined in the
                 same config file if they are differentiated by label. The
                 default label is the empty string
-
-        All other keyword arguments set options for `H` in the config file
-        (e.g. `specrad_method`, `filename`)
+            kwargs: All other keyword arguments set options for `H` in the
+                config file (e.g. `specrad_method`, `filename`)
 
         Note:
             It is recommended to us `QDYN.pulse.AnalyticalPulse` to express
@@ -249,7 +254,7 @@ class LevelModel(object):
             :meth:`set_propagation`.
         """
         config_attribs = OrderedDict([])
-        for key in kwargs:
+        for key in sorted(kwargs):
             config_attribs[key] = kwargs[key]
         if op_unit is not None:
             config_attribs['op_unit'] = op_unit
@@ -351,7 +356,7 @@ class LevelModel(object):
         All other keyword arguments set options for `L` in the config file.
         """
         config_attribs = OrderedDict([])
-        for key in kwargs:
+        for key in sorted(kwargs):
             config_attribs[key] = kwargs[key]
         if op_unit is not None:
             config_attribs['op_unit'] = op_unit
@@ -415,23 +420,46 @@ class LevelModel(object):
         else:
             self.construct_mcwf_ham = False
 
-    def set_oct(self, method, J_T_conv, **kwargs):
-        """Set the OCT section in the config file
+    def set_oct(self, pulse_settings, method, J_T_conv, **kwargs):
+        """Set config file data and pulse properties for optimal control
 
         Args:
-            method     Optimization method. Allowed values are 'krotovpk',
-                       'krotov2', 'krotovbwr', and 'lbfgs'
-            J_T_conv   The value of the final time functional
+            pulse_settings (dict): OCT settings for each known pulse. Must map
+                each pulse (see :meth:`pulses`) to an `OrderedDict` of oct
+                settings
+            method (str): Optimization method. Allowed values are 'krotovpk',
+                'krotov2', 'krotovbwr', and 'lbfgs'
+            J_T_conv (foat): The value of the final time functional
 
-        All other keyword arguments directly specify keys and value. Allowed
-        keys are `iter_start`, `iter_stop`, `max_ram_mb`, `max_disk_mb`,
-        `lbfgs_memory`, `linesearch`, `grad_order`, `iter_dat`, `tau_dat`,
-        `params_file`, `krotov2_conv_dat`, `ABC_dat`, `delta_J_conv`,
-        `delta_J_T_conv`, `A`, `B`, `C`, `dynamic_sigma`, `dynamic_lambda_a`,
-        `strict_convergence`, `limit_pulses`, `sigma_form`, `max_seconds`,
-        `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`,
-        `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN
-        documentation for details.
+        All other keyword arguments directly specify keys and values for the
+        OCT config section. Allowed keys are `iter_start`, `iter_stop`,
+        `max_ram_mb`, `max_disk_mb`, `lbfgs_memory`, `linesearch`,
+        `grad_order`, `iter_dat`, `tau_dat`, `params_file`, `krotov2_conv_dat`,
+        `ABC_dat`, `delta_J_conv`, `delta_J_T_conv`, `A`, `B`, `C`,
+        `dynamic_sigma`, `dynamic_lambda_a`, `strict_convergence`,
+        `limit_pulses`, `sigma_form`, `max_seconds`, `lambda_b`, `keep_pulses`,
+        `re_init_prop`, `continue`, `storage_folder`, `bwr_nint`, `bwr_base`,
+        `g_a`, see the QDYN Fortran library documentation for details.
+
+        The settings for each pulse given by ``pulse_settings[pulse]``. It is
+        recommended to be an `OrderedDict`, and may
+        contain the keys `oct_parametrization`, `oct_pulse_max`,
+        `oct_pulse_min`, `shape_t_start`, `shape_t_stop`, `ftbaseline`,
+        `t_rise`, `t_fall`, `oct_lambda_intens`, `oct_lambda_a`,
+        `oct_shape` (default to ``'const'``), `oct_outfile` (default to
+        ``<file>.oct.dat``, where ``<file>`` is the pulse `filename` without
+        extension), and `oct_increase_factor` (default 5.0).  See the QDYN
+        Fortran library documentation for details. If Krotov's method is used,
+        a value for `oct_lambda_a` must be given.
+
+        Since the `set_oct` method sets attribute for existing pulses, it must
+        be called *after* any methods that add the pulses (e.g.,
+        :meth:`add_ham`)
+
+        Raises:
+            KeyError: If `pulse_settings` does not contain settings for all
+                pulses, or if the settings for a pulse contain invalid or
+                missing keys
         """
         allowed_keys = [
             'iter_start', 'iter_stop', 'max_ram_mb', 'max_disk_mb',
@@ -443,14 +471,44 @@ class LevelModel(object):
             're_init_prop', 'continue', 'storage_folder', 'bwr_nint',
             'bwr_base', 'g_a'
         ]
+        allowed_pulse_keys = [
+            'oct_parametrization', 'oct_pulse_max', 'oct_pulse_min',
+            'shape_t_start', 'shape_t_stop', 'ftbaseline', 't_rise', 't_fall',
+            'oct_lambda_intens', 'oct_lambda_a', 'oct_shape', 'oct_outfile',
+            'oct_increase_factor'
+        ]
+        krotov_required_pulse_keys = ['oct_lambda_a', ]
+
+        def default_outfile(filename):
+            return os.path.splitext(filename)[0] + ".oct.dat"
+
         self._oct = OrderedDict([('method', method), ('J_T_conv', J_T_conv)])
-        for key, val in kwargs.items():
+        for key in sorted(kwargs):
             if key in allowed_keys:
-                self._oct[key] = val
+                self._oct[key] = kwargs[key]
             else:
                 raise TypeError("got an unexpected keyword argument '%s'"
                                 % key)
-
+        for pulse, attribs in self._pulses:
+            try:
+                oct_attribs = pulse_settings[pulse]
+            except KeyError:
+                raise KeyError("pulse_settings must contain settings for all "
+                               "pulses. Missing pulse: %s" % str(pulse))
+            oct_attribs['oct_shape'] = oct_attribs.get('oct_shape', "const")
+            octout = default_outfile(attribs['filename'])
+            oct_attribs['oct_outfile'] = oct_attribs.get('oct_outfile', octout)
+            oct_attribs['oct_increase_factor'] = \
+                oct_attribs.get('oct_increase_factor', 5.0)
+            if 'krotov' in method:
+                for key in krotov_required_pulse_keys:
+                    if key not in oct_attribs:
+                        raise KeyError("Key '%s' is required for each pulse "
+                                       "when using Krotov's method" % key)
+            for key in oct_attribs:
+                if key not in allowed_pulse_keys:
+                    raise KeyError("Invalid key '%s'" % key)
+            attribs.update(oct_attribs)
 
     def add_state(self, state, label):
         """Add a state (amplitude array) for the given label. Note that there
