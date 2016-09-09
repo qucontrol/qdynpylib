@@ -667,8 +667,11 @@ class LevelModel(object):
         config_data"""
         if 'psi' not in config_data:
             config_data['psi'] = []
-        for psi_counter, (label, psi) in enumerate(self._psi.items()):
-            filename = "psi%d.dat" % psi_counter
+        for label, psi in self._psi.items():
+            if label == '':
+                filename = "psi.dat"
+            else:
+                filename = "psi_%s.dat" % label
             write_psi_amplitudes(psi, os.path.join(runfolder, filename))
             if 'psi' not in config_data:
                 config_data['psi'] = []

@@ -22,4 +22,4 @@ observables: type = matrix, real_op = F, n_surf = 4, outfile = pops.dat, &
 * filename = O2.dat, column_label = "<P_1> (q2)"
 
 psi:
-* type = file, filename = psi0.dat
+* type = file, filename = psi.dat

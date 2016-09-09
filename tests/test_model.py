@@ -148,7 +148,7 @@ def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     assert file_matches_matrix('L2.dat', L2)
     assert file_matches_matrix('O1.dat', pop1)
     assert file_matches_matrix('O2.dat', pop2)
-    assert file_matches_psi('psi0.dat', psi, limit=1e-15)
+    assert file_matches_psi('psi.dat', psi, limit=1e-15)
     num_pulse = Pulse.read(str(tmpdir.join('model_rf', 'pulse1.dat')))
     assert num_pulse.time_unit == 'ns'
     assert num_pulse.T == '50_ns'
