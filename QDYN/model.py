@@ -420,7 +420,7 @@ class LevelModel(object):
         else:
             self.construct_mcwf_ham = False
 
-    def set_oct(self, pulse_settings, method, J_T_conv, **kwargs):
+    def set_oct(self, pulse_settings, method, J_T_conv, max_ram_mb, **kwargs):
         """Set config file data and pulse properties for optimal control
 
         Args:
@@ -430,16 +430,21 @@ class LevelModel(object):
             method (str): Optimization method. Allowed values are 'krotovpk',
                 'krotov2', 'krotovbwr', and 'lbfgs'
             J_T_conv (foat): The value of the final time functional
+            max_ram_mb (int): The amount of memory that is available for
+                storing propagated states. If this is not suffient to hold all
+                the states required to calculate the gradient, a "segmented"
+                storage scheme will be used that caches the states to disk,
+                using up to `max_disk_mb` hard drive storage.
 
         All other keyword arguments directly specify keys and values for the
         OCT config section. Allowed keys are `iter_start`, `iter_stop`,
-        `max_ram_mb`, `max_disk_mb`, `lbfgs_memory`, `linesearch`,
-        `grad_order`, `iter_dat`, `tau_dat`, `params_file`, `krotov2_conv_dat`,
-        `ABC_dat`, `delta_J_conv`, `delta_J_T_conv`, `A`, `B`, `C`,
-        `dynamic_sigma`, `dynamic_lambda_a`, `strict_convergence`,
-        `limit_pulses`, `sigma_form`, `max_seconds`, `lambda_b`, `keep_pulses`,
-        `re_init_prop`, `continue`, `storage_folder`, `bwr_nint`, `bwr_base`,
-        `g_a`, see the QDYN Fortran library documentation for details.
+        `max_disk_mb`, `lbfgs_memory`, `linesearch`, `grad_order`, `iter_dat`,
+        `tau_dat`, `params_file`, `krotov2_conv_dat`, `ABC_dat`,
+        `delta_J_conv`, `delta_J_T_conv`, `A`, `B`, `C`, `dynamic_sigma`,
+        `dynamic_lambda_a`, `strict_convergence`, `limit_pulses`, `sigma_form`,
+        `max_seconds`, `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`,
+        `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN Fortran
+        library documentation for details.
 
         The settings for each pulse given by ``pulse_settings[pulse]``. It is
         recommended to be an `OrderedDict`, and may
@@ -462,7 +467,7 @@ class LevelModel(object):
                 missing keys
         """
         allowed_keys = [
-            'iter_start', 'iter_stop', 'max_ram_mb', 'max_disk_mb',
+            'iter_start', 'iter_stop', 'max_disk_mb',
             'lbfgs_memory', 'linesearch', 'grad_order', 'iter_dat', 'tau_dat',
             'params_file', 'krotov2_conv_dat', 'ABC_dat', 'delta_J_conv',
             'delta_J_T_conv', 'A', 'B', 'C', 'dynamic_sigma',
@@ -482,7 +487,8 @@ class LevelModel(object):
         def default_outfile(filename):
             return os.path.splitext(filename)[0] + ".oct.dat"
 
-        self._oct = OrderedDict([('method', method), ('J_T_conv', J_T_conv)])
+        self._oct = OrderedDict([('method', method), ('J_T_conv', J_T_conv),
+                                 ('max_ram_mb', max_ram_mb)])
         for key in sorted(kwargs):
             if key in allowed_keys:
                 self._oct[key] = kwargs[key]
