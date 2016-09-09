@@ -98,6 +98,12 @@ def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
     pulse = partial(blackman, t_start=0, t_stop=50)
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
+    model.user_data['my_str'] = 'This is a custom string value'
+    model.user_data['i'] = 1
+    model.user_data['j'] = 2
+    model.user_data['propagate'] = True
+    model.user_data['liouville_space'] = False
+    model.user_data['precision'] = 1e-8
     model.write_to_runfolder(str(tmpdir.join('model_rf')))
 
     assert filecmp.cmp(os.path.join(test_dir, 'config'),

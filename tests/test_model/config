@@ -23,3 +23,11 @@ observables: type = matrix, real_op = F, n_surf = 4, outfile = pops.dat, &
 
 psi:
 * type = file, filename = psi.dat
+
+user_strings: my_str = "This is a custom string value"
+
+user_ints: i = 1, j = 2
+
+user_logicals: propagate = T, liouville_space = F
+
+user_reals: precision = 1e-08

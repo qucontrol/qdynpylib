@@ -10,7 +10,7 @@ import numpy as np
 from .io import write_indexed_matrix
 from .analytical_pulse import AnalyticalPulse
 from .pulse import Pulse, pulse_tgrid, pulse_config_line
-from .config import write_config
+from .config import write_config, set_config_user_value
 from .state import write_psi_amplitudes
 from .shutil import mkdir
 from .units import UnitFloat
@@ -40,6 +40,10 @@ class LevelModel(object):
             If ``use_mcwf=True`` and ``construct_mcwf_ham=False``, it is the
             user's responsibility to ensure that `ham` is the proper effective
             Hamiltonian.
+        user_data (OrderedDict): Key-value pairs that should that describe
+            user-defined data. These will go in the ``user_strings``,
+            ``user_reals``, ``user_logicals``, or ``user_ints`` section of the
+            config file, depending on the type of the value
 
         After instantiation, the attributes `t0`, `T`, `nt`, `prop_method`,
         `use-mcwf`, and `construct_mcwf_ham` are all set via
@@ -71,6 +75,7 @@ class LevelModel(object):
         self.use_mcwf = False
         self.mcwf_order = 2
         self.construct_mcwf_ham = False
+        self.user_data = OrderedDict([])
         self._pulse_id = defaultdict(int)  # last used pulse_id, per label
         self._pulse_ids = {}  # (pulse, label) -> pulse_id
 
@@ -566,6 +571,10 @@ class LevelModel(object):
         # OCT
         if len(self._oct) > 0:
             config_data['oct'] = self._oct
+
+        # user-defined data
+        for key, val in self.user_data.items():
+            set_config_user_value(config_data, key, val)
 
         write_config(config_data, os.path.join(runfolder, config))
 
