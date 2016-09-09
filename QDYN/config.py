@@ -504,8 +504,34 @@ def get_config_value(config_data, key_tuple):
     return val
 
 
+def get_config_user_value(config_data, key):
+    """Return the value of a user-defined key in the config file (in the
+    ``user_strings``, ``user_reals``, ``user_logicals``, or `user_ints``
+    section). Return the first value found in any of the above sections, as the
+    type corresponding to the section where the key was found. Raise a
+    `KeyError` if `key` does not exist in any of the user-defined sections
+    """
+    logical_mapping = {
+        'T': True, 'true': True, '.true.': True,
+        'F': False, 'false': False, '.false.': False,
+    }
+    user_sections = [
+        ('user_strings',  str),
+        ('user_reals',    float),
+        ('user_logicals', lambda v: logical_mapping.get(v, v)),
+        ('user_ints',     int)
+    ]
+    for section, convert in user_sections:
+        try:
+            return convert(get_config_value(config_data, (section, key)))
+        except ValueError:
+            continue
+    raise KeyError("No user-defined key '%s'" % key)
+
+
 def set_config_value(config_data, key_tuple, value):
-    """Set a value in `config_data`, cf. `get_config_value`"""
+    """Set a value in `config_data`, cf. `get_config_value`. The key that is
+    set must already exist in `config_data`"""
     if len(key_tuple) < 2:
         raise ValueError("key_tuple must have at least two elements")
     try:
@@ -517,6 +543,29 @@ def set_config_value(config_data, key_tuple, value):
         raise ValueError("Invalid key '%s': %s" % (key, str(exc_info)))
     except KeyError:
         raise ValueError("Invalid key '%s'" % (key, ))
+
+
+def set_config_user_value(config_data, key, value):
+    """Set a user-defined value in the config file. The `value` must be an
+    instance of `str`, `float`, `bool`, or `int`, and it will be set for the
+    given `key` in the corresponding section ``user_strings``, ``user_reals``,
+    ``user_loigcals``, or ``user_ints``. This routine may be used to add *new*
+    user-defined data to `config_data`; a missing user-defined section will be
+    created as necessary.
+    """
+    user_sections = [
+        ('user_strings',  str),
+        ('user_reals',    float),
+        ('user_logicals', bool),  # isinstance(False, int) is True, ...
+        ('user_ints',     int)    # ... so the order is important here
+    ]
+    for section_name, section_type in user_sections:
+        if isinstance(value, section_type):
+            if section_name not in config_data:
+                config_data[section_name] = OrderedDict([])
+            config_data[section_name][key] = value
+            return
+    raise TypeError("value must be of type str, float, int, or bool")
 
 
 def generate_make_config(config_template, variables, dependencies=None,
