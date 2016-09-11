@@ -1,5 +1,5 @@
 PROJECT_NAME = QDYN
-PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage sh
+PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage sh nose
 TESTPYPI = https://testpypi.python.org/pypi
 
 TESTOPTIONS = --doctest-modules --cov=QDYN -n auto
