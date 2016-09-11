@@ -17,7 +17,6 @@ from scipy.interpolate import UnivariateSpline
 from six.moves import xrange
 
 from .units import UnitConvert, UnitFloat
-from .linalg import reg_diff
 
 class Pulse(object):
     """Numerical real or complex control pulse
@@ -479,8 +478,7 @@ class Pulse(object):
         deriv_pulse._shift()
         return deriv_pulse
 
-    def phase(self, unwrap=False, s=None, derivative=False, freq_unit=None,
-            reg_alph=None, reg_itern=100):
+    def phase(self, unwrap=False, s=None, derivative=False, freq_unit=None):
         """Return the pulse's complex phase, or derivative of the phase
 
         Parameters:
@@ -495,19 +493,12 @@ class Pulse(object):
             freq_unit (str or None): If `derivative` is True, the unit in which
                 the derivative should be calculated. If None, `self.freq_unit`
                 is used.
-            reg_alph (float or None): If not None, and ``derivative=True``,
-                `ignore the paremters `s` and instead use regularized
-                differentiation (see `alph` in :func:`~QDYN.linalg.reg_diff`).
-            reg_itern (int): If using regularized differntiation, number of
-                iterations to perform (see `itern` in
-                :func:`~QDYN.linalg.reg_diff`)
 
         Note:
             When calculating the derivative, some smoothing is generally
-            required. There are two possibilities. Either the smoothing
-            parameters `s` should be given, in which case the phase is smoothed
-            before calculating the derivative. Alternatively, regularized
-            differentiation can be used, by giving a value to `reg_alpha`.
+            required. By specifying a smoothing parameter `s`, the phase is
+            smoothed through univeriate splines before calculating the
+            derivative.
 
             When calculating the phase directly (instead of the derivative),
             smoothing should only be used when also unwrapping the phase.
@@ -523,14 +514,10 @@ class Pulse(object):
 
             if freq_unit is None:
                 freq_unit = self.freq_unit
-            if reg_alph is None: # smoothed spline differentiation
-                if s is None:
-                    s = 1
-                spl = UnivariateSpline(tgrid, phase, s=s)
-                deriv = spl.derivative()(tgrid)
-            else:
-                deriv = reg_diff(phase, itern=reg_itern, alph=reg_alph,
-                                 dx=tgrid[1]-tgrid[0])
+            if s is None:
+                s = 1
+            spl = UnivariateSpline(tgrid, phase, s=s)
+            deriv = spl.derivative()(tgrid)
             return self.unit_convert.convert(deriv, 'iu', self.freq_unit)
 
         else: # direct phase
