@@ -2,7 +2,7 @@ PROJECT_NAME = QDYN
 PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage sh nose
 TESTPYPI = https://testpypi.python.org/pypi
 
-TESTOPTIONS = --doctest-modules --cov=QDYN -n auto
+TESTOPTIONS = --doctest-modules --cov=QDYN --cov-config .coveragerc -n auto
 TESTS = QDYN tests slow_tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
