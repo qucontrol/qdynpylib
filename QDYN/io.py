@@ -417,6 +417,51 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
+def read_cmplx_array(filename, **kwargs):
+    """Read a complex array from a file. The file must contain two columns
+    (real and imaginary part). This routine is equivalent to the Fortran QDYN
+    `read_cmplx_array` routine
+
+    Args:
+        filename (str): Name of the file from which to read the array
+        kwargs: All keyword arguments are passed to `numpy.genfromtxt`
+    """
+    x, y = np.genfromtxt(filename, usecols=(0, 1), unpack=True, **kwargs)
+    return x + 1j*y
+
+
+def write_cmplx_array(carray, filename, header=None, fmtstr='%25.16E',
+                      append=False, comment=None):
+    """Write a complex array to file. Equivalent to the Fortran QDYN
+    `write_cmplx_array`  routine. Two columns will be written to the output
+    file (real and imaginary part of `carray`)
+
+    Args:
+        filename (str): Name of file to which to write the array
+        header (str or None): A header line, to be written immediately before
+            the data. Should start with a '#'
+        fmtstr (str or None): The format to use for reach of the two columns
+        append (bool): If True, append to existing files, with a separator of
+            two blank lines
+        comment (str or None): A comment line, to be written at the top of the
+            file (before the header). Should start with a '#'
+    """
+    header_lines = []
+    if comment is not None:
+        header_lines.append(comment)
+    if header is not None:
+        header_lines.append(header)
+    if append:
+        with open(filename, 'a') as out_fh:
+            out_fh.write("\n\n")
+            writetotxt(out_fh, carray, fmt=(fmtstr, fmtstr),
+                       header=header_lines)
+
+    else:
+        writetotxt(filename, carray, fmt=(fmtstr, fmtstr),
+                   header=header_lines)
+
+
 def writetotxt(fname, *args, **kwargs):
     """Inverse function to numpy.genfromtxt and similar to `numpy.savetxt`,
     but allowing to write *multiple* numpy arrays as columns to a text file.
