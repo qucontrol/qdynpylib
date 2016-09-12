@@ -288,8 +288,7 @@ def read_indexed_matrix(filename, format='coo', shape=None,
 
 def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
         out=None):
-    """
-    Print a numpy complex matrix to screen, or to a file if outfile is given.
+    """Print a numpy complex matrix to screen, or to a file if outfile is given.
     Values below the given limit are printed as zero
 
     Arguments
