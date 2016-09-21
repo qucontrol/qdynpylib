@@ -691,31 +691,31 @@ class Pulse(object):
 
         self._shift()
 
-    def render_pulse(self, ax):
+    def render_pulse(self, ax, label='pulse'):
         """Render the pulse amplitude on the given axes."""
         if np.max(np.abs(self.amplitude.imag)) > 0.0:
             ampl_line, = ax.plot(self.tgrid, np.abs(self.amplitude),
-                                 label='pulse')
+                                 label=label)
             ax.set_ylabel("abs(pulse) (%s)" % self.ampl_unit)
         else:
             if np.min(self.amplitude.real) < 0:
                 ax.axhline(y=0.0, ls='-', color='black')
             ampl_line, = ax.plot(self.tgrid, self.amplitude.real,
-                                 label='pulse')
+                                 label=label)
             ax.set_ylabel("pulse (%s)" % (self.ampl_unit))
         ax.set_xlabel("time (%s)" % self.time_unit)
 
-    def render_phase(self, ax):
+    def render_phase(self, ax, label='phase'):
         """Render the complex phase of the pulse on the given axes."""
         ax.axhline(y=0.0, ls='-', color='black')
         phase_line, = ax.plot(self.tgrid, np.angle(self.amplitude) / np.pi,
-                              ls='-', color='black', label='phase')
+                              ls='-', color='black', label=label)
         ax.set_ylabel(r'phase ($\pi$)')
         ax.set_xlabel("time (%s)" % self.time_unit)
 
     def render_spectrum(self, ax, zoom=True, wmin=None, wmax=None,
             spec_scale=None, spec_max=None, freq_unit=None, mark_freqs=None,
-            mark_freq_points=None):
+            mark_freq_points=None, label='spectrum'):
         """Render spectrum onto the given axis, see `plot` for arguments"""
         freq, spectrum = self.spectrum(mode='abs', sort=True,
                                         freq_unit=freq_unit)
@@ -769,7 +769,7 @@ class Pulse(object):
         if spec_scale is None:
             spec_scale = 1.0
         ax.plot(freq, spec_scale*spectrum, marker=mark_freq_points,
-                label='spectrum')
+                label=label)
         if spec_max is not None:
             ax.set_ylim(0, spec_max)
         if mark_freqs is not None:
