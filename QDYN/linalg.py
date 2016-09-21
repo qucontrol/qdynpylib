@@ -178,6 +178,8 @@ def vectorize(a, order='F'):
     >>> vectorize(a, order='C')
     array([1, 2, 3, 4])
     """
+    if repr(a).startswith('Quantum object'):  # qutip.Qobj
+        a = a.data.todense()
     N = a.size
     return np.squeeze(np.asarray(a).reshape((1,N), order=order))
 
