@@ -25,6 +25,19 @@ def config1():
     return read_config_str(config)
 
 
+@pytest.fixture
+def config_two_psi():
+    """Config file with two psi sections"""
+    config = r'''
+    psi:
+    * type = file, filename = psi_10.dat, label = 10
+
+    psi:
+    * type = file, filename = psi_01.dat, label = 01
+    '''
+    return read_config_str(config)
+
+
 def test_get_config_value(config1):
     """Test that we can read value from a config_file"""
     assert get_config_value(config1, ('pulse', 1, 'id')) == 2
@@ -40,6 +53,13 @@ def test_get_config_value(config1):
     with pytest.raises(ValueError) as exc_info:
         get_config_value(config1, ('pulse', 5, 'xxx'))
     assert 'list index out of range' in str(exc_info)
+
+
+def test_parse_two_psi(config_two_psi):
+    """Test the a config file with two psi sections is read correctly"""
+    assert len(config_two_psi['psi'])
+    assert config_two_psi['psi'][0]['filename'] == 'psi_10.dat'
+    assert config_two_psi['psi'][1]['filename'] == 'psi_01.dat'
 
 
 def test_get_set_user_value(config1):

@@ -5,7 +5,7 @@ import re
 import base64
 import random
 import copy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import six
 import numpy as np
@@ -390,7 +390,6 @@ def _read_config_lines(lines):
     lines = list(lines)
 
     config_data = OrderedDict([])
-
     # first pass: identify sections, list of lines in each section
     current_section = ''
     for line in lines:
@@ -399,7 +398,8 @@ def _read_config_lines(lines):
         m_itemline = rx_itemline.match(line)
         if m_sec:
             current_section = m_sec.group('section')
-            config_data[current_section] = OrderedDict([])
+            if current_section not in config_data:
+                config_data[current_section] = OrderedDict([])
         elif m_itemline:
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section]  = []
@@ -407,7 +407,7 @@ def _read_config_lines(lines):
 
     # second pass: set items
     current_section = ''
-    current_itemline = 0
+    current_itemline = defaultdict(int)  # section => index
     for line in lines:
         line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
@@ -425,7 +425,6 @@ def _read_config_lines(lines):
             if not matched:
                 raise ValueError("Could not parse item '%s'" % str(item))
         if m_sec:
-            current_itemline = 0
             current_section = m_sec.group('section')
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section].update(line_items)
@@ -433,9 +432,9 @@ def _read_config_lines(lines):
                 for line_dict in config_data[current_section]:
                     line_dict.update(line_items)
         elif m_itemline:
-            config_data[current_section][current_itemline].update(
-                    line_items)
-            current_itemline += 1
+            config_data[current_section][current_itemline[current_section]]\
+                    .update(line_items)
+            current_itemline[current_section] += 1
         else:
             raise ValueError("Could not parse line '%s'" % line)
 
