@@ -1,7 +1,7 @@
 from textwrap import dedent
 from QDYN.config import (read_config_str, get_config_value,
         generate_make_config, config_data_to_str, get_config_user_value,
-        set_config_user_value)
+        set_config_user_value, _item_rxs)
 
 import pytest
 
@@ -38,6 +38,27 @@ def config_two_psi():
     return read_config_str(config)
 
 
+def test_item_rxs():
+    """Test regular expressions for items"""
+    rx_int = _item_rxs()[1][0]
+    assert rx_int.match("val=1")
+    assert rx_int.match("val = 0")
+    assert rx_int.match("val = 1")
+    assert rx_int.match("val = 100")
+    assert rx_int.match("val = -100")
+    assert rx_int.match("val = +100")
+    assert not rx_int.match("val = +100-100")
+    assert not rx_int.match("val = 01")
+    rx_float = _item_rxs()[2][0]
+    assert rx_float.match('val=1.0')
+    assert rx_float.match('val = 1.0')
+    assert rx_float.match('val = -1.0')
+    assert rx_float.match('val = -1.0e-5')
+    assert rx_float.match('val = -1.0e5')
+    assert rx_float.match('val = -1.0e+5')
+    assert rx_float.match('val = 2e+5')
+
+
 def test_get_config_value(config1):
     """Test that we can read value from a config_file"""
     assert get_config_value(config1, ('pulse', 1, 'id')) == 2
@@ -60,6 +81,7 @@ def test_parse_two_psi(config_two_psi):
     assert len(config_two_psi['psi'])
     assert config_two_psi['psi'][0]['filename'] == 'psi_10.dat'
     assert config_two_psi['psi'][1]['filename'] == 'psi_01.dat'
+    assert config_two_psi['psi'][1]['label'] == '01'
 
 
 def test_get_set_user_value(config1):

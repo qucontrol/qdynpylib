@@ -327,9 +327,18 @@ def _item_rxs():
     item_rxs = [
         (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
         lambda v: UnitFloat.from_str(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\d+-]+)$'),
+        (re.compile(r'''
+            (?P<key>\w+) \s*=\s* (?P<value>
+                [+-]? (0 | [1-9]\d*)  # leading zero not allowed
+            )$''', re.X),
         lambda v: int(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+)$'),
+        (re.compile(r'''
+            (?P<key>\w+) \s*=\s* (?P<value>
+                [+-]?  (
+                  \d+\.\d+([Ee][+-]?\d+)? |  # 1.0, 1.0e5 (exponent optional)
+                  \d+[Ee][+-]?\d+            # 1e-5       (exponent required)
+            ))$
+        ''', re.X),
         lambda v: float(v)),
         (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
                     r'\.true\.|\.false\.))$'),
