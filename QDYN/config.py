@@ -317,37 +317,50 @@ def _render_config_lines(section_name, section_data):
     return lines
 
 
-def _item_rxs():
-    # the following regexes are encapsulated in this function to make the them
-    # accessible to the config_conversion module
+def _item_rxs(section_name=''):
     logical_mapping = {
         'T': True, 'true': True, '.true.': True,
         'F': False, 'false': False, '.false.': False,
     }
-    item_rxs = [
-        (re.compile(r'(?P<key>label)\s*=\s*(?P<value>.+)$'),
-        lambda v: _unescape_str(v)),  # label is always a string!
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
-        lambda v: UnitFloat.from_str(v)),
-        (re.compile(r'''
-            (?P<key>\w+) \s*=\s* (?P<value>
-                [+-]? (0 | [1-9]\d*)  # leading zero not allowed
-            )$''', re.X),
-        lambda v: int(v)),
-        (re.compile(r'''
-            (?P<key>\w+) \s*=\s* (?P<value>
-                [+-]?  (
-                  \d+\.\d+([Ee][+-]?\d+)? |  # 1.0, 1.0e5 (exponent optional)
-                  \d+[Ee][+-]?\d+            # 1e-5       (exponent required)
-            ))$
-        ''', re.X),
-        lambda v: float(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
-                    r'\.true\.|\.false\.))$'),
-        lambda v: logical_mapping[v]),
+    item_rxs = []
+    if not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>label)\s*=\s*(?P<value>.+)$'),
+            lambda v: _unescape_str(v))  # label is always a string!
+        )
+    if section_name == 'user_reals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
+            lambda v: UnitFloat.from_str(v))
+        )
+    if section_name == 'user_ints' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'''
+                (?P<key>\w+) \s*=\s* (?P<value>
+                    [+-]? (0 | [1-9]\d*)  # leading zero not allowed
+                )$''', re.X),
+            lambda v: int(v))
+        )
+    if section_name == 'user_reals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'''
+                (?P<key>\w+) \s*=\s* (?P<value>
+                    [+-]?  (
+                    \d+\.\d+([Ee][+-]?\d+)? |  # 1.0, 1.0e5 (exponent optional)
+                    \d+[Ee][+-]?\d+            # 1e-5       (exponent required)
+                ))$''', re.X),
+            lambda v: float(v))
+        )
+    if section_name == 'user_logicals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
+                        r'\.true\.|\.false\.))$'),
+            lambda v: logical_mapping[v])
+        )
+    item_rxs.append(
         (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>.+)$'),
-        lambda v: _unescape_str(v)),
-    ]
+        lambda v: _unescape_str(v))
+    )
     return item_rxs
 
 
@@ -394,7 +407,6 @@ def _read_config_lines(lines):
         )
         ''', re.X)
     rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+)')
-    item_rxs = _item_rxs()
 
     # we need to make two passes over lines, so we may have to convert an
     # iterator to a list
@@ -419,9 +431,13 @@ def _read_config_lines(lines):
     # second pass: set items
     current_section = ''
     current_itemline = defaultdict(int)  # section => index
+    item_rxs = _item_rxs(current_section)
     for line in lines:
         line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
+        if m_sec:
+            current_section = m_sec.group('section')
+            item_rxs = _item_rxs(current_section)
         m_itemline = rx_itemline.match(line)
         line_items = OrderedDict([])
         for item in rx_item.findall(line):
@@ -436,7 +452,6 @@ def _read_config_lines(lines):
             if not matched:
                 raise ValueError("Could not parse item '%s'" % str(item))
         if m_sec:
-            current_section = m_sec.group('section')
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section].update(line_items)
             else:
