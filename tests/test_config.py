@@ -40,7 +40,9 @@ def config_two_psi():
 
 def test_item_rxs():
     """Test regular expressions for items"""
-    rx_int = _item_rxs()[1][0]
+    rx_label = _item_rxs()[0][0]
+    assert rx_label.match("label = 0")
+    rx_int = _item_rxs()[2][0]
     assert rx_int.match("val=1")
     assert rx_int.match("val = 0")
     assert rx_int.match("val = 1")
@@ -49,7 +51,7 @@ def test_item_rxs():
     assert rx_int.match("val = +100")
     assert not rx_int.match("val = +100-100")
     assert not rx_int.match("val = 01")
-    rx_float = _item_rxs()[2][0]
+    rx_float = _item_rxs()[3][0]
     assert rx_float.match('val=1.0')
     assert rx_float.match('val = 1.0')
     assert rx_float.match('val = -1.0')

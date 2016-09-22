@@ -325,6 +325,8 @@ def _item_rxs():
         'F': False, 'false': False, '.false.': False,
     }
     item_rxs = [
+        (re.compile(r'(?P<key>label)\s*=\s*(?P<value>.+)$'),
+        lambda v: _unescape_str(v)),  # label is always a string!
         (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
         lambda v: UnitFloat.from_str(v)),
         (re.compile(r'''
