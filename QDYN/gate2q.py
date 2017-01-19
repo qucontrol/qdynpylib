@@ -18,7 +18,7 @@ from scipy.optimize import leastsq
 from six.moves import xrange
 
 from .io import (open_file, matrix_to_latex, matrix_to_mathematica,
-                 split_sup_sub, read_cmplx_array)
+                 split_sup_sub, read_cmplx_array, write_cmplx_array)
 from .linalg import inner, norm, vectorize
 from .memoize import memoize
 
@@ -437,6 +437,14 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
             return cls._read_matrix(filename, name)
         else:
             raise ValueError("'format' must be 'array' or 'matrix'")
+
+    def write(self, filename, format='array'):
+        """Inverse to :meth:`read`"""
+        if format == 'array':
+            write_cmplx_array(vectorize(self), filename)
+        else:
+            raise NotImplementedError("Currently, only fromat='array' is "
+                                      "implemented")
 
     @classmethod
     def _read_matrix(cls, file, name='U'):
