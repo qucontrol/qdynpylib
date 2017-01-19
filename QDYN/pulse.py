@@ -140,6 +140,15 @@ class Pulse(object):
                 raise TypeError("freq_unit must be specified")
         self._check()
 
+    def copy(self):
+        """Return a copy of the pulse"""
+        return self.__class__(
+            self.tgrid, self.amplitude, time_unit=self.time_unit,
+            ampl_unit=self.ampl_unit, freq_unit=self.freq_unit, mode=self.mode)
+
+    def __copy__(self):
+        return self.copy()
+
     def _check(self):
         """Assert self-consistency of pulse"""
         logger = logging.getLogger(__name__)
