@@ -6,6 +6,7 @@ from collections import OrderedDict
 from functools import partial
 
 import numpy as np
+from scipy import sparse
 import pytest
 
 from QDYN.model import LevelModel
@@ -15,6 +16,7 @@ from QDYN.io import read_indexed_matrix
 from QDYN.linalg import norm
 from QDYN.state import read_psi_amplitudes
 from QDYN.units import UnitFloat
+from QDYN.dissipation import lindblad_ops_to_dissipator
 # built-in fixtures: tmpdir, request
 
 
@@ -178,6 +180,37 @@ def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
 
     assert filecmp.cmp(os.path.join(test_dir, 'target.config'),
                        str(tmpdir.join('model_rf', 'target.config')),
+                       shallow=False)
+
+
+def test_dissipation_superop(tmpdir, request, H0, L1, L2):
+    """Test that we can add a dissipatio superoperator as an alternative to
+    Lindblad operators"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+
+    pulse = partial(blackman, t_start=0, t_stop=50)
+
+    model = LevelModel()
+    model.add_ham(H0)
+    model.add_lindblad_op(L1)
+    model.add_lindblad_op(L2)
+
+    D = lindblad_ops_to_dissipator([sparse.coo_matrix(L) for L in (L1, L2)])
+    with pytest.raises(ValueError):
+        model.set_dissipator(D)
+
+    model._lindblad_ops = []
+    model.set_dissipator(D)
+
+    with pytest.raises(ValueError):
+        model.add_lindblad_op(L1)
+
+    model.write_to_runfolder(str(tmpdir.join('model_rf')),
+                             config='dissipator.config')
+
+    assert filecmp.cmp(os.path.join(test_dir, 'dissipator.config'),
+                       str(tmpdir.join('model_rf', 'dissipator.config')),
                        shallow=False)
 
 

@@ -66,6 +66,7 @@ class LevelModel(object):
         # collected in the `pulses` method
         self._lindblad_ops = []  # list of (matrix, config_attribs)
         self._observables = []  # list of (matrix, config_attribs)
+        self._dissipator = [] # list of (matrix, config_attribs)
         self._psi = OrderedDict([])  # label => amplitude array
         self._oct = OrderedDict([])  # key => val for OCT section
         self.t0 = UnitFloat(0, 'iu')
@@ -154,7 +155,7 @@ class LevelModel(object):
     def _add_matrix(self, add_target, matrix, label, pulse=None,
                     check_matrix=True, kwargs=None):
         """Common implementation of `add_ham`, `add_observable`,
-        `add_lindblad_op`"""
+        `add_lindblad_op`, `add_dissipator`"""
         if kwargs is None:
             # Note: we do not use **kwargs to preserve an OrderedDict
             kwargs = {}
@@ -360,6 +361,12 @@ class LevelModel(object):
 
         All other keyword arguments set options for `L` in the config file.
         """
+        for (D, config_attribs) in self._dissipator:
+            if config_attribs.get('label', None) == label:
+                raise ValueError(
+                    "Cannot set Lindblad operator for a system label for "
+                    "which there is already a dissipation superoperator "
+                    "defined")
         config_attribs = OrderedDict([])
         for key in sorted(kwargs):
             config_attribs[key] = kwargs[key]
@@ -372,6 +379,24 @@ class LevelModel(object):
         if label is not None:
             config_attribs['label'] = label
         self._add_matrix(self._lindblad_ops, L, label, pulse=pulse,
+                         kwargs=config_attribs)
+
+    def set_dissipator(
+            self, D, sparsity_model=None, label=None, pulse=None, **kwargs):
+        """Set a dissipation superoperator in the config file"""
+        for (L, config_attribs) in self._lindblad_ops:
+            if config_attribs.get('label', None) == label:
+                raise ValueError(
+                    "Cannot set dissipator for a system label for which there "
+                    "are already Lindblad operators defined")
+        config_attribs = OrderedDict([])
+        for key in sorted(kwargs):
+            config_attribs[key] = kwargs[key]
+        if sparsity_model is not None:
+            config_attribs['sparsity_model'] = sparsity_model
+        if label is not None:
+            config_attribs['label'] = label
+        self._add_matrix(self._dissipator, D, label, pulse=pulse,
                          kwargs=config_attribs)
 
     def set_propagation(self, T, nt, time_unit, t0=0.0,
@@ -550,15 +575,18 @@ class LevelModel(object):
             config_data['prop']['mcwf_order'] = self.mcwf_order
 
         # pulses
-        self._write_pulses(runfolder, config_data)
+        if len(self._pulses) > 0:
+            self._write_pulses(runfolder, config_data)
 
         # Hamiltonian
         if len(self._ham) > 0:
             self._write_ham(runfolder, config_data)
 
-        # Lindblad operators
+        # Lindblad operators and dissipation superoperators
         if len(self._lindblad_ops) > 0:
             self._write_lindblad_ops(runfolder, config_data)
+        if len(self._dissipator) > 0:
+            self._write_dissipator(runfolder, config_data)
 
         # observables
         if len(self._observables) > 0:
@@ -608,8 +636,8 @@ class LevelModel(object):
     def _write_matrices(runfolder, config_data, section, data, outprefix,
             type_attrib='matrix', set_n_surf=True, set_op_type=False,
             set_add_to_H_jump=False, counter0=0):
-        """Common implementation of `_write_ham`, `_write_observables`, and
-        `_write_lindblad_ops`"""
+        """Common implementation of `_write_ham`, `_write_observables`,
+        `_write_lindblad_ops`, and `_write_dissipator`"""
         if section not in config_data:
             config_data[section] = []
         for op_counter, (matrix, attribs) in enumerate(data):
@@ -671,6 +699,13 @@ class LevelModel(object):
                              lindblad_ops, outprefix='L', set_n_surf=False,
                              type_attrib='lindblad_ops', counter0=1)
 
+    def _write_dissipator(self, runfolder, config_data):
+        """Write dissipation superoperator to `runfolder`, and add dissipator
+        data to `config_data`"""
+        self._write_matrices(runfolder, config_data, 'dissipator',
+                             self._dissipator, outprefix='D', set_n_surf=False,
+                             type_attrib='dissipator', counter0=1)
+
     def _write_psi(self, runfolder, config_data):
         """Write initial wave function to the runfolder, and add psi data to
         config_data"""
@@ -688,4 +723,3 @@ class LevelModel(object):
                     OrderedDict([('type', 'file'), ('filename', filename)]))
             if label != '':
                 config_data['psi'][-1]['label'] = label
-
