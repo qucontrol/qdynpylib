@@ -4,6 +4,7 @@ as a config file and dependent data"""
 from __future__ import print_function, division, absolute_import
 from collections import OrderedDict, defaultdict
 import os
+import logging
 
 import numpy as np
 
@@ -39,7 +40,8 @@ class LevelModel(object):
             decay term. This term is constructed from the Lindblad operators.
             If ``use_mcwf=True`` and ``construct_mcwf_ham=False``, it is the
             user's responsibility to ensure that `ham` is the proper effective
-            Hamiltonian.
+            Hamiltonian. The `construct_mcwf` flag determines the presence of
+            `add_to_H_jump` config file parameter for each Lindblad operator
         user_data (OrderedDict): Key-value pairs that should that describe
             user-defined data. These will go in the ``user_strings``,
             ``user_reals``, ``user_logicals``, or ``user_ints`` section of the
@@ -66,7 +68,7 @@ class LevelModel(object):
         # collected in the `pulses` method
         self._lindblad_ops = []  # list of (matrix, config_attribs)
         self._observables = []  # list of (matrix, config_attribs)
-        self._dissipator = [] # list of (matrix, config_attribs)
+        self._dissipator = []  # list of (matrix, config_attribs)
         self._psi = OrderedDict([])  # label => amplitude array
         self._oct = OrderedDict([])  # key => val for OCT section
         self.t0 = UnitFloat(0, 'iu')
@@ -152,10 +154,11 @@ class LevelModel(object):
                     result.append(pulse)
         return result
 
-    def _add_matrix(self, add_target, matrix, label, pulse=None,
-                    check_matrix=True, kwargs=None):
+    def _add_matrix(
+            self, add_target, matrix, label, pulse=None, check_matrix=True,
+            kwargs=None):
         """Common implementation of `add_ham`, `add_observable`,
-        `add_lindblad_op`, `add_dissipator`"""
+        `add_lindblad_op`, `set_dissipator`"""
         if kwargs is None:
             # Note: we do not use **kwargs to preserve an OrderedDict
             kwargs = {}
@@ -165,11 +168,12 @@ class LevelModel(object):
                 # least-effort indication that we have a proper matrix
                 raise TypeError(str(matrix) + ' must be a matrix')
         if pulse is not None:
-            if not (isinstance(pulse, (Pulse, AnalyticalPulse))
-                    or callable(pulse)):
-                raise TypeError("pulse must be an instance of "
-                        "QDYN.analytical_pulse.AnalyticalPulse, "
-                        "QDYN.pulse.Pulse, or a callable.")
+            if not (isinstance(pulse, (Pulse, AnalyticalPulse)) or
+                    callable(pulse)):
+                raise TypeError(
+                    "pulse must be an instance of "
+                    "QDYN.analytical_pulse.AnalyticalPulse, "
+                    "QDYN.pulse.Pulse, or a callable.")
         config_attribs = OrderedDict([])
         for key in kwargs:
             config_attribs[key] = kwargs[key]
@@ -223,7 +227,8 @@ class LevelModel(object):
             self._pulse_ids[key] = pulse_id
         return pulse_id
 
-    def add_ham(self, H, pulse=None, op_unit=None, sparsity_model=None,
+    def add_ham(
+            self, H, pulse=None, op_unit=None, sparsity_model=None,
             op_type=None, label=None, **kwargs):
         """Add a term to the system Hamiltonian. If called repeatedly, the
         total Hamiltonian is the sum of all added terms.
@@ -273,7 +278,8 @@ class LevelModel(object):
         self._add_matrix(self._ham, H, label=label, pulse=pulse,
                          kwargs=config_attribs)
 
-    def add_observable(self, O, outfile, exp_unit, time_unit, col_label,
+    def add_observable(
+            self, O, outfile, exp_unit, time_unit, col_label,
             square=None, exp_surf=None, is_real=None, in_lab_frame=False,
             op_unit=None, label=None, pulse=None):
         """Add an observable
@@ -339,14 +345,16 @@ class LevelModel(object):
         self._add_matrix(self._observables, O, label, pulse=pulse,
                          check_matrix=False, kwargs=config_attribs)
 
-    def add_lindblad_op(self, L, op_unit=None, sparsity_model=None,
+    def add_lindblad_op(
+            self, L, op_unit=None, sparsity_model=None,
             add_to_H_jump=None, label=None, pulse=None, **kwargs):
         """Add Lindblad operator.
 
         Args:
             L (tuple, matrix): Lindblad operator to  add. Must be a matrix
                 or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.
-            op_unit (None or str): Unit of the values in `L`.
+            op_unit (None or str): Unit of the values in `L`, e.g. ``sqrt_GHz``
+                (Lindblad operators are in units square-root-of-energy)
             sparsity_model (None or str): sparsity model that QDYN should use
                 to encode the data in `L`. If None, will be determined
                 automatically
@@ -382,8 +390,26 @@ class LevelModel(object):
                          kwargs=config_attribs)
 
     def set_dissipator(
-            self, D, sparsity_model=None, label=None, pulse=None, **kwargs):
-        """Set a dissipation superoperator in the config file"""
+            self, D, op_unit=None, sparsity_model=None, label=None, pulse=None,
+            **kwargs):
+        """Set a dissipation superoperator in the config file
+
+        Args:
+            D (tuple, matrix): Dissiption superoperoperator to add. Must be a
+                matrix or a tuple ``(matrix, pulse)``
+            op_unit (None or str): Unit of the value in `D`. e.g. ``GHz``
+                (dissipators are in units of energy)
+            sparsity_model (None or str): sparsity model that QDYN should use
+                to encode the data in `D`. If None, will be determined
+                automatically
+            label (str or None): Dissipators associated with different
+                Hamiltonians may be defined in the same config file if they are
+                differentiated by label. The default label is the empty string.
+            pulse: If not None, a pulse for the Dissipator to couple to
+
+        All other keyword arguments set options for the dissipator in the
+        config file.
+        """
         for (L, config_attribs) in self._lindblad_ops:
             if config_attribs.get('label', None) == label:
                 raise ValueError(
@@ -392,6 +418,8 @@ class LevelModel(object):
         config_attribs = OrderedDict([])
         for key in sorted(kwargs):
             config_attribs[key] = kwargs[key]
+        if op_unit is not None:
+            config_attribs['op_unit'] = op_unit
         if sparsity_model is not None:
             config_attribs['sparsity_model'] = sparsity_model
         if label is not None:
@@ -399,9 +427,10 @@ class LevelModel(object):
         self._add_matrix(self._dissipator, D, label, pulse=pulse,
                          kwargs=config_attribs)
 
-    def set_propagation(self, T, nt, time_unit, t0=0.0,
-            prop_method='newton', use_mcwf=False, mcwf_order=2,
-            construct_mcwf_ham=True, label=None, initial_state=None):
+    def set_propagation(
+            self, T, nt, time_unit, t0=0.0, prop_method='newton',
+            use_mcwf=False, mcwf_order=2, construct_mcwf_ham=True, label=None,
+            initial_state=None):
         """Set the time grid and other propagation-specific settings
 
         Args:
@@ -633,7 +662,8 @@ class LevelModel(object):
                 raise TypeError("Invalid pulse type")
 
     @staticmethod
-    def _write_matrices(runfolder, config_data, section, data, outprefix,
+    def _write_matrices(
+            runfolder, config_data, section, data, outprefix,
             type_attrib='matrix', set_n_surf=True, set_op_type=False,
             set_add_to_H_jump=False, counter0=0):
         """Common implementation of `_write_ham`, `_write_observables`,
@@ -646,8 +676,8 @@ class LevelModel(object):
             else:
                 filename = "%s%d.dat" % (outprefix, op_counter+counter0)
             write_indexed_matrix(matrix,
-                    filename=os.path.join(runfolder, filename),
-                    hermitian=False)
+                                 filename=os.path.join(runfolder, filename),
+                                 hermitian=False)
             config_attribs = OrderedDict([
                 ('type', type_attrib), ('filename', filename),
                 ('real_op', (not iscomplexobj(matrix)))
@@ -682,6 +712,7 @@ class LevelModel(object):
     def _write_lindblad_ops(self, runfolder, config_data):
         """Write operators describing all Lindblad operators to the
         `runfolder`, and add dissipator data to `config_data`"""
+        logger = logging.getLogger(__name__)
         lindblad_ops = list(self._lindblad_ops)  # copy
         for L, attribs in lindblad_ops:
             if self.construct_mcwf_ham:
@@ -694,6 +725,7 @@ class LevelModel(object):
                 if 'add_to_H_jump' in attribs:
                     # add_to_H_jump should never be defined outside of the MCWF
                     # method
+                    logger.warn("Removing 'add_to_H_jump' attribute")
                     del attribs['add_to_H_jump']
         self._write_matrices(runfolder, config_data, 'dissipator',
                              lindblad_ops, outprefix='L', set_n_surf=False,
