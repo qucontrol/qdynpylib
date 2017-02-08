@@ -109,6 +109,14 @@ def test_read_write_indexed_matrix():
     print("")
 
 
+def test_single_val_read_indexed_matrix(request):
+    """Test that we can read an indexed matrix with onl one entry"""
+    datadir = os.path.splitext(request.module.__file__)[0]
+    filename = os.path.join(datadir, 'single_val_matrix.dat')
+    matrix = QDYN.io.read_indexed_matrix(filename, expand_hermitian=False)
+    assert matrix.nnz == 1
+
+
 def test_read_write_cmplx_array(request, tmpdir):
     """Test that we can read and write a complex array from file"""
     datadir = os.path.splitext(request.module.__file__)[0]
