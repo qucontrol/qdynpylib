@@ -229,11 +229,16 @@ def read_indexed_matrix(filename, format='coo', shape=None,
     = np.genfromtxt(filename, usecols=(0,1), unpack=True, dtype=np.int)
     file_real_val \
     = np.genfromtxt(filename, usecols=(2,), unpack=True, dtype=np.float64)
+    # numpy doesn't generate arrays if there is only one value -- force it!
+    file_row = file_row.reshape(file_row.size)
+    file_col = file_col.reshape(file_col.size)
+    file_real_val = file_real_val.reshape(file_real_val.size)
     val_is_real = False
     if not val_real:
         try:
             file_imag_val = np.genfromtxt(filename, usecols=(3,), unpack=True,
                                           dtype=np.float64)
+            file_imag_val = file_imag_val.reshape(file_imag_val.size)
         except ValueError:
             # File does not contain a fourth column
             val_is_real = True
