@@ -14,5 +14,7 @@ from . import octutils
 from . import memoize
 from . import config
 from . import model
+from . import math
+from . import prop_gate
 
 __version__ = "0.2.2"
