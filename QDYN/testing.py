@@ -6,7 +6,7 @@ import os
 import re
 
 from distutils import dir_util
-import sh
+import subprocess
 
 
 FEATURES = ['check-cheby', 'no-check-cheby', 'check-newton', 'no-check-newton',
@@ -98,18 +98,17 @@ def datadir(tmpdir, request):
     return str(tmpdir)
 
 
-def baked_sh_cmd(cmd, **kwargs):
-    return sh.Command(cmd[0]).bake(*cmd[1:], **kwargs)
-
-
 def make_qdyn_utility(util='qdyn_prop_traj', procs=1, threads=1):
-    """Generate a proto-fixture that returns a `sh.Command` instance wrapping
-    the utility in '../utils/', relative to the test directory.
+    """Generate a proto-fixture that returns a wrapper around
+    the utility `util` in '../utils/', relative to the test directory.
 
     If `procs` > 1 and QDYN was compiled with MPI support, then call the
     utility through mpirun (or equivalent), to run `procs` simultaneous copies
     of the program. If `threads` is > 1, the program will run with multiple
     OpenMP threads.
+
+    The wrapper returned by the fixture behaves like `subprocess.call`, with a
+    predefined `cmd` and environment.
     """
     def qdyn_utility(request, tmpdir):
         """Wrapper for the {util} utility""".format(util=util)
@@ -126,5 +125,13 @@ def make_qdyn_utility(util='qdyn_prop_traj', procs=1, threads=1):
         if (mpi_implementation is not None) and (procs > 1):
             cmd = mpirun(cmd, procs=procs, implementation=mpi_implementation,
                          hostfile=str(tmpdir.join('hostfile')))
-        return baked_sh_cmd(cmd, _env=env)
+
+        def run_cmd(*args):
+            full_cmd = cmd + list(args)
+            return subprocess.call(full_cmd, env=env, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT,
+                                   universal_newlines=True)
+
+        return run_cmd
+
     return qdyn_utility
