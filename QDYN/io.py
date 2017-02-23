@@ -623,7 +623,11 @@ def writetotxt(fname, *args, **kwargs):
                     row_data.append(a[i_row].imag)
                 else:
                     row_data.append(a[i_row])
-            fh.write(row_fmt % tuple(row_data))
+            try:
+                fh.write(row_fmt % tuple(row_data))
+            except TypeError:
+                raise TypeError("Cannot format row data %s with format %s" %
+                                (repr(tuple(row_data)), repr(fmt)))
             fh.write("\n")
 
         # write footer
