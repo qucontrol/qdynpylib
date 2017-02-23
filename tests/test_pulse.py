@@ -1,3 +1,5 @@
+import os
+import filecmp
 import QDYN
 import numpy as np
 from QDYN.units import UnitFloat
@@ -90,3 +92,14 @@ def test_pulse_derivative():
     assert deriv.time_unit == 'ns'
     assert "%.3f" % abs(np.max(deriv.amplitude)) == '0.613'
     assert "%.3f" % abs(np.min(deriv.amplitude)) == '0.613'
+
+
+def test_write_oct_spectral_filter(tmpdir, request):
+    tgrid = pulse_tgrid(10, 100)
+    ampl = gaussian(tgrid, 5, 1)
+    pulse = Pulse(tgrid=tgrid, amplitude=ampl, ampl_unit='MHz', time_unit='ns')
+    filename = str(tmpdir.join("spectral_filter.dat"))
+    pulse.write_oct_spectral_filter(
+        filename, filter_func=lambda f: abs(f) < 2)
+    datadir = os.path.splitext(request.module.__file__)[0]
+    assert filecmp.cmp(filename, os.path.join(datadir, 'spectral_filter.dat'))

@@ -17,6 +17,7 @@ from scipy.interpolate import UnivariateSpline
 from six.moves import xrange
 
 from .units import UnitConvert, UnitFloat
+from .io import writetotxt
 
 class Pulse(object):
     """Numerical real or complex control pulse
@@ -426,7 +427,7 @@ class Pulse(object):
             freq_unit (str, optional): Desired unit of the `freq` output array.
                 Can Hz (GHz, Mhz, etc) to obtain frequencies, or any energy
                 unit, using the correspondence ``f = E/h``. If not given,
-                defaults to the `freq_unit` attribtue
+                defaults to the `freq_unit` attribute
             mode (str, optional): Wanted mode for `spectrum` output array.
                 Possible values are 'complex', 'abs', 'real', 'imag'
             sort (bool, optional): Sort the output `freq` array (and the output
@@ -453,14 +454,8 @@ class Pulse(object):
             doing the normalization on the backward transform). You might want
             to normalized by 1/n for plotting.
         """
-        if freq_unit is None:
-            freq_unit = self.freq_unit
         s = fft(self.amplitude) # spectrum amplitude
-        n = len(self.amplitude)
-        dt = float(self.unit_convert.convert(self.dt, self.time_unit, 'iu'))
-        f = self.unit_convert.convert(
-                fftfreq(n, d=dt/(2.0*np.pi)), # spectrum frequencies
-                'iu', freq_unit)
+        f = self.fftfreq(freq_unit=freq_unit)
         modifier = {
             'abs'    : lambda s: np.abs(s),
             'real'   : lambda s: np.real(s),
@@ -472,6 +467,26 @@ class Pulse(object):
             f = f[order]
             s = s[order]
         return f, modifier[mode](s)
+
+    def fftfreq(self, freq_unit=None):
+        """Return the FFT frequencies associated with the pulse. Cf.
+        `numpy.fft.fftfreq`
+
+        Parameters:
+            freq_unit (str, optional): Desired unit of the output array.
+                If not given, defaults to the `freq_unit` attribute
+
+        Returns:
+            freq (ndarray(float64)): Frequency values associated with the pulse
+                time grid. The first half of the `freq` array contains the
+                positive frequencies, the second half the negative frequencies
+        """
+        if freq_unit is None:
+            freq_unit = self.freq_unit
+        n = len(self.amplitude)
+        dt = float(self.unit_convert.convert(self.dt, self.time_unit, 'iu'))
+        return self.unit_convert.convert(
+            fftfreq(n, d=dt/(2.0*np.pi)), 'iu', freq_unit)
 
     def derivative(self):
         """Calculate the derivative of the current pulse and return it as a new
@@ -598,6 +613,37 @@ class Pulse(object):
 
         with open(filename, 'w') as out_fh:
             out_fh.write(buffer)
+
+    def write_oct_spectral_filter(self, filename, filter_func, freq_unit=None):
+        """Evaluate a spectral filter function and write the result to the file
+        with a given `filename`, in a format such that the file may be used for
+        the `oct_spectral_filter` field of a pulse in a QDYN config file. The
+        file will have two columns: The pulse frequencies (see `fftfreq`
+        method), and the value of the filter function in the range [0, 1]
+
+        Args:
+            filename (str): Filename of the output file
+            filter_func (callable): A function that takes a frequency values
+                (in units of `freq_unit`) and returns a filter value in the
+                range [0, 1]
+            freq_unit (str, optional):  Unit of frequencies that `filter_func`
+                assumes.  If not given, defaults to the `freq_unit` attribute.
+
+        Note:
+            The `filter_func` function may return any values that numpy
+            considers equivalent to floats in the range [0, 1]. This
+            includes boolean values, where True is equivalent to 1.0 and
+            False is equivalent to 0.0
+        """
+        if freq_unit is None:
+            freq_unit = self.freq_unit
+        freqs = self.fftfreq(freq_unit=freq_unit)
+        filter = np.array([filter_func(f) for f in freqs], dtype=np.float64)
+        if not (0 <= np.min(filter) <= 1 and 0 <= np.max(filter) <= 1):
+            raise ValueError("filter values must be in the range [0, 1]")
+        header = "%15s%15s" % ("freq [%s]" % freq_unit, 'filter')
+        writetotxt(filename, freqs, filter, fmt='%15.7e%15.12f',
+                   header=header)
 
     def config_line(self, filename, pulse_id, label=None):
         """Return an OrderedDict of attributes for a config file line
