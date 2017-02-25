@@ -234,7 +234,9 @@ def read_indexed_matrix(filename, format='coo', shape=None,
     file_col = file_col.reshape(file_col.size)
     file_real_val = file_real_val.reshape(file_real_val.size)
     val_is_real = False
-    if not val_real:
+    if val_real:
+        val_is_real = True
+    else:
         try:
             file_imag_val = np.genfromtxt(filename, usecols=(3,), unpack=True,
                                           dtype=np.float64)
