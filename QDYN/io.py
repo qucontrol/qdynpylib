@@ -68,7 +68,7 @@ def tempinput(data, binary=False):
 
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
-        header=None, hermitian=True, limit=0.0):
+        header=None, hermitian=False, limit=0.0):
     """
     Write the given matrix to file in indexed format (1-based indexing)
 
@@ -179,7 +179,7 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,
-        expand_hermitian=True, val_real=False):
+        expand_hermitian=False, val_real=False):
     """
     Read in a matrix from the file with the given filename
 
@@ -215,11 +215,9 @@ def read_indexed_matrix(filename, format='coo', shape=None,
         If given, shape of the resulting matrix. If not given, will be
         determined from largest occurring index in the data from the input file
     expand_hermitian: boolean, optional
-        By default, the matrix to be read in is assumed to be Hermitian, and
-        the input file must only contain data for the upper or lower triangle
-        of the Matrix. The other triangle is filled automatically with the
-        complex conjugate values. With `expand_hermitian=False`, the input file
-        must contain *all* entries of the matrix.
+        If True, the input file must contain data only for the upper or lower
+        triangle. The oterh triangle will be set with the complex conjugate
+        values.
     val_real: boolean, optional
         If True, only read 3 columns from the input file (i, j, value), even if
         more columns are present in the file, and return a real matrix.
