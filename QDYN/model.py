@@ -15,7 +15,8 @@ from .config import write_config, set_config_user_value
 from .state import write_psi_amplitudes
 from .shutil import mkdir
 from .units import UnitFloat
-from .linalg import is_hermitian, choose_sparsity_model, iscomplexobj
+from .linalg import (
+    is_hermitian, choose_sparsity_model, iscomplexobj, norm, triu, tril)
 
 
 class _SimpleNamespace:
@@ -168,12 +169,24 @@ class LevelModel(object):
                 # least-effort indication that we have a proper matrix
                 raise TypeError(str(matrix) + ' must be a matrix')
         if pulse is not None:
-            if not (isinstance(pulse, (Pulse, AnalyticalPulse)) or
-                    callable(pulse)):
+            # Check that we're not making invalid connections of operators with
+            # complex pulses
+            pulse_is_complex = False
+            if isinstance(pulse, (Pulse, AnalyticalPulse)):
+                if (pulse.is_complex or pulse.mode == 'complex' or
+                        pulse.config_attribs.get('is_complex')):
+                    pulse_is_complex = True
+            elif callable(pulse):
+                pulse_is_complex = iscomplexobj(pulse(0.0))
+            else:
                 raise TypeError(
                     "pulse must be an instance of "
                     "QDYN.analytical_pulse.AnalyticalPulse, "
                     "QDYN.pulse.Pulse, or a callable.")
+            if pulse_is_complex:
+                if norm(triu(matrix)) > 1e-14 and norm(tril(matrix)) > 1e-14:
+                    raise ValueError("Cannot connect a complex pulse to a "
+                                     "matrix with data in both triangles")
         config_attribs = OrderedDict([])
         for key in kwargs:
             config_attribs[key] = kwargs[key]

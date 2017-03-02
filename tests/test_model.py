@@ -13,7 +13,7 @@ from QDYN.model import LevelModel
 from QDYN.pulse import Pulse, blackman
 from QDYN.analytical_pulse import AnalyticalPulse
 from QDYN.io import read_indexed_matrix
-from QDYN.linalg import norm
+from QDYN.linalg import norm, triu, tril
 from QDYN.state import read_psi_amplitudes
 from QDYN.units import UnitFloat
 from QDYN.dissipation import lindblad_ops_to_dissipator
@@ -314,3 +314,42 @@ def test_ensemble_shared_pulse(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     assert filecmp.cmp(os.path.join(test_dir, 'ensemble_shared.config'),
                        str(tmpdir.join('model_rf', 'ensemble_shared.config')),
                        shallow=False)
+
+
+def complex_pulse_error_data():
+    """Generate data for parametrization of test_complex_pulse_error"""
+    pulse1 = partial(blackman, t_start=0, t_stop=50)  # real
+    pulse2 = lambda t: complex(pulse1(t))
+    H1 = np.array(
+         [[0, 1, 1, 0],
+          [1, 0, 0, 1],
+          [1, 0, 0, 1],
+          [0, 1, 1, 0]], dtype=np.complex128)
+    H2 = sparse.coo_matrix(H1)
+    H3 = np.eye(4)
+    H4 = triu(H1)
+    H5 = tril(H2)
+    return [
+        (H1, pulse1, True),
+        (H2, pulse1, True),
+        (H3, pulse1, True),
+        (H1, pulse2, False),
+        (H2, pulse2, False),
+        (H3, pulse2, False),
+        (H4, pulse2, True),
+        (H5, pulse2, True),
+    ]
+
+
+@pytest.mark.parametrize('H, pulse, ok', complex_pulse_error_data())
+def test_complex_pulse_error(H, pulse, ok):
+    """Test that we catch trying to connect a complex pulse to a matrix with
+    data in both triangles"""
+    model = LevelModel()
+    if ok:
+        model.add_ham(H, pulse)
+        assert len(model._pulses) == 1
+    else:
+        with pytest.raises(ValueError) as exc_info:
+            model.add_ham(H, pulse)
+        assert "Cannot connect a complex pulse" in str(exc_info)
