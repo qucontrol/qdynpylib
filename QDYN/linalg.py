@@ -92,8 +92,12 @@ def norm(v):
     the 2-norm of the equivalent m-dimensional vector.
 
     """
-    # scipy.linalg.norm does the right thing in all instances.
-    return scipy.linalg.norm(v)
+    if repr(v).startswith('Quantum object'):  # qutip.Qobj
+        v = v.data
+    if isinstance(v, scipy.sparse.spmatrix):
+        return scipy.sparse.linalg.norm(v)
+    else:
+        return scipy.linalg.norm(v)
 
 
 def get_op_matrix(apply_op, state_shape, t):
@@ -311,3 +315,33 @@ def choose_sparsity_model(matrix):
         return 'indexed'
     else:
         return 'full'
+
+
+def triu(matrix):
+    """Return the upper triangle of the given `matrix`, which can be a numpy
+    object or scipy sparse matrix. The returned matrix will have the same type
+    as the input `matrix`. The input `matrix` can also be a QuTiP operator,
+    but in this case, the type is *not* preserved: the result is equivalent to
+    ``triu(matrix.data)``"""
+    if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
+        matrix = matrix.data
+    if isinstance(matrix, np.ndarray):
+        return np.triu(matrix)
+    elif isinstance(matrix, scipy.sparse.spmatrix):
+        return scipy.sparse.triu(matrix)
+    else:
+        raise TypeError("matrix must be numpy object, sparse matrix, or "
+                        "QuTiP operator")
+
+
+def tril(matrix):
+    """Like `triu`, but return the lower triangle"""
+    if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
+        matrix = matrix.data
+    if isinstance(matrix, np.ndarray):
+        return np.tril(matrix)
+    elif isinstance(matrix, scipy.sparse.spmatrix):
+        return scipy.sparse.tril(matrix)
+    else:
+        raise TypeError("matrix must be numpy object, sparse matrix, or "
+                        "QuTiP operator")
