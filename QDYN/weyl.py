@@ -334,8 +334,11 @@ class WeylChamber():
         ax.tick_params(axis='both', which='major',
                        labelsize=self.ticklabelsize)
         # try to fix positioning of tick labels
-        ax.xaxis._axinfo['ticklabel']['space_factor'] = 0.5
-        ax.yaxis._axinfo['ticklabel']['space_factor'] = 0.5
+        try:
+            ax.xaxis._axinfo['ticklabel']['space_factor'] = 0.5
+            ax.yaxis._axinfo['ticklabel']['space_factor'] = 0.5
+        except KeyError:
+            pass
         ax.xaxis._axinfo['label']['space_factor'] = 1.8
         ax.yaxis._axinfo['label']['space_factor'] = 1.8
         [t.set_va('center') for t in ax.get_yticklabels()]
