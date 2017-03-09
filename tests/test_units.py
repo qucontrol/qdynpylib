@@ -36,6 +36,14 @@ def test_eq():
     assert "Incompatible units in conversion: unitless, GHz" in str(exc_info)
 
 
+def test_sqrt_GHz():
+    """Test that the default units contain 'sqrt_GHz'. This tests the
+    resolution of a bug where unit names with underscores in them were not
+    recognized"""
+    c = UnitConvert()
+    assert 'sqrt_GHz' in c.units
+
+
 def test_unit_convert():
     # Note: we compare strings instead of instances of UnitFloat to deal with
     # rounding errors

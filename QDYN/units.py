@@ -298,7 +298,7 @@ class UnitConvert(object):
         self._convfactor = {}
         self._category = {}
         rx_comment  = re.compile(r'^#\s*')
-        rx_unit = re.compile(r'^(?P<unit>[A-Za-z\d]+)\s+'
+        rx_unit = re.compile(r'^(?P<unit>[A-Za-z\d_]+)\s+'
                              r'(?P<factor>[0-9eE.+-]+)')
         category = ''
         for line in units_def_str.splitlines():
