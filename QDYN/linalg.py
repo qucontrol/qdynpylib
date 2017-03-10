@@ -345,3 +345,62 @@ def tril(matrix):
     else:
         raise TypeError("matrix must be numpy object, sparse matrix, or "
                         "QuTiP operator")
+
+
+def banded_to_full(banded, n, kl, ku, mode):
+    """Convert a rectangular matrix in the Lapack "banded" format
+    (http://www.netlib.org/lapack/lug/node124.html) into a (square) full matrix
+
+    Args:
+        banded (numpy array): Rectangular matrix in banded format
+        n (int): The dimension of the (full) matrix
+        kl (int):  The number of lower diagonals (kl=0 for
+            diagonal/upper-triangular matrix)
+        ku (int):  The number of upper diagonals (ku=0 for
+            diagonal/lower-triangular matrix)
+        mode (str): On of 'g', 'h', 's', 't' corresponding to "general",
+        "Hermitian", "symmetric", and 'triangular'. The values 'g' and 's' are
+        dequivalent, except that for 's' iether kl or ku must be zero. For
+        Hermitian or symmetric storage, exactly one of `kl`, `ku` must be zero.
+        Which one determines whether `banded` is assumed to contain the data
+        for the upper or lower triangle
+
+    Returns:
+        full: numpy array of same type as `banded`
+    """
+    full = np.zeros(shape=(n, n), dtype=banded.dtype)
+    if mode in ['g', 't']:
+        if mode == 't':
+            assert kl == 0 or ku == 0
+        for j in range(n):
+            for i in range(max(0, j-ku), min(n, j+kl+1)):
+                full[i, j] = banded[ku+i-j, j]
+    else:  # Hermitian or symmetric
+        if kl == 0:  # upper triangle
+            kd = ku
+            for j in range(n):
+                for i in range(max(0, j-kd), j+1):
+                    full[i, j] = banded[kd+i-j, j]
+                    if i != j:
+                        if mode == 'h':
+                            full[j, i] = banded[kd+i-j, j].conjugate()
+                        elif mode == 's':
+                            full[j, i] = banded[kd+i-j, j]
+                        else:
+                            raise ValueError("Invalid mode %s" % mode)
+        elif ku == 0:  # lower triangle
+            kd = kl
+            for j in range(n):
+                for i in range(j, min(n, j+kd+1)):
+                    full[i, j] = banded[i-j, j]
+                    if i != j:
+                        if mode == 'h':
+                            full[j, i] = banded[i-j, j].conjugate()
+                        elif mode == 's':
+                            full[j, i] = banded[i-j, j]
+                        else:
+                            raise ValueError("Invalid mode %s" % mode)
+        else:
+            raise ValueError("For mode %s, either kl or ku must be zero"
+                             % mode)
+    return full
