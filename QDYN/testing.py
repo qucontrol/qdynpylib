@@ -128,9 +128,7 @@ def make_qdyn_utility(util='qdyn_prop_traj', procs=1, threads=1):
 
         def run_cmd(*args):
             full_cmd = cmd + list(args)
-            return subprocess.call(full_cmd, env=env, stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT,
-                                   universal_newlines=True)
+            return subprocess.call(full_cmd, env=env, universal_newlines=True)
 
         return run_cmd
 
