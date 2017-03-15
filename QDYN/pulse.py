@@ -645,6 +645,23 @@ class Pulse(object):
         writetotxt(filename, freqs, filter, fmt='%15.7e%15.12f',
                    header=header)
 
+    def apply_spectral_filter(self, filter_func, freq_unit=None):
+        """Apply a spectral filter function to the pulse
+
+        Args:
+            filter_func (callable): A function that takes a frequency values
+                (in units of `freq_unit`) and returns a filter value in the
+                range [0, 1]
+            freq_unit (str, optional):  Unit of frequencies that `filter_func`
+                assumes.  If not given, defaults to the `freq_unit` attribute.
+        """
+        freqs, spec = self.spectrum(freq_unit=freq_unit)
+        filter = np.array([filter_func(f) for f in freqs], dtype=np.float64)
+        if not (0 <= np.min(filter) <= 1 and 0 <= np.max(filter) <= 1):
+            raise ValueError("filter values must be in the range [0, 1]")
+        spec *= filter
+        self.amplitude = np.fft.ifft(spec)
+
     def config_line(self, filename, pulse_id, label=None):
         """Return an OrderedDict of attributes for a config file line
         describing the pulse. See :func:`pulse_config_line`"""
