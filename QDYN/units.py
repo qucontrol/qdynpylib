@@ -315,7 +315,9 @@ class UnitConvert(object):
         self._convfactor['iu'] = 1.0
         self._category['iu'] = '*'
         self._convfactor['unitless'] = 1.0
+        self._convfactor['dimensionless'] = 1.0
         self._category['unitless'] = 'unitless'
+        self._category['dimensionless'] = 'unitless'
 
     def compatible_units(self, unit):
         """Set of all units to which `unit` can be converted
