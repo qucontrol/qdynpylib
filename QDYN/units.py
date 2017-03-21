@@ -25,6 +25,7 @@ DEFAULT_UNITS = r'''
 iu             1.00000000000000000000  # unity :-)
 au             1.00000000000000000000  # internal units = atomic units
 unitless       1.00000000000000000000  # unitless number
+dimensionless  1.00000000000000000000  # dimensionless units
 
 
 # ------------------------------------------------------------------------------
