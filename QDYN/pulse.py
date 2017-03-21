@@ -132,6 +132,9 @@ class Pulse(object):
             'fs' : 'eV',
             'microsec' : 'MHz',
             'au' : 'au',
+            'iu' : 'iu',
+            'unitless' : 'unitless',
+            'dimensionless' : 'dimensionless',
         }
         self.freq_unit = freq_unit
         if freq_unit is None:
