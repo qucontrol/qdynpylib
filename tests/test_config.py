@@ -38,6 +38,84 @@ def config_two_psi():
     return read_config_str(config)
 
 
+@pytest.fixture
+def config_ham_ensemble():
+    """Config with an ensemble of hamiltonians"""
+    config = r'''
+    tgrid: t_start = 0, t_stop = 100_ns, nt = 2000
+
+    prop: method = newton, use_mcwf = F
+
+    pulse:
+    * is_complex = T, oct_spectral_filter = filter.dat, id = 1, &
+    filename = pulse1.dat, oct_outfile = pulse.oct.dat, oct_lambda_a = 1.0, &
+    oct_lambda_intens = 0.0, oct_increase_factor = 5.0, oct_shape = flattop, &
+    shape_t_start = 0.0, t_rise = 2_ns, shape_t_stop = 100_ns, t_fall = 2_ns, &
+    type = file, time_unit = ns, ampl_unit = MHz
+
+    ham: type = matrix, real_op = F, n_surf = 150, sparsity_model = indexed
+    * filename = H0.dat, op_unit = MHz, op_type = potential
+    * filename = H1.dat, op_unit = dimensionless, op_type = dipole, &
+    pulse_id = 1
+    * filename = H2.dat, conjg_pulse = T, op_unit = dimensionless, &
+    op_type = dipole, pulse_id = 1
+
+    ham: type = matrix, real_op = F, n_surf = 150, label = gen1, &
+    sparsity_model = indexed
+    * filename = H3.dat, op_unit = MHz, op_type = potential
+    * filename = H4.dat, op_unit = dimensionless, op_type = dipole, &
+    pulse_id = 1
+    * filename = H5.dat, conjg_pulse = T, op_unit = dimensionless, &
+    op_type = dipole, pulse_id = 1
+
+    ham: type = matrix, real_op = F, n_surf = 150, label = gen2, &
+    sparsity_model = indexed
+    * filename = H6.dat, op_unit = MHz, op_type = potential
+    * filename = H7.dat, op_unit = dimensionless, op_type = dipole, &
+    pulse_id = 1
+    * filename = H8.dat, conjg_pulse = T, op_unit = dimensionless, &
+    op_type = dipole, pulse_id = 1
+
+    ham: type = matrix, real_op = F, n_surf = 150, label = gen3, &
+    sparsity_model = indexed
+    * filename = H9.dat, op_unit = MHz, op_type = potential
+    * filename = H10.dat, op_unit = dimensionless, op_type = dipole, &
+    pulse_id = 1
+    * filename = H11.dat, conjg_pulse = T, op_unit = dimensionless, &
+    op_type = dipole, pulse_id = 1
+
+    ham: type = matrix, real_op = F, n_surf = 150, label = gen4, &
+    sparsity_model = indexed
+    * filename = H12.dat, op_unit = MHz, op_type = potential
+    * filename = H13.dat, op_unit = dimensionless, op_type = dipole, &
+    pulse_id = 1
+    * filename = H14.dat, conjg_pulse = T, op_unit = dimensionless, &
+    op_type = dipole, pulse_id = 1
+
+    psi:
+    * type = file, filename = psi_00.dat, label = 00
+
+    psi:
+    * type = file, filename = psi_01.dat, label = 01
+
+    psi:
+    * type = file, filename = psi_10.dat, label = 10
+
+    psi:
+    * type = file, filename = psi_11.dat, label = 11
+
+    oct: method = krotovpk, J_T_conv = 1e-05, max_ram_mb = 8000, &
+    iter_dat = oct_iters.dat, iter_stop = 1000, params_file = oct_params.dat
+
+    user_strings: ensemble_gens = gen1\,gen2\,gen3\,gen4, time_unit = ns, &
+    rwa_vector = rwa_vector.dat, write_gate = U_over_t.dat, &
+    basis = 00\,01\,10\,11, gate = target_gate.dat, J_T = J_T_sm
+
+    user_logicals: write_optimized_gate = T
+    '''
+    return read_config_str(config)
+
+
 def test_item_rxs():
     """Test regular expressions for items"""
     rx_label = _item_rxs()[0][0]
@@ -170,4 +248,19 @@ def test_generate_make_config(config1):
     assert "unexpected keyword" in str(exc_info)
 
 
-
+def test_config_ham_ensemble(config_ham_ensemble):
+    """Test config file with multiple hamiltonian blocks, each identified by a
+    different label"""
+    config = config_ham_ensemble
+    assert len(config['ham']) == 15
+    for line in config['ham'][0:3]:
+        assert 'label' not in line
+    for line in config['ham'][3:6]:
+        assert line['label'] == 'gen1'
+    for line in config['ham'][6:9]:
+        line['label'] == 'gen2'
+    for line in config['ham'][9:12]:
+        line['label'] == 'gen3'
+    for line in config['ham'][12:15]:
+        line['label'] == 'gen4'
+    assert len(config['psi']) == 4

@@ -455,11 +455,12 @@ def _read_config_lines(lines):
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section].update(line_items)
             else:
-                for line_dict in config_data[current_section]:
+                i_item_line = current_itemline[current_section]
+                for line_dict in config_data[current_section][i_item_line:]:
                     line_dict.update(line_items)
         elif m_itemline:
-            config_data[current_section][current_itemline[current_section]]\
-                    .update(line_items)
+            i_item_line = current_itemline[current_section]
+            config_data[current_section][i_item_line].update(line_items)
             current_itemline[current_section] += 1
         else:
             raise ValueError("Could not parse line '%s'" % line)
