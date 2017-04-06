@@ -82,6 +82,7 @@ class LevelModel(object):
         self.user_data = OrderedDict([])
         self._pulse_id = defaultdict(int)  # last used pulse_id, per label
         self._pulse_ids = {}  # (pulse, label) -> pulse_id
+        self._locked_pulses = False
 
     @staticmethod
     def _obj_list(obj_list, label=None, with_attribs=False):
@@ -131,6 +132,7 @@ class LevelModel(object):
         tuples ``(pulse, attributes)`` where ``attributes`` is a (combined,
         read-only) dictionary of all config file attributes for the pulse.
         """
+        logger = logging.getLogger(__name__)
         if label is None:
             label = ''
         result = []
@@ -147,9 +149,9 @@ class LevelModel(object):
                                 config_attribs=[])
                     else:
                         p = pulse
-                    config_attribs = pulse_config_line(p, filename, pulse_id,
-                                                       pulse_label,
-                                                       config_attribs=attribs)
+                    config_attribs = pulse_config_line(
+                        p, filename, pulse_id, pulse_label,
+                        config_attribs=attribs, warn=True)
                     result.append((pulse, config_attribs))
                 else:
                     result.append(pulse)
@@ -209,8 +211,16 @@ class LevelModel(object):
         `_pulses`. Increments ``self._pulse_id[label]`` and sets
         ``self._pulse_ids[(pulse, label)]``
 
-        Return `pulse_id`
+        Returns:
+            the pulse id, as an integer
+
+        Raises:
+            ValueError: if pulses are added after the model has be locked by a
+            call to :meth:`set_oct`
         """
+        if self._locked_pulses:
+            raise ValueError("Cannot add pulse after the set_oct method "
+                             "has been called")
         try:
             label = pulse.config_attribs['label']
         except (AttributeError, KeyError):
@@ -234,6 +244,10 @@ class LevelModel(object):
             config_attribs = OrderedDict([
                 ('label', label), ('id', pulse_id), ('filename', filename)
             ])
+            if hasattr(pulse, 'config_attribs') and 'id' in pulse.config_attribs:
+                if pulse.config_attribs['id'] != pulse_id:
+                    raise ValueError(
+                        "Pulse must not have config attribute 'id'")
             self._pulses.append(
                 (pulse, config_attribs)
             )
@@ -492,13 +506,11 @@ class LevelModel(object):
         else:
             self.construct_mcwf_ham = False
 
-    def set_oct(self, pulse_settings, method, J_T_conv, max_ram_mb, **kwargs):
+    def set_oct(
+            self, method, J_T_conv, max_ram_mb, pulse_settings=None, **kwargs):
         """Set config file data and pulse properties for optimal control
 
         Args:
-            pulse_settings (dict): OCT settings for each known pulse. Must map
-                each pulse (see :meth:`pulses`) to an `OrderedDict` of oct
-                settings
             method (str): Optimization method. Allowed values are 'krotovpk',
                 'krotov2', 'krotovbwr', and 'lbfgs'
             J_T_conv (foat): The value of the final time functional
@@ -507,6 +519,10 @@ class LevelModel(object):
                 the states required to calculate the gradient, a "segmented"
                 storage scheme will be used that caches the states to disk,
                 using up to `max_disk_mb` hard drive storage.
+            pulse_settings (dict): Additional OCT settings for each known
+                pulse. Maps each pulse (see :meth:`pulses`) to an
+                `OrderedDict` of oct settings, augmenting the settings
+                that each pulse may have in its `config_attribs` attribute
 
         All other keyword arguments directly specify keys and values for the
         OCT config section. Allowed keys are `iter_start`, `iter_stop`,
@@ -518,9 +534,8 @@ class LevelModel(object):
         `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN Fortran
         library documentation for details.
 
-        The settings for each pulse given by ``pulse_settings[pulse]``. It is
-        recommended to be an `OrderedDict`, and may
-        contain the keys `oct_parametrization`, `oct_pulse_max`,
+        Each entry in `pulse_settings` is recommended to be an `OrderedDict`,
+        and may contain the keys `oct_parametrization`, `oct_pulse_max`,
         `oct_pulse_min`, `shape_t_start`, `shape_t_stop`, `ftbaseline`,
         `t_rise`, `t_fall`, `oct_lambda_intens`, `oct_lambda_a`,
         `oct_shape` (default to ``'const'``), `oct_outfile` (default to
@@ -529,13 +544,11 @@ class LevelModel(object):
         Fortran library documentation for details. If Krotov's method is used,
         a value for `oct_lambda_a` must be given.
 
-        Since the `set_oct` method sets attribute for existing pulses, it must
-        be called *after* any methods that add the pulses (e.g.,
-        :meth:`add_ham`)
+        The given `pulse_settings` take precedence over any values in the
+        `config_attribs` attribute of each pulse.
 
         Raises:
-            KeyError: If `pulse_settings` does not contain settings for all
-                pulses, or if the settings for a pulse contain invalid or
+            KeyError: If the settings for a pulse contain invalid or
                 missing keys
         """
         allowed_keys = [
@@ -556,6 +569,9 @@ class LevelModel(object):
         ]
         krotov_required_pulse_keys = ['oct_lambda_a', ]
 
+        assert isinstance(method, str), ("`method` must be string. Is your "
+            "code adapted to the latest version of QDYN?")
+
         def default_outfile(filename):
             return os.path.splitext(filename)[0] + ".oct.dat"
 
@@ -567,26 +583,28 @@ class LevelModel(object):
             else:
                 raise TypeError("got an unexpected keyword argument '%s'"
                                 % key)
+
+        if pulse_settings is None:
+            pulse_settings = {}
         for pulse, attribs in self._pulses:
-            try:
-                oct_attribs = pulse_settings[pulse]
-            except KeyError:
-                raise KeyError("pulse_settings must contain settings for all "
-                               "pulses. Missing pulse: %s" % str(pulse))
-            oct_attribs['oct_shape'] = oct_attribs.get('oct_shape', "const")
-            octout = default_outfile(attribs['filename'])
-            oct_attribs['oct_outfile'] = oct_attribs.get('oct_outfile', octout)
-            oct_attribs['oct_increase_factor'] = \
-                oct_attribs.get('oct_increase_factor', 5.0)
+            if pulse in pulse_settings:
+                for key in pulse_settings[pulse]:
+                    if key not in allowed_pulse_keys:
+                        raise KeyError("Invalid key '%s'" % key)
+                attribs.update(pulse_settings[pulse])
+            if 'oct_shape' not in attribs:
+                attribs['oct_shape'] = 'const'
+            if 'oct_outfile' not in attribs:
+                octout = default_outfile(attribs['filename'])
+                attribs['oct_outfile'] = octout
+            if 'oct_increase_factor' not in attribs:
+                attribs['oct_increase_factor'] = 5.0
             if 'krotov' in method:
                 for key in krotov_required_pulse_keys:
-                    if key not in oct_attribs:
+                    if key not in attribs:
                         raise KeyError("Key '%s' is required for each pulse "
                                        "when using Krotov's method" % key)
-            for key in oct_attribs:
-                if key not in allowed_pulse_keys:
-                    raise KeyError("Invalid key '%s'" % key)
-            attribs.update(oct_attribs)
+        self._locked_pulses = True
 
     def add_state(self, state, label):
         """Add a state (amplitude array) for the given label. Note that there

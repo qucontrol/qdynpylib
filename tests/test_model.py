@@ -223,14 +223,11 @@ def test_oct(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     pulse = partial(blackman, t_start=0, t_stop=50)
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     with pytest.raises(KeyError) as exc_info:
-        model.set_oct({}, method='krotovpk', J_T_conv=1e-3, max_ram_mb=10)
-    assert "must contain settings for all pulses" in str(exc_info)
-    with pytest.raises(KeyError) as exc_info:
-        model.set_oct({pulse: {}}, method='krotovpk', J_T_conv=1e-3,
-                      max_ram_mb=10)
+        model.set_oct(method='krotovpk', J_T_conv=1e-3, max_ram_mb=10)
     assert "Key 'oct_lambda_a' is required" in str(exc_info)
     with pytest.raises(KeyError) as exc_info:
-        model.set_oct({pulse: {'oct_lambda_a': 1e-3, 'bogus': 1}},
+        pulse_settings = {pulse: {'oct_lambda_a': 1e-3, 'bogus': 1}}
+        model.set_oct(pulse_settings=pulse_settings,
                       method='krotovpk', J_T_conv=1e-3, max_ram_mb=10)
     assert "Invalid key 'bogus'" in str(exc_info)
     pulse_oct_settings = {
@@ -240,10 +237,10 @@ def test_oct(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
         ])
     }
     with pytest.raises(TypeError):
-        model.set_oct(pulse_oct_settings, method='krotovpk', J_T_conv=1e-3,
-                      bogus='val', max_ram_mb=10)
-    model.set_oct(pulse_oct_settings, method='krotovpk', J_T_conv=1e-3,
-                  iter_stop=10, max_ram_mb=10)
+        model.set_oct(pulse_settings=pulse_oct_settings, method='krotovpk',
+                      J_T_conv=1e-3, bogus='val', max_ram_mb=10)
+    model.set_oct(pulse_settings=pulse_oct_settings, method='krotovpk',
+                  J_T_conv=1e-3, iter_stop=10, max_ram_mb=10)
     model.write_to_runfolder(str(tmpdir.join('model_rf')),
                              config='oct.config')
 

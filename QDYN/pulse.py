@@ -1072,36 +1072,60 @@ def tgrid_from_config(tgrid_dict, time_unit, pulse_grid=True):
     return tgrid
 
 
-def pulse_config_line(pulse, filename, pulse_id, label=None,
-        config_attribs=None):
-    """Return an OrderedDict of attributes for a config file line
-    describing the pulse
+def pulse_config_line(
+        pulse, filename, pulse_id, label=None, config_attribs=None,
+        defaults=None, warn=False):
+    """Return an :class:`OrderedDict` of attributes for a config file line
+    describing the pulse.
 
     Args:
         pulse: Pulse for which to generate the config line attributes. Should
             be an instance of `Pulse` or any other compatible class (e.g.
-            `AnalyticalPulse`)
+            `AnalyticalPulse`).
         filename (str): The name of the file from which the pulse will be read.
             It is assumed that the numerical data of `pulse` will be written to
             `filename`
         pulse_id (int): The pulse ID that should be used in the config file
         label (str or None): The label that should be used in the config file.
             Both None and an empty string will omit the label from the config
-        config_attribs (dict): A dictionary of additional attributes (beyond,
-            or as an alternative to the data in `pulse.config_attribs`).
+        config_attribs (OrderedDict): A dictionary of additional attributes
+            (overwriting data in `pulse.config_attribs`).
             Preferably, this should be an OrderedDict
+        defaults (OrderedDict): A dictionary of default attributes. These are
+            overwritten by values in `pulse.config_attribs` and
+            `config_attribs`
+        warn (bool): If True, log a warning if any config file file parameter
+            is defined multiple times with differing values.
 
     The config attributes 'type', 'filename', 'id', 'time_unit', 'aml_unit',
     'label', and 'is_complex' will be set based on the `pulse` attributes and
-    the above arguments. Further config attributes may be defined (first) in
-    `pulse.config_attribs`, and (second) in the `config_attribs` argument
+    the above arguments.
+
+    Any remaining attributes will be set from `defaults`,
+    `pulse.config_attribs`, and `config_attribs` (each overwriting values the
+    previous)
     """
-    result = OrderedDict(pulse.config_attribs)
+    logger = logging.getLogger(__name__)
+
+    def _update(d1, d2):
+        if warn:
+            for key in d2:
+                if key in d1 and d2[key] != d1[key]:
+                    logger.warning(
+                        "Overwriting pulse config value for key %s: ""%s -> %s"
+                        % (key, d1[key], d2[key]))
+        d1.update(d2)
+
+    if defaults is None:
+        defaults = []
+    result = OrderedDict(defaults)
+    _update(result, pulse.config_attribs)
     if config_attribs is not None:
-        result.update(config_attribs)
-    result.update(OrderedDict([
+        _update(result, config_attribs)
+    forced = OrderedDict([
         ('type', 'file'), ('filename', filename), ('id', int(pulse_id)),
-        ('time_unit', pulse.time_unit), ('ampl_unit', pulse.ampl_unit)]))
+        ('time_unit', pulse.time_unit), ('ampl_unit', pulse.ampl_unit)])
+    _update(result, forced)
     if label is not None:
         result['label'] = label
     if 'label' in result:
