@@ -103,3 +103,52 @@ def test_write_oct_spectral_filter(tmpdir, request):
         filename, filter_func=lambda f: abs(f) < 2)
     datadir = os.path.splitext(request.module.__file__)[0]
     assert filecmp.cmp(filename, os.path.join(datadir, 'spectral_filter.dat'))
+
+
+def test_pulse_as_func():
+    """Test converting pulse as a function"""
+    tgrid = pulse_tgrid(t0=1.0, T=11.0, nt=6)
+    pulse = Pulse(tgrid=tgrid, amplitude=np.array([0, 1.0, 2.0, 0, 1.0]),
+                  ampl_unit='MHz', time_unit='ns')
+    f = pulse.as_func(interpolation='linear')
+    with pytest.raises(ValueError):
+        f(0.5)
+        f(11.1)
+    assert abs(f(1.0) - 0.0) < 1e-12
+    assert abs(f(1.9) - 0.0) < 1e-12
+    assert abs(f(2.0) - 0.0) < 1e-12
+    assert abs(f(3.0) - 0.5) < 1e-12
+    assert abs(f(3.5) - 0.75) < 1e-12
+    assert abs(f(4.0) - 1.0) < 1e-12
+    assert abs(f(5.0) - 1.5) < 1e-12
+    assert abs(f(6.0) - 2.0) < 1e-12
+    assert abs(f(7.0) - 1.0) < 1e-12
+    assert abs(f(8.0) - 0.0) < 1e-12
+    assert abs(f(9.0) - 0.5) < 1e-12
+    assert abs(f(10.0) - 1.0) < 1e-12
+    assert abs(f(11.0) - 1.0) < 1e-12
+
+    f = pulse.as_func(interpolation='piecewise')
+    with pytest.raises(ValueError):
+        f(0.5)
+        f(11.1)
+    assert abs(f(1.00) - 0.0) < 1e-12
+    assert abs(f(1.90) - 0.0) < 1e-12
+    assert abs(f(2.00) - 0.0) < 1e-12
+    assert abs(f(2.99) - 0.0) < 1e-12
+    assert abs(f(3.01) - 1.0) < 1e-12
+    assert abs(f(4.00) - 1.0) < 1e-12
+    assert abs(f(4.50) - 1.0) < 1e-12
+    assert abs(f(4.99) - 1.0) < 1e-12
+    assert abs(f(5.01) - 2.0) < 1e-12
+    assert abs(f(6.00) - 2.0) < 1e-12
+    assert abs(f(6.99) - 2.0) < 1e-12
+    assert abs(f(7.01) - 0.0) < 1e-12
+    assert abs(f(9.01) - 1.0) < 1e-12
+    assert abs(f(10.0) - 1.0) < 1e-12
+    assert abs(f(11.0) - 1.0) < 1e-12
+
+    assert abs(f(UnitFloat(6.0, 'ns')) - 2.0) < 1e-12
+
+    with pytest.raises(ValueError):
+        f = pulse.as_func(interpolation='invalid')

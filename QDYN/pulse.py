@@ -365,6 +365,69 @@ class Pulse(object):
             result = round(result)
         return UnitFloat(result, unit=self.time_unit)
 
+    @property
+    def is_complex(self):
+        """Does any element of the pulse amplitude have a non-zero imaginary
+        part?
+        """
+        return np.max(np.abs(self.amplitude.imag)) > 0.0
+
+    def as_func(self, interpolation='linear'):
+        """Return a callable the evaluates the pulse for a given time value.
+
+        Possible values for `interpolation` are 'linear' and 'piecewise'.
+
+        The resulting function takes a single argument `t` that must be a float
+        in the range [:attr:`t0`, :attr:`T`] and in units of
+        :attr:`time_unit`). It returns the
+        (interpolated) pulse amplitude as a float, in units of
+        :attr:`ampl_unit`
+        """
+
+        t0 = float(self.t0)
+        T = float(self.T)
+        dt = float(self.dt)
+        offset = t0 + 0.5 * dt
+
+        def func_linear(t):
+            """linear interpolation of pulse amplitude"""
+            if t0 <= float(t) <= T:
+                t = float(t) - offset
+                n = max(int(t / dt), 0)
+                delta = max(t - n * dt, 0.0) / dt
+                try:
+                    return ((1 - delta) * self.amplitude[n] +
+                            delta * self.amplitude[n+1])
+                except IndexError:  # last n
+                    return self.amplitude[n]
+            else:
+                raise ValueError("Value t=%g not in range [%g, %g]"
+                                 % (t, t0, T))
+
+        def func_piecewise(t):
+            """piecewise interpolation of pulse amplitude"""
+            if t0 <= float(t) <= T:
+                t = float(t) - offset
+                n = max(int(t / dt), 0)
+                delta = max(t - n * dt, 0.0) / dt
+                if delta < 0.5:
+                    return self.amplitude[n]
+                else:
+                    try:
+                        return self.amplitude[n+1]
+                    except IndexError:  # last n
+                        return self.amplitude[n]
+            else:
+                raise ValueError("Value t=%g not in range [%g, %g]"
+                                 % (t, t0, T))
+
+        func_map = {'linear': func_linear, 'piecewise': func_piecewise}
+        try:
+            return func_map[interpolation]
+        except KeyError:
+            raise ValueError("Invalid interpolation not in %s: %s"
+                             % (str(list(func_map.keys())), interpolation))
+
     def convert(self, time_unit=None, ampl_unit=None, freq_unit=None):
         """Convert the pulse data to different units"""
         if time_unit is not None:
@@ -375,16 +438,9 @@ class Pulse(object):
             factor = self.unit_convert.convert(1.0, self.ampl_unit, ampl_unit)
             self.amplitude *= factor
             self.ampl_unit = ampl_unit
-        if not freq_unit is None:
+        if freq_unit is not None:
             self.freq_unit = freq_unit
         self._check()
-
-    @property
-    def is_complex(self):
-        """Does any element of the pulse amplitude have a non-zero imaginary
-        part?
-        """
-        return np.max(np.abs(self.amplitude.imag)) > 0.0
 
     def get_timegrid_point(self, t, move="left"):
         """Return the next point to the left (or right) of the given `t` which
