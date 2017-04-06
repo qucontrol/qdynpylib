@@ -3,7 +3,8 @@ import filecmp
 import QDYN
 import numpy as np
 from QDYN.units import UnitFloat
-from QDYN.pulse import tgrid_from_config, Pulse, pulse_tgrid, gaussian
+from QDYN.pulse import (
+    tgrid_from_config, Pulse, pulse_tgrid, gaussian, blackman)
 import pytest
 
 config_str = r'''
@@ -152,3 +153,12 @@ def test_pulse_as_func():
 
     with pytest.raises(ValueError):
         f = pulse.as_func(interpolation='invalid')
+
+
+def test_pulse_from_func():
+    """Test instantiating pulse from a simple function"""
+    tgrid = pulse_tgrid(10, 100)
+    ampl = lambda t: 100 * blackman(t, 0, 10)
+    pulse1 = Pulse.from_func(tgrid, ampl, ampl_unit='MHz', time_unit='ns')
+    pulse2 = Pulse(tgrid, ampl(tgrid), ampl_unit='MHz', time_unit='ns')
+    assert pulse1 == pulse2

@@ -52,9 +52,9 @@ class Pulse(object):
         freq_unit (str): Unit to use for frequency when calculating the
             spectrum
         dt (scalar): Time step (in `time_unit`)
-        preamble (array): Array of lines that are written before the header
+        preamble (list): List of lines that are written before the header
             when writing the pulse to file. Each line should start with '# '
-        postamble (array): Array of lines that are written after all data
+        postamble (list): List of lines that are written after all data
             lines. Each line should start with '# '
         config_attribs (dict): Additional config data, for the `config_line`
             method (e.g. `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
@@ -101,8 +101,9 @@ class Pulse(object):
     """
     unit_convert = UnitConvert()
 
-    def __init__(self, tgrid, amplitude=None, time_unit=None, ampl_unit=None,
-                freq_unit=None, mode='complex'):
+    def __init__(
+            self, tgrid, amplitude=None, time_unit=None, ampl_unit=None,
+            freq_unit=None, mode='complex'):
         tgrid = np.array(tgrid, dtype=np.float64)
         if amplitude is None:
             amplitude = np.zeros(len(tgrid))
@@ -126,7 +127,7 @@ class Pulse(object):
         self.postamble = []
         self.config_attribs = OrderedDict({})
 
-        freq_units = { # map time_unit to most suitable freq_unit
+        freq_units = {  # map time_unit to most suitable freq_unit
             'ns' : 'GHz',
             'ps' : 'cminv',
             'fs' : 'eV',
@@ -143,6 +144,21 @@ class Pulse(object):
             except KeyError:
                 raise TypeError("freq_unit must be specified")
         self._check()
+
+    def __eq__(self, other):
+        """Compare two pulses, within a precision of 1e-12"""
+        if not isinstance(other, self.__class__):
+            return False
+        for attr in ('mode', 'time_unit', 'ampl_unit', 'freq_unit', 'preamble',
+                'postamble', 'config_attribs'):
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        if np.max(np.abs(self.tgrid - other.tgrid)) > 1.0e-12:
+            return False
+        if np.max(np.abs(self.amplitude - other.amplitude)) > 1.0e-12:
+            return False
+        return True
+
 
     def copy(self):
         """Return a copy of the pulse"""
@@ -309,6 +325,18 @@ class Pulse(object):
         pulse.preamble = preamble
         pulse.postamble = postamble
         return pulse
+
+    @classmethod
+    def from_func(
+            cls, tgrid, func, time_unit=None, ampl_unit=None, freq_unit=None,
+            mode='complex'):
+        """Instantiate a pulse from an amplitude function `func`.
+
+        All other parameters are passed on to `__init__`
+        """
+        amplitude = [func(t) for t in tgrid]
+        return cls(tgrid, amplitude, time_unit=time_unit, ampl_unit=ampl_unit,
+                   freq_unit=freq_unit, mode=mode)
 
     @property
     def dt(self):
