@@ -90,7 +90,7 @@ test36: .venv/py36/bin/py.test
 
 test: test27 test33 test34 test35 test36
 
-doc: .venv/py35/bin/py.test
+doc: .venv/py35/bin/py.test docs/source/*.rst QDYN/*.py
 	@rm -f docs/source/API/*
 	$(MAKE) -C docs SPHINXBUILD=../.venv/py35/bin/sphinx-build html
 	@ln -sf docs/build/html doc
