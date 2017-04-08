@@ -1,34 +1,47 @@
 """ Module containing utilities for managing QDYN config files """
 from __future__ import print_function, division, absolute_import
-import os
 import json
 import re
 import base64
 import random
 import copy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import six
+import numpy as np
 
 from .units import UnitFloat
 
-def _protect_quotes(str_line):
-    r'''Replace quoted expressions in the given `str_line` by a base-64 string
-    which is guaranteed to contain only letters and numbers. Return the
-    "protected" string and a list of tuples (base-64 replacement, quoted
-    expression). Nested and escaped quotes are handled.
+def _protect_str_vals(str_line):
+    r'''Parsing is greatly simplified if it can be assumed that key-value pairs
+    in the config match the regular expression '\w+\s*=\s*[\w.+-]+'. That is,
+    the values do not contain spaces, quotes, or escaped characters. This
+    function replaces values in the given `str_line` by a base-64 string
+    which is guaranteed to contain only letters and numbers. It returns the
+    "protected" string and a list of replacement tuples. The protected string
+    is guaranteed to not be shorter than the original string.
 
     >>> s_in = r'a = "text", '+"b = 'text'"
     >>> print(s_in)
     a = "text", b = 'text'
-    >>> s, r = _protect_quotes(s_in)
+    >>> s, r = _protect_str_vals(s_in)
     >>> print(s)
     a = InRleHQi, b = J3RleHQn
     >>> print(r)
     [('InRleHQi', '"text"'), ('J3RleHQn', "'text'")]
+
+    >>> s_in = r'a = this\ is\ an\ unquoted\ string, b = "text"'
+    >>> print(s_in)
+    a = this\ is\ an\ unquoted\ string, b = "text"
+    >>> s, r = _protect_str_vals(s_in)
+    >>> print(s)
+    a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi
+    >>> print(r)
+    [('InRleHQi', '"text"'), ('dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n', 'this\\ is\\ an\\ unquoted\\ string')]
     '''
-    rx_dq = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')
-    rx_sq = re.compile(r"'[^'\\]*(?:\\.[^'\\]*)*'")
+    # handle quoted strings
+    rx_dq = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')  # search for ...
+    rx_sq = re.compile(r"'[^'\\]*(?:\\.[^'\\]*)*'")  # ... balanced quotes
     replacements = []
     n_replacements = -1
     while n_replacements < len(replacements):
@@ -43,14 +56,33 @@ def _protect_quotes(str_line):
                     .decode('ascii').replace("=", '')
             replacements.append((b64, quoted_str))
             str_line = str_line.replace(quoted_str, b64)
+
+    # handle un-quoted, but escaped strings
+    rx_escaped_word = re.compile(
+            # any string of characters that does not include spaces or any
+            # of the characters ,:!&=\, except when they are escaped (preceded
+            # by a backslash)
+            r'(([^\s,:!&=\\]|\\\s|\\\\|\\,|\\:|\\!|\\&|\\=|\\n|\\r|\\t|\\b)+)')
+    rx_good_word = re.compile(r'^[\w.+-]+$')
+    for match in rx_escaped_word.finditer(str_line):
+        word = match.group(0)
+        if not (rx_good_word.match(word) or (word == '*')):
+            if six.PY2:
+                b64 = base64.b64encode(word).replace("=", '')
+            else:
+                b64 = base64.b64encode(bytes(word, 'utf8'))\
+                      .decode('ascii').replace("=", '')
+            replacements.append((b64, word))
+            str_line = str_line.replace(word, b64)
+
     return str_line, replacements
 
 
-def _unprotect_quotes(str_line, replacements):
-    r'''Inverse to :func:`_protect_quotes`
+def _unprotect_str_vals(str_line, replacements):
+    r'''Inverse to :func:`_protect_str_vals`
 
-    >>> s, r = _protect_quotes(r'a = "text", '+"b = 'text'")
-    >>> print(_unprotect_quotes(s, r))
+    >>> s, r = _protect_str_vals(r'a = "text", '+"b = 'text'")
+    >>> print(_unprotect_str_vals(s, r))
     a = "text", b = 'text'
     '''
     for (b64, quoted_str) in replacements:
@@ -122,6 +154,18 @@ def _unescape_str(s):
     return s
 
 
+def _val_to_str(val):
+    """Convert `val` to a string that can be written directly to the config
+    file"""
+    logical_mapping = {True: 'T', False: 'F'}
+    if isinstance(val, (bool, np.bool_)):
+        return logical_mapping[val]
+    elif isinstance(val, str):
+        return _escape_str(val)
+    else:
+        return str(val)
+
+
 def _process_raw_lines(raw_lines):
     r'''Return an iterator over the "processed" lines of a config file, based
     on the given raw lines. The processing of the raw lines consists of
@@ -164,12 +208,12 @@ def _process_raw_lines(raw_lines):
     while True: # stops when next(raw_lines) throws StopIteration
         raw_line = next(raw_lines)
         line_nr += 1
-        line, replacements = _protect_quotes(raw_line.strip())
+        line, replacements = _protect_str_vals(raw_line.strip())
         # strip out out comments
         line = re.sub('!.*$', '', line).strip()
         while line.endswith('&'):
             line = line[:-1] # strip out trailing '&' in continued line
-            line2, replacements2 = _protect_quotes(next(raw_lines).strip())
+            line2, replacements2 = _protect_str_vals(next(raw_lines).strip())
             line_nr += 1
             replacements.extend(replacements2)
             # strip out comments
@@ -178,7 +222,7 @@ def _process_raw_lines(raw_lines):
             if line2.startswith('&') and len(line2) > 1:
                 line2 = line2[1:]
             line += line2
-        line = _unprotect_quotes(line, replacements)
+        line = _unprotect_str_vals(line, replacements)
         if len(line) == 0:
             continue
         else:
@@ -189,7 +233,7 @@ def _split_config_line(line, linewidth):
     """Split the given line into a multi-line string of continued lines, trying
     to keep the length of each line under `linewidth`. Trailing newlines in
     `line` are ignored."""
-    full_line, replacements = _protect_quotes(line.strip())
+    full_line, replacements = _protect_str_vals(line.strip())
     if len(full_line) == 0:
         return "\n"
     rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+\s*,?\s*)')
@@ -206,7 +250,7 @@ def _split_config_line(line, linewidth):
         else:
             if len(parts) > 0:
                 current_line += '&'
-        current_line = _unprotect_quotes(current_line, replacements)
+        current_line = _unprotect_str_vals(current_line, replacements)
         lines.append(current_line.rstrip())
         current_line = '  ' # indent for continuing line
     return "\n".join(lines)+"\n"
@@ -243,12 +287,16 @@ def _render_config_lines(section_name, section_data):
         if len(section_data) > 1:
             common_items = dict(set(section_data[0].items()).intersection(
                                 *[set(d.items()) for d in section_data[1:]]))
+        else:
+            common_items = {}
         line = "%s:" % section_name
         for key in section_data[0]:
             # we *do not* iterate over keys in common_items, so that items
             # are ordered the same as in section_data[0], instead of randomly
             if key in common_items:
-                line += " %s = %s," % (key, _escape_str(common_items[key]))
+                if key == 'label' and common_items[key] == '':
+                    continue
+                line += " %s = %s," % (key, _val_to_str(common_items[key]))
         if line.endswith(","):
             lines.append(line[:-1].strip())
         else:
@@ -258,7 +306,9 @@ def _render_config_lines(section_name, section_data):
             line = "*"
             for key in item_line:
                 if key not in common_items:
-                    line += " %s = %s," % (key, _escape_str(item_line[key]))
+                    if key == 'label' and item_line[key] == '':
+                        continue
+                    line += " %s = %s," % (key, _val_to_str(item_line[key]))
             if line.endswith(","):
                 lines.append(line[:-1].strip())
             else:
@@ -266,31 +316,55 @@ def _render_config_lines(section_name, section_data):
     else: # section does not contain item lines, but key-value pairs only
         line = "%s:" % section_name
         for key in section_data:
-            line += " %s = %s," % (key, _escape_str(section_data[key]))
+            line += " %s = %s," % (key, _val_to_str(section_data[key]))
         lines.append(line[:-1].strip())
     return lines
 
 
-def _item_rxs():
-    # the following regexes are encapsulated in this function to make the them
-    # accessible to the config_conversion module
+def _item_rxs(section_name=''):
     logical_mapping = {
         'T': True, 'true': True, '.true.': True,
         'F': False, 'false': False, '.false.': False,
     }
-    item_rxs = [
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
-        lambda v: UnitFloat.from_str(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\d+-]+)$'),
-        lambda v: int(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+)$'),
-        lambda v: float(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
-                    r'\.true\.|\.false\.))$'),
-        lambda v: logical_mapping[v]),
+    item_rxs = []
+    if not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>label)\s*=\s*(?P<value>.+)$'),
+            lambda v: _unescape_str(v))  # label is always a string!
+        )
+    if section_name == 'user_reals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
+            lambda v: UnitFloat.from_str(v))
+        )
+    if section_name == 'user_ints' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'''
+                (?P<key>\w+) \s*=\s* (?P<value>
+                    [+-]? (0 | [1-9]\d*)  # leading zero not allowed
+                )$''', re.X),
+            lambda v: int(v))
+        )
+    if section_name == 'user_reals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'''
+                (?P<key>\w+) \s*=\s* (?P<value>
+                    [+-]?  (
+                    \d+\.\d+([Ee][+-]?\d+)? |  # 1.0, 1.0e5 (exponent optional)
+                    \d+[Ee][+-]?\d+            # 1e-5       (exponent required)
+                ))$''', re.X),
+            lambda v: float(v))
+        )
+    if section_name == 'user_logicals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
+                        r'\.true\.|\.false\.))$'),
+            lambda v: logical_mapping[v])
+        )
+    item_rxs.append(
         (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>.+)$'),
-        lambda v: _unescape_str(v)),
-    ]
+        lambda v: _unescape_str(v))
+    )
     return item_rxs
 
 
@@ -337,23 +411,22 @@ def _read_config_lines(lines):
         )
         ''', re.X)
     rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+)')
-    item_rxs = _item_rxs()
 
     # we need to make two passes over lines, so we may have to convert an
     # iterator to a list
     lines = list(lines)
 
     config_data = OrderedDict([])
-
     # first pass: identify sections, list of lines in each section
     current_section = ''
     for line in lines:
-        line, replacements = _protect_quotes(line)
+        line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
         m_itemline = rx_itemline.match(line)
         if m_sec:
             current_section = m_sec.group('section')
-            config_data[current_section] = OrderedDict([])
+            if current_section not in config_data:
+                config_data[current_section] = OrderedDict([])
         elif m_itemline:
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section]  = []
@@ -361,10 +434,14 @@ def _read_config_lines(lines):
 
     # second pass: set items
     current_section = ''
-    current_itemline = 0
+    current_itemline = defaultdict(int)  # section => index
+    item_rxs = _item_rxs(current_section)
     for line in lines:
-        line, replacements = _protect_quotes(line)
+        line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
+        if m_sec:
+            current_section = m_sec.group('section')
+            item_rxs = _item_rxs(current_section)
         m_itemline = rx_itemline.match(line)
         line_items = OrderedDict([])
         for item in rx_item.findall(line):
@@ -372,27 +449,25 @@ def _read_config_lines(lines):
             for rx, setter in item_rxs:
                 m = rx.match(item)
                 if m:
-                    val = _unprotect_quotes(m.group('value'), replacements)
+                    val = _unprotect_str_vals(m.group('value'), replacements)
                     line_items[m.group('key')] = setter(val)
                     matched = True
                     break
             if not matched:
                 raise ValueError("Could not parse item '%s'" % str(item))
         if m_sec:
-            current_itemline = 0
-            current_section = m_sec.group('section')
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section].update(line_items)
             else:
-                for line_dict in config_data[current_section]:
+                i_item_line = current_itemline[current_section]
+                for line_dict in config_data[current_section][i_item_line:]:
                     line_dict.update(line_items)
-                pass
         elif m_itemline:
-            config_data[current_section][current_itemline].update(
-                    line_items)
-            current_itemline += 1
+            i_item_line = current_itemline[current_section]
+            config_data[current_section][i_item_line].update(line_items)
+            current_itemline[current_section] += 1
         else:
-            raise ValueError("Could not parse line %d" % config.line_nr)
+            raise ValueError("Could not parse line '%s'" % line)
 
     return config_data
 
@@ -459,8 +534,34 @@ def get_config_value(config_data, key_tuple):
     return val
 
 
+def get_config_user_value(config_data, key):
+    """Return the value of a user-defined key in the config file (in the
+    ``user_strings``, ``user_reals``, ``user_logicals``, or `user_ints``
+    section). Return the first value found in any of the above sections, as the
+    type corresponding to the section where the key was found. Raise a
+    `KeyError` if `key` does not exist in any of the user-defined sections
+    """
+    logical_mapping = {
+        'T': True, 'true': True, '.true.': True,
+        'F': False, 'false': False, '.false.': False,
+    }
+    user_sections = [
+        ('user_strings',  str),
+        ('user_reals',    float),
+        ('user_logicals', lambda v: logical_mapping.get(v, v)),
+        ('user_ints',     int)
+    ]
+    for section, convert in user_sections:
+        try:
+            return convert(get_config_value(config_data, (section, key)))
+        except ValueError:
+            continue
+    raise KeyError("No user-defined key '%s'" % key)
+
+
 def set_config_value(config_data, key_tuple, value):
-    """Set a value in `config_data`, cf. `get_config_value`"""
+    """Set a value in `config_data`, cf. `get_config_value`. The key that is
+    set must already exist in `config_data`"""
     if len(key_tuple) < 2:
         raise ValueError("key_tuple must have at least two elements")
     try:
@@ -472,6 +573,29 @@ def set_config_value(config_data, key_tuple, value):
         raise ValueError("Invalid key '%s': %s" % (key, str(exc_info)))
     except KeyError:
         raise ValueError("Invalid key '%s'" % (key, ))
+
+
+def set_config_user_value(config_data, key, value):
+    """Set a user-defined value in the config file. The `value` must be an
+    instance of `str`, `float`, `bool`, or `int`, and it will be set for the
+    given `key` in the corresponding section ``user_strings``, ``user_reals``,
+    ``user_loigcals``, or ``user_ints``. This routine may be used to add *new*
+    user-defined data to `config_data`; a missing user-defined section will be
+    created as necessary.
+    """
+    user_sections = [
+        ('user_strings',  str),
+        ('user_reals',    float),
+        ('user_logicals', bool),  # isinstance(False, int) is True, ...
+        ('user_ints',     int)    # ... so the order is important here
+    ]
+    for section_name, section_type in user_sections:
+        if isinstance(value, section_type):
+            if section_name not in config_data:
+                config_data[section_name] = OrderedDict([])
+            config_data[section_name][key] = value
+            return
+    raise TypeError("value must be of type str, float, int, or bool")
 
 
 def generate_make_config(config_template, variables, dependencies=None,
@@ -550,6 +674,7 @@ def generate_make_config(config_template, variables, dependencies=None,
         # rely on get_config_value to throw Exception for invalid key_tuple
         get_config_value(config_template, key_tuple)
     def make_config(**kwargs):
+        """Generate config file data"""
         config_data = copy.deepcopy(config_template)
         for varname in defaults:
             if varname not in kwargs:
@@ -605,7 +730,7 @@ def get_config_structure(def_f90, outfile='new_config_structure.json'):
     config_structure = {}
 
     # Local regular expression filters
-    RX = {
+    rx = {
         'get_pt_type' : re.compile(
             r'^type\s*\((?P<sec_name>[^\s]\w+)_pt\).*$'),
         'start_pt_sec' : re.compile(
@@ -627,7 +752,7 @@ def get_config_structure(def_f90, outfile='new_config_structure.json'):
         if m:
             in_para_t = False
         if in_para_t:
-            m = RX['get_pt_type'].match(line)
+            m = rx['get_pt_type'].match(line)
             if m:
                 sec_name = m.group('sec_name').strip()
                 if sec_name == 'user':
@@ -644,16 +769,16 @@ def get_config_structure(def_f90, outfile='new_config_structure.json'):
             m = re.compile(r'^end\s*type\s+(\w+)_pt$').match(line)
             if m:
                 in_pt_sec = False
-        m = RX['start_pt_sec'].match(line)
+        m = rx['start_pt_sec'].match(line)
         if m:
             if in_pt_sec:
                 raise AssertionError("Couldn't find end of last *_pt section")
             in_pt_sec = True
             sec_name = m.group('sec_name')
         if in_pt_sec and sec_name in config_sec_list:
-            if not sec_name in config_structure:
+            if sec_name not in config_structure:
                 config_structure[sec_name] = []
-            m = RX['get_pt_item'].match(line)
+            m = rx['get_pt_item'].match(line)
             if m:
                 config_structure[sec_name].append(m.group('item_name').strip())
 

@@ -1,11 +1,10 @@
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 from . import io
 from . import gate2q
 from . import weyl
 from . import pulse
 from . import units
-from . import prop
 from . import linalg
 from . import state
 from . import bloch
@@ -13,5 +12,8 @@ from . import shutil
 from . import octutils
 from . import memoize
 from . import config
+from . import model
+from . import math
+from . import prop_gate
 
-__version__ = "1.2.dev"
+__version__ = "0.2.2"

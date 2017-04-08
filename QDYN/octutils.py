@@ -1,10 +1,11 @@
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 import os
-from .io import tempinput, open_file
+from collections import namedtuple
+
 import numpy as np
 
-from collections import namedtuple
+from .io import tempinput, open_file
 
 # "Filtered" representation of oct_iters data
 ConvergenceData = namedtuple("Convergence",
@@ -149,14 +150,14 @@ class OCTConvergences(object):
         self.splits[key] = []
         prev_iter = -1
         with open_file(file) as in_fh:
-            iters          = [] # vals[0]
-            J_T_vals       = [] # vals[1]
-            g_a_int_vals   = [] # vals[2]
-            g_b_int_vals   = [] # vals[3]
-            J_vals         = [] # vals[4]
-            Delta_J_T_vals = [] # vals[5]
-            Delta_J_vals   = [] # vals[6]
-            sec_vals       = [] # vals[7]
+            iters          = []  # vals[0]
+            J_T_vals       = []  # vals[1]
+            g_a_int_vals   = []  # vals[2]
+            g_b_int_vals   = []  # vals[3]
+            J_vals         = []  # vals[4]
+            Delta_J_T_vals = []  # vals[5]
+            Delta_J_vals   = []  # vals[6]
+            sec_vals       = []  # vals[7]
             current_split = ""
             for line in in_fh:
                 if line.startswith("#"):

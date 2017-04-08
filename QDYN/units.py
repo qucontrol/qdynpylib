@@ -25,6 +25,7 @@ DEFAULT_UNITS = r'''
 iu             1.00000000000000000000  # unity :-)
 au             1.00000000000000000000  # internal units = atomic units
 unitless       1.00000000000000000000  # unitless number
+dimensionless  1.00000000000000000000  # dimensionless units
 
 
 # ------------------------------------------------------------------------------
@@ -108,14 +109,26 @@ Vpcm           5.14220624463189208e09  # Hartree/(a_0*e) to volt/centimeter
 # Stark shift
 # -----------
 
-# Operator is given as polarizability
+# Operator is given as polarizability, for field in electric field strength
 C2m2Jinv       1.6487772754e-41        # e^2 a_0^2 / Hartree to C^2 m^2 J^{-1}
 cm3            1.4819210151E-25        # e^2 a_0^2 / Hartree to CGS cm^3
 
 # See http://en.wikipedia.org/wiki/Polarizability for conversion au -> CGS
 
 # QDYN knows how to square the pulse connected to a 'dstark' operator.
-# Therefore, the field must sill be given in units of electric field strength
+# Therefore, the field must still be given in units of electric field strength
+
+# Operator given as inverse energy, for field in energy
+Hartree^-1     1.00000000000000000000  # Hartree^{-1}
+hartree^-1     1.00000000000000000000  # Hartree^{-1}
+eV^-1          3.6749323778896184e-02  # Hartree^{-1} to electronvolt^{-1}
+cminv^-1       4.5563352523616969e-06  # Hartree^{-1} to wavenumbers^{-1}
+K^-1           3.1668151592337675e-06  # Hartree^{-1} to Kelvin^{-1}
+J^-1           2.2937124772447402e+17  # Hartree^{-1} to Joule^{-1}
+Hz^-1          1.5198298458734732e-16  # Hartree^{-1} to {Hz * h}^{-1}
+GHz^-1         1.5198298458734732e-07  # Hartree^{-1} to {10^9 Hz * h}^{-1}
+MHz^-1         1.5198298458734732e-10  # Hartree^{-1} to {10^6 Hz * h}^{-1}
+kHz^-1         1.5198298458734733e-13  # Hartree^{-1} to {10^3 Hz * h}^{-1}
 
 
 # ------------------------------------------------------------------------------
@@ -286,7 +299,7 @@ class UnitConvert(object):
         self._convfactor = {}
         self._category = {}
         rx_comment  = re.compile(r'^#\s*')
-        rx_unit = re.compile(r'^(?P<unit>[A-Za-z\d]+)\s+'
+        rx_unit = re.compile(r'^(?P<unit>[A-Za-z\d_]+)\s+'
                              r'(?P<factor>[0-9eE.+-]+)')
         category = ''
         for line in units_def_str.splitlines():
@@ -302,7 +315,9 @@ class UnitConvert(object):
         self._convfactor['iu'] = 1.0
         self._category['iu'] = '*'
         self._convfactor['unitless'] = 1.0
+        self._convfactor['dimensionless'] = 1.0
         self._category['unitless'] = 'unitless'
+        self._category['dimensionless'] = 'unitless'
 
     def compatible_units(self, unit):
         """Set of all units to which `unit` can be converted

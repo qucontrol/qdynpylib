@@ -1,5 +1,5 @@
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
+from __future__ import print_function, division, absolute_import
+
 from shutil import *
 import contextlib
 import os

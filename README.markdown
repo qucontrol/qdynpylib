@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/goerz/qdynpylib.svg?branch=master)](https://travis-ci.org/goerz/qdynpylib)
 
 The QDYN Python Package provides a collection of utilities to augment the
-Fortran QDYN library for quantum dynamics and control, developed in-house in the
+[Fortran QDYN library][QDYN] for quantum dynamics and control, developed in the
 [Koch group at the University of Kassel][AGKOCH]
 
 The package will read and write some of the files generated
@@ -88,6 +88,7 @@ All pull requests must be against the `develop` branch.
 
 [git-flow]: https://github.com/nvie/gitflow#git-flow
 [AGKOCH]: http://www.uni-kassel.de/fb10/en/institutes/physics/research-groups/quantum-dynamics-and-control/homepage.html
+[QDYN]: https://www.qdyn-library.net/
 [EPD]: https://www.enthought.com/products/canopy/
 [Scipy]: http://www.scipy.org
 [IPython]: http://ipython.org

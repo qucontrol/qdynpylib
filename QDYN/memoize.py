@@ -30,11 +30,13 @@ to reload it at a later time
 >>> import os
 >>> os.unlink('memoize.dump')
 '''
-from __future__ import print_function, division, absolute_import, \
-                       unicode_literals
-from six.moves import cPickle as pickle
+from __future__ import print_function, division, absolute_import
+
 from functools import update_wrapper
-from QDYN.io import open_file
+
+from six.moves import cPickle as pickle
+
+from .io import open_file
 
 
 class memoize(object):

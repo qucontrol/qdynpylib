@@ -15,7 +15,7 @@ setup(name='QDYN',
       description='Package providing some Python modules for working with ' \
                   'the QDYN Fortran library',
       author='Michael Goerz',
-      author_email='goerz@physik.uni-kassel.de',
+      author_email='goerz@stanford.edu',
       url='https://github.com/goerz/qdynpylib',
       license='GPL',
       install_requires=[
@@ -26,8 +26,9 @@ setup(name='QDYN',
           'bokeh>=0.8',
           'click>=5.0',
       ],
-      extras_require={'dev': ['pytest', 'coverage', 'pytest-cov']},
-      packages=['QDYN', 'QDYN.prop'],
+      extras_require={'dev': ['pytest', 'coverage', 'pytest-cov',
+                              'pytest-xdist', 'sphinx_rtd_theme']},
+      packages=['QDYN', ],
       scripts=[],
       classifiers=[
           'Development Status :: 4 - Beta',
@@ -40,5 +41,7 @@ setup(name='QDYN',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
       ]
      )
