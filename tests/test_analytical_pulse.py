@@ -1,4 +1,4 @@
-from QDYN.pulse import carrier, blackman, CRAB_carrier
+from QDYN.pulse import carrier, blackman, CRAB_carrier, pulse_tgrid
 from QDYN.analytical_pulse import AnalyticalPulse
 import numpy as np
 import filecmp
@@ -106,43 +106,40 @@ def test_analytical_pulse(tmpdir):
 
     AnalyticalPulse.register_formula('1freq_0', ampl_1freq_0)
     with pytest.raises(ValueError) as exc_info:
-        AnalyticalPulse('1freq_0', T=200, nt=(1000),
-                        parameters={'E0': 100},
+        AnalyticalPulse('1freq_0', parameters={'E0': 100},
                         time_unit='ns', ampl_unit='MHz')
     assert 'Required parameter "T" for formula' in str(exc_info)
 
     with pytest.raises(ValueError) as exc_info:
-        AnalyticalPulse('1freq_0', T=200, nt=(1000),
-                        parameters={'E0': 100, 'T':200, 'extra': 0},
+        AnalyticalPulse('1freq_0', parameters={'E0': 100, 'T':200, 'extra': 0},
                         time_unit='ns', ampl_unit='MHz')
     assert 'Parameter "extra" does not exist in formula' in str(exc_info)
 
-    p1 = AnalyticalPulse('field_free', T=200, nt=(500),
-            parameters={}, time_unit='ns', ampl_unit='MHz')
+    p1 = AnalyticalPulse('field_free', time_unit='ns', ampl_unit='MHz')
     assert p1.header == '# Formula "field_free"'
     p1.write(tmp('p1.json'), pretty=True)
-    p1.to_num_pulse().write(tmp('p1.dat'))
+    p1.to_num_pulse(tgrid=pulse_tgrid(200, 500)).write(tmp('p1.dat'))
     p1_copy = AnalyticalPulse.read(tmp('p1.json'))
     p1_copy.write(tmp('p1_copy.json'), pretty=True)
     assert filecmp.cmp(tmp("p1.json"), tmp("p1_copy.json"))
 
-    p2 = AnalyticalPulse('1freq', T=200, nt=(10000),
-            parameters={'E0': 100, 'T': 200, 'w_L': 6.5},
+    p2 = AnalyticalPulse(
+            '1freq', parameters={'E0': 100, 'T': 200, 'w_L': 6.5},
             time_unit='ns', ampl_unit='MHz')
     assert p2.header == '# Formula "1freq" with E0 = 100, T = 200, w_L = 6.5'
     p2.write(tmp('p2.json'), pretty=True)
-    p2.to_num_pulse().write(tmp('p2.dat'))
+    p2.to_num_pulse(tgrid=pulse_tgrid(200, 10000)).write(tmp('p2.dat'))
     p2_copy = AnalyticalPulse.read(tmp('p2.json'))
     p2_copy.write(tmp('p2_copy.json'), pretty=True)
     assert filecmp.cmp(tmp("p2.json"), tmp("p2_copy.json"))
 
-    p3 = AnalyticalPulse('2freq', T=200, nt=(10000),
-            parameters={'E0': 100, 'T': 200, 'freq_1': 6.0, 'freq_2': 6.5,
-                        'a_1': 0.5, 'a_2':1.0, 'phi': 0.0},
-            time_unit='ns', ampl_unit='MHz')
+    parameters = {'E0': 100, 'T': 200, 'freq_1': 6.0, 'freq_2': 6.5,
+                  'a_1': 0.5, 'a_2':1.0, 'phi': 0.0}
+    p3 = AnalyticalPulse('2freq', parameters=parameters,
+                         time_unit='ns', ampl_unit='MHz')
     assert p3.header == '# Formula "2freq" with E0 = 100, T = 200, a_1 = 0.5, a_2 = 1.0, freq_1 = 6.0, freq_2 = 6.5, phi = 0.0'
     p3.write(tmp('p3.json'), pretty=True)
-    p3.to_num_pulse().write(tmp('p3.dat'))
+    p3.to_num_pulse(tgrid=pulse_tgrid(200, 10000)).write(tmp('p3.dat'))
     p3_copy = AnalyticalPulse.read(tmp('p3.json'))
     p3_copy.write(tmp('p3_copy.json'), pretty=True)
     assert filecmp.cmp(tmp("p3.json"), tmp("p3_copy.json"))
@@ -153,14 +150,15 @@ def test_analytical_pulse(tmpdir):
     a_high    = np.array([0.58, 0.89, 0.1])
     b_low     = np.array([1.0, 0.51])
     b_high    = np.array([0.09, 0.12, 0.71])
-    p4 = AnalyticalPulse('5freq', T=200, nt=(10000),
+    p4 = AnalyticalPulse(
+           '5freq',
             parameters={'E0': 100, 'T': 200, 'freq_low': freq_low,
                         'freq_high': freq_high, 'a_low': a_low,
                         'a_high': a_high, 'b_low': b_low, 'b_high': b_high},
             time_unit='ns', ampl_unit='MHz')
     assert p4.header == '# Formula "5freq" with E0 = 100, T = 200, a_high = [0.58, 0.89, 0.1], a_low = [1.0, 0.21], b_high = [0.09, 0.12, 0.71], b_low = [1.0, 0.51], freq_high = [8.32, 10.1, 5.3], freq_low = [0.01, 0.0243]'
     p4.write(tmp('p4.json'), pretty=True)
-    p4.to_num_pulse().write(tmp('p4.dat'))
+    p4.to_num_pulse(tgrid=pulse_tgrid(200, 10000)).write(tmp('p4.dat'))
     p4_copy = AnalyticalPulse.read(tmp('p4.json'))
     assert isinstance(p4_copy.parameters['a_low'], np.ndarray), \
     "Coefficients 'a_low' should be a numpy array"

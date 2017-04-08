@@ -294,6 +294,8 @@ def _render_config_lines(section_name, section_data):
             # we *do not* iterate over keys in common_items, so that items
             # are ordered the same as in section_data[0], instead of randomly
             if key in common_items:
+                if key == 'label' and common_items[key] == '':
+                    continue
                 line += " %s = %s," % (key, _val_to_str(common_items[key]))
         if line.endswith(","):
             lines.append(line[:-1].strip())
@@ -304,6 +306,8 @@ def _render_config_lines(section_name, section_data):
             line = "*"
             for key in item_line:
                 if key not in common_items:
+                    if key == 'label' and item_line[key] == '':
+                        continue
                     line += " %s = %s," % (key, _val_to_str(item_line[key]))
             if line.endswith(","):
                 lines.append(line[:-1].strip())

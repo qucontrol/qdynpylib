@@ -3,7 +3,7 @@ PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage sh no
 TESTPYPI = https://testpypi.python.org/pypi
 
 TESTOPTIONS = --doctest-modules --cov=QDYN --cov-config .coveragerc -n auto
-TESTS = QDYN tests slow_tests
+TESTS = QDYN tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
 
@@ -58,6 +58,14 @@ clean:
 	@conda create -y -m -p .venv/py34 python=3.4 $(PACKAGES)
 	@.venv/py34/bin/pip install -e .[dev]
 
+.venv/py35/bin/py.test:
+	@conda create -y -m -p .venv/py35 python=3.5 $(PACKAGES)
+	@.venv/py35/bin/pip install -e .[dev]
+
+.venv/py36/bin/py.test:
+	@conda create -y -m -p .venv/py36 python=3.6 $(PACKAGES)
+	@.venv/py36/bin/pip install -e .[dev]
+
 test27: .venv/py27/bin/py.test
 	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
 
@@ -67,7 +75,13 @@ test33: .venv/py33/bin/py.test
 test34: .venv/py34/bin/py.test
 	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
 
-test: test27 test33 test34
+test35: .venv/py35/bin/py.test
+	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+
+test36: .venv/py36/bin/py.test
+	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+
+test: test27 test33 test34 test35 test36
 
 coverage: test34
 	@rm -rf htmlcov/index.html

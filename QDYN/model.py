@@ -10,7 +10,7 @@ import numpy as np
 
 from .io import write_indexed_matrix
 from .analytical_pulse import AnalyticalPulse
-from .pulse import Pulse, pulse_tgrid, pulse_config_line
+from .pulse import Pulse, pulse_tgrid
 from .config import write_config, set_config_user_value
 from .state import write_psi_amplitudes
 from .shutil import mkdir
@@ -62,11 +62,7 @@ class LevelModel(object):
 
     def __init__(self):
         self._ham = []  # list of (matrix, config_attribs)
-        self._pulses = []  # list of (pulse, config_attribs)
-        # the pulse config_attribs store the label, id, and filename, as well
-        # as any attributes set by the `set_oct` method. Additional attributes
-        # may exist in `pulse.config_attribs` of each pulse. All of these are
-        # collected in the `pulses` method
+        self._pulses = []  # list of pulses
         self._lindblad_ops = []  # list of (matrix, config_attribs)
         self._observables = []  # list of (matrix, config_attribs)
         self._dissipator = []  # list of (matrix, config_attribs)
@@ -81,12 +77,11 @@ class LevelModel(object):
         self.construct_mcwf_ham = False
         self.user_data = OrderedDict([])
         self._pulse_id = defaultdict(int)  # last used pulse_id, per label
-        self._pulse_ids = {}  # (pulse, label) -> pulse_id
-        self._locked_pulses = False
+        self._pulse_ids = {}  # (id(pulse), label) -> pulse_id
 
     @staticmethod
     def _obj_list(obj_list, label=None, with_attribs=False):
-        """Common implementation of methods `observables`, 'lindbla_ops`,
+        """Common implementation of methods `observables`, 'lindblad_ops`,
         `ham`"""
         if label is None:
             label = ''
@@ -124,37 +119,17 @@ class LevelModel(object):
         """
         return self._obj_list(self._ham, label, with_attribs)
 
-    def pulses(self, label=None, with_attribs=False):
+    def pulses(self, label=None):
         """Return a list of all known pulses with the matching label (or all
-        labels if `label` is '*'). The pulses originate from calls to e.g.
-        `add_ham`. That is, they are introduced to the system via operators
-        that couple to them. If `with_attribs` is True, the result is a list of
-        tuples ``(pulse, attributes)`` where ``attributes`` is a (combined,
-        read-only) dictionary of all config file attributes for the pulse.
+        labels if `label` is '*').
         """
-        logger = logging.getLogger(__name__)
         if label is None:
             label = ''
         result = []
-        for pulse, attribs in self._pulses:
-            pulse_label = attribs['label']
-            pulse_id = attribs['id']
-            filename = attribs['filename']
+        for pulse in self._pulses:
+            pulse_label = pulse.config_attribs.get('label', '')
             if (pulse_label == label) or (label == '*'):
-                if with_attribs:
-                    if callable(pulse):
-                        p = _SimpleNamespace(
-                                time_unit=self.T.unit, ampl_unit='unitless',
-                                is_complex=iscomplexobj(pulse(0)),
-                                config_attribs=[])
-                    else:
-                        p = pulse
-                    config_attribs = pulse_config_line(
-                        p, filename, pulse_id, pulse_label,
-                        config_attribs=attribs, warn=True)
-                    result.append((pulse, config_attribs))
-                else:
-                    result.append(pulse)
+                result.append(pulse)
         return result
 
     def _add_matrix(
@@ -171,25 +146,14 @@ class LevelModel(object):
                 # least-effort indication that we have a proper matrix
                 raise TypeError(str(matrix) + ' must be a matrix')
         if pulse is not None:
-            # Check that we're not making invalid connections of operators with
-            # complex pulses
-            pulse_is_complex = False
-            if isinstance(pulse, (Pulse, AnalyticalPulse)):
-                if (pulse.is_complex or pulse.mode == 'complex' or
-                        pulse.config_attribs.get('is_complex')):
-                    pulse_is_complex = True
-            elif callable(pulse):
-                pulse_is_complex = iscomplexobj(pulse(0.0))
-            else:
-                raise TypeError(
-                    "pulse must be an instance of "
-                    "QDYN.analytical_pulse.AnalyticalPulse, "
-                    "QDYN.pulse.Pulse, or a callable.")
-            if pulse_is_complex:
+            if not isinstance(pulse, (Pulse, AnalyticalPulse)):
+                raise TypeError("pulse must be instance of Pulse or "
+                                "AnalyticalPulse, not %s" % pulse.__class__)
+            if pulse.is_complex:
                 if norm(triu(matrix)) > 1e-14 and norm(tril(matrix)) > 1e-14:
                     raise ValueError("Cannot connect a complex pulse to a "
                                      "matrix with data in both triangles")
-        config_attribs = OrderedDict([])
+        config_attribs = OrderedDict([])  # attributes for the matrix
         for key in kwargs:
             config_attribs[key] = kwargs[key]
         if label is not None:
@@ -202,55 +166,44 @@ class LevelModel(object):
         )
 
     def _add_pulse(self, pulse, system_label):
-        """Determine the `config_attribs` ``label``, ``id``, and ``filename``
-        from the given `pulse`. The ``label`` is taken either from
-        ``pulse.config_attribs['label']`` or from `system_label`. The
-        ``filename`` is taken from either ``pulse.config_attribs['filename']``
-        or it is chosen internally. If the combination ``(pulse, label)`` has
-        not been encountered before, store ``(pulse, config_attribs)`` in
-        `_pulses`. Increments ``self._pulse_id[label]`` and sets
-        ``self._pulse_ids[(pulse, label)]``
+        """Store a copy of `pulse` with adjusted `config_attribs` in `_pulses`.
+
+        Increments ``self._pulse_id[label]`` and sets
+        ``self._pulse_ids[(id(pulse), label)]``
+
+        Args:
+            pulse: The pulse to add
+            system_label: Label to use for the pulse, only if
+                pulse.config_attribs['label'] does not exist.
 
         Returns:
             the pulse id, as an integer
-
-        Raises:
-            ValueError: if pulses are added after the model has be locked by a
-            call to :meth:`set_oct`
         """
-        if self._locked_pulses:
-            raise ValueError("Cannot add pulse after the set_oct method "
-                             "has been called")
         try:
             label = pulse.config_attribs['label']
         except (AttributeError, KeyError):
             label = system_label
         if label is None:
             label = ''
-        key = (pulse, label)
+        key = (id(pulse), label)
         try:
             pulse_id = self._pulse_ids[key]
         except KeyError:
             self._pulse_id[label] += 1
             pulse_id = self._pulse_id[label]
-        try:
-            filename = pulse.config_attribs['filename']
-        except (AttributeError, KeyError):
+        filename = pulse.config_attribs['filename']
+        if filename == '':
             if label == '':
                 filename = "pulse%d.dat" % pulse_id
             else:
                 filename = "pulse%d_%s.dat" % (pulse_id, label)
         if key not in self._pulse_ids:
-            config_attribs = OrderedDict([
-                ('label', label), ('id', pulse_id), ('filename', filename)
-            ])
-            if hasattr(pulse, 'config_attribs') and 'id' in pulse.config_attribs:
-                if pulse.config_attribs['id'] != pulse_id:
-                    raise ValueError(
-                        "Pulse must not have config attribute 'id'")
-            self._pulses.append(
-                (pulse, config_attribs)
-            )
+            pulse = pulse.copy()
+            if label != '':
+                pulse.config_attribs['label'] = label
+            pulse.config_attribs['id'] = pulse_id
+            pulse.config_attribs['filename'] = filename
+            self._pulses.append(pulse)
             self._pulse_ids[key] = pulse_id
         return pulse_id
 
@@ -264,10 +217,8 @@ class LevelModel(object):
             H: Hamiltonian matrix. Can be a numpy matrix or array,
                 scipy sparse matrix, or `qutip.Qobj`
             pulse: if not None, `H` will couple to `pulse`. Can be an instance
-                of `QDYN.analytical_pulse.AnalyticalPulse` (preferred, this is
-                the only option to fully specify units), `QDYN.pulse.Pulse`, or
-                a callable ``pulse(t)`` that returns a pulse value for a given
-                float ``t`` (time)
+                of :class:`~QDYN.analytical_pulse.AnalyticalPulse` or
+                :class:`~QDYN.pulse.Pulse`.
             op_unit (None or str): Unit of the values in `H`.
             sparsity_model (None or str): sparsity model that QDYN should use
                 to encode the data in `H`. If None, will be determined
@@ -283,12 +234,10 @@ class LevelModel(object):
                 config file (e.g. `specrad_method`, `filename`)
 
         Note:
-            It is recommended to us `QDYN.pulse.AnalyticalPulse` to express
-            time-dependency, as this allows to fully specify physical units.
-            Instances of `QDYN.pulse.Pulse` must have a time grid that exactly
-            matches the time grid specified via :meth:`set_propagation`. Using
-            a callable means that the pulse amplitude is unitless, and the
-            pulse as evaluated for time value with the unit specified in
+            It is recommended to use :class:`~QDYN.pulse.AnalyticalPulse` to
+            express time-dependency, as this is independent of a specific time
+            grid.  Instances of :class:`~QDYN.pulse.Pulse` must have a time
+            grid that exactly matches the time grid specified via
             :meth:`set_propagation`.
         """
         config_attribs = OrderedDict([])
@@ -339,7 +288,7 @@ class LevelModel(object):
                 Hamiltonians may be defined in the same config file if they are
                 differentiated by label. The default label is the empty string.
             pulse: If not None, a pulse for the observable to couple to (see
-                `add_ham`)
+                :meth:`add_ham`)
         """
         config_attribs = OrderedDict([])
         if is_real is None:
@@ -392,7 +341,7 @@ class LevelModel(object):
                 Hamiltonians may be defined in the same config file if they are
                 differentiated by label. The default label is the empty string.
             pulse: If not None, a pulse for the Lindblad operator to couple to
-                (see `add_ham`)
+                (see :meth:`add_ham`)
 
         All other keyword arguments set options for `L` in the config file.
         """
@@ -507,7 +456,7 @@ class LevelModel(object):
             self.construct_mcwf_ham = False
 
     def set_oct(
-            self, method, J_T_conv, max_ram_mb, pulse_settings=None, **kwargs):
+            self, method, J_T_conv, max_ram_mb, **kwargs):
         """Set config file data and pulse properties for optimal control
 
         Args:
@@ -519,10 +468,6 @@ class LevelModel(object):
                 the states required to calculate the gradient, a "segmented"
                 storage scheme will be used that caches the states to disk,
                 using up to `max_disk_mb` hard drive storage.
-            pulse_settings (dict): Additional OCT settings for each known
-                pulse. Maps each pulse (see :meth:`pulses`) to an
-                `OrderedDict` of oct settings, augmenting the settings
-                that each pulse may have in its `config_attribs` attribute
 
         All other keyword arguments directly specify keys and values for the
         OCT config section. Allowed keys are `iter_start`, `iter_stop`,
@@ -533,19 +478,6 @@ class LevelModel(object):
         `max_seconds`, `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`,
         `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN Fortran
         library documentation for details.
-
-        Each entry in `pulse_settings` is recommended to be an `OrderedDict`,
-        and may contain the keys `oct_parametrization`, `oct_pulse_max`,
-        `oct_pulse_min`, `shape_t_start`, `shape_t_stop`, `ftbaseline`,
-        `t_rise`, `t_fall`, `oct_lambda_intens`, `oct_lambda_a`,
-        `oct_shape` (default to ``'const'``), `oct_outfile` (default to
-        ``<file>.oct.dat``, where ``<file>`` is the pulse `filename` without
-        extension), and `oct_increase_factor` (default 5.0).  See the QDYN
-        Fortran library documentation for details. If Krotov's method is used,
-        a value for `oct_lambda_a` must be given.
-
-        The given `pulse_settings` take precedence over any values in the
-        `config_attribs` attribute of each pulse.
 
         Raises:
             KeyError: If the settings for a pulse contain invalid or
@@ -561,16 +493,11 @@ class LevelModel(object):
             're_init_prop', 'continue', 'storage_folder', 'bwr_nint',
             'bwr_base', 'g_a'
         ]
-        allowed_pulse_keys = [
-            'oct_parametrization', 'oct_pulse_max', 'oct_pulse_min',
-            'shape_t_start', 'shape_t_stop', 'ftbaseline', 't_rise', 't_fall',
-            'oct_lambda_intens', 'oct_lambda_a', 'oct_shape', 'oct_outfile',
-            'oct_increase_factor'
-        ]
         krotov_required_pulse_keys = ['oct_lambda_a', ]
 
-        assert isinstance(method, str), ("`method` must be string. Is your "
-            "code adapted to the latest version of QDYN?")
+        assert isinstance(method, str), \
+            "`method` must be string. Is your code adapted to the latest " \
+            "version of QDYN?"
 
         def default_outfile(filename):
             return os.path.splitext(filename)[0] + ".oct.dat"
@@ -584,27 +511,19 @@ class LevelModel(object):
                 raise TypeError("got an unexpected keyword argument '%s'"
                                 % key)
 
-        if pulse_settings is None:
-            pulse_settings = {}
-        for pulse, attribs in self._pulses:
-            if pulse in pulse_settings:
-                for key in pulse_settings[pulse]:
-                    if key not in allowed_pulse_keys:
-                        raise KeyError("Invalid key '%s'" % key)
-                attribs.update(pulse_settings[pulse])
-            if 'oct_shape' not in attribs:
-                attribs['oct_shape'] = 'const'
-            if 'oct_outfile' not in attribs:
-                octout = default_outfile(attribs['filename'])
-                attribs['oct_outfile'] = octout
-            if 'oct_increase_factor' not in attribs:
-                attribs['oct_increase_factor'] = 5.0
+        for pulse in self._pulses:
+            if 'oct_shape' not in pulse.config_attribs:
+                pulse.config_attribs['oct_shape'] = 'const'
+            if 'oct_outfile' not in pulse.config_attribs:
+                octout = default_outfile(pulse.config_attribs['filename'])
+                pulse.config_attribs['oct_outfile'] = octout
+            if 'oct_increase_factor' not in pulse.config_attribs:
+                pulse.config_attribs['oct_increase_factor'] = 5.0
             if 'krotov' in method:
                 for key in krotov_required_pulse_keys:
-                    if key not in attribs:
+                    if key not in pulse.config_attribs:
                         raise KeyError("Key '%s' is required for each pulse "
                                        "when using Krotov's method" % key)
-        self._locked_pulses = True
 
     def add_state(self, state, label):
         """Add a state (amplitude array) for the given label. Note that there
@@ -672,23 +591,17 @@ class LevelModel(object):
         tgrid = pulse_tgrid(self.T, self.nt, self.t0)
         if 'pulse' not in config_data:
             config_data['pulse'] = []
-        for pulse, attribs in self.pulses(label='*', with_attribs=True):
-            filename = attribs['filename']
+        for pulse in self.pulses(label='*'):
+            filename = pulse.config_attribs['filename']
             if isinstance(pulse, AnalyticalPulse):
                 p = pulse.to_num_pulse(tgrid)
                 p.write(os.path.join(runfolder, filename))
-                config_data['pulse'].append(attribs)
+                config_data['pulse'].append(pulse.config_attribs)
             elif isinstance(pulse, Pulse):
                 if np.max(np.abs(tgrid - pulse.tgrid)) > 1e-12:
                     raise ValueError("Mismatch of tgrid with pulse tgrid")
                 pulse.write(os.path.join(runfolder, filename))
-                config_data['pulse'].append(attribs)
-            elif callable(pulse):
-                ampl = np.array([pulse(t) for t in tgrid])
-                p = Pulse(tgrid, amplitude=ampl, time_unit=self.T.unit,
-                          ampl_unit='unitless', freq_unit='iu')
-                p.write(os.path.join(runfolder, filename))
-                config_data['pulse'].append(attribs)
+                config_data['pulse'].append(pulse.config_attribs)
             else:
                 raise TypeError("Invalid pulse type")
 

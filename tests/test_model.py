@@ -98,7 +98,9 @@ def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     test_dir, _ = os.path.splitext(filename)
 
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
-    pulse = partial(blackman, t_start=0, t_stop=50)
+    pulse = AnalyticalPulse.from_func(
+            partial(blackman, t_start=0, t_stop=50),
+            ampl_unit='unitless', time_unit='ns')
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     model.user_data['my_str'] = 'This is a custom string value'
     model.user_data['i'] = 1
@@ -116,7 +118,7 @@ def test_level_model(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
         `limit`"""
         file_matrix = read_indexed_matrix(
                             str(tmpdir.join('model_rf', filename)),
-                            expand_hermitian=False, shape=(4,4))
+                            expand_hermitian=False, shape=(4, 4))
         return norm(file_matrix - matrix) <= limit
 
     def file_matches_psi(filename, psi, limit=0.0):
@@ -171,7 +173,9 @@ def test_target_psi(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     test_dir, _ = os.path.splitext(filename)
 
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
-    pulse = partial(blackman, t_start=0, t_stop=50)
+    pulse = AnalyticalPulse.from_func(
+            partial(blackman, t_start=0, t_stop=50),
+            ampl_unit='unitless', time_unit='ns')
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     model.add_state(np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0),
                     label='target')
@@ -188,8 +192,6 @@ def test_dissipation_superop(tmpdir, request, H0, L1, L2):
     Lindblad operators"""
     filename = request.module.__file__
     test_dir, _ = os.path.splitext(filename)
-
-    pulse = partial(blackman, t_start=0, t_stop=50)
 
     model = LevelModel()
     model.add_ham(H0)
@@ -220,27 +222,23 @@ def test_oct(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     test_dir, _ = os.path.splitext(filename)
 
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
-    pulse = partial(blackman, t_start=0, t_stop=50)
+    pulse = AnalyticalPulse.from_func(
+            partial(blackman, t_start=0, t_stop=50),
+            ampl_unit='unitless', time_unit='ns')
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     with pytest.raises(KeyError) as exc_info:
         model.set_oct(method='krotovpk', J_T_conv=1e-3, max_ram_mb=10)
     assert "Key 'oct_lambda_a' is required" in str(exc_info)
-    with pytest.raises(KeyError) as exc_info:
-        pulse_settings = {pulse: {'oct_lambda_a': 1e-3, 'bogus': 1}}
-        model.set_oct(pulse_settings=pulse_settings,
-                      method='krotovpk', J_T_conv=1e-3, max_ram_mb=10)
-    assert "Invalid key 'bogus'" in str(exc_info)
-    pulse_oct_settings = {
-        pulse: OrderedDict([
+    pulse.config_attribs.update(OrderedDict([
             ('oct_lambda_a', 1e-3), ('oct_shape', 'flattop'),
             ('t_rise', UnitFloat(5, 'ns')), ('t_fall', UnitFloat(5, 'ns'))
-        ])
-    }
+        ]))
+    model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     with pytest.raises(TypeError):
-        model.set_oct(pulse_settings=pulse_oct_settings, method='krotovpk',
-                      J_T_conv=1e-3, bogus='val', max_ram_mb=10)
-    model.set_oct(pulse_settings=pulse_oct_settings, method='krotovpk',
-                  J_T_conv=1e-3, iter_stop=10, max_ram_mb=10)
+        model.set_oct(method='krotovpk', J_T_conv=1e-3, bogus='val',
+                      max_ram_mb=10)
+    model.set_oct(method='krotovpk', J_T_conv=1e-3, iter_stop=10,
+                  max_ram_mb=10)
     model.write_to_runfolder(str(tmpdir.join('model_rf')),
                              config='oct.config')
 
@@ -253,10 +251,11 @@ def test_ensemble(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
     """Test ensemble of multiple Hamiltonians"""
     filename = request.module.__file__
     test_dir, _ = os.path.splitext(filename)
-    pulse = partial(blackman, t_start=0, t_stop=50)
 
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
-    pulse = partial(blackman, t_start=0, t_stop=50)
+    pulse = AnalyticalPulse.from_func(
+            partial(blackman, t_start=0, t_stop=50),
+            ampl_unit='unitless', time_unit='ns')
     model = two_level_model(H0, H1, L1, L2, pop1, pop2, pulse, psi)
     for i in range(5):
         r1 = (np.random.rand() - 0.5) * 0.01
@@ -292,8 +291,7 @@ def test_ensemble_shared_pulse(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
         _required_args = {}
 
     MyAP.register_formula('blackman', blackman)
-    pulse = MyAP('blackman', T=50, nt=1000,
-                 parameters={'t_start': 0, 't_stop': 50},
+    pulse = MyAP('blackman', parameters={'t_start': 0, 't_stop': 50},
                  time_unit='ns', ampl_unit='unitless',
                  config_attribs={'label': ''})
     psi = np.array([0, 1, 1, 0], dtype=np.complex128) / np.sqrt(2.0)
@@ -315,8 +313,10 @@ def test_ensemble_shared_pulse(tmpdir, request, H0, H1, L1, L2, pop1, pop2):
 
 def complex_pulse_error_data():
     """Generate data for parametrization of test_complex_pulse_error"""
-    pulse1 = partial(blackman, t_start=0, t_stop=50)  # real
-    pulse2 = lambda t: complex(pulse1(t))
+    # real pulse:
+    pulse1 = AnalyticalPulse.from_func(partial(blackman, t_start=0, t_stop=50))
+    # complex pulse:
+    pulse2 = AnalyticalPulse.from_func(lambda t: complex(pulse1.as_func()(t)))
     H1 = np.array(
          [[0, 1, 1, 0],
           [1, 0, 0, 1],
