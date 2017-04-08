@@ -100,47 +100,98 @@ def norm(v):
         return scipy.linalg.norm(v)
 
 
-def get_op_matrix(apply_op, state_shape, t):
-    """Return the explicit matrix for the operator encoded in `apply_op`,
-    assuming that `apply_op` takes a numpy array or matrix of the given
-    `state_shape` as its first argument
+def generate_apply_H(H0, H1, pulse):
+    """Generate an apply_H routine that applies the operator
+    H0 + pulse(t)*H1
 
-    Arguments
-    ---------
+    Args:
+        H0 (ndarray, matrix): Drift Hamiltonian
+        H1 (ndarray, matrix): Control Hamiltonian
+        pulse (callable): ``pulse(t)`` must return a complex control value
 
-    apply_op: routine
-        apply_op(state, t) must return application of O(t) to state
+    Example:
 
-    state_shape: tuple of ints
-        Shape of states that apply_op understands
-
-    t: float
-        Time to pass to apply_op
-
-    Returns
-    -------
-
-    Numpy matrix of size N x N, where N is the product of the entries of
-    state_shape
-
-    Example
-    -------
-    >>> from . prop import generate_apply_H, generate_apply_L
     >>> H0 = np.matrix(np.array([[1,0],[0,2]]))
     >>> H1 = np.matrix(np.array([[0,1],[1,0]]))
     >>> def pulse(t):
     ...     return t * 0.1
     ...
+    >>> e1 = np.array([1,0])
+    >>> e2 = np.array([0,1])
     >>> apply_H = generate_apply_H(H0, H1, pulse)
-    >>> get_op_matrix(apply_H, state_shape=(2,), t=2.0)
-    matrix([[ 1.0+0.j,  0.2+0.j],
-            [ 0.2+0.j,  2.0+0.j]])
-    >>> apply_L = generate_apply_L(H0, H1, pulse)
-    >>> get_op_matrix(apply_L, state_shape=(2,2), t=2.0)
-    matrix([[ 0.0+0.j,  0.2+0.j, -0.2+0.j,  0.0+0.j],
-            [ 0.2+0.j,  1.0+0.j,  0.0+0.j, -0.2+0.j],
-            [-0.2+0.j,  0.0+0.j, -1.0+0.j,  0.2+0.j],
-            [ 0.0+0.j, -0.2+0.j,  0.2+0.j,  0.0+0.j]])
+    >>> apply_H(e1, 2.0)
+    matrix([[ 1. ,  0.2]])
+    >>> apply_H(e2, 2.0)
+    matrix([[ 0.2,  2. ]])
+
+    """
+    N = H0.shape[0]
+
+    def apply_H(state, t):
+        assert state.shape == (N,), \
+        "state of shape %s must be %d-dimensional Hilbert space vector" \
+        % (str(state.shape), N)
+        H = np.matrix(H0 + pulse(t) * H1)
+        return H.dot(state)
+
+    return apply_H
+
+
+def generate_apply_L(H0, H1, pulse, dissipator=None):
+    """Generate an apply_L routine that applies the Lindblad superoperator
+    to a density matrix
+
+    Args:
+        H0 (ndarray, matrix): Drift Hamiltonian
+        H1 (ndarray, matrix): Control Hamiltonian
+        pulse (callable): ``pulse(t)`` must return a complex control value
+        dissipator (None, callable): ``dissipator(state)`` returns the
+            dissipator part of the master equation
+    """
+    N = H0.shape[0]
+
+    def apply_L(state, t):
+        assert state.shape == (N,N), \
+        "state must be %d x %d density matrix" % (N, N)
+        H = np.matrix(H0 + pulse(t) * H1)
+        result = H.dot(state) - state.dot(H)
+        if dissipator is not None:
+            result += dissipator(state)
+        return result
+
+    return apply_L
+
+def get_op_matrix(apply_op, state_shape, t):
+    """Return the explicit matrix for the operator encoded in `apply_op`,
+    assuming that `apply_op` takes a numpy array or matrix of the given
+    `state_shape` as its first argument
+
+    Args:
+        apply_op (callable): ``apply_op(state, t)`` must return application of
+            O(t) to state
+        state_shape (tuple of ints): Shape of states that `apply_op` understands
+        t (float): Time to pass to apply_op
+
+    Returns:
+        Numpy matrix of size N x N, where N is the product of the entries of
+        state_shape
+
+    Example:
+        >>> H0 = np.matrix(np.array([[1,0],[0,2]]))
+        >>> H1 = np.matrix(np.array([[0,1],[1,0]]))
+        >>> def pulse(t):
+        ...     return t * 0.1
+        ...
+        >>> apply_H = generate_apply_H(H0, H1, pulse)
+        >>> get_op_matrix(apply_H, state_shape=(2,), t=2.0)
+        matrix([[ 1.0+0.j,  0.2+0.j],
+                [ 0.2+0.j,  2.0+0.j]])
+        >>> apply_L = generate_apply_L(H0, H1, pulse)
+        >>> get_op_matrix(apply_L, state_shape=(2,2), t=2.0)
+        matrix([[ 0.0+0.j,  0.2+0.j, -0.2+0.j,  0.0+0.j],
+                [ 0.2+0.j,  1.0+0.j,  0.0+0.j, -0.2+0.j],
+                [-0.2+0.j,  0.0+0.j, -1.0+0.j,  0.2+0.j],
+                [ 0.0+0.j, -0.2+0.j,  0.2+0.j,  0.0+0.j]])
     """
     assert 1 <= len(state_shape) <= 2, \
     "dimension of shape must be 1 or 2"
