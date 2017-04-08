@@ -91,8 +91,8 @@ test36: .venv/py36/bin/py.test
 test: test27 test33 test34 test35 test36
 
 doc: .venv/py35/bin/py.test
-	@rm -f docs/source/API/qdynpylib.*
-	$(MAKE) -C docs SPHINXBUILD=../.venv/py35/bin/sphinx-build SPHINXAPIDOC=../.venv/py35/bin/sphinx-apidoc html
+	@rm -f docs/source/API/*
+	$(MAKE) -C docs SPHINXBUILD=../.venv/py35/bin/sphinx-build html
 	@ln -sf docs/build/html doc
 
 coverage: test34
