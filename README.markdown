@@ -7,6 +7,9 @@ The QDYN Python Package provides a collection of utilities to augment the
 [QDYN Fortran library][QDYN] for quantum dynamics and control, developed in the
 [Koch group at the University of Kassel][AGKOCH]
 
+See the [full documentation](https://qdynpylib.readthedocs.org/en/latest/)
+for details.
+
 ## Installation ##
 
 Assuming that you have either a scientific Python distribution installed in your
