@@ -92,51 +92,106 @@ def norm(v):
     the 2-norm of the equivalent m-dimensional vector.
 
     """
-    # scipy.linalg.norm does the right thing in all instances.
-    return scipy.linalg.norm(v)
+    if repr(v).startswith('Quantum object'):  # qutip.Qobj
+        v = v.data
+    if isinstance(v, scipy.sparse.spmatrix):
+        return scipy.sparse.linalg.norm(v)
+    else:
+        return scipy.linalg.norm(v)
 
+
+def generate_apply_H(H0, H1, pulse):
+    """Generate an apply_H routine that applies the operator
+    H0 + pulse(t)*H1
+
+    Args:
+        H0 (ndarray, matrix): Drift Hamiltonian
+        H1 (ndarray, matrix): Control Hamiltonian
+        pulse (callable): ``pulse(t)`` must return a complex control value
+
+    Example:
+
+    >>> H0 = np.matrix(np.array([[1,0],[0,2]]))
+    >>> H1 = np.matrix(np.array([[0,1],[1,0]]))
+    >>> def pulse(t):
+    ...     return t * 0.1
+    ...
+    >>> e1 = np.array([1,0])
+    >>> e2 = np.array([0,1])
+    >>> apply_H = generate_apply_H(H0, H1, pulse)
+    >>> apply_H(e1, 2.0)
+    matrix([[ 1. ,  0.2]])
+    >>> apply_H(e2, 2.0)
+    matrix([[ 0.2,  2. ]])
+
+    """
+    N = H0.shape[0]
+
+    def apply_H(state, t):
+        assert state.shape == (N,), \
+        "state of shape %s must be %d-dimensional Hilbert space vector" \
+        % (str(state.shape), N)
+        H = np.matrix(H0 + pulse(t) * H1)
+        return H.dot(state)
+
+    return apply_H
+
+
+def generate_apply_L(H0, H1, pulse, dissipator=None):
+    """Generate an apply_L routine that applies the Lindblad superoperator
+    to a density matrix
+
+    Args:
+        H0 (ndarray, matrix): Drift Hamiltonian
+        H1 (ndarray, matrix): Control Hamiltonian
+        pulse (callable): ``pulse(t)`` must return a complex control value
+        dissipator (None, callable): ``dissipator(state)`` returns the
+            dissipator part of the master equation
+    """
+    N = H0.shape[0]
+
+    def apply_L(state, t):
+        assert state.shape == (N,N), \
+        "state must be %d x %d density matrix" % (N, N)
+        H = np.matrix(H0 + pulse(t) * H1)
+        result = H.dot(state) - state.dot(H)
+        if dissipator is not None:
+            result += dissipator(state)
+        return result
+
+    return apply_L
 
 def get_op_matrix(apply_op, state_shape, t):
     """Return the explicit matrix for the operator encoded in `apply_op`,
     assuming that `apply_op` takes a numpy array or matrix of the given
     `state_shape` as its first argument
 
-    Arguments
-    ---------
+    Args:
+        apply_op (callable): ``apply_op(state, t)`` must return application of
+            O(t) to state
+        state_shape (tuple of ints): Shape of states that `apply_op` understands
+        t (float): Time to pass to apply_op
 
-    apply_op: routine
-        apply_op(state, t) must return application of O(t) to state
+    Returns:
+        Numpy matrix of size N x N, where N is the product of the entries of
+        state_shape
 
-    state_shape: tuple of ints
-        Shape of states that apply_op understands
-
-    t: float
-        Time to pass to apply_op
-
-    Returns
-    -------
-
-    Numpy matrix of size N x N, where N is the product of the entries of
-    state_shape
-
-    Example
-    -------
-    >>> from . prop import generate_apply_H, generate_apply_L
-    >>> H0 = np.matrix(np.array([[1,0],[0,2]]))
-    >>> H1 = np.matrix(np.array([[0,1],[1,0]]))
-    >>> def pulse(t):
-    ...     return t * 0.1
-    ...
-    >>> apply_H = generate_apply_H(H0, H1, pulse)
-    >>> get_op_matrix(apply_H, state_shape=(2,), t=2.0)
-    matrix([[ 1.0+0.j,  0.2+0.j],
-            [ 0.2+0.j,  2.0+0.j]])
-    >>> apply_L = generate_apply_L(H0, H1, pulse)
-    >>> get_op_matrix(apply_L, state_shape=(2,2), t=2.0)
-    matrix([[ 0.0+0.j,  0.2+0.j, -0.2+0.j,  0.0+0.j],
-            [ 0.2+0.j,  1.0+0.j,  0.0+0.j, -0.2+0.j],
-            [-0.2+0.j,  0.0+0.j, -1.0+0.j,  0.2+0.j],
-            [ 0.0+0.j, -0.2+0.j,  0.2+0.j,  0.0+0.j]])
+    Example:
+        >>> H0 = np.matrix(np.array([[1,0],[0,2]]))
+        >>> H1 = np.matrix(np.array([[0,1],[1,0]]))
+        >>> def pulse(t):
+        ...     return t * 0.1
+        ...
+        >>> apply_H = generate_apply_H(H0, H1, pulse)
+        >>> get_op_matrix(apply_H, state_shape=(2,), t=2.0)
+        matrix([[ 1.0+0.j,  0.2+0.j],
+                [ 0.2+0.j,  2.0+0.j]])
+        >>> apply_L = generate_apply_L(H0, H1, pulse)
+        >>> get_op_matrix(apply_L, state_shape=(2,2), t=2.0)
+        matrix([[ 0.0+0.j,  0.2+0.j, -0.2+0.j,  0.0+0.j],
+                [ 0.2+0.j,  1.0+0.j,  0.0+0.j, -0.2+0.j],
+                [-0.2+0.j,  0.0+0.j, -1.0+0.j,  0.2+0.j],
+                [ 0.0+0.j, -0.2+0.j,  0.2+0.j,  0.0+0.j]])
     """
     assert 1 <= len(state_shape) <= 2, \
     "dimension of shape must be 1 or 2"
@@ -178,6 +233,8 @@ def vectorize(a, order='F'):
     >>> vectorize(a, order='C')
     array([1, 2, 3, 4])
     """
+    if repr(a).startswith('Quantum object'):  # qutip.Qobj
+        a = a.data.todense()
     N = a.size
     return np.squeeze(np.asarray(a).reshape((1,N), order=order))
 
@@ -233,11 +290,15 @@ def iscomplexobj(x):
     >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5j]]))
     True
     """
-    # This is a workaround for numpy bug #7924
+    # This is a workaround for numpy bug #7924. It also works for qutip objects
     try:
         dtype = x.dtype
     except AttributeError:
-        dtype = np.asarray(x).dtype
+        try:
+            # qutip.Qobj
+            dtype = x.data.dtype
+        except AttributeError:
+            dtype = np.asarray(x).dtype
     try:
         return issubclass(dtype.type, np.core.numeric.complexfloating)
     except AttributeError:
@@ -307,111 +368,90 @@ def choose_sparsity_model(matrix):
         return 'full'
 
 
+def triu(matrix):
+    """Return the upper triangle of the given `matrix`, which can be a numpy
+    object or scipy sparse matrix. The returned matrix will have the same type
+    as the input `matrix`. The input `matrix` can also be a QuTiP operator,
+    but in this case, the type is *not* preserved: the result is equivalent to
+    ``triu(matrix.data)``"""
+    if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
+        matrix = matrix.data
+    if isinstance(matrix, np.ndarray):
+        return np.triu(matrix)
+    elif isinstance(matrix, scipy.sparse.spmatrix):
+        return scipy.sparse.triu(matrix)
+    else:
+        raise TypeError("matrix must be numpy object, sparse matrix, or "
+                        "QuTiP operator")
 
-def reg_diff(data, itern, alph, u0=None, ep=1e-6, dx=None):
-    """Perform regularized numerical differentiation for a large data array,
-    based on the method outlined in Rick Chartrand, "Numerical differentiation
-    of noisy, nonsmooth data, ISRN Applied Mathematics, Vol. 2011, Article ID
-    164564, 2011. We use the variant of the algorithm for large `data` arrays.
+
+def tril(matrix):
+    """Like `triu`, but return the lower triangle"""
+    if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
+        matrix = matrix.data
+    if isinstance(matrix, np.ndarray):
+        return np.tril(matrix)
+    elif isinstance(matrix, scipy.sparse.spmatrix):
+        return scipy.sparse.tril(matrix)
+    else:
+        raise TypeError("matrix must be numpy object, sparse matrix, or "
+                        "QuTiP operator")
+
+
+def banded_to_full(banded, n, kl, ku, mode):
+    """Convert a rectangular matrix in the Lapack "banded" format
+    (http://www.netlib.org/lapack/lug/node124.html) into a (square) full matrix
 
     Args:
-        data (numpy array): Vector of data to be differentiated.
-        itern (int): Number of iterations to run the main loop.  A stopping
-            condition based on the norm of the gradient vector g below would be
-            an easy modification.  No default value.
-        alph (float): Regularization parameter.  This is the main parameter to
-            fiddle with.  Start by varying by orders of magnitude until
-            reasonable results are obtained.  A value to the nearest power of
-            10 is usually adequate.  No default value.  Higher values increase
-            regularization strength and improve conditioning.
-        u0 (numpy array): Initialization of the iteration.  Default value is
-            the naive derivative (without scaling), of appropriate length (this
-            being different for the two methods).  Although the solution is
-            theoretically independent of the initialization, a poor choice can
-            exacerbate conditioning issues when the linear system is solved.
-        ep (float): Parameter for avoiding division by zero.  Default value is
-            1e-6.  Results should not be very sensitive to the value.  Larger
-            values improve conditioning and therefore speed, while smaller
-            values give more accurate results with sharper jumps.
-        dx (float): Grid spacing, used in the definition of the derivative
-            operators.  Default is the reciprocal of the data size.
+        banded (numpy array): Rectangular matrix in banded format
+        n (int): The dimension of the (full) matrix
+        kl (int):  The number of lower diagonals (kl=0 for
+            diagonal/upper-triangular matrix)
+        ku (int):  The number of upper diagonals (ku=0 for
+            diagonal/lower-triangular matrix)
+        mode (str): On of 'g', 'h', 's', 't' corresponding to "general",
+        "Hermitian", "symmetric", and 'triangular'. The values 'g' and 's' are
+        dequivalent, except that for 's' iether kl or ku must be zero. For
+        Hermitian or symmetric storage, exactly one of `kl`, `ku` must be zero.
+        Which one determines whether `banded` is assumed to contain the data
+        for the upper or lower triangle
 
     Returns:
-        u (numpy array): Estimate of the regularized derivative of data.
+        full: numpy array of same type as `banded`
     """
-
-    logger = logging.getLogger(__name__)
-
-    # Make sure we have a column vector
-    data = np.array(data)
-    if len(data.shape) != 1:
-        logger.error("data is not a column vector")
-        return
-    # Get the data size.
-    n = len(data)
-
-    # Default checking. (u0 is done separately within each method.)
-    if dx is None:
-        dx = 1.0 / n
-
-    # Construct antidifferentiation operator and its adjoint.
-    A = lambda v: np.cumsum(v)
-    AT = lambda w: (sum(w) * np.ones(len(w))
-                    - np.transpose(np.concatenate(([0.0], np.cumsum(w[:-1])))))
-    # Construct differentiation matrix.
-    c = np.ones(n)
-    D = scipy.sparse.spdiags([-c, c], [0, 1], n, n) / dx
-    mask = np.ones((n, n))
-    mask[-1, -1] = 0.0
-    D = scipy.sparse.dia_matrix(D.multiply(mask))
-    DT = D.transpose()
-    # Since Au(0) = 0, we need to adjust.
-    data = data - data[0]
-    # Default initialization is naive derivative.
-    if u0 is None:
-        u0 = np.concatenate(([0], np.diff(data)))
-    u = u0
-    # Precompute.
-    ATd = AT(data)
-
-    def linop_matvec(v):
-        return alph * L * v + AT(A(v))
-    linop = scipy.sparse.linalg.LinearOperator((n, n), linop_matvec)
-
-    # Main loop.
-    for ii in range(1, itern + 1):
-
-        # Diagonal matrix of weights, for linearizing E-L equation.
-        Q = scipy.sparse.spdiags(1.0/np.sqrt((D*u)**2.0+ep), 0, n, n)
-        # Linearized diffusion matrix, also approximation of Hessian.
-        L = DT*Q*D
-        # Gradient of functional.
-        g = AT(A(u)) - ATd
-        g = g + alph * L * u
-        # Build preconditioner.
-        c = np.cumsum(range(n, 0, -1))
-        B = alph * L + scipy.sparse.spdiags(c[::-1], 0, n, n)
-        # droptol = 1.0e-2
-        R = scipy.sparse.dia_matrix(np.linalg.cholesky(B.todense()))
-        # Prepare to solve linear equation.
-        tol = 1.0e-4
-        maxit = 100
-
-        [s, info_i] = scipy.sparse.linalg.cg(linop, -g, None, tol, maxit, None,
-                                             np.dot(R.transpose(), R))
-        logger.debug("iteration %4d: relative change = %.3e, gradient "
-                     "norm = %.3e", ii,
-                     np.linalg.norm(s[0])/np.linalg.norm(u),
-                     np.linalg.norm(g))
-        if info_i > 0:
-            logger.debug("WARNING - convergence to tolerance not achieved!")
-        elif info_i < 0:
-            logger.debug("WARNING - illegal input or breakdown")
+    full = np.zeros(shape=(n, n), dtype=banded.dtype)
+    if mode in ['g', 't']:
+        if mode == 't':
+            assert kl == 0 or ku == 0
+        for j in range(n):
+            for i in range(max(0, j-ku), min(n, j+kl+1)):
+                full[i, j] = banded[ku+i-j, j]
+    else:  # Hermitian or symmetric
+        if kl == 0:  # upper triangle
+            kd = ku
+            for j in range(n):
+                for i in range(max(0, j-kd), j+1):
+                    full[i, j] = banded[kd+i-j, j]
+                    if i != j:
+                        if mode == 'h':
+                            full[j, i] = banded[kd+i-j, j].conjugate()
+                        elif mode == 's':
+                            full[j, i] = banded[kd+i-j, j]
+                        else:
+                            raise ValueError("Invalid mode %s" % mode)
+        elif ku == 0:  # lower triangle
+            kd = kl
+            for j in range(n):
+                for i in range(j, min(n, j+kd+1)):
+                    full[i, j] = banded[i-j, j]
+                    if i != j:
+                        if mode == 'h':
+                            full[j, i] = banded[i-j, j].conjugate()
+                        elif mode == 's':
+                            full[j, i] = banded[i-j, j]
+                        else:
+                            raise ValueError("Invalid mode %s" % mode)
         else:
-            [s, info_i] = scipy.sparse.linalg.cg(linop, -g, None, tol, maxit,
-                                                None, np.dot(R.transpose(), R))
-        # Update current solution
-        u = u + s
-        u = u/dx
-
-    return u
+            raise ValueError("For mode %s, either kl or ku must be zero"
+                             % mode)
+    return full

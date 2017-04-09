@@ -2,41 +2,34 @@
 as a config file and dependent data"""
 
 from __future__ import print_function, division, absolute_import
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import os
-import re
+import logging
 
 import numpy as np
 
 from .io import write_indexed_matrix
 from .analytical_pulse import AnalyticalPulse
 from .pulse import Pulse, pulse_tgrid
-from .config import write_config
+from .config import write_config, set_config_user_value
 from .state import write_psi_amplitudes
 from .shutil import mkdir
 from .units import UnitFloat
-from .linalg import is_hermitian, choose_sparsity_model
+from .linalg import (
+    is_hermitian, choose_sparsity_model, iscomplexobj, norm, triu, tril)
+
+
+class _SimpleNamespace:
+    """Implementation of types.SimpleNamespace for Python 2"""
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
 
 class LevelModel(object):
     """Model for a system well-described in the energy basis. That is, all
     operators are (sparse) matrices, and all states are simple vectors
 
-    Args:
-        label (str): set the `label` attribute
-
     Attributes:
-        label (str): label to be used for all config file items
-        ham (matrix or list): the system Hamiltonian. Must be either a matrix
-            or similar object (numpy matrix, numpy 2D array, scipy sparse
-            matrix, `qutip.Qobj`) or a list. If a list, the total Hamiltonian
-            is the sum of all list items. Each list item must be either a
-            matrix (time-independent), or a list/tuple ``(matrix, pulse)`` for
-            a time-dependent operator. The ``pulse`` must be an instance of
-            `QDYN.pulse.Pulse`, `QDYN.pulse.AnalyticalPulse`, or a callable
-            that takes a time value as a float and returns a pulse amplitude.
-            It is recommended not to set the `ham` attribute directly, but to
-            construct it using :meth:`add_ham`.
         t0 (float or QDYN.units.UnitFloat): Initial time.
         T (float or QDYN.units.UnitFloat): Final time.
         nt (int): Number of points in the time grid.
@@ -48,56 +41,175 @@ class LevelModel(object):
             decay term. This term is constructed from the Lindblad operators.
             If ``use_mcwf=True`` and ``construct_mcwf_ham=False``, it is the
             user's responsibility to ensure that `ham` is the proper effective
-            Hamiltonian.
+            Hamiltonian. The `construct_mcwf` flag determines the presence of
+            `add_to_H_jump` config file parameter for each Lindblad operator
+        user_data (OrderedDict): Key-value pairs that should that describe
+            user-defined data. These will go in the ``user_strings``,
+            ``user_reals``, ``user_logicals``, or ``user_ints`` section of the
+            config file, depending on the type of the value
 
-    Note:
-        It is recommended to us `QDYN.pulse.AnalyticalPulse` to express
-        time-dependency, as this allows to fully specify physical units.
-        Instances of `QDYN.pulse.Pulse` must have a time grid that exactly
-        matches the time grid specified via :meth:`set_propagation`. Using a
-        callable means that the pulse amplitude is unitless, and the pulse as
-        evaluated for time value with the unit specified in
-        :meth:`set_propagation`.
-
-        The attributes `t0`, `T`, `nt`, `prop_method`, `use-mcwf`, and
-        `construct_mcwf_ham` are all set via :meth:`set_propagation`.
+        After instantiation, the attributes `t0`, `T`, `nt`, `prop_method`,
+        `use-mcwf`, and `construct_mcwf_ham` are all set via
+        :meth:`set_propagation`.  Operators and pulses are added to the system
+        through :meth:`add_ham`, :meth:`add_observable`, and
+        :meth:`add_lindblad_op`. States are added through :meth:`add_state`.
+        Both the general OCT settings (OCT section in the QDYN config file) and
+        OCT-related settings for each control pulse are controlled through
+        :meth:`set_oct`. After the model has been constructed, a config file
+        and all dependent data input files for the operators, pulses, and
+        states can be written via :meth:`write_to_runfolder`.
     """
 
-    def __init__(self, label=''):
-        if not re.match(r'^[\w\d]*$', label):
-            raise ValueError("Invalid label: %s" % label)
-        self.label = label
-        self.ham = None
-        self._ham_config_attribs = []
-        self._lindblad_config_attribs = []
-        self._observables = []
-        self._obs_config_attribs = []
-        self._lindblad_ops = []
-        self._psi = None
-        self.t0 = 0.0
-        self.T = 0.0
+    def __init__(self):
+        self._ham = []  # list of (matrix, config_attribs)
+        self._pulses = []  # list of pulses
+        self._lindblad_ops = []  # list of (matrix, config_attribs)
+        self._observables = []  # list of (matrix, config_attribs)
+        self._dissipator = []  # list of (matrix, config_attribs)
+        self._psi = OrderedDict([])  # label => amplitude array
+        self._oct = OrderedDict([])  # key => val for OCT section
+        self.t0 = UnitFloat(0, 'iu')
+        self.T = UnitFloat(0, 'iu')
         self.nt = 0
         self.prop_method = 'newton'
         self.use_mcwf = False
         self.mcwf_order = 2
         self.construct_mcwf_ham = False
-        self._config_data = OrderedDict([])
-        self._pulse_id = 0 # last used pulse_id
-        self._pulse_ids = {} # pulse -> pulse_id
+        self.user_data = OrderedDict([])
+        self._pulse_id = defaultdict(int)  # last used pulse_id, per label
+        self._pulse_ids = {}  # (id(pulse), label) -> pulse_id
 
-    @property
-    def observables(self):
-        """list of all observables"""
-        # protects _observables and _obs_config_attribs from going out of sync
-        return list(self._observables)
+    @staticmethod
+    def _obj_list(obj_list, label=None, with_attribs=False):
+        """Common implementation of methods `observables`, 'lindblad_ops`,
+        `ham`"""
+        if label is None:
+            label = ''
+        result = []
+        for (obj, attribs) in obj_list:
+            obj_label = attribs.get("label", "")
+            if (obj_label == label) or (label == '*'):
+                if with_attribs:
+                    result.append((obj, attribs))
+                else:
+                    result.append(obj)
+        return result
 
-    @property
-    def lindblad_ops(self):
-        """List of all Lindblad operators"""
-        return list(self._lindblad_ops)
+    def observables(self, label=None, with_attribs=False):
+        """Return list of all observables with the matching label (or all
+        labels if `label` is '*'). If `with_attribs` is True, the result is a
+        list of tuples ``(observable, attributes``) where ``attributes`` is a
+        dictionary of config file attributes
+        """
+        return self._obj_list(self._observables, label, with_attribs)
 
-    def add_ham(self, H, pulse=None, op_unit=None, sparsity_model=None,
-            op_type=None, **kwargs):
+    def lindblad_ops(self, label=None, with_attribs=False):
+        """Return list of all Lindblad operators with the matching label (or
+        all labels if `label` is '*'). If `with_attribs` is True, the result is
+        a list of tuples ``(operator, attributes``) where ``attributes`` is a
+        dictionary of config file attributes
+        """
+        return self._obj_list(self._lindblad_ops, label, with_attribs)
+
+    def ham(self, label=None, with_attribs=False):
+        """Return list of all Hamiltonian operators with the matching label (or
+        all labels if `label` is '*'). If `with_attribs` is True, the result is
+        a list of tuples ``(ham, attributes``) where ``attributes`` is a
+        dictionary of config file attributes
+        """
+        return self._obj_list(self._ham, label, with_attribs)
+
+    def pulses(self, label=None):
+        """Return a list of all known pulses with the matching label (or all
+        labels if `label` is '*').
+        """
+        if label is None:
+            label = ''
+        result = []
+        for pulse in self._pulses:
+            pulse_label = pulse.config_attribs.get('label', '')
+            if (pulse_label == label) or (label == '*'):
+                result.append(pulse)
+        return result
+
+    def _add_matrix(
+            self, add_target, matrix, label, pulse=None, check_matrix=True,
+            kwargs=None):
+        """Common implementation of `add_ham`, `add_observable`,
+        `add_lindblad_op`, `set_dissipator`"""
+        if kwargs is None:
+            # Note: we do not use **kwargs to preserve an OrderedDict
+            kwargs = {}
+        if check_matrix:
+            if not hasattr(matrix, 'shape'):
+                # we take the existence of the 'shape' attribute as a
+                # least-effort indication that we have a proper matrix
+                raise TypeError(str(matrix) + ' must be a matrix')
+        if pulse is not None:
+            if not isinstance(pulse, (Pulse, AnalyticalPulse)):
+                raise TypeError("pulse must be instance of Pulse or "
+                                "AnalyticalPulse, not %s" % pulse.__class__)
+            if pulse.is_complex:
+                if norm(triu(matrix)) > 1e-14 and norm(tril(matrix)) > 1e-14:
+                    raise ValueError("Cannot connect a complex pulse to a "
+                                     "matrix with data in both triangles")
+        config_attribs = OrderedDict([])  # attributes for the matrix
+        for key in kwargs:
+            config_attribs[key] = kwargs[key]
+        if label is not None:
+            config_attribs['label'] = label
+        if pulse is not None:
+            pulse_id = self._add_pulse(pulse, system_label=label)
+            config_attribs['pulse_id'] = pulse_id
+        add_target.append(
+            (matrix, config_attribs)
+        )
+
+    def _add_pulse(self, pulse, system_label):
+        """Store a copy of `pulse` with adjusted `config_attribs` in `_pulses`.
+
+        Increments ``self._pulse_id[label]`` and sets
+        ``self._pulse_ids[(id(pulse), label)]``
+
+        Args:
+            pulse: The pulse to add
+            system_label: Label to use for the pulse, only if
+                pulse.config_attribs['label'] does not exist.
+
+        Returns:
+            the pulse id, as an integer
+        """
+        try:
+            label = pulse.config_attribs['label']
+        except (AttributeError, KeyError):
+            label = system_label
+        if label is None:
+            label = ''
+        key = (id(pulse), label)
+        try:
+            pulse_id = self._pulse_ids[key]
+        except KeyError:
+            self._pulse_id[label] += 1
+            pulse_id = self._pulse_id[label]
+        filename = pulse.config_attribs['filename']
+        if filename == '':
+            if label == '':
+                filename = "pulse%d.dat" % pulse_id
+            else:
+                filename = "pulse%d_%s.dat" % (pulse_id, label)
+        if key not in self._pulse_ids:
+            pulse = pulse.copy()
+            if label != '':
+                pulse.config_attribs['label'] = label
+            pulse.config_attribs['id'] = pulse_id
+            pulse.config_attribs['filename'] = filename
+            self._pulses.append(pulse)
+            self._pulse_ids[key] = pulse_id
+        return pulse_id
+
+    def add_ham(
+            self, H, pulse=None, op_unit=None, sparsity_model=None,
+            op_type=None, label=None, **kwargs):
         """Add a term to the system Hamiltonian. If called repeatedly, the
         total Hamiltonian is the sum of all added terms.
 
@@ -105,61 +217,51 @@ class LevelModel(object):
             H: Hamiltonian matrix. Can be a numpy matrix or array,
                 scipy sparse matrix, or `qutip.Qobj`
             pulse: if not None, `H` will couple to `pulse`. Can be an instance
-                of `QDYN.analytical_pulse.AnalyticalPulse` (preferred, this is
-                the only option to fully specify units), `QDYN.pulse.Pulse`, or
-                a callable ``pulse(t)`` that returns a pulse value for a given
-                float ``t`` (time)
+                of :class:`~QDYN.analytical_pulse.AnalyticalPulse` or
+                :class:`~QDYN.pulse.Pulse`.
             op_unit (None or str): Unit of the values in `H`.
             sparsity_model (None or str): sparsity model that QDYN should use
                 to encode the data in `H`. If None, will be determined
                 automatically
             op_type (None or str): the value for ``op_type`` in the config file
                 that should be used for `H`. This determines how exactly `H`
-                couples to `pulse`
+                couples to `pulse`. Common values are 'dipole' (linear
+                coupling) and 'dstark' (quadratic "Stark shift" coupling)
+            label (str or None): Multiple Hamiltonians may be defined in the
+                same config file if they are differentiated by label. The
+                default label is the empty string
+            kwargs: All other keyword arguments set options for `H` in the
+                config file (e.g. `specrad_method`, `filename`)
 
-        All other keyword arguments set options for `H` in the config file
-        (e.g. `specrad_method`)
+        Note:
+            It is recommended to use :class:`~QDYN.pulse.AnalyticalPulse` to
+            express time-dependency, as this is independent of a specific time
+            grid.  Instances of :class:`~QDYN.pulse.Pulse` must have a time
+            grid that exactly matches the time grid specified via
+            :meth:`set_propagation`.
         """
-        if not hasattr(H, 'shape'):
-            # we take the existence of the 'shape' attribute as a least-effort
-            # indication that H is one of the acceptable types
-            raise TypeError('H must be a matrix')
-        if pulse is not None:
-            if not (isinstance(pulse, (Pulse, AnalyticalPulse))
-                    or callable(pulse)):
-                raise TypeError("pulse must be an instance of "
-                        "QDYN.analytical_pulse.AnalyticalPulse, "
-                        "QDYN.pulse.Pulse, or a callable.")
-        if self.ham is None:
-            self.ham = []
-        elif hasattr(self.ham, 'shape'):
-            self.ham = [self.ham, ]
-            self._ham_config_attribs = [OrderedDict([]), ]
-        if pulse is None:
-            self.ham.append(H)
-        else:
-            self.ham.append([H, pulse])
         config_attribs = OrderedDict([])
+        for key in sorted(kwargs):
+            config_attribs[key] = kwargs[key]
         if op_unit is not None:
             config_attribs['op_unit'] = op_unit
         if sparsity_model is not None:
             config_attribs['sparsity_model'] = sparsity_model
         if op_type is not None:
             config_attribs['op_type'] = op_type
-        for key in kwargs:
-            config_attribs[key] = kwargs[key]
-        self._ham_config_attribs.append(config_attribs)
-        assert len(self._ham_config_attribs) == len(self.ham)
+        if label is not None:
+            config_attribs['label'] = label
+        self._add_matrix(self._ham, H, label=label, pulse=pulse,
+                         kwargs=config_attribs)
 
-
-    def add_observable(self, O, outfile, exp_unit, time_unit, col_label,
+    def add_observable(
+            self, O, outfile, exp_unit, time_unit, col_label,
             square=None, exp_surf=None, is_real=None, in_lab_frame=False,
-            op_unit=None):
+            op_unit=None, label=None, pulse=None):
         """Add an observable
 
         Args:
-            O (tuple, matrix, str): Observable to add. Must be a matrix
-                or a tuple ``(matrix, pulse)`` (cf. the `ham` attribute), or
+            O (matrix, str): Observable to add. Must be a matrix, or
                 one of "ham", "norm", "pop"
             outfile (str): Name of output file to which to write expectation
                 values of `O`
@@ -182,16 +284,13 @@ class LevelModel(object):
                 frame.
             op_unit (str or None): The unit in which the entries of `O` are
                 given. By default, this is the same as `exp_unit`.
+            label (str or None): Observables associated with different
+                Hamiltonians may be defined in the same config file if they are
+                differentiated by label. The default label is the empty string.
+            pulse: If not None, a pulse for the observable to couple to (see
+                :meth:`add_ham`)
         """
-        self._observables.append(O)
-        try:
-            O, pulse = O
-        except (TypeError, ValueError):
-            pass # O stays O
-        if isinstance(O, str):
-            if O not in ["ham", "norm", "pop"]:
-                raise ValueError("String expectation value must be one of"
-                        "'ham', 'norm', or 'pop'")
+        config_attribs = OrderedDict([])
         if is_real is None:
             if isinstance(O, str):
                 if O in ["norm", "pop"]:
@@ -202,57 +301,115 @@ class LevelModel(object):
                     raise ValueError("Invalid O")
             else:
                 is_real = is_hermitian(O)
-        self._obs_config_attribs.append(OrderedDict(
-            [('outfile', outfile), ('exp_unit', exp_unit),
-             ('is_real', is_real), ('time_unit', time_unit),
-             ('column_label', col_label)]))
+        config_attribs['outfile'] = outfile
+        config_attribs['exp_unit'] = exp_unit
+        config_attribs['is_real'] = is_real
+        config_attribs['time_unit'] = time_unit
+        config_attribs['column_label'] = col_label
         if square is not None:
-            self._obs_config_attribs[-1]['square'] = square
+            config_attribs['square'] = square
         if exp_surf is not None:
-            self._obs_config_attribs[-1]['exp_surf'] = exp_surf
+            config_attribs['exp_surf'] = exp_surf
+        if label is not None:
+            config_attribs['label'] = label
         if in_lab_frame:
-            self._obs_config_attribs[-1]['in_lab_frame'] = True
+            config_attribs['in_lab_frame'] = True
         if op_unit is None:
-            self._obs_config_attribs[-1]['op_unit'] = exp_unit
+            config_attribs['op_unit'] = exp_unit
         else:
-            self._obs_config_attribs[-1]['op_unit'] = op_unit
+            config_attribs['op_unit'] = op_unit
+        self._add_matrix(self._observables, O, label, pulse=pulse,
+                         check_matrix=False, kwargs=config_attribs)
 
-    def add_lindblad_op(self, L, op_unit=None, sparsity_model=None,
-            add_to_H_jump=None, **kwargs):
+    def add_lindblad_op(
+            self, L, op_unit=None, sparsity_model=None,
+            add_to_H_jump=None, label=None, pulse=None, **kwargs):
         """Add Lindblad operator.
 
         Args:
             L (tuple, matrix): Lindblad operator to  add. Must be a matrix
                 or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.
-            op_unit (None or str): Unit of the values in `L`.
+            op_unit (None or str): Unit of the values in `L`, e.g. ``sqrt_GHz``
+                (Lindblad operators are in units square-root-of-energy)
             sparsity_model (None or str): sparsity model that QDYN should use
                 to encode the data in `L`. If None, will be determined
                 automatically
             add_to_H_jump (None, str): sparsity model to be set for
                 `add_to_H_jump`, i.e. for the decay term in the effective MCWF
                 Hamiltonian. If None, will be de determined automatically.
+            label (str or None): Lindblad operators associated with different
+                Hamiltonians may be defined in the same config file if they are
+                differentiated by label. The default label is the empty string.
+            pulse: If not None, a pulse for the Lindblad operator to couple to
+                (see :meth:`add_ham`)
 
         All other keyword arguments set options for `L` in the config file.
         """
+        for (D, config_attribs) in self._dissipator:
+            if config_attribs.get('label', None) == label:
+                raise ValueError(
+                    "Cannot set Lindblad operator for a system label for "
+                    "which there is already a dissipation superoperator "
+                    "defined")
         config_attribs = OrderedDict([])
+        for key in sorted(kwargs):
+            config_attribs[key] = kwargs[key]
         if op_unit is not None:
             config_attribs['op_unit'] = op_unit
         if sparsity_model is not None:
             config_attribs['sparsity_model'] = sparsity_model
         if add_to_H_jump is not None:
             config_attribs['add_to_H_jump'] = add_to_H_jump
-        for key in kwargs:
-            config_attribs[key] = kwargs[key]
-        self._lindblad_ops.append(L)
-        self._lindblad_config_attribs.append(config_attribs)
+        if label is not None:
+            config_attribs['label'] = label
+        self._add_matrix(self._lindblad_ops, L, label, pulse=pulse,
+                         kwargs=config_attribs)
 
-    def set_propagation(self, initial_state, T, nt, time_unit, t0=0.0,
-            prop_method='newton', use_mcwf=False, mcwf_order=2,
-            construct_mcwf_ham=True):
+    def set_dissipator(
+            self, D, op_unit=None, sparsity_model=None, label=None, pulse=None,
+            **kwargs):
+        """Set a dissipation superoperator in the config file
+
+        Args:
+            D (tuple, matrix): Dissiption superoperoperator to add. Must be a
+                matrix or a tuple ``(matrix, pulse)``
+            op_unit (None or str): Unit of the value in `D`. e.g. ``GHz``
+                (dissipators are in units of energy)
+            sparsity_model (None or str): sparsity model that QDYN should use
+                to encode the data in `D`. If None, will be determined
+                automatically
+            label (str or None): Dissipators associated with different
+                Hamiltonians may be defined in the same config file if they are
+                differentiated by label. The default label is the empty string.
+            pulse: If not None, a pulse for the Dissipator to couple to
+
+        All other keyword arguments set options for the dissipator in the
+        config file.
+        """
+        for (L, config_attribs) in self._lindblad_ops:
+            if config_attribs.get('label', None) == label:
+                raise ValueError(
+                    "Cannot set dissipator for a system label for which there "
+                    "are already Lindblad operators defined")
+        config_attribs = OrderedDict([])
+        for key in sorted(kwargs):
+            config_attribs[key] = kwargs[key]
+        if op_unit is not None:
+            config_attribs['op_unit'] = op_unit
+        if sparsity_model is not None:
+            config_attribs['sparsity_model'] = sparsity_model
+        if label is not None:
+            config_attribs['label'] = label
+        self._add_matrix(self._dissipator, D, label, pulse=pulse,
+                         kwargs=config_attribs)
+
+    def set_propagation(
+            self, T, nt, time_unit, t0=0.0, prop_method='newton',
+            use_mcwf=False, mcwf_order=2, construct_mcwf_ham=True, label=None,
+            initial_state=None):
         """Set the time grid and other propagation-specific settings
 
         Args:
-            initial_state (array): Initial wave function
             T (float): final time
             nt (int): number of points in the time grid
             time_unit (str): physical unit of `T`, `t0`
@@ -268,6 +425,8 @@ class LevelModel(object):
                 user's responsibility then to ensure the Hamiltonian in the
                 model is the correct "effective" Hamiltonian for a MCWF
                 propagation.
+            label (str or None): The label for `initial_state`
+            initial_state (array or None): Initial wave function
 
         Notes:
             When setting up an MCWF propagation, using the `mcwf_order=2` is
@@ -280,7 +439,8 @@ class LevelModel(object):
             instantaneous, and there can be multiple jumps per time step, but
             the numerical overhead is larger.
         """
-        self._psi = initial_state
+        if initial_state is not None:
+            self.add_state(initial_state, label)
         self.T = UnitFloat(T, time_unit)
         self.nt = nt
         self.t0 = UnitFloat(t0, time_unit)
@@ -295,256 +455,247 @@ class LevelModel(object):
         else:
             self.construct_mcwf_ham = False
 
+    def set_oct(
+            self, method, J_T_conv, max_ram_mb, **kwargs):
+        """Set config file data and pulse properties for optimal control
+
+        Args:
+            method (str): Optimization method. Allowed values are 'krotovpk',
+                'krotov2', 'krotovbwr', and 'lbfgs'
+            J_T_conv (foat): The value of the final time functional
+            max_ram_mb (int): The amount of memory that is available for
+                storing propagated states. If this is not suffient to hold all
+                the states required to calculate the gradient, a "segmented"
+                storage scheme will be used that caches the states to disk,
+                using up to `max_disk_mb` hard drive storage.
+
+        All other keyword arguments directly specify keys and values for the
+        OCT config section. Allowed keys are `iter_start`, `iter_stop`,
+        `max_disk_mb`, `lbfgs_memory`, `linesearch`, `grad_order`, `iter_dat`,
+        `tau_dat`, `params_file`, `krotov2_conv_dat`, `ABC_dat`,
+        `delta_J_conv`, `delta_J_T_conv`, `A`, `B`, `C`, `dynamic_sigma`,
+        `dynamic_lambda_a`, `strict_convergence`, `limit_pulses`, `sigma_form`,
+        `max_seconds`, `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`,
+        `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN Fortran
+        library documentation for details.
+
+        Raises:
+            KeyError: If the settings for a pulse contain invalid or
+                missing keys
+        """
+        allowed_keys = [
+            'iter_start', 'iter_stop', 'max_disk_mb',
+            'lbfgs_memory', 'linesearch', 'grad_order', 'iter_dat', 'tau_dat',
+            'params_file', 'krotov2_conv_dat', 'ABC_dat', 'delta_J_conv',
+            'delta_J_T_conv', 'A', 'B', 'C', 'dynamic_sigma',
+            'dynamic_lambda_a', 'strict_convergence', 'limit_pulses',
+            'sigma_form', 'max_seconds', 'lambda_b', 'keep_pulses',
+            're_init_prop', 'continue', 'storage_folder', 'bwr_nint',
+            'bwr_base', 'g_a'
+        ]
+        krotov_required_pulse_keys = ['oct_lambda_a', ]
+
+        assert isinstance(method, str), \
+            "`method` must be string. Is your code adapted to the latest " \
+            "version of QDYN?"
+
+        def default_outfile(filename):
+            return os.path.splitext(filename)[0] + ".oct.dat"
+
+        self._oct = OrderedDict([('method', method), ('J_T_conv', J_T_conv),
+                                 ('max_ram_mb', max_ram_mb)])
+        for key in sorted(kwargs):
+            if key in allowed_keys:
+                self._oct[key] = kwargs[key]
+            else:
+                raise TypeError("got an unexpected keyword argument '%s'"
+                                % key)
+
+        for pulse in self._pulses:
+            if 'oct_shape' not in pulse.config_attribs:
+                pulse.config_attribs['oct_shape'] = 'const'
+            if 'oct_outfile' not in pulse.config_attribs:
+                octout = default_outfile(pulse.config_attribs['filename'])
+                pulse.config_attribs['oct_outfile'] = octout
+            if 'oct_increase_factor' not in pulse.config_attribs:
+                pulse.config_attribs['oct_increase_factor'] = 5.0
+            if 'krotov' in method:
+                for key in krotov_required_pulse_keys:
+                    if key not in pulse.config_attribs:
+                        raise KeyError("Key '%s' is required for each pulse "
+                                       "when using Krotov's method" % key)
+
+    def add_state(self, state, label):
+        """Add a state (amplitude array) for the given label. Note that there
+        can only be one state per label. Thus calling `add_state` with the same
+        `label` of an earlier call will replace the `state`"""
+        if label is None:
+            label = ''
+        self._psi[label] = state
+
     def write_to_runfolder(self, runfolder, config='config'):
         """Write the model to the given runfolder. This will create a config
         file (`config`) in the runfolder, as well as all dependent data file
         (operators, pulses)"""
         mkdir(runfolder)
-        self._config_data = OrderedDict([])
+        config_data = OrderedDict([])
 
         # time grid
-        if float(self.T) >= 0.0 and self.nt > 0:
-            self._config_data['tgrid'] = OrderedDict([
+        if self.nt > 0:
+            config_data['tgrid'] = OrderedDict([
                 ('t_start', self.t0), ('t_stop', self.T), ('nt', self.nt)])
 
         # propagation
-        self._config_data['prop'] = OrderedDict([
+        config_data['prop'] = OrderedDict([
             ('method', self.prop_method), ('use_mcwf', self.use_mcwf)])
         if self.use_mcwf:
             if self.mcwf_order not in [1, 2]:
                 raise ValueError('mcwf_order must be in [1,2]')
-            self._config_data['prop']['mcwf_order'] = self.mcwf_order
+            config_data['prop']['mcwf_order'] = self.mcwf_order
 
         # pulses
-        self._write_pulses(runfolder)  # also sets self._pulse_ids
+        if len(self._pulses) > 0:
+            self._write_pulses(runfolder, config_data)
 
         # Hamiltonian
-        if self.ham is not None:
-            self._write_ham(runfolder)
+        if len(self._ham) > 0:
+            self._write_ham(runfolder, config_data)
 
-        # Lindblad operators
+        # Lindblad operators and dissipation superoperators
         if len(self._lindblad_ops) > 0:
-            self._write_lindblad_ops(runfolder)
-
-        # initial state
-        if self._psi is not None:
-            self._write_psi(runfolder)
+            self._write_lindblad_ops(runfolder, config_data)
+        if len(self._dissipator) > 0:
+            self._write_dissipator(runfolder, config_data)
 
         # observables
         if len(self._observables) > 0:
-            assert len(self._observables) == len(self._obs_config_attribs)
-            self._write_observables(runfolder)
+            self._write_observables(runfolder, config_data)
 
-        write_config(self._config_data, os.path.join(runfolder, config))
+        # states
+        if len(self._psi) > 0:
+            self._write_psi(runfolder, config_data)
 
-    def _write_pulses(self, runfolder):
+        # OCT
+        if len(self._oct) > 0:
+            config_data['oct'] = self._oct
+
+        # user-defined data
+        for key, val in self.user_data.items():
+            set_config_user_value(config_data, key, val)
+
+        write_config(config_data, os.path.join(runfolder, config))
+
+    def _write_pulses(self, runfolder, config_data):
         """Write numerical pulse files to runfolder, add pulse data to
-        self._config_data, and build the self._pulse_ids dict so that at some
-        later point, operators may find the pulse ID for a pulse they are
-        connected to"""
-        ops = []
-        if isinstance(self.ham, (list, tuple)):
-            ops.extend(self.ham)
-        else:
-            ops = [self.ham, ]
-        ops.extend(self._observables)
-        ops.extend(self._lindblad_ops)
-        for element in ops:
-            if isinstance(element, (list, tuple)):
-                pulse = element[1]
-                if pulse not in self._pulse_ids:
-                    self._write_pulse(pulse, runfolder)
-
-    def _write_pulse(self, pulse, runfolder):
+        config_data,"""
         tgrid = pulse_tgrid(self.T, self.nt, self.t0)
-        self._pulse_id += 1
-        self._pulse_ids[pulse] = self._pulse_id
-        if 'pulse' not in self._config_data:
-            self._config_data['pulse'] = []
-        if self.label == '':
-            filename = "pulse%d.dat" % self._pulse_id
-        else:
-            filename = "pulse_%s_%d.dat" \
-                    % (self.label, self._pulse_id)
-        if isinstance(pulse, AnalyticalPulse):
-            p = pulse.to_num_pulse(tgrid)
-            p.write(os.path.join(runfolder, filename))
-            self._config_data['pulse'].append(
-                    p.config_line(filename, self._pulse_id, self.label))
-        elif isinstance(pulse, Pulse):
-            if np.max(np.abs(tgrid - pulse.tgrid)) > 1e-12:
-                raise ValueError("Mismatch of tgrid with pulse tgrid")
-            pulse.write(os.path.join(runfolder, filename))
-            self._config_data['pulse'].append(
-                    pulse.config_line(filename, self._pulse_id, self.label))
-        elif callable(pulse):
-            ampl = np.array([pulse(t) for t in tgrid])
-            p = Pulse(tgrid, amplitude=ampl,time_unit=self.T.unit,
-                      ampl_unit='unitless', freq_unit='iu')
-            p.write(os.path.join(runfolder, filename))
-            self._config_data['pulse'].append(
-                    p.config_line(filename, self._pulse_id, self.label))
-        else:
-            raise TypeError("Invalid pulse type")
+        if 'pulse' not in config_data:
+            config_data['pulse'] = []
+        for pulse in self.pulses(label='*'):
+            filename = pulse.config_attribs['filename']
+            if isinstance(pulse, AnalyticalPulse):
+                p = pulse.to_num_pulse(tgrid)
+                p.write(os.path.join(runfolder, filename))
+                config_data['pulse'].append(pulse.config_attribs)
+            elif isinstance(pulse, Pulse):
+                if np.max(np.abs(tgrid - pulse.tgrid)) > 1e-12:
+                    raise ValueError("Mismatch of tgrid with pulse tgrid")
+                pulse.write(os.path.join(runfolder, filename))
+                config_data['pulse'].append(pulse.config_attribs)
+            else:
+                raise TypeError("Invalid pulse type")
 
-    def _write_ham(self, runfolder):
-        """Write operators in the Hamiltonian to data files inside runfolder,
-        and add ham data to self._config_data"""
-        ham = self.ham
-        if not isinstance(ham, (list, tuple)):
-            ham = [ham, ]
-        op_counter = 0
-        if 'ham' not in self._config_data:
-            self._config_data['ham'] = []
-        for i, element in enumerate(ham):
-            if isinstance(element, (list, tuple)):
-                try:
-                    H, pulse = element
-                except ValueError:
-                    raise ValueError("nested_op must be either an operator or "
-                            "a list of operators or lists `[Op, pulse]`")
+    @staticmethod
+    def _write_matrices(
+            runfolder, config_data, section, data, outprefix,
+            type_attrib='matrix', set_n_surf=True, set_op_type=False,
+            set_add_to_H_jump=False, counter0=0):
+        """Common implementation of `_write_ham`, `_write_observables`,
+        `_write_lindblad_ops`, and `_write_dissipator`"""
+        if section not in config_data:
+            config_data[section] = []
+        for op_counter, (matrix, attribs) in enumerate(data):
+            if 'filename' in attribs:
+                filename = attribs['filename']
             else:
-                H = element
-                pulse = None
-            if self.label == '':
-                filename = "H%d.dat" % op_counter
-            else:
-                filename = "H_%s_%d.dat" % (self.label, op_counter)
-            write_indexed_matrix(H,
-                    filename=os.path.join(runfolder, filename),
-                    hermitian=False)
-            self._config_data['ham'].append(
-                    OrderedDict([('type', 'matrix'), ('n_surf', H.shape[0]),
-                                 ('filename', filename)]))
-            try:
-                config_attribs = self._ham_config_attribs[i]
-            except IndexError:
-                config_attribs = OrderedDict([])
+                filename = "%s%d.dat" % (outprefix, op_counter+counter0)
+            write_indexed_matrix(matrix,
+                                 filename=os.path.join(runfolder, filename),
+                                 hermitian=False)
+            config_attribs = OrderedDict([
+                ('type', type_attrib), ('filename', filename),
+                ('real_op', (not iscomplexobj(matrix)))
+            ])
+            if set_n_surf:
+                config_attribs['n_surf'] = matrix.shape[0]
+            for key, val in attribs.items():
+                config_attribs[key] = val
             if 'sparsity_model' not in config_attribs:
-                config_attribs['sparsity_model'] = choose_sparsity_model(H)
-            if 'op_type' not in config_attribs:
-                config_attribs['op_type'] = 'potential'
-                if pulse is not None:
-                    config_attribs['op_type'] = 'dipole'
-            for key, val in config_attribs.items():
-                if key not in self._config_data['ham'][-1]:
-                    self._config_data['ham'][-1][key] = val
-            if pulse is not None:
-                self._config_data['ham'][-1]['pulse_id'] \
-                = self._pulse_ids[pulse]
-            if self.label != '':
-                self._config_data['ham'][-1]['label'] = self.label
-            op_counter +=1
+                config_attribs['sparsity_model'] \
+                        = choose_sparsity_model(matrix)
+            if set_op_type:
+                if 'op_type' not in config_attribs:
+                    config_attribs['op_type'] = 'pot'
+                    if 'pulse_id' in attribs:
+                        config_attribs['op_type'] = 'dip'
+            config_data[section].append(config_attribs)
 
-    def _write_observables(self, runfolder):
+    def _write_ham(self, runfolder, config_data):
+        """Write operators in the Hamiltonian to data files inside `runfolder`,
+        and add ham data to `config_data`"""
+        self._write_matrices(runfolder, config_data, 'ham', self._ham,
+                             outprefix='H', set_op_type=True, counter0=0)
+
+    def _write_observables(self, runfolder, config_data):
         """Write operators describing all observables to the runfolder,
-        and add observables data to self._config_data"""
-        op_counter = 1
-        for i, element in enumerate(self._observables):
-            if 'observables' not in self._config_data:
-                self._config_data['observables'] = []
-            self._config_data['observables'].append(
-                    OrderedDict(self._obs_config_attribs[i]))
-            if isinstance(element, str):
-                assert element in ["ham", "norm", "pop"]
-                pulse = None
-                self._config_data['observables'][-1]['type'] = element
-            else:
-                if isinstance(element, (list, tuple)):
-                    try:
-                        O, pulse = element
-                    except ValueError:
-                        raise ValueError("Each observable must either be an "
-                                "operator or a two-element list consisting "
-                                "of an operator and a pulse")
-                else:
-                    O = element
-                    pulse = None
-                if self.label == '':
-                    filename = "O%d.dat" % op_counter
-                else:
-                    filename = "O_%s_%d.dat" % (self.label, op_counter)
-                write_indexed_matrix(O,
-                        filename=os.path.join(runfolder, filename),
-                        hermitian=False)
-                sparsity_model = choose_sparsity_model(O)
-                self._config_data['observables'][-1].update(
-                    OrderedDict([('type', 'matrix'), ('n_surf', O.shape[0]),
-                                    ('sparsity_model', sparsity_model),
-                                    ('filename', filename)]))
-            if pulse is not None:
-                self._config_data['observables'][-1]['pulse_id'] \
-                = self._pulse_ids[pulse]
-            if self.label != '':
-                self._config_data['observables'][-1]['label'] = self.label
-            op_counter +=1
+        and add observables data to `config_data`"""
+        self._write_matrices(runfolder, config_data, 'observables',
+                             self._observables, outprefix='O',
+                             set_op_type=False, counter0=1)
 
-    def _write_lindblad_ops(self, runfolder):
-        """Write operators describing all Lindblad operators to the runfolder,
-        and add dissipator data to self._config_data"""
-        op_counter = 1
-        for i, element in enumerate(self._lindblad_ops):
-            if isinstance(element, (list, tuple)):
-                try:
-                    L, pulse = element
-                except ValueError:
-                    raise ValueError("Each observable must either be an "
-                            "operator or a two-element list consisting "
-                            "of an operator and a pulse")
-            else:
-                L = element
-                pulse = None
-            if self.label == '':
-                filename = "L%d.dat" % op_counter
-            else:
-                filename = "L_%s_%d.dat" % (self.label, op_counter)
-            write_indexed_matrix(L,
-                    filename=os.path.join(runfolder, filename),
-                    hermitian=False)
-            if 'dissipator' not in self._config_data:
-                self._config_data['dissipator'] = []
-            self._config_data['dissipator'].append(
-                    OrderedDict([('type', 'lindblad_ops'),
-                                 ('filename', filename)]))
-            try:
-                config_attribs = self._lindblad_config_attribs[i]
-            except IndexError:
-                config_attribs = OrderedDict([])
-            if 'sparsity_model' not in config_attribs:
-                config_attribs['sparsity_model'] = choose_sparsity_model(L)
+    def _write_lindblad_ops(self, runfolder, config_data):
+        """Write operators describing all Lindblad operators to the
+        `runfolder`, and add dissipator data to `config_data`"""
+        logger = logging.getLogger(__name__)
+        lindblad_ops = list(self._lindblad_ops)  # copy
+        for L, attribs in lindblad_ops:
             if self.construct_mcwf_ham:
-                if 'add_to_H_jump' not in config_attribs:
+                if 'add_to_H_jump' not in attribs:
                     # TODO: choose sparsity model that is optimal for the
                     # entire decay term
-                    config_attribs['add_to_H_jump'] = choose_sparsity_model(L)
-                config_attribs['conv_to_superop'] = False
+                    attribs['add_to_H_jump'] = choose_sparsity_model(L)
+                attribs['conv_to_superop'] = False
             else:
-                if 'add_to_H_jump' in config_attribs:
+                if 'add_to_H_jump' in attribs:
                     # add_to_H_jump should never be defined outside of the MCWF
                     # method
-                    del config_attribs['add_to_H_jump']
-            for key, val in config_attribs.items():
-                self._config_data['dissipator'][-1][key] = val
-            if pulse is not None:
-                self._config_data['dissipator'][-1]['pulse_id'] \
-                = self._pulse_ids[pulse]
-            if self.label != '':
-                self._config_data['dissipator'][-1]['label'] = self.label
-            op_counter +=1
+                    logger.warn("Removing 'add_to_H_jump' attribute")
+                    del attribs['add_to_H_jump']
+        self._write_matrices(runfolder, config_data, 'dissipator',
+                             lindblad_ops, outprefix='L', set_n_surf=False,
+                             type_attrib='lindblad_ops', counter0=1)
 
-    def _write_psi(self, runfolder):
+    def _write_dissipator(self, runfolder, config_data):
+        """Write dissipation superoperator to `runfolder`, and add dissipator
+        data to `config_data`"""
+        self._write_matrices(runfolder, config_data, 'dissipator',
+                             self._dissipator, outprefix='D', set_n_surf=False,
+                             type_attrib='dissipator', counter0=1)
+
+    def _write_psi(self, runfolder, config_data):
         """Write initial wave function to the runfolder, and add psi data to
-        self._config_data"""
-        if self.label == '':
-            filename = "psi0.dat"
-        else:
-            filename = "psi_%s.dat" % self.label
-        write_psi_amplitudes(self._psi, os.path.join(runfolder, filename))
-        if 'psi' not in self._config_data:
-            self._config_data['psi'] = []
-        self._config_data['psi'].append(
-                OrderedDict([('type', 'file'), ('filename', filename)]))
-        if self.label != '':
-            self._config_data['psi'][-1]['label'] = self.label
-
-
+        config_data"""
+        if 'psi' not in config_data:
+            config_data['psi'] = []
+        for label, psi in self._psi.items():
+            if label == '':
+                filename = "psi.dat"
+            else:
+                filename = "psi_%s.dat" % label
+            write_psi_amplitudes(psi, os.path.join(runfolder, filename))
+            if 'psi' not in config_data:
+                config_data['psi'] = []
+            config_data['psi'].append(
+                    OrderedDict([('type', 'file'), ('filename', filename)]))
+            if label != '':
+                config_data['psi'][-1]['label'] = label

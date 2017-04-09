@@ -3,23 +3,31 @@ tgrid: t_start = 0, t_stop = 50_ns, nt = 1001
 prop: method = newton, use_mcwf = T, mcwf_order = 2
 
 pulse:
-* type = file, filename = pulse1.dat, id = 1, time_unit = ns, &
-  ampl_unit = unitless
+* id = 1, type = file, filename = pulse1.dat, time_unit = ns, &
+  ampl_unit = unitless, is_complex = F
 
-ham: type = matrix, n_surf = 4
-* filename = H0.dat, sparsity_model = banded, op_type = potential
-* filename = H1.dat, sparsity_model = indexed, op_type = dipole, pulse_id = 1
+ham: type = matrix, real_op = F, n_surf = 4
+* filename = H0.dat, sparsity_model = banded, op_type = pot
+* filename = H1.dat, pulse_id = 1, sparsity_model = indexed, op_type = dip
 
-dissipator: type = lindblad_ops, sparsity_model = banded, &
-  add_to_H_jump = banded, conv_to_superop = F
+dissipator: type = lindblad_ops, real_op = F, add_to_H_jump = banded, &
+  conv_to_superop = F, sparsity_model = banded
 * filename = L1.dat
 * filename = L2.dat
 
-psi:
-* type = file, filename = psi0.dat
-
-observables: outfile = pops.dat, exp_unit = unitless, is_real = T, &
-  time_unit = ns, op_unit = unitless, type = matrix, n_surf = 4, &
+observables: type = matrix, real_op = F, n_surf = 4, outfile = pops.dat, &
+  exp_unit = unitless, is_real = T, time_unit = ns, op_unit = unitless, &
   sparsity_model = banded
-* column_label = "<P_1> (q1)", filename = O1.dat
-* column_label = "<P_1> (q2)", filename = O2.dat
+* filename = O1.dat, column_label = "<P_1> (q1)"
+* filename = O2.dat, column_label = "<P_1> (q2)"
+
+psi:
+* type = file, filename = psi.dat
+
+user_strings: my_str = "This is a custom string value"
+
+user_ints: i = 1, j = 2
+
+user_logicals: propagate = T, liouville_space = F
+
+user_reals: precision = 1e-08

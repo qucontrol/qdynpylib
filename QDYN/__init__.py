@@ -5,7 +5,6 @@ from . import gate2q
 from . import weyl
 from . import pulse
 from . import units
-from . import prop
 from . import linalg
 from . import state
 from . import bloch
@@ -14,5 +13,7 @@ from . import octutils
 from . import memoize
 from . import config
 from . import model
+from . import math
+from . import prop_gate
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"

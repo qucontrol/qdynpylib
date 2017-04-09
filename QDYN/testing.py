@@ -6,12 +6,13 @@ import os
 import re
 
 from distutils import dir_util
-import sh
+import subprocess
 
 
 FEATURES = ['check-cheby', 'no-check-cheby', 'check-newton', 'no-check-newton',
             'parallel-ham', 'no-parallel-ham', 'use-mpi', 'use-mkl',
-            'parallel-oct', 'no-parallel-oct', 'backtraces', 'no-backtraces']
+            'parallel-oct', 'no-parallel-oct', 'backtraces', 'no-backtraces',
+            'debug', 'no-debug']
 
 
 def qdyn_feature(configure_log, feature):
@@ -97,29 +98,38 @@ def datadir(tmpdir, request):
     return str(tmpdir)
 
 
-def baked_sh_cmd(cmd, **kwargs):
-    return sh.Command(cmd[0]).bake(*cmd[1:], **kwargs)
+def make_qdyn_utility(util='qdyn_prop_traj', procs=1, threads=1):
+    """Generate a proto-fixture that returns a wrapper around
+    the utility `util` in '../utils/', relative to the test directory.
 
+    If `procs` > 1 and QDYN was compiled with MPI support, then call the
+    utility through mpirun (or equivalent), to run `procs` simultaneous copies
+    of the program. If `threads` is > 1, the program will run with multiple
+    OpenMP threads.
 
-def make_qdyn_prop_traj(procs=1):
-    """Generate a proto-fixture that returns a `sh.Command` instance wrapping
-    the `qdyn_prop_traj` utility in '../utils/qdyn_prop_traj', relative to the
-    test directory"""
-    def qdyn_prop_traj(request, tmpdir):
-        """Wrapper for the qdyn_prop_traj utility"""
+    The wrapper returned by the fixture behaves like `subprocess.call`, with a
+    predefined `cmd` and environment.
+    """
+    def qdyn_utility(request, tmpdir):
+        """Wrapper for the {util} utility""".format(util=util)
         test_module = request.module.__file__
         testdir = os.path.split(test_module)[0]
         units_files = os.path.join(testdir, '..', 'units_files')
         configure_log = os.path.join(testdir, '..', 'configure.log')
         mpi_implementation = get_mpi_implementation(configure_log)
-        qdyn_prop_traj = os.path.abspath(os.path.join(
-                            testdir, '../utils/qdyn_prop_traj'))
+        exe = os.path.abspath(os.path.join(testdir, '..', 'utils', util))
         env = os.environ.copy()
         env['QDYN_UNITS'] = units_files
-        env['OMP_NUM_THREADS'] = '1'
-        cmd = [qdyn_prop_traj, ]
+        env['OMP_NUM_THREADS'] = str(threads)
+        cmd = [exe, ]
         if (mpi_implementation is not None) and (procs > 1):
             cmd = mpirun(cmd, procs=procs, implementation=mpi_implementation,
                          hostfile=str(tmpdir.join('hostfile')))
-        return baked_sh_cmd(cmd, _env=env)
-    return qdyn_prop_traj
+
+        def run_cmd(*args):
+            full_cmd = cmd + list(args)
+            return subprocess.call(full_cmd, env=env, universal_newlines=True)
+
+        return run_cmd
+
+    return qdyn_utility

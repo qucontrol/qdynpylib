@@ -4,6 +4,8 @@ from __future__ import print_function, division, absolute_import
 import sys
 import re
 import os
+from collections import OrderedDict
+import logging
 # import for doctests
 from contextlib import contextmanager
 import tempfile
@@ -66,7 +68,7 @@ def tempinput(data, binary=False):
 
 
 def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
-        header=None, hermitian=True, limit=0.0):
+        header=None, hermitian=False, limit=0.0):
     """
     Write the given matrix to file in indexed format (1-based indexing)
 
@@ -111,10 +113,13 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
     """
 
     # set line formatter
+
     def real_formatter(i, j, v):
         return "%8d%8d%25.16E" % (i, j, v.real)
+
     def complex_formatter(i, j, v):
         return "%8d%8d%25.16E%25.16E" % (i, j, v.real, v.imag)
+
     if repr(matrix).startswith('Quantum object'):
         # handle qutip Qobj (without importing the qutip package)
         matrix = matrix.data
@@ -174,7 +179,7 @@ def write_indexed_matrix(matrix, filename, comment=None, line_formatter=None,
 
 
 def read_indexed_matrix(filename, format='coo', shape=None,
-        expand_hermitian=True, val_real=False):
+        expand_hermitian=False, val_real=False):
     """
     Read in a matrix from the file with the given filename
 
@@ -210,11 +215,9 @@ def read_indexed_matrix(filename, format='coo', shape=None,
         If given, shape of the resulting matrix. If not given, will be
         determined from largest occurring index in the data from the input file
     expand_hermitian: boolean, optional
-        By default, the matrix to be read in is assumed to be Hermitian, and
-        the input file must only contain data for the upper or lower triangle
-        of the Matrix. The other triangle is filled automatically with the
-        complex conjugate values. With `expand_hermitian=False`, the input file
-        must contain *all* entries of the matrix.
+        If True, the input file must contain data only for the upper or lower
+        triangle. The oterh triangle will be set with the complex conjugate
+        values.
     val_real: boolean, optional
         If True, only read 3 columns from the input file (i, j, value), even if
         more columns are present in the file, and return a real matrix.
@@ -224,11 +227,18 @@ def read_indexed_matrix(filename, format='coo', shape=None,
     = np.genfromtxt(filename, usecols=(0,1), unpack=True, dtype=np.int)
     file_real_val \
     = np.genfromtxt(filename, usecols=(2,), unpack=True, dtype=np.float64)
+    # numpy doesn't generate arrays if there is only one value -- force it!
+    file_row = file_row.reshape(file_row.size)
+    file_col = file_col.reshape(file_col.size)
+    file_real_val = file_real_val.reshape(file_real_val.size)
     val_is_real = False
-    if not val_real:
+    if val_real:
+        val_is_real = True
+    else:
         try:
             file_imag_val = np.genfromtxt(filename, usecols=(3,), unpack=True,
                                           dtype=np.float64)
+            file_imag_val = file_imag_val.reshape(file_imag_val.size)
         except ValueError:
             # File does not contain a fourth column
             val_is_real = True
@@ -283,8 +293,7 @@ def read_indexed_matrix(filename, format='coo', shape=None,
 
 def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
         out=None):
-    """
-    Print a numpy complex matrix to screen, or to a file if outfile is given.
+    """Print a numpy complex matrix to screen, or to a file if outfile is given.
     Values below the given limit are printed as zero
 
     Arguments
@@ -410,6 +419,233 @@ def read_complex(str):
     real_part = fix_fortran_exponent(real_part)
     imag_part = fix_fortran_exponent(imag_part)
     return float(real_part) + 1.0j*float(imag_part)
+
+
+def read_cmplx_array(filename, **kwargs):
+    """Read a complex array from a file. The file must contain two columns
+    (real and imaginary part). This routine is equivalent to the Fortran QDYN
+    `read_cmplx_array` routine
+
+    Args:
+        filename (str): Name of the file from which to read the array
+        kwargs: All keyword arguments are passed to `numpy.genfromtxt`
+    """
+    x, y = np.genfromtxt(filename, usecols=(0, 1), unpack=True, **kwargs)
+    return x + 1j*y
+
+
+def write_cmplx_array(carray, filename, header=None, fmtstr='%25.16E',
+                      append=False, comment=None):
+    """Write a complex array to file. Equivalent to the Fortran QDYN
+    `write_cmplx_array`  routine. Two columns will be written to the output
+    file (real and imaginary part of `carray`)
+
+    Args:
+        filename (str): Name of file to which to write the array
+        header (str or None): A header line, to be written immediately before
+            the data. Should start with a '#'
+        fmtstr (str or None): The format to use for reach of the two columns
+        append (bool): If True, append to existing files, with a separator of
+            two blank lines
+        comment (str or None): A comment line, to be written at the top of the
+            file (before the header). Should start with a '#'
+    """
+    header_lines = []
+    if comment is not None:
+        header_lines.append(comment)
+    if header is not None:
+        header_lines.append(header)
+    if append:
+        with open(filename, 'a') as out_fh:
+            out_fh.write("\n\n")
+            writetotxt(out_fh, carray, fmt=(fmtstr, fmtstr),
+                       header=header_lines)
+
+    else:
+        writetotxt(filename, carray, fmt=(fmtstr, fmtstr),
+                   header=header_lines)
+
+
+def writetotxt(fname, *args, **kwargs):
+    """Inverse function to numpy.genfromtxt and similar to `numpy.savetxt`,
+    but allowing to write *multiple* numpy arrays as columns to a text file.
+    Also, handle headers/footers more intelligently.
+
+    The first argument is the filename or handler to which to write, followed
+    by an arbitrary number of numpy arrays, to be written as columns in the
+    file (real arrays will produce once column, complex arrays two). The
+    remaining keyword arguments are passed directly to `numpy.savetxt` (with
+    fixes to the header/footer lines, as described below)
+
+    Args:
+        fname (str): filename or file handle
+        args (ndarray): Numpy arrays to write to fname. All arrays must have
+            the same length
+        fmt (str, list(str)): A single format (e.g. '%10.5f'), a sequence
+            of formats, or a multi-format string, e.g.
+            'Iteration %d -- %10.5f', in which case `delimiter` is ignored. For
+            a complex array in `*args`, a format for the real and imaginary
+            parts must be given.  Defaults to '%25.16E'.
+        delimiter (str): Character separating columns. Defaults to ''
+        header (str, list(str)): String that will be written at the beginning
+            of the file. If sequence of strings, multiple lines will be
+            written.
+        footer (str, list(str)): String that will be written at the end of the
+            file. If sequence of strings, multiple lines will be written
+        comments (str): String that will be prepended to the each line of the
+            ``header`` and ``footer`` strings, to mark them as comments.
+            Defaults to '# '
+
+    Note:
+
+        The `header` and `footer` lines are handled more intelligently than by
+        the `numpy.savetxt` routine.  First, header and footer may be an array
+        of lines instead of just a (multiline) string.  Second, each line in
+        the header may or may not already include the `comments` prefix. If a
+        line does not include the `comments` prefix yet, but starts with a
+        sufficient number of spaces, the `comments` prefix will not be
+        prepended to the line in output, but will overwrite the beginning of
+        the line, so as not to change the line length. E.g. giving
+        `header="   time [ns]"` will result in a header line of
+        `#  time [ns]` in the output, not `#    time [ns]`.
+
+        Further explanation of the `fmt` parameter
+        (``%[flag]width[.precision]specifier``):
+
+        flags:
+            ``-`` : left justify
+
+            ``+`` : Forces to precede result with + or -.
+
+            ``0`` : Left pad the number with zeros instead of space (see
+                    width).
+
+        width:
+            Minimum number of characters to be printed. The value is not
+            truncated if it has more characters.
+
+        precision:
+            - For integer specifiers (eg. ``d,i``), the minimum number of
+            digits.
+            - For ``e, E`` and ``f`` specifiers, the number of digits to print
+            after the decimal point.
+            - For ``g`` and ``G``, the maximum number of significant digits.
+
+        specifiers (partial list):
+            ``c`` : character
+
+            ``d`` or ``i`` : signed decimal integer
+
+            ``e`` or ``E`` : scientific notation with ``e`` or ``E``.
+
+            ``f`` : decimal floating point
+
+            ``g,G`` : use the shorter of ``e,E`` or ``f``
+
+        For more details, see `numpy.savetxt`
+    """
+    fmt       = kwargs.get('fmt', '%25.16E')
+    delimiter = kwargs.get('delimiter', '')
+    header    = kwargs.get('header', '')
+    footer    = kwargs.get('footer', '')
+    comments  = kwargs.get('comments', "# ")
+    l_comments = len(comments)
+
+    # open file
+    own_fh = False
+    if isinstance(fname, str):
+        own_fh = True
+        if fname.endswith('.gz'):
+            import gzip
+            fh = gzip.open(fname, 'wb')
+        else:
+            fh = open(fname, 'w')
+    elif hasattr(fname, 'write'):
+        fh = fname
+    else:
+        raise ValueError('fname must be a string or file handle')
+
+    try:
+
+        # write header
+        if isinstance(header, (list, tuple)):
+            header = "\n".join(header)
+        if len(header) > 0:
+            for line in header.split("\n"):
+                if not line.startswith(comments):
+                    if line.startswith(" "*l_comments):
+                        line = comments + line[l_comments:]
+                    else:
+                        line = comments + line
+                fh.write(line)
+                fh.write("\n")
+
+        # check input data and prepare row format
+        n_cols = 0
+        n_rows = 0
+        row_fmt = ""
+        completed_row_fmt = False
+        if isinstance(fmt, (list, tuple)):
+            row_fmt = delimiter.join(fmt)
+            completed_row_fmt = True
+        elif isinstance(fmt, str):
+            if fmt.count('%') > 1:
+                row_fmt = fmt
+                completed_row_fmt = True
+        for a in args:
+            if n_rows == 0:
+                n_rows = len(a)
+            else:
+                if n_rows != len(a):
+                    raise ValueError("All arrays must be of same length")
+            if np.iscomplexobj(a):
+                n_cols += 2
+                if not completed_row_fmt:
+                    row_fmt += "%s%s%s%s" % (fmt, delimiter, fmt, delimiter)
+            else:
+                n_cols += 1
+                if not completed_row_fmt:
+                    row_fmt += "%s%s" % (fmt, delimiter)
+        if row_fmt.count('%') != n_cols:
+            raise ValueError('fmt has wrong number of %% formats:  %s'
+                             % row_fmt)
+        if not completed_row_fmt:
+            if len(delimiter) > 0:
+                row_fmt = row_fmt[:-len(delimiter)]
+            completed_row_fmt = True
+
+        # write out data
+        for i_row in xrange(n_rows):
+            row_data = []
+            for a in args:
+                if np.iscomplexobj(a):
+                    row_data.append(a[i_row].real)
+                    row_data.append(a[i_row].imag)
+                else:
+                    row_data.append(a[i_row])
+            try:
+                fh.write(row_fmt % tuple(row_data))
+            except TypeError:
+                raise TypeError("Cannot format row data %s with format %s" %
+                                (repr(tuple(row_data)), repr(fmt)))
+            fh.write("\n")
+
+        # write footer
+        if isinstance(footer, (list, tuple)):
+            footer = "\n".join(footer)
+        if len(footer) > 0:
+            for line in footer.split("\n"):
+                if not line.startswith(comments):
+                    if line.startswith(" "*l_comments):
+                        line = comments + line[l_comments:]
+                    else:
+                        line = comments + line
+                fh.write(line)
+                fh.write("\n")
+
+    finally:
+        if own_fh:
+            fh.close()
 
 
 def split_sup_sub(name):
@@ -661,3 +897,176 @@ def obj_to_json(obj, classkey=None, attr_filter=None, depth=10, sort_keys=True,
         obj_to_data(obj, classkey=classkey, attr_filter=attr_filter,
                     depth=depth),
         sort_keys=sort_keys, indent=indent, separators=separators)
+
+
+def read_ascii_dump(filename, convert_boolean=True, flatten=False):
+    """Read a file in the format written by the QDYN `dump_ascii_*` routines
+    and return its data as a nested OrderedDict. The QDYN type of the dumped
+    data structure is recorded in the `typename` attribute of the result.
+
+    Args:
+        filename (str): name of file from which to read data
+        convert_boolean (bool): Convert strings 'T', 'F' to Boolean values True
+            and False
+        flatten (bool):  If True, numerical array data is returned flattend
+            (one-dimensional). If False, it is reshaped to the shape defined in
+            the dump file.
+    """
+    with open(filename) as in_fh:
+        try:
+            return _read_ascii_dump(in_fh, convert_boolean=convert_boolean,
+                                    flatten=flatten)
+        except StopIteration:
+            # If the file properly ended in '# END ASCII DUMP', we should have
+            # returned cleanly instead of running into the end of the file
+            raise ValueError("Premature file end")
+
+
+def _read_ascii_dump(data, convert_boolean=True, flatten=False,
+                     typename=None):
+    """Recursive implementation of `read_ascci_dump`
+
+    Args:
+        data (iterator): An iterator of lines (e.g., an open file handle).
+        convert_boolean (bool): Convert 'T', 'F' to boolean values?
+        flatten (bool):  If True, numerical array data is returned flattend
+            (one-dimensional). If False, it is reshaped to the shape defined in
+            the dump file.
+        typename (str or None): The name of the type that is being read. If
+            None, extract it from the first line.
+    """
+    logger = logging.getLogger(__name__)
+    logger.debug("ENTERING READ_ASCII_DUMP")
+    result = OrderedDict([])
+    rx_field = re.compile(r'^# (?P<field>\w+)$')
+    rx_arraybounds = re.compile(r'^(\s+\d+){2,}$')
+    rx_item = re.compile(r'^# item\s+\d+')
+    rx_int = re.compile(r'^\s*(?P<val>[0-9+-]+)$')
+    rx_float = re.compile(r'^\s*(?P<val>([+-]?\d+\.[\dEe+-]+))$')
+    rx_complex = re.compile(r'^\s*(?P<re>([+-]?\d+\.[\dEe+-]+))\s+'
+                            r'(?P<im>([+-]?\d+\.[\dEe+-]+))$')
+    rx_boolean = re.compile(r'^(?P<val>[T|F])$')
+    rx_str = re.compile(r'^(?P<val>.*)$')
+    bool_map = {'T': True, 'F': False}
+
+    def ftfloat(num_str):
+        return float(fix_fortran_exponent(num_str))
+
+    def get_shape(line):
+        bounds = [int(i) for i in line.split()]
+        lbounds = np.array(bounds[:(len(bounds)//2)])
+        ubounds = np.array(bounds[(len(bounds)//2):])
+        return tuple(ubounds - lbounds + 1)
+
+    rx_converters = [
+            (rx_int, lambda m: int(m.group('val'))),
+            (rx_float, lambda m: ftfloat(m.group('val'))),
+            (rx_complex, lambda m: complex(ftfloat(m.group('re')),
+                                           ftfloat(m.group('im')))),
+    ]
+    if convert_boolean:
+        rx_converters.append((rx_boolean, lambda m: bool_map[m.group('val')]))
+    rx_converters.append((rx_str, lambda m: m.group('val')))
+
+    if typename is None:
+        first_line = next(data)
+        logger.debug("FIRST LINE: %s", first_line.rstrip())
+        if not first_line.startswith("# ASCII DUMP"):
+            raise ValueError("Invalid dump format")
+        typename = first_line[13:].strip()
+    result.typename = typename
+
+    field = None
+    value = None
+    array_size = 0
+    array = []
+    looking_for_field_name = True
+
+    while True:
+        line = next(data)
+        logger.debug("LINE: %s", line.rstrip())
+        if rx_item.match(line):
+            logger.debug("  (skipped as item line)")
+            continue  # skip line
+        if looking_for_field_name:
+            m = rx_field.match(line)
+        else:
+            m = None
+        if m:  # field name line
+            field = m.group('field')
+            logger.debug("  (matched as field-name line, %s)", field)
+            value = None
+            result[field] = None  # so we can detect fixed-sized arrays
+            array_size = 0
+            array = []
+            looking_for_field_name = False
+            # Not looking for two consecutive field name lines means we could
+            # have string values that start with '#'
+        else:  # value-line, array bound line, or end of dump
+            if line.startswith('# END ASCII DUMP'):
+                logger.debug("  (end dump -> return)")
+                return result
+            # array bounds?
+            if rx_arraybounds.match(line):
+                array_size = int(value) #  what we thought was a simple int ...
+                result[field] = None    #  ... value is actually the array_size
+                shape = get_shape(line)
+                logger.debug("  (array bound line -> value will be array "
+                             "of size %d)", array_size)
+                # note that only allocatable components have an array bound
+                # line. Fixed-sized arrays are handled separately (below)
+                continue
+            # obtain value
+            if line.startswith('# ASCII DUMP'):
+                logger.debug("  (value is sub-dump, recurse)")
+                typename = line[13:].strip()
+                value = _read_ascii_dump(data,
+                                         convert_boolean=convert_boolean,
+                                         flatten=flatten,
+                                         typename=typename)
+            else:
+                matched = False
+                for rx, conv in rx_converters:
+                    m = rx.match(line)
+                    if m:
+                        matched = True
+                        value = conv(m)
+                        logger.debug("  (value: %s)", value)
+                        break
+                assert matched
+            # append value to array, or set result
+            if array_size > 0:
+                array.append(value)
+                array_size -= 1
+                logger.debug("  (appended value %s, %d remaining)",
+                             value, array_size)
+                if array_size == 0:
+                    if np.isscalar(array[0]):
+                        if flatten:
+                            logger.debug("  (set result for %s as flat "
+                                         "np.array)", field)
+                            result[field] = np.array(array)
+                        else:
+                            logger.debug("  (set result for %s as reshaped "
+                                         "np.array)", field)
+                            result[field] = np.array(array).reshape(shape,
+                                                                    order='F')
+                    else:
+                        result[field] = array
+                        logger.debug("  (set result for %s as list)",
+                                     field)
+            else:  # not an array (or at least not an allocatable array)
+                if result[field] is None:
+                    logger.debug("  (set result for %s as simple value %s)",
+                                 field, value)
+                    result[field] = value
+                elif isinstance(result[field], list):
+                    logger.debug("  (append simple value %s to fixed-sized "
+                                 "array for %s)", value, field)
+                    result[field].append(value)
+                else:
+                    logger.debug("  (append simple value %s to fixed-sized "
+                                 "array for %s [new])", value, field)
+                    result[field] = [result[field], value]
+            if array_size == 0:
+                looking_for_field_name = True  # next line may be a field name

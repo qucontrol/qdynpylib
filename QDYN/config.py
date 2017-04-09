@@ -5,7 +5,7 @@ import re
 import base64
 import random
 import copy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import six
 import numpy as np
@@ -294,6 +294,8 @@ def _render_config_lines(section_name, section_data):
             # we *do not* iterate over keys in common_items, so that items
             # are ordered the same as in section_data[0], instead of randomly
             if key in common_items:
+                if key == 'label' and common_items[key] == '':
+                    continue
                 line += " %s = %s," % (key, _val_to_str(common_items[key]))
         if line.endswith(","):
             lines.append(line[:-1].strip())
@@ -304,6 +306,8 @@ def _render_config_lines(section_name, section_data):
             line = "*"
             for key in item_line:
                 if key not in common_items:
+                    if key == 'label' and item_line[key] == '':
+                        continue
                     line += " %s = %s," % (key, _val_to_str(item_line[key]))
             if line.endswith(","):
                 lines.append(line[:-1].strip())
@@ -317,26 +321,50 @@ def _render_config_lines(section_name, section_data):
     return lines
 
 
-def _item_rxs():
-    # the following regexes are encapsulated in this function to make the them
-    # accessible to the config_conversion module
+def _item_rxs(section_name=''):
     logical_mapping = {
         'T': True, 'true': True, '.true.': True,
         'F': False, 'false': False, '.false.': False,
     }
-    item_rxs = [
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
-        lambda v: UnitFloat.from_str(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\d+-]+)$'),
-        lambda v: int(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+)$'),
-        lambda v: float(v)),
-        (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
-                    r'\.true\.|\.false\.))$'),
-        lambda v: logical_mapping[v]),
+    item_rxs = []
+    if not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>label)\s*=\s*(?P<value>.+)$'),
+            lambda v: _unescape_str(v))  # label is always a string!
+        )
+    if section_name == 'user_reals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>[\dEe.+-]+_\w+)$'),
+            lambda v: UnitFloat.from_str(v))
+        )
+    if section_name == 'user_ints' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'''
+                (?P<key>\w+) \s*=\s* (?P<value>
+                    [+-]? (0 | [1-9]\d*)  # leading zero not allowed
+                )$''', re.X),
+            lambda v: int(v))
+        )
+    if section_name == 'user_reals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'''
+                (?P<key>\w+) \s*=\s* (?P<value>
+                    [+-]?  (
+                    \d+\.\d+([Ee][+-]?\d+)? |  # 1.0, 1.0e5 (exponent optional)
+                    \d+[Ee][+-]?\d+            # 1e-5       (exponent required)
+                ))$''', re.X),
+            lambda v: float(v))
+        )
+    if section_name == 'user_logicals' or not section_name.startswith('user_'):
+        item_rxs.append(
+            (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>(T|F|true|false|'
+                        r'\.true\.|\.false\.))$'),
+            lambda v: logical_mapping[v])
+        )
+    item_rxs.append(
         (re.compile(r'(?P<key>\w+)\s*=\s*(?P<value>.+)$'),
-        lambda v: _unescape_str(v)),
-    ]
+        lambda v: _unescape_str(v))
+    )
     return item_rxs
 
 
@@ -383,14 +411,12 @@ def _read_config_lines(lines):
         )
         ''', re.X)
     rx_item = re.compile(r'(\w+\s*=\s*[\w.+-]+)')
-    item_rxs = _item_rxs()
 
     # we need to make two passes over lines, so we may have to convert an
     # iterator to a list
     lines = list(lines)
 
     config_data = OrderedDict([])
-
     # first pass: identify sections, list of lines in each section
     current_section = ''
     for line in lines:
@@ -399,7 +425,8 @@ def _read_config_lines(lines):
         m_itemline = rx_itemline.match(line)
         if m_sec:
             current_section = m_sec.group('section')
-            config_data[current_section] = OrderedDict([])
+            if current_section not in config_data:
+                config_data[current_section] = OrderedDict([])
         elif m_itemline:
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section]  = []
@@ -407,10 +434,14 @@ def _read_config_lines(lines):
 
     # second pass: set items
     current_section = ''
-    current_itemline = 0
+    current_itemline = defaultdict(int)  # section => index
+    item_rxs = _item_rxs(current_section)
     for line in lines:
         line, replacements = _protect_str_vals(line)
         m_sec = rx_sec.match(line)
+        if m_sec:
+            current_section = m_sec.group('section')
+            item_rxs = _item_rxs(current_section)
         m_itemline = rx_itemline.match(line)
         line_items = OrderedDict([])
         for item in rx_item.findall(line):
@@ -425,17 +456,16 @@ def _read_config_lines(lines):
             if not matched:
                 raise ValueError("Could not parse item '%s'" % str(item))
         if m_sec:
-            current_itemline = 0
-            current_section = m_sec.group('section')
             if isinstance(config_data[current_section], OrderedDict):
                 config_data[current_section].update(line_items)
             else:
-                for line_dict in config_data[current_section]:
+                i_item_line = current_itemline[current_section]
+                for line_dict in config_data[current_section][i_item_line:]:
                     line_dict.update(line_items)
         elif m_itemline:
-            config_data[current_section][current_itemline].update(
-                    line_items)
-            current_itemline += 1
+            i_item_line = current_itemline[current_section]
+            config_data[current_section][i_item_line].update(line_items)
+            current_itemline[current_section] += 1
         else:
             raise ValueError("Could not parse line '%s'" % line)
 
@@ -504,8 +534,34 @@ def get_config_value(config_data, key_tuple):
     return val
 
 
+def get_config_user_value(config_data, key):
+    """Return the value of a user-defined key in the config file (in the
+    ``user_strings``, ``user_reals``, ``user_logicals``, or `user_ints``
+    section). Return the first value found in any of the above sections, as the
+    type corresponding to the section where the key was found. Raise a
+    `KeyError` if `key` does not exist in any of the user-defined sections
+    """
+    logical_mapping = {
+        'T': True, 'true': True, '.true.': True,
+        'F': False, 'false': False, '.false.': False,
+    }
+    user_sections = [
+        ('user_strings',  str),
+        ('user_reals',    float),
+        ('user_logicals', lambda v: logical_mapping.get(v, v)),
+        ('user_ints',     int)
+    ]
+    for section, convert in user_sections:
+        try:
+            return convert(get_config_value(config_data, (section, key)))
+        except ValueError:
+            continue
+    raise KeyError("No user-defined key '%s'" % key)
+
+
 def set_config_value(config_data, key_tuple, value):
-    """Set a value in `config_data`, cf. `get_config_value`"""
+    """Set a value in `config_data`, cf. `get_config_value`. The key that is
+    set must already exist in `config_data`"""
     if len(key_tuple) < 2:
         raise ValueError("key_tuple must have at least two elements")
     try:
@@ -517,6 +573,29 @@ def set_config_value(config_data, key_tuple, value):
         raise ValueError("Invalid key '%s': %s" % (key, str(exc_info)))
     except KeyError:
         raise ValueError("Invalid key '%s'" % (key, ))
+
+
+def set_config_user_value(config_data, key, value):
+    """Set a user-defined value in the config file. The `value` must be an
+    instance of `str`, `float`, `bool`, or `int`, and it will be set for the
+    given `key` in the corresponding section ``user_strings``, ``user_reals``,
+    ``user_loigcals``, or ``user_ints``. This routine may be used to add *new*
+    user-defined data to `config_data`; a missing user-defined section will be
+    created as necessary.
+    """
+    user_sections = [
+        ('user_strings',  str),
+        ('user_reals',    float),
+        ('user_logicals', bool),  # isinstance(False, int) is True, ...
+        ('user_ints',     int)    # ... so the order is important here
+    ]
+    for section_name, section_type in user_sections:
+        if isinstance(value, section_type):
+            if section_name not in config_data:
+                config_data[section_name] = OrderedDict([])
+            config_data[section_name][key] = value
+            return
+    raise TypeError("value must be of type str, float, int, or bool")
 
 
 def generate_make_config(config_template, variables, dependencies=None,

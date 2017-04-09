@@ -1,0 +1,10244 @@
+# ASCII DUMP para_t
+# runfolder
+multi_config_run
+# initialized
+T
+# grid
+         -1
+# tgrid
+# ASCII DUMP tgrid_pt
+# t_start
+   0.0000000000000000E+00
+# t_stop
+   3.3073098656453251E+10
+# dt
+   1.6537376197036477E+06
+# nt
+       20000
+# fixed
+F
+# END ASCII DUMP tgrid_pt
+# ham
+         32
+          1         32
+# item          1
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           1
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   0.0000000000000000E+00
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          2
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           2
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.3830451604008457E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          3
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           3
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.9347433947145898E-07
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          4
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           4
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+  -1.5198298465943362E-11
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          5
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           5
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.3830451604008457E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          6
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           6
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   2.7660903208016914E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          7
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           7
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5765194998723048E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          8
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           8
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.3830299621023798E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item          9
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           9
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.9347433947145898E-07
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         10
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          10
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5765194998723048E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         11
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          11
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   3.8694867894291795E-07
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         12
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          12
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.9345914117299305E-07
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         13
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          13
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+  -1.5198298465943362E-11
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         14
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          14
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.3830299621023798E-06
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         15
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          15
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.9345914117299305E-07
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         16
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+pot
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           0
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+          16
+# op_surf_1
+           0
+# op_surf_2
+           0
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+  -8.7329422985310556E-09
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         17
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           3
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           1
+# op_surf_2
+           3
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         18
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           1
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           1
+# op_surf_2
+           9
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         19
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           1
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           2
+# op_surf_2
+          10
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         20
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           4
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           3
+# op_surf_2
+           4
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         21
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           1
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           3
+# op_surf_2
+          11
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         22
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           1
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           4
+# op_surf_2
+          12
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         23
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           3
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           5
+# op_surf_2
+           7
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         24
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           4
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           7
+# op_surf_2
+           8
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         25
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           3
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           9
+# op_surf_2
+          11
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         26
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           2
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+           9
+# op_surf_2
+          13
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         27
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           2
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+          10
+# op_surf_2
+          14
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         28
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           4
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+          11
+# op_surf_2
+          12
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         29
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           2
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+          11
+# op_surf_2
+          15
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         30
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           2
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+          12
+# op_surf_2
+          16
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         31
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           3
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+          13
+# op_surf_2
+          15
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# item         32
+# ASCII DUMP ham_pt
+# type
+op
+# label
+
+# op_type
+dip
+# op_form
+const
+# filename
+
+# n_photons
+           1
+# pulse_id
+           4
+# real_op
+T
+# imag_op
+F
+# herm_op
+F
+# cos_theta
+F
+# r_unit
+iu
+# op_unit
+iu
+# deriv_before
+F
+# n_surf
+           0
+# op_surf
+           0
+# op_surf_1
+          15
+# op_surf_2
+          16
+# V_max
+   1.7976931348623157+308
+# V_min
+  -1.7976931348623157+308
+# w_0
+   0.0000000000000000E+00
+# offset
+   0.0000000000000000E+00
+# E_0
+   1.5198298465943362E-08
+# width
+   0.0000000000000000E+00
+# depth
+   0.0000000000000000E+00
+# laser_I
+   0.0000000000000000E+00
+# lin_grad
+   0.0000000000000000E+00
+# fwhm
+   0.0000000000000000E+00
+# rshift
+   0.0000000000000000E+00
+# r_star
+   0.0000000000000000E+00
+# C12
+   0.0000000000000000E+00
+# C3
+   0.0000000000000000E+00
+# eta
+   0.0000000000000000E+00
+# rc
+   0.0000000000000000E+00
+# rat_r_0
+   0.0000000000000000E+00
+# rotbarr_j
+           0
+# map_to_j
+          -1
+# no_splining
+F
+# no_asymptote_check
+F
+# asym_SO
+   0.0000000000000000E+00
+# asym_stark
+   0.0000000000000000E+00
+# n_spins
+           0
+# n_ex_min
+           0
+# n_ex_max
+           0
+# ex_step
+           1
+# mirror_ex
+F
+# int_model
+
+# loc_x
+F
+# loc_y
+F
+# loc_z
+F
+# is_periodic
+F
+# cart_dim
+           0
+# filename_int
+
+# filename_loc
+
+# o_x
+   0.0000000000000000E+00
+# o_y
+   0.0000000000000000E+00
+# o_z
+   0.0000000000000000E+00
+# mass
+   1.0000000000000000E+00
+# kin_base
+exp
+# specrad_method
+
+# sparsity_model
+
+# memoize_ops
+F
+# END ASCII DUMP ham_pt
+# observables
+         -1
+# dissipator
+         -1
+# eigensystem
+         -1
+# psi
+         -1
+# pulse
+          6
+          1          6
+# item          1
+# ASCII DUMP pulse_pt
+# type
+blackman
+# t_start
+   0.0000000000000000E+00
+# t_stop
+   1.8603617994254951E+10
+# t_0
+   0.0000000000000000E+00
+# t_FWHM
+   0.0000000000000000E+00
+# E_0
+   6.9999999999999996E-01
+# w_L
+   0.0000000000000000E+00
+# chirprate
+   0.0000000000000000E+00
+# dp_separation
+   0.0000000000000000E+00
+# w_flip
+   0.0000000000000000E+00
+# w_step
+   0.0000000000000000E+00
+# delay
+   0.0000000000000000E+00
+# scale
+   0.0000000000000000E+00
+# phi
+   0.0000000000000000E+00
+# oct_lambda_a
+   5.0000000000000003E-10
+# oct_lambda_intens
+   0.0000000000000000E+00
+# oct_increase_factor
+   5.0000000000000000E+00
+# oct_pulse_max
+   0.0000000000000000E+00
+# oct_pulse_min
+   0.0000000000000000E+00
+# oct_shape
+flattop
+# oct_parametrization
+
+# is_complex
+T
+# shape_t_start
+   0.0000000000000000E+00
+# shape_t_stop
+   1.8603617994254951E+10
+# ftbaseline
+   0.0000000000000000E+00
+# t_rise
+   4.1341373320566565E+08
+# t_fall
+   4.1341373320566565E+08
+# oct_shapefile
+
+# oct_outfile
+multi_config_run/pulse1.dat
+# id
+           1
+# filename
+
+# time_unit
+ns
+# ampl_unit
+iu
+# check_tgrid
+T
+# rwa
+F
+# END ASCII DUMP pulse_pt
+# item          2
+# ASCII DUMP pulse_pt
+# type
+blackman
+# t_start
+   0.0000000000000000E+00
+# t_stop
+   1.8603617994254951E+10
+# t_0
+   0.0000000000000000E+00
+# t_FWHM
+   0.0000000000000000E+00
+# E_0
+   6.9999999999999996E-01
+# w_L
+   0.0000000000000000E+00
+# chirprate
+   0.0000000000000000E+00
+# dp_separation
+   0.0000000000000000E+00
+# w_flip
+   0.0000000000000000E+00
+# w_step
+   0.0000000000000000E+00
+# delay
+   0.0000000000000000E+00
+# scale
+   0.0000000000000000E+00
+# phi
+   0.0000000000000000E+00
+# oct_lambda_a
+   5.0000000000000003E-10
+# oct_lambda_intens
+   0.0000000000000000E+00
+# oct_increase_factor
+   5.0000000000000000E+00
+# oct_pulse_max
+   0.0000000000000000E+00
+# oct_pulse_min
+   0.0000000000000000E+00
+# oct_shape
+flattop
+# oct_parametrization
+
+# is_complex
+T
+# shape_t_start
+   0.0000000000000000E+00
+# shape_t_stop
+   1.8603617994254951E+10
+# ftbaseline
+   0.0000000000000000E+00
+# t_rise
+   4.1341373320566565E+08
+# t_fall
+   4.1341373320566565E+08
+# oct_shapefile
+
+# oct_outfile
+multi_config_run/pulse2.dat
+# id
+           2
+# filename
+
+# time_unit
+ns
+# ampl_unit
+iu
+# check_tgrid
+T
+# rwa
+F
+# END ASCII DUMP pulse_pt
+# item          3
+# ASCII DUMP pulse_pt
+# type
+blackman
+# t_start
+   0.0000000000000000E+00
+# t_stop
+   3.3073098656453251E+10
+# t_0
+   0.0000000000000000E+00
+# t_FWHM
+   0.0000000000000000E+00
+# E_0
+   5.0000000000000000E-01
+# w_L
+   0.0000000000000000E+00
+# chirprate
+   0.0000000000000000E+00
+# dp_separation
+   0.0000000000000000E+00
+# w_flip
+   0.0000000000000000E+00
+# w_step
+   0.0000000000000000E+00
+# delay
+   0.0000000000000000E+00
+# scale
+   0.0000000000000000E+00
+# phi
+   0.0000000000000000E+00
+# oct_lambda_a
+   5.0000000000000003E-10
+# oct_lambda_intens
+   0.0000000000000000E+00
+# oct_increase_factor
+   5.0000000000000000E+00
+# oct_pulse_max
+   0.0000000000000000E+00
+# oct_pulse_min
+   0.0000000000000000E+00
+# oct_shape
+flattop
+# oct_parametrization
+
+# is_complex
+T
+# shape_t_start
+   0.0000000000000000E+00
+# shape_t_stop
+   3.3073098656453251E+10
+# ftbaseline
+   0.0000000000000000E+00
+# t_rise
+   4.1341373320566565E+08
+# t_fall
+   4.1341373320566565E+08
+# oct_shapefile
+
+# oct_outfile
+multi_config_run/pulse3.dat
+# id
+           3
+# filename
+
+# time_unit
+ns
+# ampl_unit
+iu
+# check_tgrid
+T
+# rwa
+F
+# END ASCII DUMP pulse_pt
+# item          4
+# ASCII DUMP pulse_pt
+# type
+blackman
+# t_start
+   0.0000000000000000E+00
+# t_stop
+   3.3073098656453252E+09
+# t_0
+   0.0000000000000000E+00
+# t_FWHM
+   0.0000000000000000E+00
+# E_0
+   5.0000000000000000E-01
+# w_L
+   0.0000000000000000E+00
+# chirprate
+   0.0000000000000000E+00
+# dp_separation
+   0.0000000000000000E+00
+# w_flip
+   0.0000000000000000E+00
+# w_step
+   0.0000000000000000E+00
+# delay
+   0.0000000000000000E+00
+# scale
+   0.0000000000000000E+00
+# phi
+   0.0000000000000000E+00
+# oct_lambda_a
+   5.0000000000000003E-10
+# oct_lambda_intens
+   0.0000000000000000E+00
+# oct_increase_factor
+   5.0000000000000000E+00
+# oct_pulse_max
+   0.0000000000000000E+00
+# oct_pulse_min
+   0.0000000000000000E+00
+# oct_shape
+flattop
+# oct_parametrization
+
+# is_complex
+T
+# shape_t_start
+   0.0000000000000000E+00
+# shape_t_stop
+   3.3073098656453252E+09
+# ftbaseline
+   0.0000000000000000E+00
+# t_rise
+   4.1341373320566565E+08
+# t_fall
+   4.1341373320566565E+08
+# oct_shapefile
+
+# oct_outfile
+multi_config_run/pulse4.dat
+# id
+           4
+# filename
+
+# time_unit
+ns
+# ampl_unit
+iu
+# check_tgrid
+T
+# rwa
+F
+# END ASCII DUMP pulse_pt
+# item          5
+# ASCII DUMP pulse_pt
+# type
+blackman
+# t_start
+   1.4469480662198298E+10
+# t_stop
+   3.3073098656453251E+10
+# t_0
+   0.0000000000000000E+00
+# t_FWHM
+   0.0000000000000000E+00
+# E_0
+   6.9999999999999996E-01
+# w_L
+   0.0000000000000000E+00
+# chirprate
+   0.0000000000000000E+00
+# dp_separation
+   0.0000000000000000E+00
+# w_flip
+   0.0000000000000000E+00
+# w_step
+   0.0000000000000000E+00
+# delay
+   0.0000000000000000E+00
+# scale
+   0.0000000000000000E+00
+# phi
+   0.0000000000000000E+00
+# oct_lambda_a
+   5.0000000000000003E-10
+# oct_lambda_intens
+   0.0000000000000000E+00
+# oct_increase_factor
+   5.0000000000000000E+00
+# oct_pulse_max
+   0.0000000000000000E+00
+# oct_pulse_min
+   0.0000000000000000E+00
+# oct_shape
+flattop
+# oct_parametrization
+
+# is_complex
+T
+# shape_t_start
+   1.4469480662198298E+10
+# shape_t_stop
+   3.3073098656453251E+10
+# ftbaseline
+   0.0000000000000000E+00
+# t_rise
+   4.1341373320566565E+08
+# t_fall
+   4.1341373320566565E+08
+# oct_shapefile
+
+# oct_outfile
+multi_config_run/pulse1.dat
+# id
+           1
+# filename
+
+# time_unit
+ns
+# ampl_unit
+iu
+# check_tgrid
+T
+# rwa
+F
+# END ASCII DUMP pulse_pt
+# item          6
+# ASCII DUMP pulse_pt
+# type
+blackman
+# t_start
+   1.4469480662198298E+10
+# t_stop
+   3.3073098656453251E+10
+# t_0
+   0.0000000000000000E+00
+# t_FWHM
+   0.0000000000000000E+00
+# E_0
+   6.9999999999999996E-01
+# w_L
+   0.0000000000000000E+00
+# chirprate
+   0.0000000000000000E+00
+# dp_separation
+   0.0000000000000000E+00
+# w_flip
+   0.0000000000000000E+00
+# w_step
+   0.0000000000000000E+00
+# delay
+   0.0000000000000000E+00
+# scale
+   0.0000000000000000E+00
+# phi
+   0.0000000000000000E+00
+# oct_lambda_a
+   5.0000000000000003E-10
+# oct_lambda_intens
+   0.0000000000000000E+00
+# oct_increase_factor
+   5.0000000000000000E+00
+# oct_pulse_max
+   0.0000000000000000E+00
+# oct_pulse_min
+   0.0000000000000000E+00
+# oct_shape
+flattop
+# oct_parametrization
+
+# is_complex
+T
+# shape_t_start
+   1.4469480662198298E+10
+# shape_t_stop
+   3.3073098656453251E+10
+# ftbaseline
+   0.0000000000000000E+00
+# t_rise
+   4.1341373320566565E+08
+# t_fall
+   4.1341373320566565E+08
+# oct_shapefile
+
+# oct_outfile
+multi_config_run/pulse2.dat
+# id
+           2
+# filename
+
+# time_unit
+ns
+# ampl_unit
+iu
+# check_tgrid
+T
+# rwa
+F
+# END ASCII DUMP pulse_pt
+# oct
+# ASCII DUMP oct_pt
+# method
+krotovpk
+# iter_start
+           1
+# iter_stop
+        1000
+# max_ram_mb
+        2000
+# max_disk_mb
+           0
+# lbfgs_memory
+           0
+# linesearch
+           0
+# grad_order
+           2
+# iter_dat
+multi_config_run/oct_iters.dat
+# tau_dat
+
+# params_file
+multi_config_run/oct_params.dat
+# krotov2_conv_dat
+
+# ABC_dat
+
+# delta_J_conv
+   0.0000000000000000E+00
+# delta_J_T_conv
+   9.9999999999999995E-21
+# J_T_conv
+   1.0000000000000000E-03
+# A
+   0.0000000000000000E+00
+# B
+   0.0000000000000000E+00
+# C
+   0.0000000000000000E+00
+# dynamic_sigma
+F
+# dynamic_lambda_a
+   0.0000000000000000E+00
+# strict_convergence
+F
+# limit_pulses
+F
+# sigma_form
+
+# max_seconds
+       18000
+# lambda_b
+   0.0000000000000000E+00
+# keep_pulses
+prev
+# re_init_prop
+T
+# continue
+F
+# storage_folder
+.
+# bwr_nint
+           0
+# bwr_base
+
+# g_a
+delta_eps_sq
+# END ASCII DUMP oct_pt
+# prop
+# ASCII DUMP prop_pt
+# method
+cheby
+# inhom_method
+
+# inhom_max_order
+           5
+# n_taylor
+          20
+# rk45_relerr
+   9.9999999999999994E-12
+# rk45_abserr
+   1.0000000000000001E-15
+# newton_relerr
+   1.0000000000000000E-13
+# newton_norm_min
+   1.0000000000000001E-15
+# newton_arnoldi_order
+           4
+# newton_max_restarts
+        1000
+# ITO_guess_method
+hom
+# ITO_do_iter
+T
+# inhom_expan_err
+   9.9999999999999998E-13
+# use_mcwf
+F
+# mcwf_order
+           2
+# END ASCII DUMP prop_pt
+# bwr
+         -1
+# numerov
+# ASCII DUMP numerov_pt
+# energy
+   0.0000000000000000E+00
+# I
+   0.0000000000000000E+00
+# B
+   0.0000000000000000E+00
+# E
+   0.0000000000000000E+00
+# g1
+   0.0000000000000000E+00
+# g2
+   0.0000000000000000E+00
+# A1
+   0.0000000000000000E+00
+# zeta1
+   0.0000000000000000E+00
+# beta1
+   0.0000000000000000E+00
+# R1
+   0.0000000000000000E+00
+# zeta2
+   0.0000000000000000E+00
+# beta2
+   0.0000000000000000E+00
+# R2
+   0.0000000000000000E+00
+# A2
+   0.0000000000000000E+00
+# i1
+   0.0000000000000000E+00
+# s1
+   0.0000000000000000E+00
+# i2
+   0.0000000000000000E+00
+# s2
+   0.0000000000000000E+00
+# mi1
+   0.0000000000000000E+00
+# mi2
+   0.0000000000000000E+00
+# ms1
+   0.0000000000000000E+00
+# ms2
+   0.0000000000000000E+00
+# l
+           0
+# ml
+           0
+# op_surf
+           1
+# nchannel
+           1
+# npt
+           0
+# l_max
+           0
+# coup_al
+F
+# coup_d
+F
+# coup_i1s1
+F
+# coup_i2s2
+F
+# coup_i2s1
+F
+# coup_s1s2
+F
+# coup_sl
+F
+# END ASCII DUMP numerov_pt
+# user
+# ASCII DUMP user_pt
+# reals_keys
+gamma_1
+gamma_3
+gamma_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# reals_vals
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+   0.0000000000000000E+00
+# ints_keys
+fidelity
+ensembles
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ints_vals
+          1
+          5
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+          0
+# logicals_keys
+parametrize_pulses
+prop_guess
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# logicals_vals
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+F
+# strings_keys
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# strings_vals
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# reals_i
+           3
+# ints_i
+           2
+# logicals_i
+           2
+# strings_i
+           0
+# END ASCII DUMP user_pt
+# is_set
+# ASCII DUMP is_set_t
+# numerov
+# ASCII DUMP is_set_numerov_t
+# coup_i2s1
+F
+# I
+F
+# ms1
+F
+# i1
+F
+# nchannel
+F
+# l
+F
+# op_surf
+F
+# mi2
+F
+# s2
+F
+# E
+F
+# coup_i2s2
+F
+# beta2
+F
+# ml
+F
+# coup_al
+F
+# ms2
+F
+# coup_s1s2
+F
+# coup_sl
+F
+# R1
+F
+# mi1
+F
+# l_max
+F
+# energy
+F
+# coup_d
+F
+# B
+F
+# coup_i1s1
+F
+# i2
+F
+# A1
+F
+# zeta1
+F
+# s1
+F
+# g2
+F
+# R2
+F
+# npt
+F
+# A2
+F
+# beta1
+F
+# g1
+F
+# zeta2
+F
+# END ASCII DUMP is_set_numerov_t
+# psi
+         -1
+# grid
+         -1
+# dissipator
+         -1
+# ham
+         32
+          1         32
+# item          1
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          2
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          3
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          4
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          5
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          6
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          7
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          8
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item          9
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         10
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         11
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         12
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         13
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         14
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         15
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         16
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+T
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+F
+# n_spins
+F
+# pulse_id
+F
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+F
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         17
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         18
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         19
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         20
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         21
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         22
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         23
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         24
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         25
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         26
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         27
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         28
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         29
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         30
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         31
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# item         32
+# ASCII DUMP is_set_ham_t
+# herm_op
+F
+# laser_I
+F
+# loc_y
+F
+# eta
+F
+# op_form
+T
+# rat_r_0
+F
+# width
+F
+# op_surf
+F
+# mirror_ex
+F
+# rshift
+F
+# op_unit
+F
+# no_splining
+F
+# r_unit
+F
+# offset
+F
+# imag_op
+F
+# type
+T
+# V_max
+F
+# filename_loc
+F
+# C3
+F
+# memoize_ops
+F
+# rotbarr_j
+F
+# real_op
+F
+# loc_x
+F
+# E_0
+T
+# op_type
+T
+# n_ex_min
+F
+# op_surf_2
+T
+# n_spins
+F
+# pulse_id
+T
+# map_to_j
+F
+# o_y
+F
+# label
+F
+# no_asymptote_check
+F
+# kin_base
+T
+# fwhm
+F
+# loc_z
+F
+# w_0
+F
+# n_photons
+F
+# r_star
+F
+# is_periodic
+F
+# lin_grad
+F
+# rc
+F
+# cos_theta
+F
+# mass
+T
+# filename_int
+F
+# o_z
+F
+# specrad_method
+F
+# n_surf
+F
+# op_surf_1
+T
+# sparsity_model
+F
+# int_model
+F
+# asym_SO
+F
+# o_x
+F
+# filename
+F
+# asym_stark
+F
+# deriv_before
+F
+# C12
+F
+# ex_step
+F
+# cart_dim
+F
+# n_ex_max
+F
+# V_min
+F
+# depth
+F
+# END ASCII DUMP is_set_ham_t
+# eigensystem
+         -1
+# bwr
+         -1
+# tgrid
+# ASCII DUMP is_set_tgrid_t
+# t_stop
+T
+# dt
+F
+# nt
+T
+# fixed
+F
+# t_start
+T
+# END ASCII DUMP is_set_tgrid_t
+# observables
+         -1
+# prop
+# ASCII DUMP is_set_prop_t
+# mcwf_order
+F
+# ITO_guess_method
+F
+# n_taylor
+F
+# inhom_max_order
+F
+# inhom_expan_err
+F
+# inhom_method
+F
+# newton_arnoldi_order
+F
+# rk45_relerr
+F
+# newton_max_restarts
+F
+# rk45_abserr
+F
+# newton_norm_min
+F
+# ITO_do_iter
+F
+# method
+T
+# newton_relerr
+F
+# use_mcwf
+F
+# END ASCII DUMP is_set_prop_t
+# oct
+# ASCII DUMP is_set_oct_t
+# storage_folder
+F
+# grad_order
+F
+# limit_pulses
+F
+# J_T_conv
+T
+# max_ram_mb
+T
+# dynamic_sigma
+F
+# lbfgs_memory
+F
+# max_seconds
+T
+# re_init_prop
+F
+# bwr_base
+F
+# continue
+T
+# ABC_dat
+F
+# params_file
+T
+# linesearch
+F
+# bwr_nint
+F
+# sigma_form
+F
+# C
+F
+# strict_convergence
+T
+# g_a
+F
+# iter_stop
+T
+# B
+F
+# krotov2_conv_dat
+F
+# max_disk_mb
+F
+# keep_pulses
+T
+# delta_J_conv
+F
+# method
+T
+# iter_dat
+T
+# dynamic_lambda_a
+F
+# iter_start
+F
+# lambda_b
+F
+# A
+F
+# tau_dat
+F
+# delta_J_T_conv
+T
+# END ASCII DUMP is_set_oct_t
+# pulse
+          6
+          1          6
+# item          1
+# ASCII DUMP is_set_pulse_t
+# time_unit
+T
+# t_FWHM
+F
+# oct_pulse_min
+F
+# oct_shape
+T
+# phi
+F
+# id
+T
+# shape_t_start
+F
+# oct_pulse_max
+F
+# delay
+F
+# oct_parametrization
+F
+# w_step
+F
+# oct_lambda_a
+T
+# oct_increase_factor
+T
+# rwa
+F
+# t_fall
+T
+# type
+T
+# scale
+F
+# t_rise
+T
+# t_0
+F
+# ampl_unit
+F
+# dp_separation
+F
+# oct_shapefile
+F
+# w_L
+T
+# oct_outfile
+T
+# E_0
+T
+# check_tgrid
+F
+# t_stop
+T
+# filename
+F
+# shape_t_stop
+F
+# oct_lambda_intens
+F
+# chirprate
+F
+# t_start
+T
+# is_complex
+T
+# w_flip
+F
+# ftbaseline
+F
+# END ASCII DUMP is_set_pulse_t
+# item          2
+# ASCII DUMP is_set_pulse_t
+# time_unit
+T
+# t_FWHM
+F
+# oct_pulse_min
+F
+# oct_shape
+T
+# phi
+F
+# id
+T
+# shape_t_start
+F
+# oct_pulse_max
+F
+# delay
+F
+# oct_parametrization
+F
+# w_step
+F
+# oct_lambda_a
+T
+# oct_increase_factor
+T
+# rwa
+F
+# t_fall
+T
+# type
+T
+# scale
+F
+# t_rise
+T
+# t_0
+F
+# ampl_unit
+F
+# dp_separation
+F
+# oct_shapefile
+F
+# w_L
+T
+# oct_outfile
+T
+# E_0
+T
+# check_tgrid
+F
+# t_stop
+T
+# filename
+F
+# shape_t_stop
+F
+# oct_lambda_intens
+F
+# chirprate
+F
+# t_start
+T
+# is_complex
+T
+# w_flip
+F
+# ftbaseline
+F
+# END ASCII DUMP is_set_pulse_t
+# item          3
+# ASCII DUMP is_set_pulse_t
+# time_unit
+T
+# t_FWHM
+F
+# oct_pulse_min
+F
+# oct_shape
+T
+# phi
+F
+# id
+T
+# shape_t_start
+F
+# oct_pulse_max
+F
+# delay
+F
+# oct_parametrization
+F
+# w_step
+F
+# oct_lambda_a
+T
+# oct_increase_factor
+T
+# rwa
+F
+# t_fall
+T
+# type
+T
+# scale
+F
+# t_rise
+T
+# t_0
+F
+# ampl_unit
+F
+# dp_separation
+F
+# oct_shapefile
+F
+# w_L
+T
+# oct_outfile
+T
+# E_0
+T
+# check_tgrid
+F
+# t_stop
+T
+# filename
+F
+# shape_t_stop
+F
+# oct_lambda_intens
+F
+# chirprate
+F
+# t_start
+T
+# is_complex
+T
+# w_flip
+F
+# ftbaseline
+F
+# END ASCII DUMP is_set_pulse_t
+# item          4
+# ASCII DUMP is_set_pulse_t
+# time_unit
+T
+# t_FWHM
+F
+# oct_pulse_min
+F
+# oct_shape
+T
+# phi
+F
+# id
+T
+# shape_t_start
+F
+# oct_pulse_max
+F
+# delay
+F
+# oct_parametrization
+F
+# w_step
+F
+# oct_lambda_a
+T
+# oct_increase_factor
+T
+# rwa
+F
+# t_fall
+T
+# type
+T
+# scale
+F
+# t_rise
+T
+# t_0
+F
+# ampl_unit
+F
+# dp_separation
+F
+# oct_shapefile
+F
+# w_L
+T
+# oct_outfile
+T
+# E_0
+T
+# check_tgrid
+F
+# t_stop
+T
+# filename
+F
+# shape_t_stop
+F
+# oct_lambda_intens
+F
+# chirprate
+F
+# t_start
+T
+# is_complex
+T
+# w_flip
+F
+# ftbaseline
+F
+# END ASCII DUMP is_set_pulse_t
+# item          5
+# ASCII DUMP is_set_pulse_t
+# time_unit
+T
+# t_FWHM
+F
+# oct_pulse_min
+F
+# oct_shape
+T
+# phi
+F
+# id
+T
+# shape_t_start
+F
+# oct_pulse_max
+F
+# delay
+F
+# oct_parametrization
+F
+# w_step
+F
+# oct_lambda_a
+T
+# oct_increase_factor
+T
+# rwa
+F
+# t_fall
+T
+# type
+T
+# scale
+F
+# t_rise
+T
+# t_0
+F
+# ampl_unit
+F
+# dp_separation
+F
+# oct_shapefile
+F
+# w_L
+T
+# oct_outfile
+T
+# E_0
+T
+# check_tgrid
+F
+# t_stop
+T
+# filename
+F
+# shape_t_stop
+F
+# oct_lambda_intens
+F
+# chirprate
+F
+# t_start
+T
+# is_complex
+T
+# w_flip
+F
+# ftbaseline
+F
+# END ASCII DUMP is_set_pulse_t
+# item          6
+# ASCII DUMP is_set_pulse_t
+# time_unit
+T
+# t_FWHM
+F
+# oct_pulse_min
+F
+# oct_shape
+T
+# phi
+F
+# id
+T
+# shape_t_start
+F
+# oct_pulse_max
+F
+# delay
+F
+# oct_parametrization
+F
+# w_step
+F
+# oct_lambda_a
+T
+# oct_increase_factor
+T
+# rwa
+F
+# t_fall
+T
+# type
+T
+# scale
+F
+# t_rise
+T
+# t_0
+F
+# ampl_unit
+F
+# dp_separation
+F
+# oct_shapefile
+F
+# w_L
+T
+# oct_outfile
+T
+# E_0
+T
+# check_tgrid
+F
+# t_stop
+T
+# filename
+F
+# shape_t_stop
+F
+# oct_lambda_intens
+F
+# chirprate
+F
+# t_start
+T
+# is_complex
+T
+# w_flip
+F
+# ftbaseline
+F
+# END ASCII DUMP is_set_pulse_t
+# END ASCII DUMP is_set_t
+# END ASCII DUMP para_t
