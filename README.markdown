@@ -1,6 +1,7 @@
 # The QDYN Python Package
 
 [![Build Status](https://travis-ci.org/goerz/qdynpylib.svg?branch=master)](https://travis-ci.org/goerz/qdynpylib)
+[![Documentation Status](https://readthedocs.org/projects/qdynpylib/badge/?version=latest)](https://qdynpylib.readthedocs.org/en/latest/?badge=latest)
 
 The QDYN Python Package provides a collection of utilities to augment the
 [QDYN Fortran library][QDYN] for quantum dynamics and control, developed in the
