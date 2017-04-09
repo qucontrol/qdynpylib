@@ -37,6 +37,7 @@ sys.path.insert(0, os.path.abspath('_extensions'))
 def run_apidoc(_):
     """Generage API documentation"""
     import better_apidoc
+    print("Current working directory: %s" % os.getcwd())
     better_apidoc.main(
         ['better-apidoc', '-t', './source/_templates', '--force', '--no-toc',
          '--separate', '-o', './source/API', '../QDYN'])
