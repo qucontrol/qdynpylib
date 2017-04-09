@@ -672,7 +672,7 @@ class Pulse(object):
                 the phase may take any real value, avoiding the discontinuous
                 jumps introduced by limiting the phase to a 2 pi interval.
             s (float or None): smoothing parameter, see
-                :cls:`scipy.interpolate.UnivariateSpline`. If None, no
+                :py:class:`scipy.interpolate.UnivariateSpline`. If None, no
                 smoothing is performed.
             derivative (bool): If False, return the (smoothed) phase directly.
                 If True, return the derivative of the (smoothed) phase.
@@ -1262,9 +1262,9 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
                     s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
                     s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))
 
-                with:math:`\omega_j = 2 * \pi * f_j`, and frequency `f_j` where
-                `f_j` is the j'th value in `freq`. The value of `\phi_j` is the
-                j'th value in `phases`
+                with :math:`\omega_j = 2 * \pi * f_j`, and frequency
+                :math:`f_j` where :math:`f_j` is the j'th value in `freq`. The
+                value of :math:`\phi_j` is the j'th value in `phases`
 
                 `signal` is a scalar if `t` is a scalar, and and array if `t`
                 is an array
@@ -1275,7 +1275,8 @@ def carrier(t, time_unit, freq, freq_unit, weights=None, phases=None,
         directly, or any energy unit, in which case the energy value E (given
         through the freq parameter) is converted to an actual frequency as
 
-        .. math:: f = E / (\\hbar * 2 * pi)
+        .. math::
+            f = E / (\hbar * 2 * \pi)
     '''
     unit_convert = UnitConvert()
     if np.isscalar(t):
@@ -1314,12 +1315,13 @@ def CRAB_carrier(t, time_unit, freq, freq_unit, a, b, normalize=False,
     r'''Construct a "carrier" based on the CRAB formula
 
         .. math::
-        E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))
+            E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))
 
     where :math:`a_n` is the n'th element of `a`, :math:`b_n` is the n'th
     element of `b`, and :math:`\omega_n` is the n'th element of freq.
 
-    Parameters:
+    Parameters
+    ----------
         t (array-like): time grid values
         time_unit (str): Unit of `t`
         freq (scalar, ndarray(float64)): Carrier frequency or frequencies
@@ -1332,7 +1334,7 @@ def CRAB_carrier(t, time_unit, freq, freq_unit, a, b, normalize=False,
             plane
 
             .. math::
-            E(t) = \sum_{n} (a_n - i b_n) \exp(i \omega_n t)
+                E(t) = \sum_{n} (a_n - i b_n) \exp(i \omega_n t)
 
     Notes:
 
@@ -1340,7 +1342,8 @@ def CRAB_carrier(t, time_unit, freq, freq_unit, a, b, normalize=False,
         directly, or any energy unit, in which case the energy value E (given
         through the freq parameter) is converted to an actual frequency as
 
-        .. math:: f = E / (\\hbar * 2 * pi)
+        .. math::
+            f = E / (\hbar * 2 * \pi)
     '''
     unit_convert = UnitConvert()
     c = ( unit_convert.convert(1, time_unit, 'iu')

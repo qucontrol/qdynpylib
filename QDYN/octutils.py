@@ -45,7 +45,8 @@ class OCTConvergences(object):
 
     def load(self, keys, files, colors=None, plot_labels=None):
         """
-        Load data from a series of files. See `load_file` method for details.
+        Load data from a series of files. See :py:func:`load_file` method for
+        details.
 
         Parameters
         ----------
@@ -98,8 +99,8 @@ class OCTConvergences(object):
         written by the QDYN fortran library when specifying the `iter_dat`
         attribute in the oct section of the config file.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
 
         key: str
             Key under which to register the data (i.e., data will be stored in

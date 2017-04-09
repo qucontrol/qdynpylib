@@ -535,8 +535,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
         return pop_loss(self)
 
     def logical_pops(self):
-        """
-        Return the total population in each of the mapped logical states
+        """Return the total population in each of the mapped logical states
         (projected to the logical subspace)
         """
         return logical_pops(self)
@@ -879,7 +878,8 @@ def pop_loss(A):
     A can be a matrix of arbitrary dimension N. The loss of population is
     calculated as
 
-    1 - \Tr[A^\dagger A] / N
+    .. math::
+        1 - \Tr[A^\dagger A] / N
 
     >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
     >>> abs( (1 - (0.9 * 0.9 + 3) / 4) - pop_loss(U) ) < 1.0e-15
@@ -894,15 +894,20 @@ def pop_loss(A):
 
 def logical_pops(A):
     """Return a numpy array of four values that give the total population of
-    the states A |00>, A |01> A |10> A |11>. If A is unitary, all values are
-    1.0.  If there is loss from the logical subspace, the values are between
-    0.0 and 1.0.
+    the states
+
+    .. math::
+        A |00>, A |01>, A |10>, A |11>.
+
+    If `A` is unitary, all values are 1.0.  If there is loss from the logical
+    subspace, the values are between 0.0 and 1.0.
 
     >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
     >>> logical_pops(U)
     array([ 1.  ,  1.  ,  1.  ,  0.81])
 
     The average of the logical_pops sums to one minus the population loss:
+
     >>> print("%.3f" % ( (np.sum(logical_pops(U))/4.0) - (1.0-U.pop_loss()) ))
     0.000
     """
