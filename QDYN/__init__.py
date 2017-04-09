@@ -16,4 +16,4 @@ from . import model
 from . import math
 from . import prop_gate
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
