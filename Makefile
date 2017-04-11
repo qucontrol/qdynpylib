@@ -2,6 +2,7 @@ PROJECT_NAME = QDYN
 PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage click sphinx
 TESTPYPI = https://testpypi.python.org/pypi
 
+TESTENV = PYTHONHASHSEED=0 MATPLOTLIBRC=tests
 TESTOPTIONS = --doctest-modules --cov=QDYN --cov-config .coveragerc -n auto
 TESTS = QDYN tests
 # You may redefine TESTS to run a specific test. E.g.
@@ -21,6 +22,8 @@ help:
 	@echo '   make test27        Test on Python 2.7                            	  '
 	@echo '   make test33        Test on Python 3.3                               '
 	@echo '   make test34        Test on Python 3.4                               '
+	@echo '   make test35        Test on Python 3.5                               '
+	@echo '   make test35        Test on Python 3.6                               '
 	@echo '   make test          Test on all versions of Python                   '
 	@echo '   make coverage      Generate coverage report htmlcov                 '
 
@@ -91,19 +94,19 @@ distclean: clean clean-doc
 	@.venv/py36/bin/pip install -e .[dev]
 
 test27: .venv/py27/bin/py.test
-	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 test33: .venv/py33/bin/py.test
-	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+	$(TESTENV)PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
 
 test34: .venv/py34/bin/py.test
-	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 test35: .venv/py35/bin/py.test
-	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 test36: .venv/py36/bin/py.test
-	PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
+	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 test: test27 test33 test34 test35 test36
 
