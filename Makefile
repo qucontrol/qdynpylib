@@ -7,6 +7,23 @@ TESTS = QDYN tests
 # You may redefine TESTS to run a specific test. E.g.
 #     make test TESTS="tests/test_io.py"
 
+help:
+	@echo 'Makefile for qdynpylib                                                 '
+	@echo '                                                                       '
+	@echo 'Usage:                                                                 '
+	@echo '   make develop       Install "editable" version of package            '
+	@echo '   make install       Install package into current environment         '
+	@echo '   make uninstall     Remove package from current environment          '
+	@echo '   make upload        Upload package to pypi                           '
+	@echo '   make test-upload   Upload package to testpypi                       '
+	@echo '   make test-install  Install fromm testpypi                           '
+	@echo '   make clean         Remove build files                               '
+	@echo '   make test27        Test on Python 2.7                            	  '
+	@echo '   make test33        Test on Python 3.3                               '
+	@echo '   make test34        Test on Python 3.4                               '
+	@echo '   make test          Test on all versions of Python                   '
+	@echo '   make coverage      Generate coverage report htmlcov                 '
+
 develop:
 	pip install -e .[dev]
 
