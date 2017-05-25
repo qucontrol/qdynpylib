@@ -31,6 +31,10 @@ setup(name='QDYN',
                               'better-apidoc']},
       packages=['QDYN', ],
       scripts=[],
+      entry_points='''
+        [console_scripts]
+        qdyn_lb2diss=QDYN._lb2diss:main
+      ''',
       classifiers=[
           'Development Status :: 4 - Beta',
           'Environment :: Console',

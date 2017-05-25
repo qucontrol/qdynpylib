@@ -368,6 +368,11 @@ def _item_rxs(section_name=''):
     return item_rxs
 
 
+def read_config_fh(fh):
+    """Equivalent to ``read_config_str(fh.read())``"""
+    return _read_config_lines(_process_raw_lines(fh))
+
+
 def read_config_file(filename):
     """Equivalent to ``read_config_str(open(filename).read())``"""
     with open(filename) as in_fh:

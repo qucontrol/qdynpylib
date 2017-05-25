@@ -1,0 +1,25 @@
+tgrid: t_start = 0.0, t_stop = 10.0_ns, nt = 1000
+
+pulse:
+* type = const, E_0 = 0.5_GHz, id = 1
+
+ham: type=matrix, n_surf=2, sparsity_model=indexed
+* filename = "h_drift.dat", op_type = potential, op_unit = GHz
+* filename = "h_ctrl.dat", op_type = dipole, op_unit = unitless, pulse_id = 1
+
+psi:
+*  type = const, a = 1.0, surf = 2
+
+ham: type=matrix, n_surf=2, sparsity_model=indexed, label=dissipative
+* filename = "h_drift.dat", op_type = potential, op_unit = GHz
+
+dissipator: label=dissipative, type=lindblad_ops, op_unit = sqrt_GHz, sparsity_model=indexed
+* filename = "A_decay.dat"
+* filename = "A_deph.dat"
+
+psi: label=dissipative
+*  type = const, a = 0.5, surf = 1
+*  type = const, a = 0.5, surf = 2
+
+prop: method = newton
+
