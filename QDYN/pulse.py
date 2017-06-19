@@ -1098,36 +1098,6 @@ class Pulse(object):
 
         fig.subplots_adjust(hspace=0.3)
 
-    def _repr_png_(self):
-        """Return png representation"""
-        return self._figure_data(fmt='png')
-
-    def _repr_svg_(self):
-        """Return svg representation"""
-        return self._figure_data(fmt='svg')
-
-    def _figure_data(self, fmt='png', display=False):
-        """Return image representation"""
-        from IPython.core.pylabtools import print_figure
-        from IPython.display import Image, SVG
-        from IPython.display import display as ipy_display
-        fig = plt.figure()
-        self.plot(fig=fig)
-        fig_data = print_figure(fig, fmt)
-        if fmt=='svg':
-            fig_data = fig_data.decode('utf-8')
-        # We MUST close the figure, otherwise IPython's display machinery
-        # will pick it up and send it as output, resulting in a
-        # double display
-        plt.close(fig)
-        if display:
-            if fmt=='svg':
-                ipy_display(SVG(fig_data))
-            else:
-                ipy_display(Image(fig_data))
-        else:
-            return fig_data
-
     def show(self, **kwargs):
         """Show a plot of the pulse and its spectrum. All arguments will be
         passed to the plot method
