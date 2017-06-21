@@ -134,3 +134,19 @@ def test_read_write_cmplx_array(request, tmpdir):
     assert len(v0_double) == 200
     with open(outfile) as fh:
         assert "# second block" in fh.read()
+
+
+def test_datablock(request):
+    """Test that we can extacts blocks from a file"""
+    datadir = os.path.splitext(request.module.__file__)[0]
+    infile = os.path.join(datadir, 'blocks.dat')
+    assert len(list(QDYN.io.datablock(infile, -2))) == 0
+    assert len(list(QDYN.io.datablock(infile, 0))) == 0
+    assert len(list(QDYN.io.datablock(infile, 1))) == 16
+    assert len(list(QDYN.io.datablock(infile, 2))) == 16
+    assert len(list(QDYN.io.datablock(infile, 4))) == 16
+    assert len(list(QDYN.io.datablock(infile, 5))) == 0
+    assert (list(QDYN.io.datablock(infile, 1))[1] ==
+            b' -1.42014783459907938E-03  2.01139166550349301E-16\n')
+    assert (list(QDYN.io.datablock(infile, 1, 'ascii'))[1] ==
+            ' -1.42014783459907938E-03  2.01139166550349301E-16\n')

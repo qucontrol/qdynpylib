@@ -198,9 +198,9 @@ def read_indexed_matrix(filename, format='coo', shape=None,
     Arguments
     ---------
 
-    filename: string
+    filename: str
         Name of file from which to read the matrix
-    format: string, optional
+    format: str, optional
         Result type:
         * 'coo' (default): scipy.sparse.coo.coo_matrix
         * 'array': numpy.ndarray
@@ -427,11 +427,50 @@ def read_cmplx_array(filename, **kwargs):
     `read_cmplx_array` routine
 
     Args:
-        filename (str): Name of the file from which to read the array
-        kwargs: All keyword arguments are passed to `numpy.genfromtxt`
+        filename (file, str, pathlib.Path, list of str, generator): File,
+            filename, list, or generator to read. Cf. `fname` in
+            :func:`numpy.genfromtxt`.
+        kwargs: All keyword arguments are passed to :func:`numpy.genfromtxt`
+
+    Notes:
+        You may use :func:`datablock` as a wrapper for `fileanme` in order to
+        read a specific block from a file that contains multiple blocks
     """
     x, y = np.genfromtxt(filename, usecols=(0, 1), unpack=True, **kwargs)
     return x + 1j*y
+
+
+def datablock(filename, block, decoding=None):
+    """Iterator over the lines inside the file with the given `filename` inside
+    the given `block` only. Blocks must be separated by two empty lines.
+
+    Args:
+        filename (str): Name of file from which to read
+        block (int): One-based Index of the desired block. A value of less than
+            1 or more than the number of block available in the file will not
+            cause an error, but result in an empty iterator
+        decoding (None or str): By default, the resulting lines are byte
+            strings (so that :func:`datablock` can wrap `fname` in
+            :func:`np.genfromtxt`). If `decoding` is given different from None,
+            the resulting strings will be decoded instead.
+    """
+    in_block = 0
+    blank = 0
+    with open(filename, 'rb') as in_fh:
+        for line in in_fh:
+            if len(line.strip()) == 0:
+                blank += 1
+            elif not line.strip().startswith(b'#'):
+                if in_block == 0 or blank >= 2:
+                    in_block += 1
+                    blank = 0  # reset counter
+                if in_block == block:
+                    if decoding is None:
+                        yield line
+                    else:
+                        yield line.decode(decoding)
+                elif in_block > block:
+                    break
 
 
 def write_cmplx_array(carray, filename, header=None, fmtstr='%25.16E',
