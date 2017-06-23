@@ -812,7 +812,7 @@ class Pulse(object):
                    header=header)
 
     def apply_spectral_filter(self, filter_func, freq_unit=None):
-        """Apply a spectral filter function to the pulse
+        """Apply a spectral filter function to the pulse (in place)
 
         Args:
             filter_func (callable): A function that takes a frequency values
@@ -827,6 +827,22 @@ class Pulse(object):
             raise ValueError("filter values must be in the range [0, 1]")
         spec *= filter
         self.amplitude = np.fft.ifft(spec)
+        return self
+
+    def apply_smoothing(self, **kwargs):
+        """Smooth the pulse amplitude (in place) through univariate splining.
+        All keyword arguments are passed directly to
+        :py:class:`scipy.interpolate.UnivariateSpline`. This especially
+        includes the smoothing parameter `s`.
+        """
+        if iscomplexobj(self.amplitude):
+            splx = UnivariateSpline(self.tgrid, self.amplitude.real, **kwargs)
+            sply = UnivariateSpline(self.tgrid, self.amplitude.imag, **kwargs)
+            self.amplitude = splx(self.tgrid) + 1.0j * sply(self.tgrid)
+        else:
+            spl = UnivariateSpline(self.tgrid, self.amplitude, **kwargs)
+            self.amplitude = spl(self.tgrid)
+        return self
 
     def _unshift(self):
         """Move the pulse onto the unshifted time grid. This increases the
