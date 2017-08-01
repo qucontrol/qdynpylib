@@ -257,7 +257,8 @@ class LevelModel(object):
     def add_observable(
             self, O, outfile, exp_unit, time_unit, col_label,
             square=None, exp_surf=None, is_real=None, in_lab_frame=False,
-            op_unit=None, label=None, pulse=None):
+            op_unit=None, label=None, pulse=None, from_time_index=None,
+            to_time_index=None, step=None):
         """Add an observable
 
         Args:
@@ -289,6 +290,16 @@ class LevelModel(object):
                 differentiated by label. The default label is the empty string.
             pulse: If not None, a pulse for the observable to couple to (see
                 :meth:`add_ham`)
+            from_time_index (int or None): Index on total time grid from where
+                to start calculating/writing expectation values. Negative
+                values count from the end of the time grid. If None, equivalent
+                to 1.
+            to_time_index (int or None): Index on total time grid where to stop
+                calculating/writing expectation values. Negative values count
+                from the end of the time grid. If None, equivalent to -1
+            step (int or None): Step width for where to calculate/write
+                expectation values between `from_time_index` and
+                `to_time_index`.  If None, equivalent to 1
         """
         config_attribs = OrderedDict([])
         if is_real is None:
@@ -318,6 +329,12 @@ class LevelModel(object):
             config_attribs['op_unit'] = exp_unit
         else:
             config_attribs['op_unit'] = op_unit
+        if from_time_index is not None:
+            config_attribs['from_time_index'] = from_time_index
+        if to_time_index is not None:
+            config_attribs['to_time_index'] = to_time_index
+        if step is not None:
+            config_attribs['step'] = step
         self._add_matrix(self._observables, O, label, pulse=pulse,
                          check_matrix=False, kwargs=config_attribs)
 
