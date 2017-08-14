@@ -71,7 +71,7 @@ def mpirun(cmd, procs=1, implementation='openmpi', hostfile=None):
     """
     if implementation is None:
         return cmd
-    elif implementation == 'openmpi':
+    elif implementation in ['openmpi', 'intel']:
         new_cmd = ['mpirun', '-n', str(procs), ]
         if hostfile is not None:
             hostfile = os.path.abspath(hostfile)
