@@ -81,7 +81,7 @@ def mpirun(cmd, procs=1, implementation='openmpi', hostfile=None):
         new_cmd += cmd
         return new_cmd
     else:
-        raise ValueError("Unknown MPI implementation")
+        raise ValueError("Unknown MPI implementation: %s" % implementation)
 
 
 def datadir(tmpdir, request):
