@@ -73,7 +73,7 @@ def mpirun(cmd, procs=1, implementation='openmpi', hostfile=None):
         return cmd
     elif implementation in ['openmpi', 'intel']:
         new_cmd = ['mpirun', '-n', str(procs), ]
-        if hostfile is not None:
+        if implementation == 'openmpi' and hostfile is not None:
             hostfile = os.path.abspath(hostfile)
             with (open(hostfile, 'w')) as out_fh:
                 out_fh.write("localhost slots=%d\n" % procs)
