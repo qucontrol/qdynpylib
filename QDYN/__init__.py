@@ -15,5 +15,6 @@ from . import config
 from . import model
 from . import math
 from . import prop_gate
+from . import dissipation
 
 __version__ = "0.3.0"
