@@ -34,36 +34,72 @@ def write_psi_amplitudes(psi, filename):
                     out_fh.write("%10d%25.16E\n" % (i+1, val.real))
 
 
-def read_psi_amplitudes(filename, n, block=1):
+def read_psi_amplitudes(filename, n, block=1, normalize=True):
     """Read the wave function of size `n` from file. For 'block=1', inverse to
-    `write_psi_amplitudes`. Returns complex or real numpy array.
+    `write_psi_amplitudes`. Returns complex or real numpy array
 
     By specifying `blocks`, data may be read from a file that contains multiple
     wave functions, in the format generated e.g. by the
     ``qdyn_prop_traj --write-all-states`` utility
 
-    Paramters:
+    Parameters:
         filename (str): Name of file from which to read data
         n (int): dimension of the Hilbert space (i.e. size of returned vector)
-        block (int): One-based index block to read from `filename`, if the file
-            contains multiple block. Blocks must be separated by exactly two
-            empty lines
+        block (int): One-based index of the block to read from
+            `filename`, if the file contains multiple block. Blocks must be
+            separated by exactly two empty lines
+        normalize (bool): Whether or not to normalize the wave function
+    """
+    if block < 1:
+        raise ValueError("Invalid block %d, block must be >= 1" % block)
+    return next(iterate_psi_amplitudes(filename, n, block, normalize))
+
+
+def iterate_psi_amplitudes(filename, n, start_from_block=1, normalize=True):
+    """Iterate over blocks of wave functions stored in `filename`
+
+    This is equivalent to the following pseudocode::
+
+        iter([read_psi_amplitudes(filename, n, block, normalize)
+              for block >= start_from_block])
+
+    Hoever, the data file is only traversed once, and memory is only required
+    for one block.
+
+    Parameters:
+        filename (str): Name of file from which to read data
+        n (int): dimension of the Hilbert space (i.e. size of returned vector)
+        start_from_block (int): One-based index of block from which to
+            start the iterator.
+        normalize (bool): Whether or not to normalize the wave function
     """
     psi = np.zeros(n, dtype=np.complex128)
     i_block = 1
     blanks = 0
-    if block < 1:
-        raise ValueError("Invalid block %d < 1" % block)
+
+    def normalized(psi):
+        if normalize:
+            nrm = norm(psi)
+            if nrm > 1e-15:
+                return psi/norm(psi)
+            else:
+                return psi * 0.0
+        else:
+            return psi
+
     with open(filename, 'r') as in_fh:
-        for line in in_fh:
+        for line_nr, line in enumerate(in_fh):
             line = line.strip()
             if line == '':
                 blanks += 1
                 if blanks >= 2:
+                    if i_block >= start_from_block:
+                        yield normalized(psi)
+                        psi = np.zeros(n, dtype=np.complex128)
                     blanks = 0
                     i_block += 1
                 continue
-            if i_block != block:
+            if i_block < start_from_block:
                 continue
             if not line.startswith("#"):
                 vals = line.split()[:3]
@@ -74,14 +110,10 @@ def read_psi_amplitudes(filename, n, block=1):
                         psi[i] += 1j*float(vals[2])
                 except (ValueError, TypeError) as exc_info:
                     raise ValueError("Invalid format: %s" % str(exc_info))
-    if block > i_block:
+    if start_from_block > i_block:
         raise ValueError("Requested block %d, file only has %d blocks"
-                         % (block, i_block))
-    nrm = norm(psi)
-    if nrm > 1e-15:
-        return psi/norm(psi)
-    else:
-        return psi * 0.0
+                         % (start_from_block, i_block))
+    yield normalized(psi)
 
 
 def random_density_matrix(N):
