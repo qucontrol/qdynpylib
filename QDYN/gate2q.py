@@ -80,7 +80,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
 
         # We allow an empty constructor to create a zero-matrix
         if len(args) == 0:
-            args = [(np.zeros((4,4), dtype=np.complex128)), ]
+            args = [(np.zeros((4, 4), dtype=np.complex128)), ]
         elif len(args) == 1:
             arg = args[0]
             if isinstance(arg, np.ndarray):
@@ -90,7 +90,7 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
             if isinstance(arg, str):
                 if os.path.isfile(arg):
                     kwargs['file'] = arg
-                    args = [(np.zeros((4,4), dtype=np.complex128)), ]
+                    args = [(np.zeros((4, 4), dtype=np.complex128)), ]
 
         # Make sure that dtype is np.complex128
         if 'dtype' in kwargs:
@@ -226,10 +226,10 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
                 else:
                     fmt = fmt[:-2] + "])"
             row_str = fmt % (
-                    self[i,0].real, self[i,0].imag,
-                    self[i,1].real, self[i,1].imag,
-                    self[i,2].real, self[i,2].imag,
-                    self[i,3].real, self[i,3].imag)
+                    self[i, 0].real, self[i, 0].imag,
+                    self[i, 1].real, self[i, 1].imag,
+                    self[i, 2].real, self[i, 2].imag,
+                    self[i, 3].real, self[i, 3].imag)
             result += row_str
         return result
 
@@ -919,7 +919,7 @@ def F_avg(U, O):
     optimal gate O.
     """
     n = O.shape[0]
-    F_U_avg = abs(inner(O,U))**2
+    F_U_avg = abs(inner(O, U))**2
     Udagger = U.conjugate().transpose()
     Udagger_O = Udagger.dot(O)
     F_TW_avg = inner(Udagger_O, Udagger_O)
@@ -931,7 +931,7 @@ def F_sm(U, O):
     the optimal gate O.
     """
     n = O.shape[0]
-    return abs(inner(O,U))**2 / n**2
+    return abs(inner(O, U))**2 / n**2
 
 
 def F_re(U, O):
@@ -939,7 +939,7 @@ def F_re(U, O):
     optimal gate O
     """
     n = O.shape[0]
-    return inner(O,U).real() / n
+    return inner(O, U).real() / n
 
 
 ###############################################################################
