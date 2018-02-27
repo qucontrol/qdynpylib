@@ -627,8 +627,8 @@ class LevelModel(object):
             runfolder, config_data, section, data, outprefix,
             type_attrib='matrix', set_n_surf=True, set_op_type=False,
             set_add_to_H_jump=False, counter0=0):
-        """Common implementation of `_write_ham`, `_write_observables`,
-        `_write_lindblad_ops`, and `_write_dissipator`"""
+        """Common implementation of `_write_ham`, `_write_lindblad_ops`, and
+        `_write_dissipator`"""
         if section not in config_data:
             config_data[section] = []
         for op_counter, (matrix, attribs) in enumerate(data):
@@ -666,9 +666,38 @@ class LevelModel(object):
     def _write_observables(self, runfolder, config_data):
         """Write operators describing all observables to the runfolder,
         and add observables data to `config_data`"""
-        self._write_matrices(runfolder, config_data, 'observables',
-                             self._observables, outprefix='O',
-                             set_op_type=False, counter0=1)
+        if 'observables' not in config_data:
+            config_data['observables'] = []
+        for op_counter, (op, attribs) in enumerate(self._observables):
+            if 'filename' in attribs:
+                filename = attribs['filename']
+            else:
+                filename = "O%d.dat" % (op_counter+1)
+            if isinstance(op, str):
+                assert op in ['ham', 'norm', 'pop']
+                config_attribs = OrderedDict([
+                    ('type', op), ('filename', filename), ('real_op', False)
+                ])
+            else:  # assume that op is a matrix
+                matrix = op
+                write_indexed_matrix(
+                    matrix, filename=os.path.join(runfolder, filename),
+                    hermitian=False)
+                config_attribs = OrderedDict([
+                    ('type', 'matrix'), ('filename', filename),
+                    ('real_op', (not iscomplexobj(op)))
+                ])
+                if 'sparsity_model' not in config_attribs:
+                    config_attribs['sparsity_model'] \
+                            = choose_sparsity_model(matrix)
+                if 'op_type' not in config_attribs:
+                    config_attribs['op_type'] = 'pot'
+                    if 'pulse_id' in attribs:
+                        config_attribs['op_type'] = 'dip'
+                config_attribs['n_surf'] = matrix.shape[0]
+            for key, val in attribs.items():
+                config_attribs[key] = val
+            config_data['observables'].append(config_attribs)
 
     def _write_lindblad_ops(self, runfolder, config_data):
         """Write operators describing all Lindblad operators to the
