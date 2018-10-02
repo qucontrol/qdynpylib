@@ -291,15 +291,39 @@ def read_indexed_matrix(filename, format='coo', shape=None,
         return getattr(m, 'to'+format)()  # e.g. format='dense' -> m.todense()
 
 
-def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
-        out=None):
+def _compress_str(s, spaces_to_drop):
+    """Remove `spaces_to_drop` spaces from `s`, alternating between left and
+    right"""
+    assert s.count(" ") >= spaces_to_drop
+    from_left = True
+    l = 0
+    r = len(s)
+    drop = set()
+    remaining_spaces = spaces_to_drop
+    while remaining_spaces > 0:
+        if from_left:
+            l = s.find(" ", l)
+            drop.add(l)
+            l += 1  # since `s.find` is inclusive, but we need exclusive
+        else:
+            r = s.rfind(" ", 0, r)
+            drop.add(r)
+        from_left = not from_left
+        remaining_spaces -= 1
+    assert len(drop) == spaces_to_drop
+    return ''.join([l for (i, l) in enumerate(s) if i not in drop])
+
+
+def print_matrix(
+        M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
+        compress=False, zero_as_blank=False, out=None):
     """Print a numpy complex matrix to screen, or to a file if outfile is given.
     Values below the given limit are printed as zero
 
     Arguments
     ---------
 
-    M: numpy matrix, 2D ndarray
+    M: numpy matrix, 2D ndarray, sparse matrix
         Matrix to print. In addition to a standard dense matrix, may also be
         any scipy sparse matrix in a format where M[i,j] is defined.
     matrix_name: str, optional
@@ -307,8 +331,18 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     limit: float, optional
        Any number (real or imaginary part) whose absolute value is smaller than
        this limit will be printed as 0.0.
-    fmt: str, optional
-        Format of each entry (both for real and imaginary part)
+    fmt: str or callable, optional
+        Format of each entry (both for real and imaginary part). If str, must
+        be an "old-style" format string the formats a single floating value. If
+        a callable, the callable must return a string of fixed length when
+        passed a number. The string returned by ``fmt(0)`` will be used for
+        values that are exactly zero, whereas the string returned by
+        ``fmt(0.0)`` will be used for values that are below `limit`.
+    compress: bool, optional
+        If True, remove spaces to compress the output to be narrower. Real and
+        imaginary parts will no longer be aligned.
+    zero_as_blank: bool, optional
+        If True, represent entries that are exactly zero as blank strings
     out: open filehandle. If None, print to stdout
 
     Examples
@@ -328,11 +362,33 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     (      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)
     ( 1.00E+00, 1.00E+00)(      0.0,      0.0){-1.00E+00,      0.0}
 
+    >>> print_matrix(M, compress=True)
+    {1.00E+00,     0.0}(2.00E+00,     0.0)(       0,       0)
+    (    0.0,-1.00E+00){2.00E+00,     0.0}(     0.0,     0.0)
+    (1.00E+00,1.00E+00)(1.00E-09,     0.0){-1.00E+00,    0.0}
+
+    >>> print_matrix(M, compress=True, zero_as_blank=True)
+    {1.00E+00,     0.0}(2.00E+00,     0.0)(                 )
+    (    0.0,-1.00E+00){2.00E+00,     0.0}(     0.0,     0.0)
+    (1.00E+00,1.00E+00)(1.00E-09,     0.0){-1.00E+00,    0.0}
+
     >>> M[2,1] = 1.0
     >>> print_matrix(M, fmt="%5.1f")
     {  1.0,  0.0}(  2.0,  0.0)(    0,    0)
     (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)
     (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}
+
+    >>> def compact_exp_fmt(x):
+    ...     if x == 0:
+    ...         return '%7d' % 0
+    ...     else:  # single-digit exponent
+    ...         s = "%8.1e" % x
+    ...         base, exp = s.split('e')
+    ...         return base + 'e%+d' % int(exp)
+    >>> print_matrix(M, compress=True, zero_as_blank=True, fmt=compact_exp_fmt)
+    {1.0e+0,     0}(2.0e+0,     0)(             )
+    (    0,-1.0e+0){2.0e+0,     0}(     0,     0)
+    (1.0e+0,1.0e+0)(1.0e+0,     0){-1.0e+0,    0}
 
     >>> print_matrix(M, matrix_name="M", fmt="%5.1f")
     M = [
@@ -350,22 +406,32 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
     ]
     """
     m, n = M.shape
-    fmt_rx = re.compile(r'%[#0i +-]?(?P<width>\d+)\.\d+[hlL]?[diouxXeEfFgG]')
-    fmt_m = fmt_rx.match(fmt)
-    width = 9
-    if fmt_m:
-        width = int(fmt_m.group('width'))
-        zero_fmt = '%' + ("%dd" % width)
-        zero_fmt = "%s,%s" % (zero_fmt, zero_fmt)
-        zero = zero_fmt % (0, 0)
-        small_fmt = '%' + ("%d.1f" % width)
-        small = small_fmt % 0
+    if callable(fmt):
+        zero = "%s,%s" % (fmt(0), fmt(0))
+        small = fmt(0.0)
+        formatter = fmt
     else:
-        raise ValueError("fmt must match '%[conversion flags]w.d<type>'")
+        fmt_rx = re.compile(
+            r'%[#0i +-]?(?P<width>\d+)\.\d+[hlL]?[diouxXeEfFgG]')
+        fmt_m = fmt_rx.match(fmt)
+        width = 9
+        if fmt_m:
+            width = int(fmt_m.group('width'))
+            zero_fmt = '%' + ("%dd" % width)
+            zero_fmt = "%s,%s" % (zero_fmt, zero_fmt)
+            zero = zero_fmt % (0, 0)
+            small_fmt = '%' + ("%d.1f" % width)
+            small = small_fmt % 0
+        else:
+            raise ValueError("fmt must match '%[conversion flags]w.d<type>'")
+        formatter = lambda x: fmt % x
+    if zero_as_blank:
+        zero = " " * len(zero)
     if out is None:
         out = sys.stdout
     if matrix_name is not None:
         out.write("%s = [\n" % matrix_name)
+    entries = [[],]
     for i in xrange(m):
         for j in xrange(n):
             if M[i,j] == 0.0:
@@ -380,12 +446,22 @@ def print_matrix(M, matrix_name=None, limit=1.0e-14, fmt="%9.2E",
                 if x == 0.0:
                     entry = small
                 else:
-                    entry = fmt % x
+                    entry = formatter(x)
                 entry += ","
                 if y == 0.0:
                     entry += small
                 else:
-                    entry += fmt % y
+                    entry += formatter(y)
+            entries[-1].append(entry)
+        entries.append([])
+    if compress:
+        spaces_to_drop = min(
+            [entry.count(' ') for row in entries for entry in row])
+    for i in xrange(m):
+        for j in xrange(n):
+            entry = entries[i][j]
+            if compress:
+                entry = _compress_str(entry, spaces_to_drop)
             if i == j:
                 out.write("{" + entry + "}")
             else:
