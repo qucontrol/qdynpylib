@@ -8,6 +8,7 @@ from numpy import pi
 from six.moves import xrange
 
 from .linalg import norm
+from .io import read_real
 
 
 def write_psi_amplitudes(psi, filename):
@@ -105,9 +106,9 @@ def iterate_psi_amplitudes(filename, n, start_from_block=1, normalize=True):
                 vals = line.split()[:3]
                 try:
                     i = int(vals[0]) - 1
-                    psi[i] = float(vals[1])
+                    psi[i] = read_real(vals[1])
                     if len(vals) == 3:
-                        psi[i] += 1j*float(vals[2])
+                        psi[i] += 1j*read_real(vals[2])
                 except (ValueError, TypeError) as exc_info:
                     raise ValueError("Invalid format: %s" % str(exc_info))
     if start_from_block > i_block:

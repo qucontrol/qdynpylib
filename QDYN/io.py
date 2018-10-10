@@ -497,6 +497,20 @@ def read_complex(str):
     return float(real_part) + 1.0j*float(imag_part)
 
 
+def read_real(str):
+    """Convert a string to a real number
+
+    This works for Fortran-formatted numbers with a missing 'E' sign
+
+    >>> read_complex("-2.0-100")
+    -2e-100
+    """
+    try:
+        return float(str)
+    except ValueError:
+        return float(fix_fortran_exponent(str))
+
+
 def read_cmplx_array(filename, **kwargs):
     """Read a complex array from a file. The file must contain two columns
     (real and imaginary part). This routine is equivalent to the Fortran QDYN
