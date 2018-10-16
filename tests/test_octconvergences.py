@@ -9,4 +9,3 @@ def test_oct_convergences_show_bokeh():
     c = QDYN.octutils.OCTConvergences(keys=keys,
                     files=[join(root, '%s.dat' % k) for k in keys],
                     colors=['black', '#377eb8', '#ff7f00', 'red'])
-    c.show_bokeh(outfile='test_octconvergences.html')

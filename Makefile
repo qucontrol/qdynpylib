@@ -1,5 +1,5 @@
 PROJECT_NAME = QDYN
-PACKAGES =  pip numpy matplotlib scipy sympy ipython bokeh pytest coverage click sphinx
+PACKAGES =  pip "numpy<1.15" matplotlib scipy sympy ipython bokeh pytest coverage click sphinx
 TESTPYPI = https://testpypi.python.org/pypi
 
 TESTENV = PYTHONHASHSEED=0 MATPLOTLIBRC=tests
@@ -20,7 +20,6 @@ help:
 	@echo '   make test-install  Install fromm testpypi                           '
 	@echo '   make clean         Remove build files                               '
 	@echo '   make test27        Test on Python 2.7                            	  '
-	@echo '   make test33        Test on Python 3.3                               '
 	@echo '   make test34        Test on Python 3.4                               '
 	@echo '   make test35        Test on Python 3.5                               '
 	@echo '   make test35        Test on Python 3.6                               '
@@ -96,28 +95,22 @@ distclean: clean clean-doc
 test27: .venv/py27/bin/py.test
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
-test33: .venv/py33/bin/py.test
-	$(TESTENV)PYTHONHASHSEED=0 $< -v $(TESTOPTIONS) $(TESTS)
-
-test34: .venv/py34/bin/py.test
-	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
-
 test35: .venv/py35/bin/py.test
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 test36: .venv/py36/bin/py.test
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
-test: test27 test33 test34 test35 test36
+test: test27 test35 test36
 
 doc: .venv/py35/bin/py.test docs/source/*.rst QDYN/*.py
 	@rm -f docs/source/API/*
 	$(MAKE) -C docs SPHINXBUILD=../.venv/py35/bin/sphinx-build html
 	@ln -sf docs/build/html doc
 
-coverage: test34
+coverage: test36
 	@rm -rf htmlcov/index.html
-	.venv/py34/bin/coverage html
+	.venv/py36/bin/coverage html
 
 .PHONY: install develop uninstall upload test-upload test-install sdist clean \
-test test27 test33 test34 coverage
+test test27 test35 test36 coverage

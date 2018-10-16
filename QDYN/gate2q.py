@@ -35,28 +35,26 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
     >>> # Note: the 'str' wrapper is only required in context of doctest
     >>> CNOT = Gate2Q(CNOT)
     >>> CNOT
-    matrix([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j],
-            [ 0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j]])
-    >>> type(CNOT)
-    <class 'QDYN.gate2q.Gate2Q'>
+    Gate2Q([[1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 1.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 0.+0.j, 0.+0.j, 1.+0.j],
+            [0.+0.j, 0.+0.j, 1.+0.j, 0.+0.j]])
 
     Alternatively, it can be create from a string:
 
     >>> Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0'))
-    matrix([[ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j],
-            [ 0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j]])
+    Gate2Q([[1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 1.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 0.+0.j, 0.+0.j, 1.+0.j],
+            [0.+0.j, 0.+0.j, 1.+0.j, 0.+0.j]])
 
     However, we also allow to create a zero gate as
 
     >>> Gate2Q()
-    matrix([[ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j],
-            [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j]])
+    Gate2Q([[0.+0.j, 0.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 0.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 0.+0.j, 0.+0.j, 0.+0.j],
+            [0.+0.j, 0.+0.j, 0.+0.j, 0.+0.j]])
 
     The Gate2Q object can also be supplied a name that will be used for output.
 
@@ -267,8 +265,8 @@ class Gate2Q(np.matrixlib.defmatrix.matrix):
     def to_mathematica(self):
         """
         Return a Mathematica representation of the gate
-        >>> print(cphase(0.25*pi).to_mathematica())
-        {{0.707106781187+0.707106781187I, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 1.0, 0}, {0, 0, 0, 1.0}}
+        >>> print(CNOT.to_mathematica())
+        {{1.0, 0, 0, 0}, {0, 1.0, 0, 0}, {0, 0, 0, 1.0}, {0, 0, 1.0, 0}}
         """
         return matrix_to_mathematica(self)
 
@@ -904,7 +902,7 @@ def logical_pops(A):
 
     >>> U = Gate2Q(str('1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -0.9'))
     >>> logical_pops(U)
-    array([ 1.  ,  1.  ,  1.  ,  0.81])
+    array([1.  , 1.  , 1.  , 0.81])
 
     The average of the logical_pops sums to one minus the population loss:
 
@@ -961,14 +959,14 @@ def cphase(phi=pi, state='00'):
     Construct a controlled phasegate, where the phase phi is on the given state
 
     >>> cphase(pi/4.0, '00')
-    matrix([[ 0.70710678+0.70710678j,  0.00000000+0.j        ,
-              0.00000000+0.j        ,  0.00000000+0.j        ],
-            [ 0.00000000+0.j        ,  1.00000000+0.j        ,
-              0.00000000+0.j        ,  0.00000000+0.j        ],
-            [ 0.00000000+0.j        ,  0.00000000+0.j        ,
-              1.00000000+0.j        ,  0.00000000+0.j        ],
-            [ 0.00000000+0.j        ,  0.00000000+0.j        ,
-              0.00000000+0.j        ,  1.00000000+0.j        ]])
+    Gate2Q([[0.70710678+0.70710678j, 0.        +0.j        ,
+             0.        +0.j        , 0.        +0.j        ],
+            [0.        +0.j        , 1.        +0.j        ,
+             0.        +0.j        , 0.        +0.j        ],
+            [0.        +0.j        , 0.        +0.j        ,
+             1.        +0.j        , 0.        +0.j        ],
+            [0.        +0.j        , 0.        +0.j        ,
+             0.        +0.j        , 1.        +0.j        ]])
     """
     logical_basis = {'00': 0, '01': 1, '10': 2, '11': 3}
     gate = Gate2Q(np.identity(4))

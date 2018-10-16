@@ -130,18 +130,18 @@ class OCTConvergences(object):
         ...     c.load_file('iters', oct_iters_dat)
         >>> len(c.data)
         1
-        >>> c.data['iters'].iter
-        array([0, 1, 2])
-        >>> c.data['iters'].J_T
-        array([ 0.01401102,  0.00729416,  0.00350202])
-        >>> c.data['iters'].J
-        array([ 0.01401102,  0.01060672,  0.00538403])
-        >>> c.data['iters'].Delta_J_T
-        array([ 0.01401102, -0.00671686, -0.00379214])
-        >>> c.data['iters'].Delta_J
-        array([ 0.01401102, -0.0034043 , -0.00191013])
-        >>> c.data['iters'].sec
-        array([ 0, 96, 97])
+        >>> print(c.data['iters'].iter)
+        [0 1 2]
+        >>> print(c.data['iters'].J_T)
+        [0.01401102 0.00729416 0.00350202]
+        >>> print(c.data['iters'].J)
+        [0.01401102 0.01060672 0.00538403]
+        >>> print(c.data['iters'].Delta_J_T)
+        [ 0.01401102 -0.00671686 -0.00379214]
+        >>> print(c.data['iters'].Delta_J)
+        [ 0.01401102 -0.0034043  -0.00191013]
+        >>> print(c.data['iters'].sec)
+        [ 0 96 97]
         '''
         if plot_label is None:
             plot_label = key

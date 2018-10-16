@@ -542,8 +542,8 @@ def point_in_weyl_chamber(c1, c2, c3, raise_exception=False):
     The coordinates may also be array-like, in which case a boolean numpy array
     is returned.
 
-    >>> point_in_weyl_chamber([0.0,0.5,0.8], [1.0,0.25,0.0], [1.0,0.25,0.0])
-    array([False,  True,  True], dtype=bool)
+    >>> print(point_in_weyl_chamber([0.0,0.5,0.8], [1.0,0.25,0.0], [1.0,0.25,0.0]))
+    [False  True  True]
 
     If raise_exception is True, raise an ValueError if any values are outside
     the Weyl chamber.
@@ -583,8 +583,8 @@ def point_in_PE(c1, c2, c3, check_weyl=False):
     >>> point_in_PE(*c1c2c3(identity))
     False
 
-    >>> point_in_PE([0.0, 0.5, 0.8], [1.0, 0.25, 0.0], [1.0, 0.25, 0.0])
-    array([False,  True, False], dtype=bool)
+    >>> print(point_in_PE([0.0, 0.5, 0.8], [1.0, 0.25, 0.0], [1.0, 0.25, 0.0]))
+    [False  True False]
     """
     in_weyl = point_in_weyl_chamber(c1, c2, c3, raise_exception=check_weyl)
     c1 = np.array(c1); c2 = np.array(c2); c3 = np.array(c3)
@@ -629,8 +629,8 @@ def point_in_region(region, c1, c2, c3, check_weyl=False):
     True
 
     The function may be also applied against arrays:
-    >>> point_in_region('W1', [0.5,0.5], [0.4,0.25], [0.25,0.0])
-    array([ True, False], dtype=bool)
+    >>> print(point_in_region('W1', [0.5,0.5], [0.4,0.25], [0.25,0.0]))
+    [ True False]
     """
     regions = ['W0', 'W0*', 'W1', 'PE']
     if region == 'PE':
@@ -695,8 +695,8 @@ def project_to_PE(c1, c2, c3, check_weyl=True):
     polyhedron. If the input point already is a perfect entangler, it will be
     returned unchanged
 
-    >>> print("%s, %s, %s" % tuple(project_to_PE(*WeylChamber.A3)))
-    0.5, 0.25, 0.25
+    >>> print("%.2f, %.2f, %.2f" % tuple(project_to_PE(*WeylChamber.A3)))
+    0.50, 0.25, 0.25
     >>> print("%.3f, %.3f, %.3f" % tuple(project_to_PE(0.5, 0.5, 0.25)))
     0.500, 0.375, 0.125
     >>> print("%.3f, %.3f, %.3f" % tuple(project_to_PE(0.25, 0, 0)))

@@ -119,11 +119,10 @@ def generate_apply_H(H0, H1, pulse):
     >>> e1 = np.array([1,0])
     >>> e2 = np.array([0,1])
     >>> apply_H = generate_apply_H(H0, H1, pulse)
-    >>> apply_H(e1, 2.0)
-    matrix([[ 1. ,  0.2]])
-    >>> apply_H(e2, 2.0)
-    matrix([[ 0.2,  2. ]])
-
+    >>> norm(apply_H(e1, 2.0) - np.array([[ 1. ,  0.2]])) == 0
+    True
+    >>> norm(apply_H(e2, 2.0) - np.array([[ 0.2,  2. ]])) == 0
+    True
     """
     N = H0.shape[0]
 
@@ -183,15 +182,17 @@ def get_op_matrix(apply_op, state_shape, t):
         ...     return t * 0.1
         ...
         >>> apply_H = generate_apply_H(H0, H1, pulse)
-        >>> get_op_matrix(apply_H, state_shape=(2,), t=2.0)
-        matrix([[ 1.0+0.j,  0.2+0.j],
-                [ 0.2+0.j,  2.0+0.j]])
+        >>> norm(get_op_matrix(apply_H, state_shape=(2,), t=2.0) -
+        ...  np.matrix([[ 1.0+0.j,  0.2+0.j],
+        ...            [ 0.2+0.j,  2.0+0.j]])) == 0
+        True
         >>> apply_L = generate_apply_L(H0, H1, pulse)
-        >>> get_op_matrix(apply_L, state_shape=(2,2), t=2.0)
-        matrix([[ 0.0+0.j,  0.2+0.j, -0.2+0.j,  0.0+0.j],
-                [ 0.2+0.j,  1.0+0.j,  0.0+0.j, -0.2+0.j],
-                [-0.2+0.j,  0.0+0.j, -1.0+0.j,  0.2+0.j],
-                [ 0.0+0.j, -0.2+0.j,  0.2+0.j,  0.0+0.j]])
+        >>> norm(get_op_matrix(apply_L, state_shape=(2,2), t=2.0) -
+        ... np.matrix([[ 0.0+0.j,  0.2+0.j, -0.2+0.j,  0.0+0.j],
+        ...            [ 0.2+0.j,  1.0+0.j,  0.0+0.j, -0.2+0.j],
+        ...            [-0.2+0.j,  0.0+0.j, -1.0+0.j,  0.2+0.j],
+        ...            [ 0.0+0.j, -0.2+0.j,  0.2+0.j,  0.0+0.j]])) == 0
+        True
     """
     assert 1 <= len(state_shape) <= 2, \
     "dimension of shape must be 1 or 2"

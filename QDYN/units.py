@@ -186,8 +186,8 @@ class UnitConvert(object):
         1_GHz
         >>> import numpy as np
         >>> v = np.linspace(0, 1000, 3)
-        >>> convert.convert(v, 'MHz', 'GHz')
-        array([ 0. ,  0.5,  1. ])
+        >>> print(convert.convert(v, 'MHz', 'GHz'))
+        [0.  0.5 1. ]
     """
     def __init__(self, units_file=None):
         self._convfactor = {} # unit => factor for internal unit to unit

@@ -1,5 +1,6 @@
 from QDYN.pulse import carrier, blackman, CRAB_carrier, pulse_tgrid
 from QDYN.analytical_pulse import AnalyticalPulse
+from QDYN.units import UnitFloat
 import numpy as np
 import filecmp
 import pytest
@@ -164,3 +165,33 @@ def test_analytical_pulse(tmpdir):
     "Coefficients 'a_low' should be a numpy array"
     p4_copy.write(tmp('p4_copy.json'), pretty=True)
     assert filecmp.cmp(tmp("p4.json"), tmp("p4_copy.json"))
+
+
+def test_analytical_pulse_with_tgrid():
+    p0 = AnalyticalPulse.from_func(
+        ampl_1freq, parameters={'E0': 100, 'T': 200, 'w_L': 6.5},
+        time_unit='ns', ampl_unit='MHz')
+    assert p0.t0 == 0.0
+    assert p0.T is None
+    assert p0.nt is None
+    assert p0.dt is None
+    assert p0.tgrid is None
+    assert p0.tgrid is None
+    assert p0.w_max is None
+    assert p0.dw is None
+    assert p0.to_num_pulse() is None
+
+    p1 = AnalyticalPulse.from_func(
+        ampl_1freq, parameters={'E0': 100, 'T': 200, 'w_L': 6.5},
+        time_unit='ns', ampl_unit='MHz', t0=0, T='T',
+        nt=lambda _p: int(float(_p.T * 10))+1)
+    assert p0 != p1
+    assert p1.copy() == p1
+    assert p1.t0 == 0.0
+    assert p1.T == UnitFloat(200, 'ns')
+    assert p1.nt == 2001
+    assert p1.dt == UnitFloat(0.1, 'ns')
+    assert np.max(np.abs(p1.tgrid - np.linspace(0.05, 200-0.05, 2000))) < 1e-14
+    assert p1.w_max == 5.0
+    assert p1.dw == 0.005
+    assert p1.to_num_pulse() == p0.to_num_pulse(pulse_tgrid(200, 2001))

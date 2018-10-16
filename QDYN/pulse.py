@@ -130,8 +130,9 @@ class Pulse(object):
             when writing the pulse to file. Each line should start with '# '
         postamble (list): List of lines that are written after all data
             lines. Each line should start with '# '
-        config_attribs (dict): Additional config data, for the `config_line`
-            method (e.g. `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
+        config_attribs (dict): Additional config data, for when generating a
+            QDYN config file section describing the pulse (e.g.
+            `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
 
     Class Attributes:
         unit_convert (QDYN.units.UnitConvert): converter to be used for any
@@ -231,9 +232,12 @@ class Pulse(object):
         for attr in public_attribs:
             if getattr(self, attr) != getattr(other, attr):
                 return False
-        if np.max(np.abs(self.tgrid - other.tgrid)) > 1.0e-12:
-            return False
-        if np.max(np.abs(self.amplitude - other.amplitude)) > 1.0e-12:
+        try:
+            if np.max(np.abs(self.tgrid - other.tgrid)) > 1.0e-12:
+                return False
+            if np.max(np.abs(self.amplitude - other.amplitude)) > 1.0e-12:
+                return False
+        except ValueError:
             return False
         return True
 
@@ -249,7 +253,6 @@ class Pulse(object):
 
     def _check(self):
         """Assert self-consistency of pulse"""
-        logger = logging.getLogger(__name__)
         assert self.tgrid is not None, "Pulse is not initialized"
         assert self.amplitude is not None, "Pulse is not initialized"
         assert isinstance(self.tgrid, np.ndarray), "tgrid must be numpy array"
@@ -1143,8 +1146,8 @@ def pulse_tgrid(T, nt, t0=0.0):
     shifted by dt/2 with respect to the time grid of the states. Also, the
     pulse time grid will have nt-1 points:
 
-    >>> pulse_tgrid(1.5, nt=4)
-    array([ 0.25,  0.75,  1.25])
+    >>> print(pulse_tgrid(1.5, nt=4))
+    [0.25 0.75 1.25]
 
     The limits of the states time grid are defined as the starting and end
     points of the pulse, however:

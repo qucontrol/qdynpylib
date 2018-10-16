@@ -502,7 +502,7 @@ def read_real(str):
 
     This works for Fortran-formatted numbers with a missing 'E' sign
 
-    >>> read_complex("-2.0-100")
+    >>> read_real("-2.0-100")
     -2e-100
     """
     try:

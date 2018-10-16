@@ -48,9 +48,9 @@ from collections import OrderedDict
 
 import numpy as np
 
-from .pulse import Pulse, pulse_tgrid, _PulseConfigAttribs
+from .pulse import Pulse, _PulseConfigAttribs
 from .linalg import iscomplexobj
-from .units import UnitConvert
+from .units import UnitConvert, UnitFloat
 
 
 class NumpyAwareJSONEncoder(json.JSONEncoder):
@@ -88,6 +88,7 @@ class NumpyAwareJSONDecoder(json.JSONDecoder):
     def __init__(self, *args, **kargs):
         json.JSONDecoder.__init__(self, object_hook=self.dict_to_object,
                                   *args, **kargs)
+
     def dict_to_object(self, d):
         """Convert (type, vals) to type(vals) for numpy-array-types"""
         inst = d
@@ -103,25 +104,42 @@ class NumpyAwareJSONDecoder(json.JSONDecoder):
 class AnalyticalPulse(object):
     """Representation of a pulse determined by an analytical formula
 
-    The `formula` parameter must be the name of a previously registered
-    formula. All other parameters set the corresponding attribute.
+    Args:
+        formula (str): Name of a previously registered formula
+        parameters (dict): Dictionary of values for the pulse formula
+        time_unit (str or None): The unit of the `tgrid` input parameter of the
+            formula (None is equivalent to 'iu')
+        ampl_unit (str or None): Unit in which the amplitude is defined. It is
+            assumed that the formula gives values in the correct unit.
+        t0 (float or str or callable): Start time of the pulse
+        T (float or str or callable or None): End time of the pulse
+        nt (int or str or callable or None): Number of grid points between `t0`
+            and `T` (inclusive)
+        freq_unit (float or None): Preferred unit for pulse spectra
+        config_attribs (dict or None): Additional config data, for when
+            generating a QDYN config file section describing the pulse (e.g.
+            `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
 
     Attributes:
         parameters (dict): Dictionary of values for the pulse formula
-        time_unit (str): The unit of the `tgrid` input parameter of the formula
-        ampl_unit (str): Unit in which the amplitude is defined. It is assumed
-            that the formula gives values in the correct .
-        freq_unit (str, None): Preferred unit for pulse spectra
-        mode ("real", "complex", or None): If None, the mode will be selected
-            depending on the whether the formula returns real or complex
-            values. When set explicitly, the formula *must* give matching
-            values
-        config_attribs (dict): Additional config data, for the `config_line`
-            method (e.g. `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
+        time_unit (str or None): Value of the `time_unit` arg
+        ampl_unit (str): Value of the `ampl_unit` arg
+        freq_unit (str, None): Value of the `freq_unit` arg
+        config_attribs (MutableMapping): dictionary with the items from the
+            `config_attribs` arg
+    Notes:
+        The `t0`, `T`, and `nt` may be given to specify a time grid that is
+        used by default when converting to a numerical pulse
+        (:meth:`to_num_pulse`). They may be a numerical value, which will
+        be used directly. Alternatively, they may be a string, which is a
+        key in the `parameters` dict, and the value of the corresponding
+        parameter will be used. Lastly, they may be a callable the receives
+        the entire :class:`AnalyticalPulse` object as its argument and
+        returns and appropriate numerical value.
     """
-    _formulas = {} # formula name => formula callable, see `register_formula()`
+    _formulas = {}  # formula name => formula callable, cf `register_formula()`
     _allowed_args = {}  # formula name => allowed arguments
-    _required_args = {} # formula name => required arguments
+    _required_args = {}  # formula name => required arguments
     unit_convert = UnitConvert()
 
     @classmethod
@@ -147,7 +165,7 @@ class AnalyticalPulse(object):
 
     def __init__(
             self, formula, parameters=None, time_unit=None, ampl_unit=None,
-            t0=0.0, freq_unit=None, config_attribs=None):
+            t0=0.0, T=None, nt=None, freq_unit=None, config_attribs=None):
         if formula not in self._formulas:
             raise ValueError("Unknown formula '%s'" % formula)
         self._formula = formula
@@ -162,11 +180,144 @@ class AnalyticalPulse(object):
         if config_attribs is not None:
             for key in config_attribs:
                 self.config_attribs[key] = config_attribs[key]
+        self._t0 = t0
+        self._T = T
+        self._nt = nt
+
+    def _get(self, attr):
+        val = getattr(self, attr)
+        if isinstance(val, str):
+            return self.parameters[val]
+        elif callable(val):
+            return val(self)
+        else:
+            return val
+
+    @property
+    def t0(self):
+        """Time at which the pulse begins (dt/2 before the first point in the
+        pulse), as instance of `UnitFloat`
+        """
+        t0 = self._get('_t0')
+        if t0 is None:
+            return None
+        else:
+            return UnitFloat(t0, self.time_unit)
+
+    @property
+    def T(self):
+        """Time at which the pulse ends (dt/2 after the last point in the
+        pulse), as an instance of :obj:`UnitFloat`.
+
+        None if T was given as None in initialization.
+        """
+        T = self._get('_T')
+        if T is None:
+            return None
+        else:
+            return UnitFloat(T, self.time_unit)
+
+    @property
+    def tgrid(self):
+        """Time grid points for the numerical pulse values, as numpy array in
+        units of :attr:`time_unit`.
+
+        None if missing `T`, `nt` in initialization.
+
+        The returned time grid has ``nt - 1`` values, and extends from ``t0 +
+        dt/2`` to ``T - dt/2``, matching the requirements for the `tgrid`
+        argument of :class:`Pulse`.
+
+        See also:
+            :attr:`states_tgrid` is the time grid of length ``nt`` from ``t0``
+            to ``T``
+        """
+        try:
+            return np.linspace(
+                float(self.t0 + self.dt/2),
+                float(self.T - self.dt/2),
+                self.nt-1, dtype=np.float64)
+        except TypeError:
+            return None
+
+    @property
+    def states_tgrid(self):
+        """Time grid values for the states propagated under the numerica pulse
+        values, as numpy array in units of :attr:`time_unit`.
+
+        None if missing `T`, `nt` in initialization.
+
+        The returned time grid has ``nt`` values, and extends from ``t0``
+        to ``T`` (inclusive).
+
+        See also:
+            attr:`tgrid` is the time grid for the numerical pulse values of
+            length ``nt-1``, extending from ``t0 + dt/2`` to ``T - dt/2``.
+        """
+        try:
+            return np.linspace(
+                float(self.t0),
+                float(self.T),
+                self.nt, dtype=np.float64)
+        except TypeError:
+            return None
+
+    @property
+    def dt(self):
+        """Time grid step, as instance of `UnitFloat`
+
+        None if time grid is not defined (missing T, nt in initialization).
+        """
+        t0 = self.t0
+        nt = self.nt
+        T = self.T
+        if T is None or t0 is None or nt is None:
+            return None
+        else:
+            return (T - t0) / (nt - 1)
+
+    @property
+    def nt(self):
+        """Number of time steps in the time grid between :attr:`t0` and
+        :attr:`T`, as an integer.
+
+        None if `nt` missing in initialization.
+        """
+        nt = self._get('_nt')
+        if nt is None:
+            return None
+        else:
+            return int(nt)
+
+    @property
+    def w_max(self):
+        """Maximum frequency that can be represented with the
+        current sampling rate.
+
+        None if time grid is not defined (missing T, nt in initialization).
+        """
+        try:
+            return self.to_num_pulse().w_max
+        except AttributeError:
+            return None
+
+    @property
+    def dw(self):
+        """Step width in the spectrum (i.e. the spectral resolution)
+        based on the current pulse duration, as an instance of
+        :obj:`UnitFloat`.
+
+        None if time grid is not defined (missing T, nt in initialization).
+        """
+        try:
+            return self.to_num_pulse().dw
+        except AttributeError:
+            return None
 
     @classmethod
     def from_func(
             cls, func, parameters=None, time_unit=None, ampl_unit=None,
-            freq_unit=None, config_attribs=None):
+            t0=0.0, T=None, nt=None, freq_unit=None, config_attribs=None):
         """Instantiate directly from a callable `func`, without the need to
         register the formula first
 
@@ -177,7 +328,7 @@ class AnalyticalPulse(object):
         cls.register_formula(name, func)
         return cls(
             name, parameters=parameters, time_unit=time_unit,
-            ampl_unit=ampl_unit, freq_unit=freq_unit,
+            ampl_unit=ampl_unit, t0=t0, T=T, nt=nt, freq_unit=freq_unit,
             config_attribs=config_attribs)
 
     @property
@@ -190,8 +341,10 @@ class AnalyticalPulse(object):
         """Compare two pulses, within a precision of 1e-12"""
         if not isinstance(other, self.__class__):
             return False
-        for attr in ('_formula', 'mode', 'time_unit', 'ampl_unit', 'freq_unit',
-                     'mode', 'postamble', 'config_attribs'):
+        attribs = (
+            '_formula', '_T', '_t0', '_nt', 'time_unit', 'ampl_unit',
+            'freq_unit', 'config_attribs')
+        for attr in attribs:
             if getattr(self, attr) != getattr(other, attr):
                 return False
         for key in self.parameters:
@@ -208,7 +361,8 @@ class AnalyticalPulse(object):
         return self.__class__(
             self._formula, parameters=self.parameters,
             time_unit=self.time_unit, ampl_unit=self.ampl_unit,
-            freq_unit=self.freq_unit, config_attribs=self.config_attribs)
+            freq_unit=self.freq_unit, config_attribs=self.config_attribs,
+            t0=self._t0, T=self._T, nt=self._nt)
 
     def array_to_parameters(self, array, keys=None):
         """Unpack the given array (numpy array or regular list) into the pulse
@@ -255,14 +409,14 @@ class AnalyticalPulse(object):
         self.parameters contains any extra parameters"""
         formula = self._formula
         for arg in self._required_args[formula]:
-            if not arg in self.parameters:
+            if arg not in self.parameters:
                 raise ValueError(('Required parameter "%s" for formula "%s" '
-                                  'not in parameters %s')%(arg, formula,
-                                  self.parameters))
+                                  'not in parameters %s') % (
+                                      arg, formula, self.parameters))
         for arg in self.parameters:
-            if not arg in self._allowed_args[formula]:
+            if arg not in self._allowed_args[formula]:
                 raise ValueError(('Parameter "%s" does not exist in formula '
-                                  '"%s"')%(arg, formula))
+                                  '"%s"') % (arg, formula))
 
     @property
     def formula_name(self):
@@ -296,7 +450,8 @@ class AnalyticalPulse(object):
             json_opts = {'indent': 2, 'separators': (',', ': '),
                          'sort_keys': True}
         attributes = self.__dict__.copy()
-        attributes['formula'] = attributes.pop('_formula')
+        for key in ['formula', 't0', 'T', 'nt']:
+            attributes[key] = attributes.pop('_%s' % key)
         return json.dumps(attributes, cls=NumpyAwareJSONEncoder,
                           **json_opts)
 
@@ -317,8 +472,8 @@ class AnalyticalPulse(object):
         result = '# Formula "%s"' % self._formula
         if len(self.parameters) > 0:
             result += ' with '
-            json_opts = {'indent': None, 'separators':(', ',': '),
-                        'sort_keys': True}
+            json_opts = {'indent': None, 'separators': (', ', ': '),
+                         'sort_keys': True}
             json_str = json.dumps(self.parameters,
                                   cls=SimpleNumpyAwareJSONEncoder,
                                   **json_opts)
@@ -334,11 +489,28 @@ class AnalyticalPulse(object):
         return pulse
 
     def to_num_pulse(
-            self, tgrid, time_unit=None, ampl_unit=None, freq_unit=None,
-            mode=None):
+            self, tgrid=None, time_unit=None, ampl_unit=None, freq_unit=None):
         """Return a :cls:`~QDYN.pulse.Pulse` instance that contains the
-        corresponding numerical pulse"""
+        corresponding numerical pulse.
+
+        Args:
+            tgrid (numpy array or None): The time grid on which to evaluate the
+                pulse. Use :func:`pulse_tgrid` to generate this.
+            time_unit (str or None): Unit of `tgrid`
+            ampl_unit (str or None): Unit of pulse amplitude
+            freq_unit (str or None): Unit of pulse frequencies
+
+        For any missing argument (None value), the corresponding attribute is
+        used.
+
+        Returns None if `tgrid` is not given explicitly and no time grid was
+        defined on initialization (arguments `T`, `nt`)
+        """
         self._check_parameters()
+        if tgrid is None:
+            tgrid = self.tgrid
+        if tgrid is None:
+            return None
         if time_unit is None:
             time_unit = self.time_unit
         if ampl_unit is None:
@@ -351,10 +523,9 @@ class AnalyticalPulse(object):
         if ampl_unit != self.ampl_unit:
             amplitude = self.unit_convert.convert(amplitude, self.ampl_unit,
                                                   ampl_unit)
-        if (not isinstance(amplitude, np.ndarray)
-        and amplitude.ndim != 1):
+        if not (isinstance(amplitude, np.ndarray) and amplitude.ndim == 1):
             raise TypeError(('Formula "%s" returned type %s instead of the '
-                             'required 1-D numpy array')%(
+                             'required 1-D numpy array') % (
                              self._formula, type(amplitude)))
 
         pulse = Pulse(tgrid=tgrid, amplitude=amplitude, time_unit=time_unit,
