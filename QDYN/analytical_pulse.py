@@ -242,7 +242,7 @@ class AnalyticalPulse(object):
 
     @property
     def states_tgrid(self):
-        """Time grid values for the states propagated under the numerica pulse
+        """Time grid values for the states propagated under the numerical pulse
         values, as numpy array in units of :attr:`time_unit`.
 
         None if missing `T`, `nt` in initialization.
@@ -282,6 +282,9 @@ class AnalyticalPulse(object):
         :attr:`T`, as an integer.
 
         None if `nt` missing in initialization.
+
+        Note that this is the length of :attr:`states_tgrid`, not of
+        :attr:`tgrid`.
         """
         nt = self._get('_nt')
         if nt is None:

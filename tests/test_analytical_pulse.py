@@ -194,4 +194,7 @@ def test_analytical_pulse_with_tgrid():
     assert np.max(np.abs(p1.tgrid - np.linspace(0.05, 200-0.05, 2000))) < 1e-14
     assert p1.w_max == 5.0
     assert p1.dw == 0.005
-    assert p1.to_num_pulse() == p0.to_num_pulse(pulse_tgrid(200, 2001))
+    p1_num = p1.to_num_pulse()
+    assert p1_num == p0.to_num_pulse(pulse_tgrid(200, 2001))
+    assert np.max(np.abs(p1_num.tgrid - p1.tgrid)) < 1e-14
+    assert np.max(np.abs(p1_num.states_tgrid - p1.states_tgrid)) < 1e-14

@@ -118,7 +118,7 @@ class Pulse(object):
 
     Attributes:
         tgrid (ndarray(float64)): time points at which the pulse values are
-            defined
+            defined, from ``t0 + dt/2`` to ``T - dt/2``.
         amplitude (ndarray(float64), ndarray(complex128)): array of real or
             complex pulse values.
         time_unit (str): Unit of values in `tgrid`
@@ -432,6 +432,16 @@ class Pulse(object):
         if abs(result) < 1.0e-15*self.tgrid[-1]:
             result = 0.0
         return UnitFloat(result, self.time_unit)
+
+    @property
+    def states_tgrid(self):
+        """Time grid values for the states propagated under the numerical pulse
+        values, as numpy array in units of :attr:`time_unit`.
+
+        The returned time grid has one point more than :attr:`tgrid`, and
+        extends from :attr:`t0` to :attr:`T` (inclusive).
+        """
+        return np.linspace(float(self.t0), float(self.T), len(self.tgrid)+1)
 
     @property
     def w_max(self):
