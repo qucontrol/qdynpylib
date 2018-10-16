@@ -115,7 +115,8 @@ class AnalyticalPulse(object):
         T (float or str or callable or None): End time of the pulse
         nt (int or str or callable or None): Number of grid points between `t0`
             and `T` (inclusive)
-        freq_unit (float or None): Preferred unit for pulse spectra
+        freq_unit (str or None): Preferred unit for pulse spectra. If None,
+            unit will be chose automatically.
         config_attribs (dict or None): Additional config data, for when
             generating a QDYN config file section describing the pulse (e.g.
             `{'oct_shape': 'flattop', 't_rise': '10_ns'}`)
@@ -124,7 +125,7 @@ class AnalyticalPulse(object):
         parameters (dict): Dictionary of values for the pulse formula
         time_unit (str or None): Value of the `time_unit` arg
         ampl_unit (str): Value of the `ampl_unit` arg
-        freq_unit (str, None): Value of the `freq_unit` arg
+        freq_unit (str): Value of the `freq_unit` arg
         config_attribs (MutableMapping): dictionary with the items from the
             `config_attribs` arg
     Notes:
@@ -173,9 +174,14 @@ class AnalyticalPulse(object):
             parameters = {}
         self.parameters = parameters
         self._check_parameters()
-        self.time_unit = time_unit
-        self.ampl_unit = ampl_unit
+        self.time_unit = time_unit or 'iu'  # cannot be None
+        self.ampl_unit = ampl_unit or 'iu'  # cannot be None
         self.freq_unit = freq_unit
+        if freq_unit is None:
+            try:
+                self.freq_unit = Pulse.freq_units[self.time_unit]
+            except KeyError:
+                raise TypeError("freq_unit must be specified")
         self.config_attribs = _PulseConfigAttribs(self)
         if config_attribs is not None:
             for key in config_attribs:

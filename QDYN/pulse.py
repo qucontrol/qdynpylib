@@ -182,6 +182,11 @@ class Pulse(object):
     """
     unit_convert = UnitConvert()
 
+    freq_units = {  # map time_unit to most suitable freq_unit
+        'ns': 'GHz', 'ps': 'cminv', 'fs': 'eV', 'microsec': 'MHz',
+        'au': 'au', 'iu': 'iu', 'unitless': 'unitless',
+        'dimensionless': 'dimensionless'}
+
     def __init__(
             self, tgrid, amplitude=None, time_unit=None, ampl_unit=None,
             freq_unit=None, config_attribs=None):
@@ -206,14 +211,10 @@ class Pulse(object):
         self.preamble = []
         self.postamble = []
 
-        freq_units = {  # map time_unit to most suitable freq_unit
-            'ns': 'GHz', 'ps': 'cminv', 'fs': 'eV', 'microsec': 'MHz',
-            'au': 'au', 'iu': 'iu', 'unitless': 'unitless',
-            'dimensionless': 'dimensionless'}
         self.freq_unit = freq_unit
         if freq_unit is None:
             try:
-                self.freq_unit = freq_units[self.time_unit]
+                self.freq_unit = self.freq_units[self.time_unit]
             except KeyError:
                 raise TypeError("freq_unit must be specified")
         self.config_attribs = _PulseConfigAttribs(self)

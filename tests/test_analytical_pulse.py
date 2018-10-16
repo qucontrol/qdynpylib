@@ -186,6 +186,9 @@ def test_analytical_pulse_with_tgrid():
         time_unit='ns', ampl_unit='MHz', t0=0, T='T',
         nt=lambda _p: int(float(_p.T * 10))+1)
     assert p0 != p1
+    assert p1.time_unit == 'ns'
+    assert p1.ampl_unit == 'MHz'
+    assert p1.freq_unit == 'GHz'
     assert p1.copy() == p1
     assert p1.t0 == 0.0
     assert p1.T == UnitFloat(200, 'ns')
@@ -198,3 +201,6 @@ def test_analytical_pulse_with_tgrid():
     assert p1_num == p0.to_num_pulse(pulse_tgrid(200, 2001))
     assert np.max(np.abs(p1_num.tgrid - p1.tgrid)) < 1e-14
     assert np.max(np.abs(p1_num.states_tgrid - p1.states_tgrid)) < 1e-14
+    assert p1_num.dt == p1.dt
+    assert p1_num.w_max == p1.w_max
+    assert p1_num.dw == p1.dw
