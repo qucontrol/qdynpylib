@@ -15,9 +15,46 @@ import scipy.sparse
 import numpy as np
 import six
 from six.moves import xrange
-from click.utils import open_file
 
 from .linalg import iscomplexobj
+
+
+@contextmanager
+def open_file(
+        file, mode='r', buffering=-1, encoding=None, errors=None, newline=None,
+        closefd=True, opener=None):
+    """Like the builtin func:`open`, but allow an existing open file handle to
+    be passed for `file`"""
+    fh_attribs = ('seek', 'close', 'read', 'write')
+    is_fh = all(hasattr(file, attr) for attr in fh_attribs)
+    if is_fh:
+        if hasattr(file, 'mode'):  # e.g. sys.stdout doesn't have mode attr
+            if file.mode != mode:
+                raise IOError(
+                    "File handle %s aleady open in mode %s; cannot open in "
+                    "mode %s" % (file, file.mode, mode))
+        if encoding is not None and hasattr(file, 'encoding'):
+            if encoding != file.encoding:
+                raise IOError(
+                    "Open file handle %s has enconding %s; cannot open with "
+                    "encoding %s" (file, file.encoding, encoding))
+        yield file
+    else:
+        if file == '-':
+            if mode == 'r':
+                yield sys.stdin
+            elif mode == 'w':
+                yield sys.stdout
+            else:
+                raise IOError(
+                    "File '-' can only be opened in 'r' mode (stdin) or "
+                    "'w' mode (stdout)")
+        else:
+            with open(
+                    file, mode, buffering=buffering, encoding=encoding,
+                    errors=errors, newline=newline, closefd=closefd,
+                    opener=opener) as fh:
+                yield fh
 
 
 @contextmanager
@@ -546,7 +583,7 @@ def datablock(filename, block, decoding=None):
     """
     in_block = 0
     blank = 0
-    with open(filename, 'rb') as in_fh:
+    with open_file(filename, 'rb') as in_fh:
         for line in in_fh:
             if len(line.strip()) == 0:
                 blank += 1
@@ -585,7 +622,7 @@ def write_cmplx_array(carray, filename, header=None, fmtstr='%25.16E',
     if header is not None:
         header_lines.append(header)
     if append:
-        with open(filename, 'a') as out_fh:
+        with open_file(filename, 'a') as out_fh:
             out_fh.write("\n\n")
             writetotxt(out_fh, carray, fmt=(fmtstr, fmtstr),
                        header=header_lines)
@@ -1041,7 +1078,7 @@ def read_ascii_dump(filename, convert_boolean=True, flatten=False):
             (one-dimensional). If False, it is reshaped to the shape defined in
             the dump file.
     """
-    with open(filename) as in_fh:
+    with open_file(filename) as in_fh:
         try:
             return _read_ascii_dump(in_fh, convert_boolean=convert_boolean,
                                     flatten=flatten)

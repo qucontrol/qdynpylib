@@ -21,7 +21,7 @@ from scipy.interpolate import UnivariateSpline
 from six.moves import xrange
 
 from .units import UnitConvert, UnitFloat
-from .io import writetotxt
+from .io import writetotxt, open_file
 from .linalg import iscomplexobj
 
 
@@ -329,7 +329,7 @@ class Pulse(object):
             y = None
         preamble = []
         postamble = []
-        with open(filename) as in_fh:
+        with open_file(filename) as in_fh:
             in_preamble = True
             for line in in_fh:
                 if line.startswith('#'):
@@ -791,7 +791,7 @@ class Pulse(object):
             else:
                 buffer += '# %s' % line
 
-        with open(filename, 'w') as out_fh:
+        with open_file(filename, 'w') as out_fh:
             out_fh.write(buffer)
 
     def write_oct_spectral_filter(self, filename, filter_func, freq_unit=None):

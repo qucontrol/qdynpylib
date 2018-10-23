@@ -8,7 +8,7 @@ from numpy import pi
 from six.moves import xrange
 
 from .linalg import norm
-from .io import read_real
+from .io import read_real, open_file
 
 
 def write_psi_amplitudes(psi, filename):
@@ -19,7 +19,7 @@ def write_psi_amplitudes(psi, filename):
         psi (numpy array): Array of complex probability amplitudes
         filename (str): Name of file to which to write
     """
-    with open(filename, 'w') as out_fh:
+    with open_file(filename, 'w') as out_fh:
         is_complex = np.any(np.iscomplex(psi))
         if is_complex:
             out_fh.write("#%9s%25s%25s\n"
@@ -88,7 +88,7 @@ def iterate_psi_amplitudes(filename, n, start_from_block=1, normalize=True):
         else:
             return psi
 
-    with open(filename, 'r') as in_fh:
+    with open_file(filename, 'r') as in_fh:
         for line_nr, line in enumerate(in_fh):
             line = line.strip()
             if line == '':
