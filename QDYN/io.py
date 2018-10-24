@@ -2,6 +2,7 @@
 from __future__ import print_function, division, absolute_import
 
 import sys
+import io
 import re
 import os
 from collections import OrderedDict
@@ -20,11 +21,33 @@ from .linalg import iscomplexobj
 
 
 @contextmanager
-def open_file(
-        file, mode='r', buffering=-1, encoding=None, errors=None, newline=None,
-        closefd=True, opener=None):
-    """Like the builtin func:`open`, but allow an existing open file handle to
-    be passed for `file`"""
+def open_file(file, mode='r', **kwargs):
+    """Wrapper around :func:`io.open`, allowing `file` to be a file handle.
+
+    Any `kwargs` are passed to :func:`io.open`. The `file` parameter may also
+    be given as the string '-', which indicates :obj:`sys.stdin` for
+    ``mode='r'`` and :obj:`sys.stdout` for ``mode='w'``. If `file` is an open
+    file handle, its `mode` and `encoding` are checked against the arguments;
+    the file handle will not be closed one exit.
+
+    In Python 2, if no `kwargs` beyond `mode` are given and `file` is a string
+    giving a pathname or a file descriptor, the built-in :func:`open` function
+    is used instead of :func:`io.open`. As a consequence, regular (unencoded)
+    strings can be read or written directly from or to the resulting file
+    handle, without having to open it in binary mode. This behavior provides
+    maximal compatibility between Python 2 and 3.
+
+    This function must be used as a context manager::
+
+    >>> with open_file('-', 'w') as out_fh:
+    ...      written_bytes = out_fh.write("Hello World")
+    Hello World
+
+    Raises:
+        IOError: If the file cannot be opened (see :func:`io.open`), if `file`
+        is open file handle with the incorrect `mode` or `encoding`, or if
+        `file` is '-' and `mode` is neither 'r' nor 'w'.
+    """
     fh_attribs = ('seek', 'close', 'read', 'write')
     is_fh = all(hasattr(file, attr) for attr in fh_attribs)
     if is_fh:
@@ -33,13 +56,13 @@ def open_file(
                 raise IOError(
                     "File handle %s aleady open in mode %s; cannot open in "
                     "mode %s" % (file, file.mode, mode))
-        if encoding is not None and hasattr(file, 'encoding'):
-            if encoding != file.encoding:
+        if 'encoding' in kwargs and hasattr(file, 'encoding'):
+            if kwargs['encoding'] != file.encoding:
                 raise IOError(
                     "Open file handle %s has enconding %s; cannot open with "
-                    "encoding %s" (file, file.encoding, encoding))
+                    "encoding %s" (file, file.encoding, kwargs['encoding']))
         yield file
-    else:
+    else:  # str or descriptor or path-like object
         if file == '-':
             if mode == 'r':
                 yield sys.stdin
@@ -50,11 +73,13 @@ def open_file(
                     "File '-' can only be opened in 'r' mode (stdin) or "
                     "'w' mode (stdout)")
         else:
-            with open(
-                    file, mode, buffering=buffering, encoding=encoding,
-                    errors=errors, newline=newline, closefd=closefd,
-                    opener=opener) as fh:
-                yield fh
+            if len(kwargs) > 0:
+                with io.open(file, mode, **kwargs) as fh:
+                    yield fh
+            else:
+                # on Python 3, `io.open` and `open` are identical
+                with open(file, mode, **kwargs) as fh:
+                    yield fh
 
 
 @contextmanager
