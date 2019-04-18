@@ -1,8 +1,13 @@
 #!/usr/bin/env python
-from setuptools import setup
+# -*- coding: utf-8 -*-
+
+"""The setup script."""
+
+from setuptools import setup, find_packages
 
 
 def get_version(filename):
+    """Extract the package version"""
     with open(filename) as in_fh:
         for line in in_fh:
             if line.startswith('__version__'):
@@ -10,41 +15,56 @@ def get_version(filename):
     raise ValueError("Cannot extract version from %s" % filename)
 
 
-setup(name='QDYN',
-      version=get_version("QDYN/__init__.py"),
-      description='Package providing some Python modules for working with ' \
-                  'the QDYN Fortran library',
-      author='Michael Goerz',
-      author_email='goerz@stanford.edu',
-      url='https://github.com/goerz/qdynpylib',
-      license='GPL',
-      install_requires=[
-          'numpy>=1.9',
-          'matplotlib>=1.3',
-          'scipy>=0.15',
-          'sympy>=0.7',
-          'bokeh>=0.8',
-          'click>=5.0',
-      ],
-      extras_require={'dev': ['pytest', 'coverage', 'pytest-cov',
-                              'pytest-xdist', 'sphinx_rtd_theme',
-                              'better-apidoc']},
-      packages=['QDYN', ],
-      scripts=[],
-      entry_points='''
-        [console_scripts]
-        qdyn_lb2diss=QDYN._lb2diss:main
-      ''',
-      classifiers=[
-          'Development Status :: 4 - Beta',
-          'Environment :: Console',
-          'Environment :: Web Environment',
-          'Intended Audience :: Science/Research',
-          'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
-          'Natural Language :: English',
-          'Topic :: Scientific/Engineering',
-          'Programming Language :: Python :: 2.7',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-      ]
-     )
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
+
+try:
+    with open('HISTORY.rst') as history_file:
+        history = history_file.read()
+except OSError:
+    history = ''
+
+requirements = ['numpy', 'matplotlib', 'scipy', 'sympy', 'click']
+
+dev_requirements = [
+    'coverage', 'pytest', 'pytest-cov', 'pytest-xdist', 'twine', 'pep8',
+    'flake8', 'wheel', 'sphinx', 'sphinx-autobuild', 'sphinx_rtd_theme',
+    'sphinx-autodoc-typehints', 'gitpython', 'qutip']
+dev_requirements.append('better-apidoc')
+
+dev_requirements.extend([
+    'jupyter', 'nbval', 'nbsphinx', 'watermark'])
+
+
+version = get_version('./src/qdyn/__init__.py')
+
+setup(
+    author="Michael Goerz",
+    author_email='mail@michaelgoerz.net',
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+    ],
+    description=(
+        "Python package for interacting with the Fortran QDYN library "
+        "and tools"),
+    python_requires='>=3.6',
+    install_requires=requirements,
+    extras_require={
+        'dev': dev_requirements,
+    },
+    license="BSD license",
+    long_description=readme + '\n\n' + history,
+    include_package_data=True,
+    keywords='qdyn',
+    name='qdyn',
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    url='https://github.com/qucontrol/qdynpylib',
+    version=version,
+    zip_safe=False,
+)

@@ -1,116 +1,173 @@
-PROJECT_NAME = QDYN
-PACKAGES =  pip "numpy<1.15" matplotlib scipy sympy ipython bokeh pytest coverage click sphinx
-TESTPYPI = https://testpypi.python.org/pypi
+.PHONY: clean clean-test clean-pyc clean-build clean-venvs line pep8 docs dist install develop help
+.DEFAULT_GOAL := help
+CONDA_PACKAGES = qutip
+TESTENV = MATPLOTLIBRC=tests
+TESTOPTIONS = --doctest-modules --cov=qdyn --nbval --sanitize-with docs/nbval_sanitize.cfg
+TESTS = src tests docs/*.rst
+# if there are any ipynb files added to the documentation, make sure to extend
+# the above list of TESTS
 
-TESTENV = PYTHONHASHSEED=0 MATPLOTLIBRC=tests
-TESTOPTIONS = --doctest-modules --cov=QDYN --cov-config .coveragerc -n auto
-TESTS = QDYN tests
-# You may redefine TESTS to run a specific test. E.g.
-#     make test TESTS="tests/test_io.py"
+
+define PRINT_HELP_PYSCRIPT
+import re, sys
+
+for line in sys.stdin:
+	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
+	if match:
+		target, help = match.groups()
+		print("%-20s %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
 
 help:
-	@echo 'Makefile for qdynpylib                                                 '
-	@echo '                                                                       '
-	@echo 'Usage:                                                                 '
-	@echo '   make develop       Install "editable" version of package            '
-	@echo '   make install       Install package into current environment         '
-	@echo '   make uninstall     Remove package from current environment          '
-	@echo '   make upload        Upload package to pypi                           '
-	@echo '   make test-upload   Upload package to testpypi                       '
-	@echo '   make test-install  Install fromm testpypi                           '
-	@echo '   make clean         Remove build files                               '
-	@echo '   make test27        Test on Python 2.7                            	  '
-	@echo '   make test34        Test on Python 3.4                               '
-	@echo '   make test35        Test on Python 3.5                               '
-	@echo '   make test35        Test on Python 3.6                               '
-	@echo '   make test          Test on all versions of Python                   '
-	@echo '   make coverage      Generate coverage report htmlcov                 '
+	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-develop:
-	pip install -e .[dev]
+clean: clean-build clean-pyc clean-test clean-venvs ## remove all build, test, coverage, and Python artifacts, as well as environments
+	$(MAKE) -C docs clean
 
-install:
-	pip install .
+clean-build: ## remove build artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	rm -fr src/*.egg-info
+	rm -fr pip-wheel-metadata
+	find tests src -name '*.egg-info' -exec rm -fr {} +
+	find tests src -name '*.egg' -exec rm -f {} +
 
-uninstall:
-	pip uninstall $(PROJECT_NAME)
+clean-pyc: ## remove Python file artifacts
+	find tests src -name '*.pyc' -exec rm -f {} +
+	find tests src -name '*.pyo' -exec rm -f {} +
+	find tests src -name '*~' -exec rm -f {} +
+	find tests src -name '__pycache__' -exec rm -fr {} +
 
-sdist:
-	python setup.py sdist
+clean-test: ## remove test and coverage artifacts
+	rm -f .coverage
+	rm -fr htmlcov/
 
-upload:
-	python setup.py register
-	python setup.py sdist upload
+clean-venvs: ## remove testing/build environments
+	rm -fr .tox
+	rm -fr .venv
 
-test-upload:
-	python setup.py register -r $(TESTPYPI)
-	python setup.py sdist upload -r $(TESTPYPI)
+lint: ## check style with flake8
+	flake8 src tests
 
-test-install:
-	pip install -i $(TESTPYPI) $(PROJECT_NAME)
+pep8: ## check style with pep8
+	pep8 src tests
 
-clean:
-	@rm -rf build
-	@rm -rf __pycache__
-	@rm -rf dist
-	@rm -f *.pyc
-	@rm -rf QDYN.egg-info
-	@rm -f QDYN/*.pyc
-	@rm -f QDYN/prop/*.pyc
-	@rm -rf QDYN/__pycache__
-	@rm -f tests/*.pyc
-	@rm -rf tests/__pycache__
-	@rm -f QDYN/__git__.py
-	@rm -f test_octconvergences.html
-	@rm -f tests/result_images/*
-	@rm -f .coverage
 
-clean-doc:
-	@rm -rf docs/build
-	@rm -rf doc
-
-distclean: clean clean-doc
-	@rm -rf .venv
-
-.venv/py27/bin/py.test:
-	@conda create -y -m -p .venv/py27 python=2.7 $(PACKAGES)
-	@.venv/py27/bin/pip install -e .[dev]
-
-.venv/py33/bin/py.test:
-	@conda create -y -m -p .venv/py33 python=3.3 $(PACKAGES)
-	@.venv/py33/bin/pip install -e .[dev]
+test:   test36 test37 ## run tests on every Python version
 
 .venv/py34/bin/py.test:
-	@conda create -y -m -p .venv/py34 python=3.4 $(PACKAGES)
+	@conda create -y -m -p .venv/py34 python=3.4
+	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py34 $(CONDA_PACKAGES)
 	@.venv/py34/bin/pip install -e .[dev]
 
+test34: .venv/py34/bin/py.test ## run tests for Python 3.4
+	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
+
 .venv/py35/bin/py.test:
-	@conda create -y -m -p .venv/py35 python=3.5 $(PACKAGES)
+	@conda create -y -m -p .venv/py35 python=3.5
+	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py35 $(CONDA_PACKAGES)
 	@.venv/py35/bin/pip install -e .[dev]
 
+test35: .venv/py35/bin/py.test ## run tests for Python 3.5
+	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
+
 .venv/py36/bin/py.test:
-	@conda create -y -m -p .venv/py36 python=3.6 $(PACKAGES)
+	@conda create -y -m -p .venv/py36 python=3.6
+	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py36 $(CONDA_PACKAGES)
 	@.venv/py36/bin/pip install -e .[dev]
 
-test27: .venv/py27/bin/py.test
+test36: .venv/py36/bin/py.test ## run tests for Python 3.6
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
-test35: .venv/py35/bin/py.test
+.venv/py37/bin/py.test:
+	@conda create -y -m -p .venv/py37 python=3.7
+	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 $(CONDA_PACKAGES)
+	@.venv/py37/bin/pip install -e .[dev]
+
+test37: .venv/py37/bin/py.test ## run tests for Python 3.6
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
-test36: .venv/py36/bin/py.test
-	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
+.venv/py37/bin/python: .venv/py37/bin/py.test
 
-test: test27 test35 test36
 
-doc: .venv/py35/bin/py.test docs/source/*.rst QDYN/*.py
-	@rm -f docs/source/API/*
-	$(MAKE) -C docs SPHINXBUILD=../.venv/py35/bin/sphinx-build html
-	@ln -sf docs/build/html doc
+.venv/py37/bin/sphinx-build: .venv/py37/bin/py.test
 
-coverage: test36
-	@rm -rf htmlcov/index.html
-	.venv/py36/bin/coverage html
+docs: .venv/py37/bin/sphinx-build ## generate Sphinx HTML documentation, including API docs
+	$(MAKE) -C docs MATPLOTLIBRC=../tests SPHINXBUILD=../.venv/py37/bin/sphinx-build clean
+	$(MAKE) -C docs MATPLOTLIBRC=../tests SPHINXBUILD=../.venv/py37/bin/sphinx-build html
+	@echo "open docs/_build/html/index.html"
 
-.PHONY: install develop uninstall upload test-upload test-install sdist clean \
-test test27 test35 test36 coverage
+spellcheck: .venv/py37/bin/sphinx-build ## check spelling in docs
+	@.venv/py37/bin/pip install sphinxcontrib-spelling
+	SPELLCHECK=en_US $(MAKE) -C docs SPHINXBUILD=../.venv/py37/bin/sphinx-build spelling
+
+coverage: test37  ## generate coverage report in ./htmlcov
+	.venv/py37/bin/coverage html
+	@echo "open htmlcov/index.html"
+
+test-upload: .venv/py37/bin/python clean-build clean-pyc dist ## package and upload a release to test.pypi.org
+	.venv/py37/bin/twine check dist/*
+	.venv/py37/bin/twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+
+upload: .venv/py37/bin/python clean-build clean-pyc dist ## package and upload a release to pypi.org
+	.venv/py37/bin/twine check dist/*
+	.venv/py37/bin/twine upload dist/*
+
+
+release: clean .venv/py37/bin/python ## Create a new version, package and upload it
+	.venv/py37/bin/python ./scripts/release.py
+
+
+dist: .venv/py37/bin/python clean-build clean-pyc ## builds source and wheel package
+	@$< setup.py sdist
+	@$< setup.py bdist_wheel
+	ls -l dist
+
+dist-check: .venv/py37/bin/python  ## Check all dist files for correctness
+	.venv/py37/bin/twine check dist/*
+
+install: clean-build clean-pyc ## install the package to the active Python's site-packages
+	pip install .
+
+uninstall:  ## uninstall the package from the active Python's site-packages
+	pip uninstall qdyn
+
+develop: clean-build clean-pyc ## install the package to the active Python's site-packages, in develop mode
+	pip install -e .
+
+develop-test: develop ## run tests within the active Python environment
+	$(TESTENV) py.test -v $(TESTOPTIONS) $(TESTS)
+
+
+develop-docs: develop  ## generate Sphinx HTML documentation, including API docs, within the active Python environment
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+	@echo "open docs/_build/html/index.html"
+.venv/py37/bin/jupyter: .venv/py37/bin/py.test
+
+# How to execute notebook files
+%.ipynb.log: %.ipynb .venv/py37/bin/jupyter
+	@echo ""
+	@.venv/py37/bin/jupyter nbconvert --to notebook --execute --inplace --allow-errors --ExecutePreprocessor.kernel_name='python3' --config=/dev/null $< 2>&1 | tee $@
+
+NOTEBOOKFILES = $(shell find docs/ -iname '*.ipynb'  -maxdepth 1)
+NOTEBOOKLOGS = $(patsubst %.ipynb,%.ipynb.log,$(NOTEBOOKFILES))
+
+notebooks: $(NOTEBOOKLOGS)  ## re-evaluate the notebooks
+	@echo ""
+	@echo "All notebook are now up to date; the were executed using the python3 kernel"
+	@.venv/py37/bin/jupyter kernelspec list | grep python3
+
+jupyter-notebook: .venv/py37/bin/jupyter  ## run a notebook server for editing the examples
+	.venv/py37/bin/jupyter notebook --config=/dev/null
+
+jupyter-lab: .venv/py37/bin/jupyter  ## run a jupyterlab server for editing the examples
+	@.venv/py37/bin/pip install jupyterlab
+	.venv/py37/bin/jupyter lab --config=/dev/null

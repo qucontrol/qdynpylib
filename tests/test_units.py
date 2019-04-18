@@ -1,22 +1,14 @@
-import QDYN
-from QDYN.units import UnitFloat, UnitConvert
-import six
 import math
+
 import pytest
 
+from qdyn.units import UnitConvert, UnitFloat
+
+
 def test_unit_float_round():
-    if six.PY2:
-        assert round(UnitFloat(1.11, 'GHz'), 1) == 1.1
-    else:
-        assert round(UnitFloat(1.11, 'GHz'), 1) == UnitFloat(1.1, 'GHz')
-    if six.PY2:
-        assert math.floor(UnitFloat(1.11, 'GHz')) == 1
-    else:
-        assert math.floor(UnitFloat(1.11, 'GHz')) == UnitFloat(1, 'GHz')
-    if six.PY2:
-        assert math.ceil(UnitFloat(1.11, 'GHz')) == 2
-    else:
-        assert math.ceil(UnitFloat(1.11, 'GHz')) == UnitFloat(2, 'GHz')
+    assert round(UnitFloat(1.11, 'GHz'), 1) == UnitFloat(1.1, 'GHz')
+    assert math.floor(UnitFloat(1.11, 'GHz')) == UnitFloat(1, 'GHz')
+    assert math.ceil(UnitFloat(1.11, 'GHz')) == UnitFloat(2, 'GHz')
 
 
 def test_none_unit():
@@ -25,7 +17,7 @@ def test_none_unit():
 
 
 def test_eq():
-    assert UnitFloat(1.0+1e-12, 'GHz') == (1, 'GHz')
+    assert UnitFloat(1.0 + 1e-12, 'GHz') == (1, 'GHz')
     v = UnitFloat(1.0)
     assert v == 1
     with pytest.raises(TypeError) as exc_info:
@@ -67,7 +59,7 @@ def test_unit_convert():
 
     # using the default internal units, we can convert anything to au
     v2 = c.convert(v, to_unit='au')
-    assert str(v) == str(c.convert(v2, from_unit='au',  to_unit='GHz'))
+    assert str(v) == str(c.convert(v2, from_unit='au', to_unit='GHz'))
 
     # Invalid units produces ValueErrors
     with pytest.raises(ValueError) as excinfo:
@@ -82,4 +74,3 @@ def test_unit_convert():
     with pytest.raises(ValueError) as excinfo:
         c.convert(2.5, 'n/a', 'MHz')
     assert "Unknown from_unit" in str(excinfo.value)
-

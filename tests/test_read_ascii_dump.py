@@ -5,7 +5,8 @@ from collections import OrderedDict
 
 import numpy as np
 
-from QDYN.io import read_ascii_dump
+from qdyn.io import read_ascii_dump
+
 # built-in fixtures: request
 
 
@@ -15,9 +16,22 @@ def test_read_para_dump(request):
     test_dir, _ = os.path.splitext(filename)
     para = read_ascii_dump(os.path.join(test_dir, 'para.asciidump'))
     expected_keys = [
-        'runfolder', 'initialized', 'grid', 'tgrid',
-        'ham', 'observables', 'dissipator', 'eigensystem', 'psi', 'pulse',
-        'oct', 'prop', 'bwr', 'numerov', 'user', 'is_set'
+        'runfolder',
+        'initialized',
+        'grid',
+        'tgrid',
+        'ham',
+        'observables',
+        'dissipator',
+        'eigensystem',
+        'psi',
+        'pulse',
+        'oct',
+        'prop',
+        'bwr',
+        'numerov',
+        'user',
+        'is_set',
     ]
     assert para.typename == 'para_t'
     assert list(para.keys()) == expected_keys
@@ -30,8 +44,9 @@ def test_read_para_dump(request):
     assert isinstance(para['user'], OrderedDict)
     assert isinstance(para['user']['reals_vals'], list)
 
-    para = read_ascii_dump(os.path.join(test_dir, 'para.asciidump'),
-                           convert_boolean=False)
+    para = read_ascii_dump(
+        os.path.join(test_dir, 'para.asciidump'), convert_boolean=False
+    )
     assert para['initialized'] == 'T'
 
 
@@ -40,13 +55,21 @@ def test_read_state_dump(request):
     filename = request.module.__file__
     test_dir, _ = os.path.splitext(filename)
     state = read_ascii_dump(os.path.join(test_dir, 'state.asciidump'))
-    expected_keys = ['psi', 'rho', 'coord_min', 'mom_disp', 'movgrid_nr',
-                     'surfs', 'spindim']
+    expected_keys = [
+        'psi',
+        'rho',
+        'coord_min',
+        'mom_disp',
+        'movgrid_nr',
+        'surfs',
+        'spindim',
+    ]
     assert list(state.keys()) == expected_keys
-    assert np.all(state['movgrid_nr'] == np.array([1,]))
+    assert np.all(state['movgrid_nr'] == np.array([1]))
     assert state['rho'].shape == (1, 1, 3, 1, 1, 3)
-    assert state['rho'][0,0,0,0,0,2] == -1j
+    assert state['rho'][0, 0, 0, 0, 0, 2] == -1j
 
-    state = read_ascii_dump(os.path.join(test_dir, 'state.asciidump'),
-                            flatten=True)
-    assert state['rho'].shape == (9, )
+    state = read_ascii_dump(
+        os.path.join(test_dir, 'state.asciidump'), flatten=True
+    )
+    assert state['rho'].shape == (9,)

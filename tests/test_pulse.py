@@ -1,11 +1,17 @@
-import os
 import filecmp
-import QDYN
+import os
+
 import numpy as np
-from QDYN.units import UnitFloat
-from QDYN.pulse import (
-    tgrid_from_config, Pulse, pulse_tgrid, gaussian, blackman)
 import pytest
+
+from qdyn.pulse import (
+    Pulse,
+    blackman,
+    gaussian,
+    pulse_tgrid,
+    tgrid_from_config,
+)
+from qdyn.units import UnitFloat
 
 config_str = r'''
 grid: system = initial, base = exp
@@ -47,14 +53,26 @@ user_logicals: silent = true
 
 def test_tgrid_from_config():
 
-    tgrid_dict = dict([('t_start', 0.0), ('t_stop', UnitFloat(10.0, 'ns')),
-                       ('dt', UnitFloat(0.02, 'ns')), ('fixed', True)])
+    tgrid_dict = dict(
+        [
+            ('t_start', 0.0),
+            ('t_stop', UnitFloat(10.0, 'ns')),
+            ('dt', UnitFloat(0.02, 'ns')),
+            ('fixed', True),
+        ]
+    )
     tgrid = tgrid_from_config(tgrid_dict, time_unit='ns')
     assert ("%g" % tgrid[0]) == "0.01"
     assert ("%g" % tgrid[-1]) == "9.99"
 
-    tgrid_dict = dict([('t_start', 0.0), ('t_stop', UnitFloat(10.0, 'ns')),
-                       ('dt', UnitFloat(20, 'ps')), ('fixed', True)])
+    tgrid_dict = dict(
+        [
+            ('t_start', 0.0),
+            ('t_stop', UnitFloat(10.0, 'ns')),
+            ('dt', UnitFloat(20, 'ps')),
+            ('fixed', True),
+        ]
+    )
     tgrid = tgrid_from_config(tgrid_dict, time_unit='ns')
     assert ("%g" % tgrid[0]) == "0.01"
     assert ("%g" % tgrid[-1]) == "9.99"
@@ -62,8 +80,9 @@ def test_tgrid_from_config():
     assert ("%g" % tgrid[0]) == "10"
     assert ("%g" % tgrid[-1]) == "9990"
 
-    tgrid_dict = dict([('t_start', 0.0), ('t_stop', 10),
-                    ('dt', 0.02), ('fixed', True)])
+    tgrid_dict = dict(
+        [('t_start', 0.0), ('t_stop', 10), ('dt', 0.02), ('fixed', True)]
+    )
     with pytest.raises(ValueError) as exc_info:
         tgrid = tgrid_from_config(tgrid_dict, time_unit='ns')
     assert "Incompatible units in conversion: unitless, ns" in str(exc_info)
@@ -76,8 +95,14 @@ def test_tgrid_from_config():
     assert ("%g" % tgrid[0]) == "0.01"
     assert ("%g" % tgrid[-1]) == "9.99"
 
-    tgrid_dict = dict([('t_start', 0.0), ('t_stop', UnitFloat(10.0, 'ns')),
-                       ('dt', UnitFloat(0.02, 'ns')), ('fixed', True)])
+    tgrid_dict = dict(
+        [
+            ('t_start', 0.0),
+            ('t_stop', UnitFloat(10.0, 'ns')),
+            ('dt', UnitFloat(0.02, 'ns')),
+            ('fixed', True),
+        ]
+    )
     with pytest.raises(ValueError) as exc_info:
         tgrid = tgrid_from_config(tgrid_dict, time_unit=None)
     assert "Incompatible units in conversion: ns, unitless" in str(exc_info)
@@ -100,8 +125,7 @@ def test_write_oct_spectral_filter(tmpdir, request):
     ampl = gaussian(tgrid, 5, 1)
     pulse = Pulse(tgrid=tgrid, amplitude=ampl, ampl_unit='MHz', time_unit='ns')
     filename = str(tmpdir.join("spectral_filter.dat"))
-    pulse.write_oct_spectral_filter(
-        filename, filter_func=lambda f: abs(f) < 2)
+    pulse.write_oct_spectral_filter(filename, filter_func=lambda f: abs(f) < 2)
     datadir = os.path.splitext(request.module.__file__)[0]
     assert filecmp.cmp(filename, os.path.join(datadir, 'spectral_filter.dat'))
 
@@ -109,8 +133,12 @@ def test_write_oct_spectral_filter(tmpdir, request):
 def test_pulse_as_func():
     """Test converting pulse as a function"""
     tgrid = pulse_tgrid(t0=1.0, T=11.0, nt=6)
-    pulse = Pulse(tgrid=tgrid, amplitude=np.array([0, 1.0, 2.0, 0, 1.0]),
-                  ampl_unit='MHz', time_unit='ns')
+    pulse = Pulse(
+        tgrid=tgrid,
+        amplitude=np.array([0, 1.0, 2.0, 0, 1.0]),
+        ampl_unit='MHz',
+        time_unit='ns',
+    )
     f = pulse.as_func(interpolation='linear')
     with pytest.raises(ValueError):
         f(0.5)
