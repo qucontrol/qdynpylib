@@ -2,8 +2,8 @@
 History
 =======
 
-0.4.0-dev (in preparation)
---------------------------
+0.4.0 (2019-04-19)
+------------------
 
 * Extensive restructuring of the package
 * QDYN-pylib must now be imported as ``import qdyn``, not ``import QDYN``.
@@ -11,6 +11,8 @@ History
 * Drop support for Python 2.
 * Add support for Python 3.7.
 * Change license to BSD
+* Improvements on ``Pulse`` and ``AnalyticalPulse``
+* Improved I/O routines
 
 .. _qutip: http://qutip.org
 .. _krotov: https://krotov.readthedocs.io/
@@ -19,7 +21,7 @@ History
 Earlier versions
 ----------------
 
-* ``0.3.0``: 2017-04-09
+* ``0.3.0``: 2017-04-09 (2019-04-18 on PyPI)
 * ``0.2.2``: 2016-08-15
 * ``0.2.1``: 2016-08-07
 * ``0.2.0``: 2016-08-07
