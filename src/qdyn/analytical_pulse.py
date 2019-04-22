@@ -539,11 +539,7 @@ class AnalyticalPulse:
         return pulse
 
     def to_num_pulse(
-        self,
-        tgrid=None,
-        time_unit=None,
-        ampl_unit=None,
-        freq_unit=None
+        self, tgrid=None, time_unit=None, ampl_unit=None, freq_unit=None
     ):
         """Return a :cls:`.Pulse` instance that contains the
         corresponding numerical pulse.

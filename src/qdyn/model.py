@@ -59,7 +59,7 @@ def random_density_matrix(N):
     return rho
 
 
-class LevelModel():
+class LevelModel:
     """Model for a system well-described in the energy basis. That is, all
     operators are (sparse) matrices, and all states are simple vectors
 

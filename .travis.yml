@@ -20,6 +20,8 @@ install:
   - pip freeze
 
 script:
+  - set -e
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then black --skip-string-normalization --line-length 79 --check src tests; fi
   - pytest --doctest-modules --cov=qdyn --nbval --sanitize-with docs/nbval_sanitize.cfg src tests docs/*.rst
 after_success:
   - coveralls

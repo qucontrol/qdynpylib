@@ -152,7 +152,7 @@ tesla          2.35051746468947e05     # hbar/(a_0^2*e) to tesla
 '''
 
 
-class UnitConvert():
+class UnitConvert:
     """Perform conversion between different physical units
 
     Parameters:
@@ -348,7 +348,7 @@ class UnitConvert():
         return set(self._convfactor.keys())
 
 
-class UnitFloat():
+class UnitFloat:
     """Class for a float value with a physical unit. Behaves like a float in
     most contexts.
 

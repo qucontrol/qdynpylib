@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+import sys
 
 from setuptools import setup, find_packages
 
@@ -27,13 +28,28 @@ except OSError:
 requirements = ['numpy', 'matplotlib', 'scipy', 'sympy', 'click']
 
 dev_requirements = [
-    'coverage', 'pytest', 'pytest-cov', 'pytest-xdist', 'twine', 'pep8',
-    'flake8', 'wheel', 'sphinx', 'sphinx-autobuild', 'sphinx_rtd_theme',
-    'sphinx-autodoc-typehints', 'gitpython', 'qutip']
-dev_requirements.append('better-apidoc')
-
-dev_requirements.extend([
-    'jupyter', 'nbval', 'nbsphinx', 'watermark'])
+    'better-apidoc',
+    'coverage',
+    'flake8',
+    'gitpython',
+    'jupyter',
+    'nbsphinx',
+    'nbval',
+    'pep8',
+    'pytest',
+    'pytest-cov',
+    'pytest-xdist',
+    'qutip',
+    'sphinx',
+    'sphinx-autobuild',
+    'sphinx-autodoc-typehints',
+    'sphinx_rtd_theme',
+    'twine',
+    'watermark',
+    'wheel',
+]
+if sys.version_info >= (3, 6):
+    dev_requirements.append('black')
 
 
 version = get_version('./src/qdyn/__init__.py')
@@ -55,12 +71,11 @@ setup(
     ],
     description=(
         "Python package for interacting with the Fortran QDYN library "
-        "and tools"),
+        "and tools"
+    ),
     python_requires='>=3.6',
     install_requires=requirements,
-    extras_require={
-        'dev': dev_requirements,
-    },
+    extras_require={'dev': dev_requirements},
     license="BSD license",
     long_description=readme + '\n\n' + history,
     include_package_data=True,

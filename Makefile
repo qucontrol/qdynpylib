@@ -4,6 +4,7 @@ CONDA_PACKAGES = qutip
 TESTENV = MATPLOTLIBRC=tests
 TESTOPTIONS = --doctest-modules --cov=qdyn --nbval --sanitize-with docs/nbval_sanitize.cfg
 TESTS = src tests docs/*.rst
+BLACKOPTIONS = --skip-string-normalization --line-length 79
 # if there are any ipynb files added to the documentation, make sure to extend
 # the above list of TESTS
 
@@ -90,7 +91,7 @@ test36: .venv/py36/bin/py.test ## run tests for Python 3.6
 	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 $(CONDA_PACKAGES)
 	@.venv/py37/bin/pip install -e .[dev]
 
-test37: .venv/py37/bin/py.test ## run tests for Python 3.6
+test37: .venv/py37/bin/py.test black-check ## run tests for Python 3.7
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 .venv/py37/bin/python: .venv/py37/bin/py.test
@@ -106,6 +107,12 @@ docs: .venv/py37/bin/sphinx-build ## generate Sphinx HTML documentation, includi
 spellcheck: .venv/py37/bin/sphinx-build ## check spelling in docs
 	@.venv/py37/bin/pip install sphinxcontrib-spelling
 	SPELLCHECK=en_US $(MAKE) -C docs SPHINXBUILD=../.venv/py37/bin/sphinx-build spelling
+
+black-check: .venv/py37/bin/python  ## Check all src and test files for complience to "black" code style
+	.venv/py37/bin/black $(BLACKOPTIONS) --diff --check src tests
+
+black: .venv/py37/bin/python  ## Apply 'black' code style to all src and test files
+	.venv/py37/bin/black $(BLACKOPTIONS) src tests
 
 coverage: test37  ## generate coverage report in ./htmlcov
 	.venv/py37/bin/coverage html
