@@ -91,7 +91,7 @@ test36: .venv/py36/bin/py.test ## run tests for Python 3.6
 	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 $(CONDA_PACKAGES)
 	@.venv/py37/bin/pip install -e .[dev]
 
-test37: .venv/py37/bin/py.test black-check ## run tests for Python 3.7
+test37: .venv/py37/bin/py.test isort-check black-check ## run tests for Python 3.7
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 .venv/py37/bin/python: .venv/py37/bin/py.test
