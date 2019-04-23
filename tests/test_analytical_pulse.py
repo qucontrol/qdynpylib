@@ -7,6 +7,7 @@ from qdyn.analytical_pulse import AnalyticalPulse
 from qdyn.pulse import CRAB_carrier, blackman, carrier, pulse_tgrid
 from qdyn.units import UnitFloat
 
+
 # built-in fixtures: tmpdir
 
 

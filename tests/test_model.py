@@ -7,8 +7,8 @@ from functools import partial
 
 import numpy as np
 import pytest
-from scipy import sparse
 import qutip
+from scipy import sparse
 
 from qdyn.analytical_pulse import AnalyticalPulse
 from qdyn.io import read_indexed_matrix, read_psi_amplitudes
@@ -16,6 +16,7 @@ from qdyn.linalg import norm, tril, triu
 from qdyn.model import LevelModel
 from qdyn.pulse import Pulse, blackman
 from qdyn.units import UnitFloat
+
 
 # built-in fixtures: tmpdir, request
 

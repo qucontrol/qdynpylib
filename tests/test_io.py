@@ -6,17 +6,18 @@ import tempfile
 from cmath import sqrt
 
 import numpy as np
+import pytest
 import scipy.sparse
 from six.moves import xrange
-import pytest
 
 import qdyn
-from qdyn.linalg import norm
 from qdyn.io import (
     iterate_psi_amplitudes,
     read_psi_amplitudes,
     write_psi_amplitudes,
 )
+from qdyn.linalg import norm
+
 
 # buitin fixtures: request, tmpdir
 

@@ -13,6 +13,7 @@ from qdyn.pulse import (
 )
 from qdyn.units import UnitFloat
 
+
 config_str = r'''
 grid: system = initial, base = exp
 * dim = 1, r_min = -10, r_max = 10, nr = 128, moveable = true
