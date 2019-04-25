@@ -1,4 +1,4 @@
-.PHONY: clean clean-test clean-pyc clean-build clean-venvs line pep8 docs dist install develop help
+.PHONY: black black-check clean clean-build clean-pyc clean-test clean-venvs coverage develop develop-docs develop-test dist dist-check docs help install isort isort-check jupyter-lab jupyter-notebook lint notebooks pre-commit-hooks release spellcheck test test-upload uninstall upload
 .DEFAULT_GOAL := help
 CONDA_PACKAGES = qutip
 TESTENV = MATPLOTLIBRC=tests
@@ -20,7 +20,7 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
-help:
+help:  ## show this help
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 clean: clean-build clean-pyc clean-test clean-venvs ## remove all build, test, coverage, and Python artifacts, as well as environments
@@ -56,7 +56,7 @@ pep8: ## check style with pep8
 	pep8 src tests
 
 
-test:   test36 test37 ## run tests on every Python version
+test: test36 test37  ## run tests on every supported Python version
 
 .venv/py34/bin/py.test:
 	@conda create -y -m -p .venv/py34 python=3.4
@@ -90,7 +90,7 @@ test36: .venv/py36/bin/py.test ## run tests for Python 3.6
 	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
 	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 $(CONDA_PACKAGES)
 	@.venv/py37/bin/pip install -e .[dev]
-	@.venv/py36/bin/python scripts/install-pre-commit.py
+	@.venv/py37/bin/python scripts/install-pre-commit.py
 
 test37: .venv/py37/bin/py.test isort-check black-check ## run tests for Python 3.7
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
@@ -99,6 +99,9 @@ test37: .venv/py37/bin/py.test isort-check black-check ## run tests for Python 3
 
 
 .venv/py37/bin/sphinx-build: .venv/py37/bin/py.test
+
+
+pre-commit-hooks: .venv/py37/bin/py.test  ## install pre-commit hooks
 
 docs: .venv/py37/bin/sphinx-build ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs MATPLOTLIBRC=../tests SPHINXBUILD=../.venv/py37/bin/sphinx-build clean
@@ -158,7 +161,6 @@ develop: clean-build clean-pyc ## install the package to the active Python's sit
 
 develop-test: develop ## run tests within the active Python environment
 	$(TESTENV) py.test -v $(TESTOPTIONS) $(TESTS)
-
 
 develop-docs: develop  ## generate Sphinx HTML documentation, including API docs, within the active Python environment
 	$(MAKE) -C docs clean
