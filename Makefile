@@ -90,6 +90,7 @@ test36: .venv/py36/bin/py.test ## run tests for Python 3.6
 	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
 	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 $(CONDA_PACKAGES)
 	@.venv/py37/bin/pip install -e .[dev]
+	@.venv/py36/bin/python scripts/install-pre-commit.py
 
 test37: .venv/py37/bin/py.test isort-check black-check ## run tests for Python 3.7
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)

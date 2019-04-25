@@ -4,7 +4,7 @@
 """The setup script."""
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def get_version(filename):
@@ -29,14 +29,15 @@ requirements = ['numpy', 'matplotlib', 'scipy', 'sympy', 'click']
 
 dev_requirements = [
     'better-apidoc',
-    'isort',
     'coverage',
     'flake8',
     'gitpython',
+    'isort',
     'jupyter',
     'nbsphinx',
     'nbval',
     'pep8',
+    'pre-commit',
     'pytest',
     'pytest-cov',
     'pytest-xdist',
