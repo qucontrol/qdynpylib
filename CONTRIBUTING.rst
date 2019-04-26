@@ -57,15 +57,15 @@ Get Started!
 
 Ready to contribute? Follow `Aaron Meurer's Git Workflow Notes`_ (with ``qucontrol/qdynpylib`` instead of ``sympy/sympy``)
 
-In short,
+In short, if you are not a member of the `qucontrol organization`_,
 
 1. Clone the repository from ``git@github.com:qucontrol/qdynpylib.git``
 2. Fork the repo on GitHub to your personal account.
 3. Add your fork as a remote.
 4. Pull in the latest changes from the master branch.
-5. Create a topic branch
-6. Make your changes and commit them (testing locally)
-7. Push changes to the topic branch on *your* remote
+5. Create a topic branch.
+6. Make your changes and commit them (testing locally).
+7. Push changes to the topic branch on *your* remote.
 8. Make a pull request against the base master branch through the Github website of your fork.
 
 The project contains a ``Makefile`` to help with development tasks. In your checked-out clone, do
@@ -76,6 +76,8 @@ The project contains a ``Makefile`` to help with development tasks. In your chec
 
 to see the available make targets.
 
+If you are a member of the `qucontrol organization`_, there is no need to fork
+``qdynpylib`` - you can directly pull and push to ``git@github.com:qucontrol/qdynpylib.git``.
 
 It is strongly recommended that you use the conda_ package manager. The
 ``Makefile`` relies on conda to create local testing and documentation building
@@ -94,10 +96,13 @@ You still can (and should) look at https://travis-ci.org/qucontrol/qdynpylib/ to
 
 .. _Aaron Meurer's Git Workflow Notes:  https://www.asmeurer.com/git-workflow/
 
+.. _qucontrol organization: https://github.com/qucontrol
+
+
 Testing
 -------
 
-qdynpylib includes a full test-suite using pytest_.
+QDYN-pylib includes a full test-suite using pytest_.
 We strive for a `test coverage`_ above 90%.
 
 
@@ -135,8 +140,7 @@ readability significantly.
 Beyond :pep:`8`, this project adopts the `Black code style`_, with
 ``--skip-string-normalization --line-length 79``. You can
 run ``make black-check`` to check adherence to the code style, and
-``make black`` to apply it. The automatic test suite also includes the
-``black`` style check, so style violations are considered errors.
+``make black`` to apply it.
 
 .. _Black code style: https://github.com/ambv/black/#the-black-code-style
 
@@ -158,20 +162,28 @@ requirements. These hooks are managed through the `pre-commit framework`_.
 
 .. _pre-commit framework: https://pre-commit.com
 
+You may use ``make flake8-check`` and ``make pylint-check`` for additional
+checks on the code with flake8_ and pylint_, but there is no strict requirement
+for a perfect score with either one of these linters. They only serve as a
+guideline for code that might be improved.
+
+.. _flake8: http://flake8.pycqa.org
+.. _pylint: http://pylint.pycqa.org
+
 
 .. _write-documentation:
 
 Write Documentation
 -------------------
 
-qdynpylib could always use more documentation, whether
+QDYN-pylib could always use more documentation, whether
 as part of the official docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 The package documentation is generated with Sphinx_, the
 documentation (and docstrings) are formatted using the
 `Restructured Text markup language`_ (file extension ``rst``).
-See also the `Matplotlib Sphinx Sheet sheet`_ for some helpful tips.
+See also the `Matplotlib Sphinx cheat sheet`_ for some helpful tips.
 
 Each function or class must have a docstring_; this docstring must
 be written in the `"Google Style" format`_ (as implemented by
@@ -209,7 +221,7 @@ to generate the documentation locally.
 .. _mathematical formulas in LaTeX syntax: http://www.sphinx-doc.org/en/1.6/ext/math.html
 .. _mathjax: http://www.sphinx-doc.org/en/master/usage/extensions/math.html#module-sphinx.ext.mathjax
 .. _BibTeX: https://sphinxcontrib-bibtex.readthedocs.io/en/latest/
-.. _Matplotlib Sphinx Sheet sheet: https://matplotlib.org/sampledoc/cheatsheet.html
+.. _Matplotlib Sphinx cheat sheet: https://matplotlib.org/sampledoc/cheatsheet.html
 .. _attrs: http://www.attrs.org
 
 
@@ -355,7 +367,6 @@ form of `test-driven development`_, you have two options:
         @pytest.mark.xfail
 
     See the `pytest documentation on skip and xfail`_ for details.
-
 
     For notebooks, the equivalent to the decorator is to add a comment to the
     first line of the failing cell, either::
