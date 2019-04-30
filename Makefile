@@ -158,7 +158,7 @@ uninstall:  ## uninstall the package from the active Python's site-packages
 	pip uninstall qdyn
 
 develop: clean-build clean-pyc ## install the package to the active Python's site-packages, in develop mode
-	pip install -e .
+	pip install -e .[dev]
 
 develop-test: develop ## run tests within the active Python environment
 	$(TESTENV) py.test -v $(TESTOPTIONS) $(TESTS)
