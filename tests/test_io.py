@@ -19,7 +19,7 @@ from qdyn.io import (
 from qdyn.linalg import norm
 
 
-# buitin fixtures: request, tmpdir
+# builtin fixtures: request, tmpdir
 
 
 def tempfilename():
@@ -33,7 +33,7 @@ def test_print_matrix():
 
     print("*** Running test_print_matrix")
 
-    M = np.matrix(
+    M = np.array(
         [[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20], [1 + 1j, 1.0e-9, -1.0]]
     )
 
@@ -59,9 +59,9 @@ def test_print_matrix():
 def identical_matrices(A, B):
     """Check if matrices A, B are identical up to a precision of 1.0e-14"""
     if isinstance(A, scipy.sparse.spmatrix):
-        A = A.todense()
+        A = A.toarray()
     if isinstance(B, scipy.sparse.spmatrix):
-        B = B.todense()
+        B = B.toarray()
     return qdyn.linalg.norm(A - B) < 1.0e-14
 
 
@@ -72,7 +72,7 @@ def print_file(file):
 
 
 def make_hermitian(A):
-    """For matrix A to be Hermitian"""
+    """Force matrix A to be Hermitian"""
     n = A.shape[0]
     for i in xrange(n):
         for j in xrange(i):
@@ -84,7 +84,7 @@ def test_read_write_indexed_matrix():
     """Test reading and writing of sparse matrices"""
 
     print("Simple real sparse matrix")
-    M = np.matrix([[0.0, 1.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0]])
+    M = np.array([[0.0, 1.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0]])
     Id = scipy.sparse.eye(3, format='coo')
     M = scipy.sparse.kron(M, Id)
     filename = tempfilename()
@@ -97,9 +97,7 @@ def test_read_write_indexed_matrix():
 
     print("Complex sparse matrix")
     filename = tempfilename()
-    M2 = np.matrix(
-        make_hermitian((M + 0.5j * M)).todense(), dtype=np.complex128
-    )
+    M2 = make_hermitian((M + 0.5j * M).toarray())
     qdyn.io.write_indexed_matrix(M2, filename)
     print_file(filename)
     O2 = qdyn.io.read_indexed_matrix(filename)
@@ -109,7 +107,7 @@ def test_read_write_indexed_matrix():
 
     print("Complex non-Hermitian sparse matrix")
     filename = tempfilename()
-    M3 = np.matrix((M + 0.5j * M).todense(), dtype=np.complex128)
+    M3 = (M + 0.5j * M).toarray()
     qdyn.io.write_indexed_matrix(M3, filename, hermitian=False)
     print_file(filename)
     O3 = qdyn.io.read_indexed_matrix(filename, expand_hermitian=False)
@@ -119,7 +117,7 @@ def test_read_write_indexed_matrix():
 
 
 def test_single_val_read_indexed_matrix(request):
-    """Test that we can read an indexed matrix with onl one entry"""
+    """Test that we can read an indexed matrix with only one entry"""
     datadir = os.path.splitext(request.module.__file__)[0]
     filename = os.path.join(datadir, 'single_val_matrix.dat')
     matrix = qdyn.io.read_indexed_matrix(filename, expand_hermitian=False)
