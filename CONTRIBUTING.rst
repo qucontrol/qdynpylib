@@ -307,6 +307,47 @@ commit message to automatically close the issue.
 See `Closing issues using keywords`_ for details.
 
 
+How to install QuTiP from source ("illegal instruction" in QuTiP conda install)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The local conda environments that ``make test`` and other ``make`` targets set
+up in the ``.venv`` folder use pre-compiled ``conda`` packages for QuTiP by
+default. Unfortunately, some of QuTiP's conda packages are compiled
+incorrectly, and crash the entire Python process whenever the ``qutip`` package
+is imported (QuTiP issues `#951 <QutipIssue951_>`_, `#920 <QutipIssue920_>`_,
+and `#674 <QutipIssue674_>`_). You will see a message like "Illegal
+instruction" or something similar. This problem happens especially on Linux and
+sometimes other Unixes (like macOS). Luckily, on Linux you will usually have
+the necessary compilers to install QuTiP "from source" (via ``pip``). To enable
+automatic installation via ``pip``, make the following changes to the
+``Makefile``:
+
+* Un-comment the line::
+
+      CONDA_PACKAGES = cython numpy scipy
+
+  near the top of the ``Makefile``. Defining ``CONDA_PACKAGES`` as above will
+  ensure that the necessary build-requirements for QuTiP are available in the
+  conda environment.
+
+* Comment out all lines similar to::
+
+      @conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 qutip
+
+  By omitting this line, the ``Makefile`` will instead pick up the ``qutip``
+  dependency automatically from ``setup.py`` in the command following in the next
+  line::
+
+      .venv/py37/bin/python -m pip install -e .[dev]
+
+ This change is necessary for all of the ``.venv`` environments.
+
+
+.. _QutipIssue951: https://github.com/qutip/qutip/issues/951
+.. _QutipIssue920: https://github.com/qutip/qutip/issues/920
+.. _QutipIssue674: https://github.com/qutip/qutip/issues/674
+
+
 How to run a jupyter notebook server for working on notebooks in the docs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
