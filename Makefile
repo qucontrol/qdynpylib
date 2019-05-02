@@ -1,6 +1,6 @@
 .PHONY: black black-check clean clean-build clean-pyc clean-test clean-venvs coverage develop develop-docs develop-test dist dist-check docs help install isort isort-check jupyter-lab jupyter-notebook flake8-check pylint-check notebooks pre-commit-hooks release spellcheck test test-upload uninstall upload
 .DEFAULT_GOAL := help
-CONDA_PACKAGES = qutip
+#CONDA_PACKAGES = cython numpy scipy
 TESTENV = MATPLOTLIBRC=tests
 TESTOPTIONS = --doctest-modules --cov=qdyn --nbval --sanitize-with docs/nbval_sanitize.cfg
 TESTS = src tests docs/*.rst
@@ -60,36 +60,36 @@ pylint-check: $(LATESTVENV)/bin/python ## check style with pylint
 test: test36 test37  ## run tests on every supported Python version
 
 .venv/py34/bin/py.test:
-	@conda create -y -m -p .venv/py34 python=3.4
+	@conda create -y -m -p .venv/py34 python=3.4 $(CONDA_PACKAGES)
 	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
-	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py34 $(CONDA_PACKAGES)
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py34 qutip
 	@.venv/py34/bin/python -m pip install -e .[dev]
 
 test34: .venv/py34/bin/py.test ## run tests for Python 3.4
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 .venv/py35/bin/py.test:
-	@conda create -y -m -p .venv/py35 python=3.5
+	@conda create -y -m -p .venv/py35 python=3.5 $(CONDA_PACKAGES)
 	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
-	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py35 $(CONDA_PACKAGES)
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py35 qutip
 	@.venv/py35/bin/python -m pip install -e .[dev]
 
 test35: .venv/py35/bin/py.test ## run tests for Python 3.5
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 .venv/py36/bin/py.test:
-	@conda create -y -m -p .venv/py36 python=3.6
+	@conda create -y -m -p .venv/py36 python=3.6 $(CONDA_PACKAGES)
 	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
-	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py36 $(CONDA_PACKAGES)
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py36 qutip
 	@.venv/py36/bin/python -m pip install -e .[dev]
 
 test36: .venv/py36/bin/py.test ## run tests for Python 3.6
 	$(TESTENV) $< -v $(TESTOPTIONS) $(TESTS)
 
 .venv/py37/bin/py.test:
-	@conda create -y -m -p .venv/py37 python=3.7
+	@conda create -y -m -p .venv/py37 python=3.7 $(CONDA_PACKAGES)
 	@# if the conda installation does not work, simply comment out the following line, and let pip handle it
-	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 $(CONDA_PACKAGES)
+	@conda install -y --override-channels -c defaults -c conda-forge -p .venv/py37 qutip
 	@.venv/py37/bin/python -m pip install -e .[dev]
 	@.venv/py37/bin/python scripts/install-pre-commit.py
 
