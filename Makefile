@@ -175,7 +175,7 @@ $(LATESTVENV)/bin/jupyter: $(LATESTVENV)/bin/py.test
 	@echo ""
 	@$(LATESTVENV)/bin/jupyter nbconvert --to notebook --execute --inplace --allow-errors --ExecutePreprocessor.kernel_name='python3' --config=/dev/null $< 2>&1 | tee $@
 
-NOTEBOOKFILES = $(shell find docs/ -iname '*.ipynb'  -maxdepth 1)
+NOTEBOOKFILES = $(shell find docs/ -maxdepth 1 -iname '*.ipynb')
 NOTEBOOKLOGS = $(patsubst %.ipynb,%.ipynb.log,$(NOTEBOOKFILES))
 
 notebooks: $(NOTEBOOKLOGS)  ## re-evaluate the notebooks
