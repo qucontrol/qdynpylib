@@ -51,7 +51,7 @@ Before you submit a pull request, check that it meets these guidelines:
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
+   feature to the list in ``HISTORY.rst``.
 3. Check https://travis-ci.org/qucontrol/qdynpylib/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
@@ -98,11 +98,12 @@ You still can (and should) look at https://travis-ci.org/qucontrol/qdynpylib/ to
 
 .. _conda: https://conda.io/docs/
 
-
 .. _Aaron Meurer's Git Workflow Notes:  https://www.asmeurer.com/git-workflow/
 
 .. _qucontrol organization: https://github.com/qucontrol
 
+
+.. _BranchingModel:
 
 Branching Model
 ---------------
@@ -224,7 +225,7 @@ QDYN-pylib includes a full test-suite using pytest_.
 We strive for a `test coverage`_ above 90%.
 
 
-From a checkout of the ``qdyn`` repository, assuming conda_ is installed, you can use
+From a checkout of the ``qdynpylib`` repository, assuming conda_ is installed, you can use
 
 .. code-block:: console
 
@@ -351,8 +352,6 @@ The following assumes your current working directory is a checkout of
 ``qdyn``, and that you have successfully run ``make test`` (which creates
 some local virtual environments that development relies on).
 
-.. _how-to-work-on-a-topic-branch:
-
 
 How to install QuTiP from source ("illegal instruction" in QuTiP conda install)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -400,7 +399,7 @@ How to run a jupyter notebook server for working on notebooks in the docs
 
 A notebook server that is isolated to the proper testing environment can be started via the Makefile::
 
-    $ make jupter-notebook
+    $ make jupyter-notebook
 
 This is equivalent to::
 
@@ -414,7 +413,7 @@ course, if you know what you're doing, you may want this.
 
 If you prefer, you may also use the newer jupyterlab::
 
-    $ make jupter-lab
+    $ make jupyter-lab
 
 
 How to convert a notebook to a script for easier debugging
@@ -447,7 +446,7 @@ would like to commit any example notebooks or tests that currently fail, as a
 form of `test-driven development`_, you have two options:
 
 *   Push onto a topic branch (which are allowed to have failing tests), see
-    :ref:`how-to-work-on-a-topic-branch`. The failing tests can then be fixed by
+    the :ref:`BranchingModel`. The failing tests can then be fixed by
     adding commits to the same branch.
 
 *   Mark the test as failing. For normal tests, add a decorator::
