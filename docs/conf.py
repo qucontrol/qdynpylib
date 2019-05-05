@@ -23,13 +23,13 @@ def run_apidoc(app):
         [
             'better-apidoc',
             '-t',
-            os.path.join('.', '_templates'),
+            os.path.join('docs', '_templates'),
             '--force',
             '--no-toc',
             '--separate',
             '-o',
-            os.path.join('.', 'API'),
-            os.path.join('..', 'src', 'qdyn'),
+            os.path.join('docs', 'API'),
+            os.path.join('src', 'qdyn'),
         ]
     )
 
@@ -54,6 +54,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.inheritance_diagram',
     'dollarmath',
+    'sphinxcontrib.spelling',
     'sphinx_autodoc_typehints',
 ]
 
