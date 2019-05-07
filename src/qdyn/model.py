@@ -82,16 +82,16 @@ class LevelModel:
             ``user_reals``, ``user_logicals``, or ``user_ints`` section of the
             config file, depending on the type of the value
 
-        After instantiation, the attributes `t0`, `T`, `nt`, `prop_method`,
-        `use-mcwf`, and `construct_mcwf_ham` are all set via
-        :meth:`set_propagation`.  Operators and pulses are added to the system
-        through :meth:`add_ham`, :meth:`add_observable`, and
-        :meth:`add_lindblad_op`. States are added through :meth:`add_state`.
-        Both the general OCT settings (OCT section in the QDYN config file) and
-        OCT-related settings for each control pulse are controlled through
-        :meth:`set_oct`. After the model has been constructed, a config file
-        and all dependent data input files for the operators, pulses, and
-        states can be written via :meth:`write_to_runfolder`.
+    After instantiation, the attributes `t0`, `T`, `nt`, `prop_method`,
+    `use-mcwf`, and `construct_mcwf_ham` are all set via
+    :meth:`set_propagation`.  Operators and pulses are added to the system
+    through :meth:`add_ham`, :meth:`add_observable`, and
+    :meth:`add_lindblad_op`. States are added through :meth:`add_state`.
+    Both the general OCT settings (OCT section in the QDYN config file) and
+    OCT-related settings for each control pulse are controlled through
+    :meth:`set_oct`. After the model has been constructed, a config file
+    and all dependent data input files for the operators, pulses, and
+    states can be written via :meth:`write_to_runfolder`.
     """
 
     def __init__(self):
