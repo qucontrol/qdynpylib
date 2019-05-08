@@ -208,6 +208,8 @@ def _process_raw_lines(raw_lines):
     while True:
         try:
             raw_line = next(raw_lines)
+            # One iteration of the loop may consume multiple raw_lines (for
+            # continuations), so we can't just do `for raw_line in raw_lines`
         except StopIteration:
             # see PEP 479
             return
