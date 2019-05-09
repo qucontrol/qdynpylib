@@ -10,7 +10,7 @@ import scipy.sparse
 def inner(v1, v2):
     """Calculate the inner product of the two vectors or matrices v1, v2
 
-    For vectors, the inner product is the standard Euclidian inner product
+    For vectors, the inner product is the standard Euclidian inner product.
 
     For matrices, the innner product is the Hilbert-Schmidt overlap.
 
@@ -49,19 +49,12 @@ def inner(v1, v2):
         "v1 and v2 must be of the same type: types are %s vs %s"
         % (type(v1), type(v2))
     )
-    # numpy matrices are sub-types of ndarray
-    assert isinstance(
-        v1, np.ndarray
-    ), "v1, v2 must be numpy matrices, or 1D/2D numpy arrays"
-    if hasattr(np, 'matrix') and isinstance(v1, np.matrix):
-        # np.matrix might not exist in future versions of numpy
-        return trace(np.dot(v1.H, v2))
-    else:
-        assert len(v1.shape) <= 2, "v1, v2 must be matrix or vector"
-        if len(v1.shape) == 1:  # vector
-            return np.vdot(v1, v2)
-        else:  # matrix as 2D array
-            return trace(np.dot(v1.conjugate().transpose(), v2))
+    assert isinstance(v1, np.ndarray), "v1, v2 must be 1D/2D numpy arrays"
+    assert len(v1.shape) <= 2, "v1, v2 must be matrix or vector"
+    if len(v1.shape) == 1:  # vector
+        return np.vdot(v1, v2)
+    else:  # matrix as 2D array
+        return trace(v1.conjugate().transpose() @ v2)
 
 
 def trace(m):
@@ -94,7 +87,7 @@ def norm(v):
 
 
 def vectorize(a, order='F'):
-    """Return vectorization of multi-dimensional numpy array or matrix `a`
+    """Return vectorization of multi-dimensional numpy array `a`.
 
     Examples
     --------
@@ -107,15 +100,11 @@ def vectorize(a, order='F'):
     >>> vectorize(a)
     array([1, 3, 2, 4])
 
-    >>> a = np.matrix(np.array([[1,2],[3,4]]))
-    >>> vectorize(a)
-    array([1, 3, 2, 4])
-
     >>> vectorize(a, order='C')
     array([1, 2, 3, 4])
     """
     if repr(a).startswith('Quantum object'):  # qutip.Qobj
-        a = a.data.todense()
+        a = a.data.toarray()
     N = a.size
     return np.squeeze(np.asarray(a).reshape((1, N), order=order))
 
@@ -124,11 +113,11 @@ def is_hermitian(matrix):
     """Return True if matrix is Hermitian, False otherwise. The `matrix` can be
     a numpy array or matrix, a scipy sparse matrix, or a `qutip.Qobj` instance.
 
-    >>> m = np.matrix([[0, 1j], [-1j, 1]])
+    >>> m = np.array([[0, 1j], [-1j, 1]])
     >>> is_hermitian(m)
     True
 
-    >>> m = np.matrix([[0, 1j], [-1j, 1j]])
+    >>> m = np.array([[0, 1j], [-1j, 1j]])
     >>> is_hermitian(m)
     False
 
@@ -137,7 +126,7 @@ def is_hermitian(matrix):
     False
 
     >>> from scipy.sparse import coo_matrix
-    >>> m  = coo_matrix(np.matrix([[0, 1j], [-1j, 0]]))
+    >>> m  = coo_matrix(np.array([[0, 1j], [-1j, 0]]))
     >>> is_hermitian(m)
     True
     """
@@ -209,11 +198,11 @@ def choose_sparsity_model(matrix):
 
     >>> td_data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)
     >>> off = np.array([0, -1, 1])
-    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(5,5)).todense()
+    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(5,5)).toarray()
     >>> choose_sparsity_model(m) # should eventually be 'dia'
     'indexed'
 
-    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(20,20)).todense()
+    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(20,20)).toarray()
     >>> m[19,19] = 1
     >>> choose_sparsity_model(m)
     'indexed'
