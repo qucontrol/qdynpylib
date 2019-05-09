@@ -32,8 +32,7 @@ class _SimpleNamespace:
 
 
 def random_density_matrix(N):
-    """
-    Return a random N x N density matrix
+    """Return a random N x N density matrix.
 
     >>> rho = random_density_matrix(10)
 
@@ -42,20 +41,20 @@ def random_density_matrix(N):
 
     >>> assert( abs(np.trace(rho) - 1.0) <= 1.0e-14 )
     >>> assert( np.min(np.linalg.eigvals(rho).real) > 0.0 )
-    >>> assert( np.max(np.abs(rho.H - rho)) <= 1.0e-14 )
+    >>> assert( np.max(np.abs(rho.conjugate().transpose() - rho)) <= 1.0e-14 )
     """
-    rho = np.matrix(np.zeros(shape=(N, N)), dtype=np.complex128)
+    rho = np.zeros((N, N), dtype=np.complex128)
     for i in range(N):
         for j in range(N):
             r = np.random.rand()
             phi = np.random.rand()
             rho[i, j] = r * np.exp(2.0j * pi * phi)
     # make hermitian
-    rho = 0.5 * (rho + rho.H)
+    rho = 0.5 * (rho + rho.conjugate().transpose())
     # make positive-semidifinite by squaring
-    rho = rho * rho
+    rho = rho @ rho
     # normalize
-    rho = rho / (rho.trace()[0, 0])
+    rho = rho / (rho.trace())
     return rho
 
 
