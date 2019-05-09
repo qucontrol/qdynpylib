@@ -10,7 +10,6 @@ def test_norm():
     """Test calculation of norm for matrix in varying formats"""
     A = np.diag([1, 1, 1, 1])
     assert abs(norm(A) - 2.0) < 1e-12
-    assert abs(norm(np.matrix(A)) - 2.0) < 1e-12
     assert abs(norm(scipy.sparse.coo_matrix(A)) - 2.0) < 1e-12
 
 
@@ -25,8 +24,6 @@ def test_triu_tril():
     )
     assert norm(A_u - triu(A)) < 1e-12
     assert norm(A_l - tril(A)) < 1e-12
-    assert norm(np.matrix(A_u) - triu(np.matrix((A)))) < 1e-12
-    assert norm(np.matrix(A_l) - tril(np.matrix((A)))) < 1e-12
     assert (
         norm(scipy.sparse.coo_matrix(A_u) - triu(scipy.sparse.coo_matrix((A))))
         < 1e-12

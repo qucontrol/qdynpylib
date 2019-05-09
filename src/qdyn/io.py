@@ -370,7 +370,7 @@ def read_indexed_matrix(
     else:
         return getattr(
             m, 'to' + format
-        )()  # e.g. format='dense' -> m.todense()
+        )()  # e.g. format='dense' -> m.toarray()
 
 
 def _compress_str(s, spaces_to_drop):
@@ -411,7 +411,7 @@ def print_matrix(
     Arguments
     ---------
 
-    M: numpy matrix, 2D ndarray, sparse matrix
+    M: 2D ndarray, sparse matrix
         Matrix to print. In addition to a standard dense matrix, may also be
         any scipy sparse matrix in a format where M[i,j] is defined.
     matrix_name: str, optional
@@ -437,7 +437,7 @@ def print_matrix(
     --------
 
     >>> import numpy as np
-    >>> M = np.matrix([[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20],
+    >>> M = np.array([[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20],
     ... [1+1j, 1.0e-9, -1.0]])
 
     >>> print_matrix(M)
