@@ -1003,7 +1003,7 @@ class Pulse:
                 pulse to end earlier than the original pulse
             num (int, optional): Resample with `num` sampling points. This may
                 case the end point of the resampled pulse to change
-            window (array_like, callable, string, float, or tuple, optional):
+            window (array_like, callable, str, float, or tuple, optional):
                 Specifies the window applied to the signal in the Fourier
                 domain.  See `sympy.signal.resample`.
 
@@ -1194,13 +1194,13 @@ class Pulse:
                 spec_scale has been applied
             freq_unit (str): Unit in which to show the frequency axis in the
                 spectrum. If not given, use the `freq_unit` attribute
-            mark_freqs (None, array of floats, array of tuples (float, dict)):
+            mark_freqs (None, list(float), list((float, dict))):
                 Array of frequencies to mark in spectrum as vertical dashed
                 lines.  If list of tuples (float, dict), the float value is the
                 frequency to mark, and the dict gives the keyword arguments
                 that are passed to the matplotlib `axvline` method.
             mark_freq_points (None, or matplotlib marker (see
-                `matplotlib.markers`)): Marker to be used to indicate the
+            matplotlib.markers`)): Marker to be used to indicate the
                 individual points in the spectrum.
 
         The remaining figargs are passed to `matplotlib.pyplot.figure` to
@@ -1459,8 +1459,7 @@ def CRAB_carrier(
     where :math:`a_n` is the n'th element of `a`, :math:`b_n` is the n'th
     element of `b`, and :math:`\omega_n` is the n'th element of freq.
 
-    Parameters
-    ----------
+    Args:
         t (array-like): time grid values
         time_unit (str): Unit of `t`
         freq (scalar, ndarray(float64)): Carrier frequency or frequencies
@@ -1476,7 +1475,6 @@ def CRAB_carrier(
                 E(t) = \sum_{n} (a_n - i b_n) \exp(i \omega_n t)
 
     Notes:
-
         `freq_unit` can be Hz (GHz, MHz, etc), describing the frequency
         directly, or any energy unit, in which case the energy value E (given
         through the freq parameter) is converted to an actual frequency as
@@ -1518,7 +1516,7 @@ def gaussian(t, t0, sigma):
 
     Returns:
 
-        gaussian (scalar, ndarray): Gaussian shape of same type as `t`
+        (float, ndarray): Gaussian shape of same type as `t`
 
     """
     return np.exp(-(t - t0) ** 2 / (2 * sigma ** 2))
@@ -1560,13 +1558,13 @@ def blackman(t, t_start, t_stop, a=0.16):
 
     Parameters:
 
-        t (scalar, ndarray): Time point or time grid
-        t_start (scalar): Starting point of Blackman shape
-        t_stop (scalar): End point of Blackman shape
+        t (float, ndarray): Time point or time grid
+        t_start (float): Starting point of Blackman shape
+        t_stop (float): End point of Blackman shape
 
     Returns:
 
-        blackman_shape (scalar, ndarray(float64)):
+        (float, ndarray(float64)):
             If `t` is a scalar, `blackman_shape` is the scalar value of the
             Blackman shape at `t`.  If `t` is an array, `blackman_shape` is an
             array of same size as `t`, containing the values for the Blackman

@@ -275,18 +275,18 @@ def banded_to_full(banded, n, kl, ku, mode):
     (http://www.netlib.org/lapack/lug/node124.html) into a (square) full matrix
 
     Args:
-        banded (numpy array): Rectangular matrix in banded format
+        banded (numpy.ndarray): Rectangular matrix in banded format
         n (int): The dimension of the (full) matrix
         kl (int):  The number of lower diagonals (kl=0 for
             diagonal/upper-triangular matrix)
         ku (int):  The number of upper diagonals (ku=0 for
             diagonal/lower-triangular matrix)
         mode (str): On of 'g', 'h', 's', 't' corresponding to "general",
-        "Hermitian", "symmetric", and 'triangular'. The values 'g' and 's' are
-        dequivalent, except that for 's' iether kl or ku must be zero. For
-        Hermitian or symmetric storage, exactly one of `kl`, `ku` must be zero.
-        Which one determines whether `banded` is assumed to contain the data
-        for the upper or lower triangle
+            "Hermitian", "symmetric", and 'triangular'. The values 'g' and 's'
+            are dequivalent, except that for 's' iether kl or ku must be zero.
+            For Hermitian or symmetric storage, exactly one of `kl`, `ku` must
+            be zero.  Which one determines whether `banded` is assumed to
+            contain the data for the upper or lower triangle
 
     Returns:
         full: numpy array of same type as `banded`
