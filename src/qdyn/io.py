@@ -41,8 +41,8 @@ def open_file(file, mode='r', **kwargs):
 
     Raises:
         IOError: If the file cannot be opened (see :func:`io.open`), if `file`
-        is open file handle with the incorrect `mode` or `encoding`, or if
-        `file` is '-' and `mode` is neither 'r' nor 'w'.
+            is open file handle with the incorrect `mode` or `encoding`, or if
+            `file` is '-' and `mode` is neither 'r' nor 'w'.
     """
     fh_attribs = ('seek', 'close', 'read', 'write')
     is_fh = all(hasattr(file, attr) for attr in fh_attribs)
@@ -143,13 +143,13 @@ def write_indexed_matrix(
     Arguments
     ---------
 
-    matrix: numpy matrix, 2D ndarray, qutip.Qobj, or any scipy sparse matrix
+    matrix: numpy.matrix, 2D ndarray, qutip.Qobj or any scipy.sparse_matrix
         Matrix to write to file
 
     filename: str
         Name of file to write to
 
-    comment: str of array of strings, optional
+    comment: str or list(str), optional
         Comment line, or array of comment lines to write to the top of the
         file. Each line that does not start with '#' will have "# "
         prepended.
@@ -173,7 +173,7 @@ def write_indexed_matrix(
         or a space, in which case the leading space will be replaced with '#'.
         Defaults to a header line suitable for the default line_formatter
 
-    hermitian: boolean, optional
+    hermitian: bool, optional
         If True, write only entries from the upper triangle
 
     limit: float, optional
@@ -284,14 +284,14 @@ def read_indexed_matrix(
         * 'dia': scipy.sparse.dia.dia_matrix
         * 'dok': scipy.sparse.dok.dok_matrix
         * 'lil': scipy.sparse.lil.lil_matrix
-    shape: int or sequence of two ints, optional
+    shape: int or (int,int), optional
         If given, shape of the resulting matrix. If not given, will be
         determined from largest occurring index in the data from the input file
-    expand_hermitian: boolean, optional
+    expand_hermitian: bool, optional
         If True, the input file must contain data only for the upper or lower
         triangle. The oterh triangle will be set with the complex conjugate
         values.
-    val_real: boolean, optional
+    val_real: bool, optional
         If True, only read 3 columns from the input file (i, j, value), even if
         more columns are present in the file, and return a real matrix.
     """
@@ -431,7 +431,8 @@ def print_matrix(
         imaginary parts will no longer be aligned.
     zero_as_blank: bool, optional
         If True, represent entries that are exactly zero as blank strings
-    out: open filehandle. If None, print to stdout
+    out: file
+        open filehandle. If None, print to stdout
 
     Examples
     --------
@@ -621,7 +622,8 @@ def read_cmplx_array(filename, **kwargs):
     ``read_cmplx_array`` routine
 
     Args:
-        filename (file, str, pathlib.Path, list of str, generator): File,
+        filename (file, :obj:`str`, pathlib.Path,
+                    :obj:`list` of :obj:`str`, generator): File,
             filename, list, or generator to read. Cf. `fname` in
             :func:`numpy.genfromtxt`.
         kwargs: All keyword arguments are passed to :func:`numpy.genfromtxt`
@@ -670,7 +672,7 @@ def datablock(filename, block, decoding=None):
             cause an error, but result in an empty iterator
         decoding (None or str): By default, the resulting lines are byte
             strings (so that :func:`datablock` can wrap `fname` in
-            :func:`np.genfromtxt`). If `decoding` is given different from None,
+            :func:`numpy.genfromtxt`). If `decoding` is given different from None,
             the resulting strings will be decoded instead.
     """
     in_block = 0
@@ -738,7 +740,7 @@ def writetotxt(fname, *args, **kwargs):
 
     Args:
         fname (str): filename or file handle
-        args (ndarray): Numpy arrays to write to fname. All arrays must have
+        args (numpy.ndarray): Numpy arrays to write to fname. All arrays must have
             the same length
         fmt (str, list(str)): A single format (e.g. '%10.5f'), a sequence
             of formats, or a multi-format string, e.g.
@@ -1115,7 +1117,7 @@ def write_psi_amplitudes(psi, filename):
     `write_psi_amplitudes` Fortran routine
 
     Parameters:
-        psi (numpy array): Array of complex probability amplitudes
+        psi (:obj:`numpy.array`): Array of complex probability amplitudes
         filename (str): Name of file to which to write
     """
     with open_file(filename, 'w') as out_fh:

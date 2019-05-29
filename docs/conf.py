@@ -38,7 +38,7 @@ def run_apidoc(app):
 
 # Report broken links as warnings
 nitpicky = True
-nitpick_ignore = [('py:class', 'callable')]
+nitpick_ignore = [('py:class', 'callable'), ('py:class', 'file'),]
 
 extensions = [
     'sphinx.ext.autodoc',
