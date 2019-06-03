@@ -143,8 +143,9 @@ def write_indexed_matrix(
     Arguments
     ---------
 
-    matrix: numpy.matrix, 2D ndarray, qutip.Qobj or any scipy.sparse_matrix
-        Matrix to write to file
+    matrix: numpy.matrix, numpy.ndarray, qutip.Qobj or scipy.sparse.spmatrix
+        Matrix to write to file. If an ndarray is given, it has to be
+        2-dimenstional
 
     filename: str
         Name of file to write to
@@ -411,7 +412,7 @@ def print_matrix(
     Arguments
     ---------
 
-    M: 2D ndarray, sparse matrix
+    M: numpy.ndarray, scipy.sparse.spmatrix
         Matrix to print. In addition to a standard dense matrix, may also be
         any scipy sparse matrix in a format where M[i,j] is defined.
     matrix_name: str, optional
@@ -622,11 +623,10 @@ def read_cmplx_array(filename, **kwargs):
     ``read_cmplx_array`` routine
 
     Args:
-        filename (file, :obj:`str`, pathlib.Path,
-                    :obj:`list` of :obj:`str`, generator): File,
+        filename (file, str, pathlib.Path, list(str), generator): File,
             filename, list, or generator to read. Cf. `fname` in
             :func:`numpy.genfromtxt`.
-        kwargs: All keyword arguments are passed to :func:`numpy.genfromtxt`
+        **kwargs: All keyword arguments are passed to :func:`numpy.genfromtxt`
 
     Notes:
         You may use :func:`datablock` as a wrapper for `fileanme` in order to
@@ -787,9 +787,9 @@ def writetotxt(fname, *args, **kwargs):
 
         precision:
             - For integer specifiers (eg. ``d,i``), the minimum number of
-            digits.
+              digits.
             - For ``e, E`` and ``f`` specifiers, the number of digits to print
-            after the decimal point.
+              after the decimal point.
             - For ``g`` and ``G``, the maximum number of significant digits.
 
         specifiers (partial list):
@@ -1117,7 +1117,7 @@ def write_psi_amplitudes(psi, filename):
     `write_psi_amplitudes` Fortran routine
 
     Parameters:
-        psi (:obj:`numpy.array`): Array of complex probability amplitudes
+        psi (numpy.ndarray): Array of complex probability amplitudes
         filename (str): Name of file to which to write
     """
     with open_file(filename, 'w') as out_fh:

@@ -537,7 +537,7 @@ class LevelModel:
                 model is the correct "effective" Hamiltonian for a MCWF
                 propagation.
             label (str or None): The label for `initial_state`
-            initial_state (array or None): Initial wave function
+            initial_state (numpy.ndarray or None): Initial wave function
 
         Notes:
             When setting up an MCWF propagation, using the `mcwf_order=2` is
@@ -572,7 +572,7 @@ class LevelModel:
         Args:
             method (str): Optimization method. Allowed values are 'krotovpk',
                 'krotov2', 'krotovbwr', and 'lbfgs'
-            J_T_conv (foat): The value of the final time functional
+            J_T_conv (float): The value of the final time functional
             max_ram_mb (int): The amount of memory that is available for
                 storing propagated states. If this is not suffient to hold all
                 the states required to calculate the gradient, a "segmented"

@@ -1516,7 +1516,7 @@ def gaussian(t, t0, sigma):
 
     Returns:
 
-        (float, ndarray): Gaussian shape of same type as `t`
+        (float, numpy.ndarray): Gaussian shape of same type as `t`
 
     """
     return np.exp(-(t - t0) ** 2 / (2 * sigma ** 2))
@@ -1529,13 +1529,13 @@ def box(t, t_start, t_stop):
 
     Parameters:
 
-        t (scalar, ndarray): Time point or time grid
+        t (scalar, numpy.ndarray): Time point or time grid
         t_start (scalar): First value of `t` for which the box has value 1
         t_stop (scalar): Last value of `t` for which the box has value 1
 
     Returns:
 
-        box_shape (ndarray(float64)): If `t` is an array, `box_shape` is an
+        box_shape (numpy.ndarray(float64)): If `t` is an array, `box_shape` is an
             array of the same size as `t` If `t` is scalar, `box_shape` is an
             array of size 1 (which for all intents and purposes can be used
             like a float)
@@ -1558,13 +1558,13 @@ def blackman(t, t_start, t_stop, a=0.16):
 
     Parameters:
 
-        t (float, ndarray): Time point or time grid
+        t (float, numpy.ndarray): Time point or time grid
         t_start (float): Starting point of Blackman shape
         t_stop (float): End point of Blackman shape
 
     Returns:
 
-        (float, ndarray(float64)):
+        (float, numpy.ndarray(float64)):
             If `t` is a scalar, `blackman_shape` is the scalar value of the
             Blackman shape at `t`.  If `t` is an array, `blackman_shape` is an
             array of same size as `t`, containing the values for the Blackman

@@ -207,7 +207,7 @@ class UnitConvert:
         as the input `value`.
 
         Parameters:
-            value (float, numpy array, UnitFloat): Value (or array of values)
+            value (float, numpy.ndarray, UnitFloat): Value (or array of values)
                 to convert
             from_unit (str, optional): Unit of `value`. Alternatively, if
                 `value` is an instance of :class:`UnitFloat`, the `from_unit`
