@@ -88,8 +88,8 @@ class AnalyticalPulse:
         time_unit (str or None): Value of the `time_unit` arg
         ampl_unit (str): Value of the `ampl_unit` arg
         freq_unit (str): Value of the `freq_unit` arg
-        config_attribs (MutableMapping): dictionary with the items from the
-            `config_attribs` arg
+        config_attribs (collections.abc.MutableMapping): dictionary with the
+            items from the `config_attribs` arg
     Notes:
         The `t0`, `T`, and `nt` may be given to specify a time grid that is
         used by default when converting to a numerical pulse
@@ -189,7 +189,7 @@ class AnalyticalPulse:
     @property
     def T(self):
         """Time at which the pulse ends (dt/2 after the last point in the
-        pulse), as an instance of :obj:`UnitFloat`.
+        pulse), as an instance of :class:`qdyn.units.UnitFloat`.
 
         None if T was given as None in initialization.
         """
@@ -208,7 +208,7 @@ class AnalyticalPulse:
 
         The returned time grid has ``nt - 1`` values, and extends from ``t0 +
         dt/2`` to ``T - dt/2``, matching the requirements for the `tgrid`
-        argument of :class:`Pulse`.
+        argument of :class:`qdyn.pulse.Pulse`.
 
         See also:
             :attr:`states_tgrid` is the time grid of length ``nt`` from ``t0``
@@ -247,7 +247,7 @@ class AnalyticalPulse:
 
     @property
     def dt(self):
-        """Time grid step, as instance of `UnitFloat`
+        """Time grid step, as instance of :class:`qdyn.units.UnitFloat`
 
         None if time grid is not defined (missing T, nt in initialization).
         """
@@ -291,7 +291,7 @@ class AnalyticalPulse:
     def dw(self):
         """Step width in the spectrum (i.e. the spectral resolution)
         based on the current pulse duration, as an instance of
-        :obj:`UnitFloat`.
+        :class:`qdyn.units.UnitFloat`.
 
         None if time grid is not defined (missing T, nt in initialization).
         """
@@ -541,12 +541,12 @@ class AnalyticalPulse:
     def to_num_pulse(
         self, tgrid=None, time_unit=None, ampl_unit=None, freq_unit=None
     ):
-        """Return a :cls:`.Pulse` instance that contains the
+        """Return a :class:`.Pulse` instance that contains the
         corresponding numerical pulse.
 
         Args:
-            tgrid (numpy array or None): The time grid on which to evaluate the
-                pulse. Use :func:`pulse_tgrid` to generate this.
+            tgrid (numpy.ndarray or None): The time grid on which to evaluate
+                the pulse. Use :func:`qdyn.pulse.pulse_tgrid` to generate this.
             time_unit (str or None): Unit of `tgrid`
             ampl_unit (str or None): Unit of pulse amplitude
             freq_unit (str or None): Unit of pulse frequencies
