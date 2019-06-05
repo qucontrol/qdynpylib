@@ -35,9 +35,9 @@ def open_file(file, mode='r', **kwargs):
 
     This function must be used as a context manager::
 
-    >>> with open_file('-', 'w') as out_fh:
-    ...      written_bytes = out_fh.write("Hello World")
-    Hello World
+        >>> with open_file('-', 'w') as out_fh:
+        ...      written_bytes = out_fh.write("Hello World")
+        Hello World
 
     Raises:
         IOError: If the file cannot be opened (see :func:`io.open`), if `file`

@@ -63,8 +63,8 @@ class LevelModel:
     operators are (sparse) matrices, and all states are simple vectors
 
     Attributes:
-        t0 (float or QDYN.units.UnitFloat): Initial time.
-        T (float or QDYN.units.UnitFloat): Final time.
+        t0 (float or qdyn.units.UnitFloat): Initial time.
+        T (float or qdyn.units.UnitFloat): Final time.
         nt (int): Number of points in the time grid.
         prop_method (str): Propagation method
         use_mcwf: Propagate using the Monte-Carlo Wave Function (quantum
@@ -76,8 +76,8 @@ class LevelModel:
             user's responsibility to ensure that `ham` is the proper effective
             Hamiltonian. The `construct_mcwf` flag determines the presence of
             `add_to_H_jump` config file parameter for each Lindblad operator
-        user_data (OrderedDict): Key-value pairs that should that describe
-            user-defined data. These will go in the ``user_strings``,
+        user_data (collections.OrderedDict): Key-value pairs that should that
+            describe user-defined data. These will go in the ``user_strings``,
             ``user_reals``, ``user_logicals``, or ``user_ints`` section of the
             config file, depending on the type of the value
 
@@ -265,8 +265,8 @@ class LevelModel:
             H: Hamiltonian matrix. Can be a numpy matrix or array,
                 scipy sparse matrix, or `qutip.Qobj`
             pulse: if not None, `H` will couple to `pulse`. Can be an instance
-                of :class:`~QDYN.analytical_pulse.AnalyticalPulse` or
-                :class:`~QDYN.pulse.Pulse`.
+                of :class:`~qdyn.analytical_pulse.AnalyticalPulse` or
+                :class:`~qdyn.pulse.Pulse`.
             op_unit (None or str): Unit of the values in `H`.
             sparsity_model (None or str): sparsity model that QDYN should use
                 to encode the data in `H`. If None, will be determined
@@ -282,9 +282,10 @@ class LevelModel:
                 config file (e.g. `specrad_method`, `filename`)
 
         Note:
-            It is recommended to use :class:`~QDYN.pulse.AnalyticalPulse` to
+            It is recommended to use
+            :class:`~qdyn.analytical_pulse.AnalyticalPulse` to
             express time-dependency, as this is independent of a specific time
-            grid.  Instances of :class:`~QDYN.pulse.Pulse` must have a time
+            grid.  Instances of :class:`~qdyn.pulse.Pulse` must have a time
             grid that exactly matches the time grid specified via
             :meth:`set_propagation`.
         """
@@ -324,7 +325,7 @@ class LevelModel:
         """Add an observable
 
         Args:
-            O (matrix, str): Observable to add. Must be a matrix, or
+            O (numpy.matrix, str): Observable to add. Must be a matrix, or
                 one of "ham", "norm", "pop"
             outfile (str): Name of output file to which to write expectation
                 values of `O`
@@ -419,8 +420,8 @@ class LevelModel:
         """Add Lindblad operator.
 
         Args:
-            L (tuple, matrix): Lindblad operator to  add. Must be a matrix
-                or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.
+            L (tuple, numpy.matrix): Lindblad operator to  add. Must be a
+                matrix or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.
             op_unit (None or str): Unit of the values in `L`, e.g. ``sqrt_GHz``
                 (Lindblad operators are in units square-root-of-energy)
             sparsity_model (None or str): sparsity model that QDYN should use
@@ -471,8 +472,8 @@ class LevelModel:
         """Set a dissipation superoperator in the config file
 
         Args:
-            D (tuple, matrix): Dissiption superoperoperator to add. Must be a
-                matrix or a tuple ``(matrix, pulse)``
+            D (tuple, numpy.matrix): Dissiption superoperoperator to add.
+                Must be a matrix or a tuple ``(matrix, pulse)``
             op_unit (None or str): Unit of the value in `D`. e.g. ``GHz``
                 (dissipators are in units of energy)
             sparsity_model (None or str): sparsity model that QDYN should use
