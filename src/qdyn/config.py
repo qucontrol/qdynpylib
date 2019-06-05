@@ -520,7 +520,8 @@ def write_config(config_data, filename):
     """Write out a config file
 
     Arguments:
-        config_data (dict): data structure as returned by :func:`read_config`.
+        config_data (dict): data structure as returned by
+            :func:`read_config_str`.
         filename (str): name of file to which to write config
     """
     with open(filename, 'w') as out_fh:
@@ -554,7 +555,8 @@ def get_config_value(config_data, key_tuple):
     """Extract value from `config_data` by the given `key_tuple`
 
     Arguments:
-        config_data (dict): data structure as returned by :func:`read_config`.
+        config_data (dict): data structure as returned by
+            :func:`read_config_str`.
         key_tuple (tuple): tuple of keys. For example if `key_tuple` is
             ``('pulse', 0, 'id')``, then the returned value would be
             ``config_data['pulse'][0]['id']``
@@ -654,7 +656,7 @@ def generate_make_config(
 
     Arguments:
         config_template (dict): data structure as returned by
-            :func:`read_config` that will serve as a template
+            :func:`read_config_str` that will serve as a template
         variables (dict): mapping of a keyword variable name to a key-tuple
             in the config (cf. :func:`set_config_value`)
         dependencies (dict): mapping of a key-tuple to a callable that
