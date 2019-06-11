@@ -178,7 +178,7 @@ class AnalyticalPulse:
     @property
     def t0(self):
         """Time at which the pulse begins (dt/2 before the first point in the
-        pulse), as instance of `UnitFloat`
+        pulse), as instance of :class:`~qdyn.units.UnitFloat`.
         """
         t0 = self._get('_t0')
         if t0 is None:
@@ -189,7 +189,7 @@ class AnalyticalPulse:
     @property
     def T(self):
         """Time at which the pulse ends (dt/2 after the last point in the
-        pulse), as an instance of :class:`qdyn.units.UnitFloat`.
+        pulse), as an instance of :class:`~qdyn.units.UnitFloat`.
 
         None if T was given as None in initialization.
         """
@@ -208,7 +208,7 @@ class AnalyticalPulse:
 
         The returned time grid has ``nt - 1`` values, and extends from ``t0 +
         dt/2`` to ``T - dt/2``, matching the requirements for the `tgrid`
-        argument of :class:`qdyn.pulse.Pulse`.
+        argument of :class:`~qdyn.pulse.Pulse`.
 
         See also:
             :attr:`states_tgrid` is the time grid of length ``nt`` from ``t0``
@@ -247,7 +247,7 @@ class AnalyticalPulse:
 
     @property
     def dt(self):
-        """Time grid step, as instance of :class:`qdyn.units.UnitFloat`
+        """Time grid step, as instance of :class:`~qdyn.units.UnitFloat`
 
         None if time grid is not defined (missing T, nt in initialization).
         """
@@ -291,7 +291,7 @@ class AnalyticalPulse:
     def dw(self):
         """Step width in the spectrum (i.e. the spectral resolution)
         based on the current pulse duration, as an instance of
-        :class:`qdyn.units.UnitFloat`.
+        :class:`~qdyn.units.UnitFloat`.
 
         None if time grid is not defined (missing T, nt in initialization).
         """
@@ -546,7 +546,7 @@ class AnalyticalPulse:
 
         Args:
             tgrid (numpy.ndarray or None): The time grid on which to evaluate
-                the pulse. Use :func:`qdyn.pulse.pulse_tgrid` to generate this.
+                the pulse. Use :func:`~qdyn.pulse.pulse_tgrid` to generate this.
             time_unit (str or None): Unit of `tgrid`
             ampl_unit (str or None): Unit of pulse amplitude
             freq_unit (str or None): Unit of pulse frequencies

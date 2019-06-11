@@ -102,9 +102,9 @@ class Pulse:
     """Numerical real or complex control pulse
 
     Args:
-        tgrid (ndarray(float64)):
+        tgrid (numpy.ndarray(float)):
             Time grid values
-        amplitude (ndarray(float64), ndarray(complex128)):
+        amplitude (numpy.ndarray(float), numpy.ndarray(complex)):
             Amplitude values. If not given, amplitude will be zero
         time_unit (str): Unit of values in `tgrid`. Will be ignored when
             reading from file.
@@ -115,10 +115,10 @@ class Pulse:
             possible (or a `TypeError` will be raised.
 
     Attributes:
-        tgrid (ndarray(float64)): time points at which the pulse values are
-            defined, from ``t0 + dt/2`` to ``T - dt/2``.
-        amplitude (ndarray(float64), ndarray(complex128)): array of real or
-            complex pulse values.
+        tgrid (numpy.ndarray(float)): time points at which the pulse values
+            are defined, from ``t0 + dt/2`` to ``T - dt/2``.
+        amplitude (numpy.ndarray(float), numpy.ndarray(complex)): array
+            of real or complex pulse values.
         time_unit (str): Unit of values in `tgrid`
         ampl_unit (str): Unit of values in `amplitude`
         freq_unit (str): Unit to use for frequency when calculating the
@@ -526,7 +526,7 @@ class Pulse:
     def dw(self):
         """Step width in the spectrum (i.e. the spectral resolution)
         based on the current pulse duration, as an instance of
-        :obj:`UnitFloat`.
+        :class:`~qdyn.units.UnitFloat`.
         """
         n = len(self.tgrid)
         w_max = self.w_max
@@ -540,7 +540,7 @@ class Pulse:
     @property
     def T(self):
         """Time at which the pulse ends (dt/2 after the last point in the
-        pulse), as an instance of :obj:`UnitFloat`
+        pulse), as an instance of :class:`~qdyn.units.UnitFloat`.
         """
         result = self.tgrid[-1] + 0.5 * float(self.dt)
         if abs(round(result) - result) < (1.0e-15 * result):
@@ -695,12 +695,11 @@ class Pulse:
 
         Returns:
 
-            freq (ndarray(float64)): Frequency values associated with the
-                amplitude values in `spectrum`, i.e. the x-axis of the
-                spectrogram. The values are in the unit `freq_unit`
-            spectrum (ndarray(float64), ndarray(complex128)):
-                Real (`mode in ['abs', 'real', 'imag']`) or complex
-                (`mode='complex'`) amplitude of each frequency component
+            numpy.ndarray(float), numpy.ndarray(complex): Frequency values
+            associated with the amplitude values in `spectrum`, i.e. the x-axis
+            of the spectrogram. The values are in the unit `freq_unit`.
+            Real (`mode in ['abs', 'real', 'imag']`) or complex
+            (`mode='complex'`) amplitude of each frequency component.
 
         Notes:
 
@@ -734,9 +733,10 @@ class Pulse:
                 If not given, defaults to the `freq_unit` attribute
 
         Returns:
-            freq (ndarray(float64)): Frequency values associated with the pulse
-                time grid. The first half of the `freq` array contains the
-                positive frequencies, the second half the negative frequencies
+            numpy.ndarray(float): Frequency values associated with
+            the pulse time grid.
+            The first half of the `freq` array contains the
+            positive frequencies, the second half the negative frequencies
         """
         if freq_unit is None:
             freq_unit = self.freq_unit
@@ -1199,9 +1199,8 @@ class Pulse:
                 lines.  If list of tuples (float, dict), the float value is the
                 frequency to mark, and the dict gives the keyword arguments
                 that are passed to the matplotlib `axvline` method.
-            mark_freq_points (None, or matplotlib marker (see
-            matplotlib.markers`)): Marker to be used to indicate the
-                individual points in the spectrum.
+            mark_freq_points (None, ~matplotlib.markers.MarkerStyle): Marker to
+                be used to indicate the individual points in the spectrum.
 
         The remaining figargs are passed to `matplotlib.pyplot.figure` to
         create a new figure if `fig` is None.
@@ -1376,33 +1375,34 @@ def carrier(
 
     Parameters:
 
-        t (scalar, ndarray(float64)): Time value or time grid
+        t (scalar, numpy.ndarray(float)): Time value or time grid
         time_unit (str): Unit of `t`
-        freq (scalar, ndarray(float64)): Carrier frequency or frequencies
+        freq (scalar, numpy.ndarray(float)): Carrier frequency or frequencies
         freq_unit (str): Unit of `freq`
-        weights (array-like, optional): If `freq` is an array, weights for the
-            different frequencies. If not given, all weights are 1. The weights
-            are normalized to sum to one.  Any weight smaller than machine
-            precision is assumed zero.
-        phases (array-line, optional): If `phases` is an array, phase shift for
-            each frequency component, in units of pi. If not given, all phases
-            are 0.
+        weights (numpy.ndarray, optional): If `freq` is an array, weights for
+            the different frequencies. If not given, all weights are 1. The
+            weights are normalized to sum to one.  Any weight smaller than
+            machine precision is assumed zero.
+        phases (numpy.ndarray, optional): If `phases` is an array, phase shift
+            for each frequency component, in units of pi. If not given, all
+            phases are 0.
         complex (bool): If `True`, oscillate in the complex plane
 
     Returns:
 
-        signal (scalar, ndarray(complex128)): Depending on whether `complex` is
-            `True` or `False`,
-                .. math::
-                    s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
-                    s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))
+        scalar, numpy.ndarray(complex): Depending on whether
+        `complex` is `True` or `False`,
 
-                with :math:`\omega_j = 2 * \pi * f_j`, and frequency
-                :math:`f_j` where :math:`f_j` is the j'th value in `freq`. The
-                value of :math:`\phi_j` is the j'th value in `phases`
+        .. math::
+            s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
+            s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))
 
-                `signal` is a scalar if `t` is a scalar, and and array if `t`
-                is an array
+        with :math:`\omega_j = 2 * \pi * f_j`, and frequency
+        :math:`f_j` where :math:`f_j` is the j'th value in `freq`. The
+        value of :math:`\phi_j` is the j'th value in `phases`
+
+        `signal` is a scalar if `t` is a scalar, and and array if `t`
+        is an array
 
     Notes:
 
@@ -1460,15 +1460,15 @@ def CRAB_carrier(
     element of `b`, and :math:`\omega_n` is the n'th element of freq.
 
     Args:
-        t (array-like): time grid values
+        t (numpy.ndarray): time grid values
         time_unit (str): Unit of `t`
-        freq (scalar, ndarray(float64)): Carrier frequency or frequencies
+        freq (scalar, numpy.ndarray(float)): Carrier frequency or frequencies
         freq_unit (str): Unit of `freq`
-        a (array-like): Coefficients for cosines
-        b (array-line): Coefficients for sines
-        normalize (logical, optional): If True, normalize the resulting carrier
+        a (numpy.ndarray): Coefficients for cosines
+        b (numpy.ndarray): Coefficients for sines
+        normalize (bool, optional): If True, normalize the resulting carrier
             such that its values are in [-1,1]
-        complex (logical, optional): If True, oscillate in the complex
+        complex (bool, optional): If True, oscillate in the complex
             plane
 
             .. math::
@@ -1510,7 +1510,7 @@ def gaussian(t, t0, sigma):
 
     Parameters:
 
-        t (float, ndarray): time value or grid
+        t (float, numpy.ndarray): time value or grid
         t0 (float): center of peak
         sigma (float): width of Gaussian
 
@@ -1535,9 +1535,9 @@ def box(t, t_start, t_stop):
 
     Returns:
 
-        box_shape (numpy.ndarray(float64)): If `t` is an array, `box_shape` is an
-            array of the same size as `t` If `t` is scalar, `box_shape` is an
-            array of size 1 (which for all intents and purposes can be used
+        box_shape (numpy.ndarray(float)): If `t` is an array, `box_shape` is
+            an array of the same size as `t` If `t` is scalar, `box_shape` is
+            an array of size 1 (which for all intents and purposes can be used
             like a float)
     """
     if t < t_start:
@@ -1564,7 +1564,7 @@ def blackman(t, t_start, t_stop, a=0.16):
 
     Returns:
 
-        (float, numpy.ndarray(float64)):
+        (float, numpy.ndarray(float)):
             If `t` is a scalar, `blackman_shape` is the scalar value of the
             Blackman shape at `t`.  If `t` is an array, `blackman_shape` is an
             array of same size as `t`, containing the values for the Blackman
@@ -1595,7 +1595,7 @@ def flattop(t, t_start, t_stop, t_rise, t_fall=None):
 
     Parameters:
 
-        t (scalar, ndarray): Time  point or time grid
+        t (scalar, numpy.ndarray): Time  point or time grid
         t_start (scalar): Start of flattop window
         t_stop (scalar): Stop of flattop window
         t_rise (scalar): Duration of ramp-up, starting at `t_start`
@@ -1604,10 +1604,10 @@ def flattop(t, t_start, t_stop, t_rise, t_fall=None):
 
     Returns:
 
-        flattop_shape (ndarray(float64)): If `t` is an array, `flattop_shape`
-            is an array of the same size as `t` If `t` is scalar,
-            `flattop_ox_shape` is an array of size 1 (which for all intents and
-            purposes can be used like a float)
+        flattop_shape (numpy.ndarray(float)): If `t` is an array,
+            `flattop_shape` is an array of the same size as `t` If `t` is
+            scalar, `flattop_ox_shape` is an array of size 1 (which for all
+            intents and purposes can be used like a float)
     """
     if t_start <= t <= t_stop:
         f = 1.0
