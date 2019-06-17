@@ -150,12 +150,12 @@ def write_indexed_matrix(
     filename: str
         Name of file to write to
 
-    comment: str or list(str), optional
+    comment: str or list(str)
         Comment line, or array of comment lines to write to the top of the
         file. Each line that does not start with '#' will have "# "
         prepended.
 
-    line_formatter: callable, optional
+    line_formatter: callable
         Function that takes three arguments i, j, v (row index, column index,
         and complex value matrix[i,j]) and returns a line to be written to
         file. If the function returns None for any input data, no line will be
@@ -169,15 +169,15 @@ def write_indexed_matrix(
 
         if matrix is complex.
 
-    header: str, optional
+    header: str
         Header line to be written before any data. Must start with either '#'
         or a space, in which case the leading space will be replaced with '#'.
         Defaults to a header line suitable for the default line_formatter
 
-    hermitian: bool, optional
+    hermitian: bool
         If True, write only entries from the upper triangle
 
-    limit: float, optional
+    limit: float
         Only values with an absolute value greater than `limit` are written
     """
 
@@ -274,7 +274,7 @@ def read_indexed_matrix(
 
     filename: str
         Name of file from which to read the matrix
-    format: str, optional
+    format: str
         Result type:
         * 'coo' (default): scipy.sparse.coo.coo_matrix
         * 'array': numpy.ndarray
@@ -285,14 +285,14 @@ def read_indexed_matrix(
         * 'dia': scipy.sparse.dia.dia_matrix
         * 'dok': scipy.sparse.dok.dok_matrix
         * 'lil': scipy.sparse.lil.lil_matrix
-    shape: int or (int,int), optional
+    shape: int or (int,int)
         If given, shape of the resulting matrix. If not given, will be
         determined from largest occurring index in the data from the input file
-    expand_hermitian: bool, optional
+    expand_hermitian: bool
         If True, the input file must contain data only for the upper or lower
         triangle. The oterh triangle will be set with the complex conjugate
         values.
-    val_real: bool, optional
+    val_real: bool
         If True, only read 3 columns from the input file (i, j, value), even if
         more columns are present in the file, and return a real matrix.
     """
@@ -415,22 +415,22 @@ def print_matrix(
     M: numpy.ndarray, scipy.sparse.spmatrix
         Matrix to print. In addition to a standard dense matrix, may also be
         any scipy sparse matrix in a format where M[i,j] is defined.
-    matrix_name: str, optional
+    matrix_name: str
         Name of matrix
-    limit: float, optional
+    limit: float
        Any number (real or imaginary part) whose absolute value is smaller than
        this limit will be printed as 0.0.
-    fmt: str or callable, optional
+    fmt: str or callable
         Format of each entry (both for real and imaginary part). If str, must
         be an "old-style" format string the formats a single floating value. If
         a callable, the callable must return a string of fixed length when
         passed a number. The string returned by ``fmt(0)`` will be used for
         values that are exactly zero, whereas the string returned by
         ``fmt(0.0)`` will be used for values that are below `limit`.
-    compress: bool, optional
+    compress: bool
         If True, remove spaces to compress the output to be narrower. Real and
         imaginary parts will no longer be aligned.
-    zero_as_blank: bool, optional
+    zero_as_blank: bool
         If True, represent entries that are exactly zero as blank strings
     out: file
         open filehandle. If None, print to stdout

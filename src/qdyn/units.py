@@ -157,7 +157,7 @@ class UnitConvert:
     """Perform conversion between different physical units
 
     Parameters:
-        units_file (str, optional): file from which to read unit definitions.
+        units_file (str): file from which to read unit definitions.
             The content in the file must be in the format specified in
             :meth:`read_units_definition`. The file  must contain two columns.
             The first columns contains the unit name, the second column the
@@ -209,11 +209,11 @@ class UnitConvert:
         Parameters:
             value (float, numpy.ndarray, UnitFloat): Value (or array of values)
                 to convert
-            from_unit (str, optional): Unit of `value`. Alternatively, if
+            from_unit (str): Unit of `value`. Alternatively, if
                 `value` is an instance of :class:`UnitFloat`, the `from_unit`
                 can be taken from value. If given neither directly or obtained
                 from `value`, convert from 'internal units'
-            to_unit (str, optional): Unit to which to convert. If not given,
+            to_unit (str): Unit to which to convert. If not given,
                 convert to 'internal units'. Note that `from_unit` and
                 `to_unit` must be compatible (i.e., both must be units of the
                 same category, e.g. energy, length, or time)

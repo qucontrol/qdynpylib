@@ -681,13 +681,13 @@ class Pulse:
 
         Parameters:
 
-            freq_unit (str, optional): Desired unit of the `freq` output array.
+            freq_unit (str): Desired unit of the `freq` output array.
                 Can Hz (GHz, Mhz, etc) to obtain frequencies, or any energy
                 unit, using the correspondence ``f = E/h``. If not given,
                 defaults to the `freq_unit` attribute
-            mode (str, optional): Wanted mode for `spectrum` output array.
+            mode (str): Wanted mode for `spectrum` output array.
                 Possible values are 'complex', 'abs', 'real', 'imag'
-            sort (bool, optional): Sort the output `freq` array (and the output
+            sort (bool): Sort the output `freq` array (and the output
                 `spectrum` array) so that frequecies are ordered from
                 ``-w_max .. 0 .. w_max``, instead of the direct output from the
                 FFT. This is good for plotting, but does not allow to do an
@@ -729,7 +729,7 @@ class Pulse:
         `numpy.fft.fftfreq`
 
         Parameters:
-            freq_unit (str, optional): Desired unit of the output array.
+            freq_unit (str): Desired unit of the output array.
                 If not given, defaults to the `freq_unit` attribute
 
         Returns:
@@ -820,8 +820,8 @@ class Pulse:
 
         Parameters:
 
-            filename (str, optional): Name of file to which to write the pulse
-            mode (str, optional): Mode in which to write files. Possible values
+            filename (str): Name of file to which to write the pulse
+            mode (str): Mode in which to write files. Possible values
                 are 'abs', 'real', or 'complex'. The former two result in a
                 two-column file, the latter in a three-column file. If not
                 given, 'real' or 'complex' is used, depending on the type of
@@ -897,7 +897,7 @@ class Pulse:
             filter_func (callable): A function that takes a frequency values
                 (in units of `freq_unit`) and returns a filter value in the
                 range [0, 1]
-            freq_unit (str, optional):  Unit of frequencies that `filter_func`
+            freq_unit (str):  Unit of frequencies that `filter_func`
                 assumes.  If not given, defaults to the `freq_unit` attribute.
 
         Note:
@@ -922,7 +922,7 @@ class Pulse:
             filter_func (callable): A function that takes a frequency values
                 (in units of `freq_unit`) and returns a filter value in the
                 range [0, 1]
-            freq_unit (str, optional):  Unit of frequencies that `filter_func`
+            freq_unit (str):  Unit of frequencies that `filter_func`
                 assumes.  If not given, defaults to the `freq_unit` attribute.
         """
         freqs, spec = self.spectrum(freq_unit=freq_unit)
@@ -995,15 +995,15 @@ class Pulse:
 
         Parameters:
 
-            upsample (int, optional): Factor by which to increase the number of
+            upsample (int): Factor by which to increase the number of
                 samples. Afterwards, those points extending beyond the original
                 end point of the pulse are discarded.
-            downsample (int, optional): For ``downsample=n``, keep only every
+            downsample (int): For ``downsample=n``, keep only every
                 n'th point of the original pulse. This may cause the resampled
                 pulse to end earlier than the original pulse
-            num (int, optional): Resample with `num` sampling points. This may
+            num (int): Resample with `num` sampling points. This may
                 case the end point of the resampled pulse to change
-            window (array_like, callable, str, float, or tuple, optional):
+            window (array_like, callable, str, float, or tuple):
                 Specifies the window applied to the signal in the Fourier
                 domain.  See `sympy.signal.resample`.
 
@@ -1379,11 +1379,11 @@ def carrier(
         time_unit (str): Unit of `t`
         freq (scalar, numpy.ndarray(float)): Carrier frequency or frequencies
         freq_unit (str): Unit of `freq`
-        weights (numpy.ndarray, optional): If `freq` is an array, weights for
+        weights (numpy.ndarray): If `freq` is an array, weights for
             the different frequencies. If not given, all weights are 1. The
             weights are normalized to sum to one.  Any weight smaller than
             machine precision is assumed zero.
-        phases (numpy.ndarray, optional): If `phases` is an array, phase shift
+        phases (numpy.ndarray): If `phases` is an array, phase shift
             for each frequency component, in units of pi. If not given, all
             phases are 0.
         complex (bool): If `True`, oscillate in the complex plane
@@ -1466,9 +1466,9 @@ def CRAB_carrier(
         freq_unit (str): Unit of `freq`
         a (numpy.ndarray): Coefficients for cosines
         b (numpy.ndarray): Coefficients for sines
-        normalize (bool, optional): If True, normalize the resulting carrier
+        normalize (bool): If True, normalize the resulting carrier
             such that its values are in [-1,1]
-        complex (bool, optional): If True, oscillate in the complex
+        complex (bool): If True, oscillate in the complex
             plane
 
             .. math::
