@@ -123,7 +123,7 @@ class Pulse:
         ampl_unit (str): Unit of values in `amplitude`
         freq_unit (str): Unit to use for frequency when calculating the
             spectrum
-        dt (scalar): Time step (in `time_unit`)
+        dt (float): Time step (in `time_unit`)
         preamble (list): List of lines that are written before the header
             when writing the pulse to file. Each line should start with '# '
         postamble (list): List of lines that are written after all data
@@ -1003,7 +1003,7 @@ class Pulse:
                 pulse to end earlier than the original pulse
             num (int): Resample with `num` sampling points. This may
                 case the end point of the resampled pulse to change
-            window (array_like, callable, str, float, or tuple):
+            window (list, numpy.ndarray, callable, str, float, or tuple):
                 Specifies the window applied to the signal in the Fourier
                 domain.  See `sympy.signal.resample`.
 
@@ -1375,9 +1375,9 @@ def carrier(
 
     Parameters:
 
-        t (scalar, numpy.ndarray(float)): Time value or time grid
+        t (numpy.ndarray(float)): Time value or time grid
         time_unit (str): Unit of `t`
-        freq (scalar, numpy.ndarray(float)): Carrier frequency or frequencies
+        freq (numpy.ndarray(float)): Carrier frequency or frequencies
         freq_unit (str): Unit of `freq`
         weights (numpy.ndarray): If `freq` is an array, weights for
             the different frequencies. If not given, all weights are 1. The
@@ -1390,7 +1390,7 @@ def carrier(
 
     Returns:
 
-        scalar, numpy.ndarray(complex): Depending on whether
+        numpy.ndarray(complex): Depending on whether
         `complex` is `True` or `False`,
 
         .. math::
@@ -1462,7 +1462,7 @@ def CRAB_carrier(
     Args:
         t (numpy.ndarray): time grid values
         time_unit (str): Unit of `t`
-        freq (scalar, numpy.ndarray(float)): Carrier frequency or frequencies
+        freq (numpy.ndarray): Carrier frequency or frequencies
         freq_unit (str): Unit of `freq`
         a (numpy.ndarray): Coefficients for cosines
         b (numpy.ndarray): Coefficients for sines
