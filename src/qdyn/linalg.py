@@ -8,42 +8,49 @@ import scipy.sparse
 
 
 def inner(v1, v2):
-    """Calculate the inner product of the two vectors or matrices v1, v2
+    """Calculate the inner product of the two vectors or matrices `v1`, `v2`.
 
-    For vectors, the inner product is the standard Euclidian inner product.
+    * For vectors, the inner product is the standard Euclidian inner product.
 
-    For matrices, the innner product is the Hilbert-Schmidt overlap.
+    * For matrices, the innner product is the Hilbert-Schmidt overlap.
 
     Note that the inner product of the vectorization of two matrices is the
     same as the inner product of the original matrices, and that two m x 1
     matrices have the same inner product as the corresponding m-dimensional
-    vectors
+    vectors.
 
     The `inner` routine corresponds to `overlap` in QDYN.
 
-    Examples
-    --------
+    Args:
+        v1 (numpy.ndarray): First argument.
+            The conjugate transposed of `v1` is taken before the calculation of
+            the inner product.
+        v2 (numpy.ndarray): Second argument.
 
-    >>> v1 = np.array([1.0, 1.0j, 1.0, 1.0j])
-    >>> v2 = np.array([1.0j, 1.0j, 1.0j, 1.0j])
-    >>> inner(v1, v2)
-    (2+2j)
-    >>> m1 = v1.reshape((2,2))
-    >>> m2 = v2.reshape((2,2))
-    >>> inner(m1, m2)
-    (2+2j)
-    >>> m1 = v1.reshape((4,1))
-    >>> m2 = v2.reshape((4,1))
-    >>> inner(m1, m2)
-    (2+2j)
-    >>> m1 = v1.reshape((4,1), order='F')
-    >>> m2 = v2.reshape((4,1), order='F')
-    >>> inner(m1, m2)
-    (2+2j)
-    >>> m1 = v1.reshape((1,4), order='F')
-    >>> m2 = v2.reshape((1,4), order='F')
-    >>> inner(m1, m2)
-    (2+2j)
+    Returns:
+        float: Inner product of `v1` and `v2`.
+
+    Examples:
+        >>> v1 = np.array([1.0, 1.0j, 1.0, 1.0j])
+        >>> v2 = np.array([1.0j, 1.0j, 1.0j, 1.0j])
+        >>> inner(v1, v2)
+        (2+2j)
+        >>> m1 = v1.reshape((2,2))
+        >>> m2 = v2.reshape((2,2))
+        >>> inner(m1, m2)
+        (2+2j)
+        >>> m1 = v1.reshape((4,1))
+        >>> m2 = v2.reshape((4,1))
+        >>> inner(m1, m2)
+        (2+2j)
+        >>> m1 = v1.reshape((4,1), order='F')
+        >>> m2 = v2.reshape((4,1), order='F')
+        >>> inner(m1, m2)
+        (2+2j)
+        >>> m1 = v1.reshape((1,4), order='F')
+        >>> m2 = v2.reshape((1,4), order='F')
+        >>> inner(m1, m2)
+        (2+2j)
     """
     assert type(v1) is type(v2), (
         "v1 and v2 must be of the same type: types are %s vs %s"
@@ -58,7 +65,16 @@ def inner(v1, v2):
 
 
 def trace(m):
-    """Return the trace of the given matrix"""
+    """Return the trace of the given matrix.
+
+    Args:
+        m (list, numpy.ndarray): Input array from which the diagonals are taken.
+
+    Returns:
+        float:
+        If `m` is a matrix, the sum along the diagonal is returned. If `m` has
+        larger dimensions, then an array of sums along diagonals is returned.
+    """
     return (np.asarray(m)).trace()
 
 
@@ -68,15 +84,21 @@ def norm(v):
     Gram-Schmidt-Orthonormalization will only work if the choice of norm and
     inner product are compatible.
 
-    If `v` is a vector, the norm is the 2-norm (i.e. the standard Euclidian
-    vector norm).
+    * If `v` is a vector, the norm is the 2-norm (i.e. the standard Euclidian
+      vector norm).
 
-    If `v` is a matrix, the norm is the Hilbert-Schmidt (aka Frobenius) norm.
-    Note that the HS norm of a matrix is identical to the 2-norm of any
-    vectorization of that matrix (e.g. writing the columns of the matrix
-    underneat each other). Also, the HS norm of the m x 1 matrix is the same as
-    the 2-norm of the equivalent m-dimensional vector.
+    * If `v` is a matrix, the norm is the Hilbert-Schmidt (aka Frobenius) norm.
+      Note that the HS norm of a matrix is identical to the 2-norm of any
+      vectorization of that matrix (e.g. writing the columns of the matrix
+      underneat each other). Also, the HS norm of the m x 1 matrix is the same
+      as the 2-norm of the equivalent m-dimensional vector.
 
+    Args:
+        v (numpy.ndarray, scipy.sparse.spmatrix, qutip.Qobj):
+            Input vector or matrix.
+
+    Returns:
+        float: Norm of `v`.
     """
     if repr(v).startswith('Quantum object'):  # qutip.Qobj
         v = v.data
@@ -87,21 +109,39 @@ def norm(v):
 
 
 def vectorize(a, order='F'):
-    """Return vectorization of multi-dimensional numpy array `a`.
+    """Return vectorization of multi-dimensional array `a`.
 
-    Examples
-    --------
+    Args:
+        a (list, numpy.ndarray, qutip.Qobj): Array to be vectorized.
+        order (str): One of {'C', 'F', 'A'}.
+           Read the elements of `a` using this index order, and place the
+           elements into the reshaped array using this index order.  'C'
+           means to read / write the elements using C-like index order,
+           with the last axis index changing fastest, back to the first
+           axis index changing slowest. 'F' means to read / write the
+           elements using Fortran-like index order, with the first index
+           changing fastest, and the last index changing slowest. Note that
+           the 'C' and 'F' options take no account of the memory layout of
+           the underlying array, and only refer to the order of indexing.
+           'A' means to read / write the elements in Fortran-like index
+           order if `a` is Fortran *contiguous* in memory, C-like order
+           otherwise.
 
-    >>> a = np.array([1,2,3,4])
-    >>> vectorize(a)
-    array([1, 2, 3, 4])
+    Returns:
+        numpy.ndarray: The input array, but with all or `a` subset of the
+        dimensions of length 1 removed. This is always `a` itself or a view
+        into `a`.
 
-    >>> a = np.array([[1,2],[3,4]])
-    >>> vectorize(a)
-    array([1, 3, 2, 4])
+    Examples:
+        >>> a = np.array([1,2,3,4])
+        >>> vectorize(a)
+        array([1, 2, 3, 4])
 
-    >>> vectorize(a, order='C')
-    array([1, 2, 3, 4])
+        >>> a = np.array([[1,2],[3,4]])
+        >>> vectorize(a)
+        array([1, 3, 2, 4])
+        >>> vectorize(a, order='C')
+        array([1, 2, 3, 4])
     """
     if repr(a).startswith('Quantum object'):  # qutip.Qobj
         a = a.data.toarray()
@@ -110,25 +150,34 @@ def vectorize(a, order='F'):
 
 
 def is_hermitian(matrix):
-    """Return True if matrix is Hermitian, False otherwise. The `matrix` can be
-    a numpy array or matrix, a scipy sparse matrix, or a `qutip.Qobj` instance.
+    """Check, if a matrix is Hermitian.
 
-    >>> m = np.array([[0, 1j], [-1j, 1]])
-    >>> is_hermitian(m)
-    True
+    `matrix` can be a numpy array, a scipy sparse matrix, or a `qutip.Qobj`
+    instance.
 
-    >>> m = np.array([[0, 1j], [-1j, 1j]])
-    >>> is_hermitian(m)
-    False
+    Args:
+        matrix (list, numpy.ndarray, qutip.Qobj): Input array.
 
-    >>> m = np.array([[0, -1j], [-1j, 1]])
-    >>> is_hermitian(m)
-    False
+    Returns:
+        bool: Returns `True` if matrix is Hermitian, `False` otherwise.
 
-    >>> from scipy.sparse import coo_matrix
-    >>> m  = coo_matrix(np.array([[0, 1j], [-1j, 0]]))
-    >>> is_hermitian(m)
-    True
+    Examples:
+         >>> m = np.array([[0, 1j], [-1j, 1]])
+         >>> is_hermitian(m)
+         True
+
+         >>> m = np.array([[0, 1j], [-1j, 1j]])
+         >>> is_hermitian(m)
+         False
+
+         >>> m = np.array([[0, -1j], [-1j, 1]])
+         >>> is_hermitian(m)
+         False
+
+         >>> from scipy.sparse import coo_matrix
+         >>> m  = coo_matrix(np.array([[0, 1j], [-1j, 0]]))
+         >>> is_hermitian(m)
+         True
     """
     if hasattr(matrix, 'isherm'):  # qutip.Qobj
         return matrix.isherm
@@ -147,18 +196,26 @@ def iscomplexobj(x):
     """Check whether the (multidimensional `x` object) has a type that
     allows for complex entries.
 
-    >>> iscomplexobj(1)
-    False
-    >>> iscomplexobj(1+0j)
-    True
-    >>> iscomplexobj([3, 1+0j, True])
-    True
-    >>> iscomplexobj(np.array([3, 1j]))
-    True
-    >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5]]))
-    False
-    >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5j]]))
-    True
+    Args:
+        x: Multidimensional array like object.
+
+    Returns:
+        bool: Returns `True`, if `x` allows for complex entries, `False`
+        otherwise.
+
+    Examples:
+         >>> iscomplexobj(1)
+         False
+         >>> iscomplexobj(1+0j)
+         True
+         >>> iscomplexobj([3, 1+0j, True])
+         True
+         >>> iscomplexobj(np.array([3, 1j]))
+         True
+         >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5]]))
+         False
+         >>> iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5j]]))
+         True
     """
     # This is a workaround for numpy bug #7924. It also works for qutip objects
     try:
@@ -176,36 +233,43 @@ def iscomplexobj(x):
 
 
 def choose_sparsity_model(matrix):
-    """Return one of 'full', 'banded', 'dia', or 'indexed', depending on an
-    estimate of white might be the best storage format for the given `matrix`.
+    """Estimate which might be the best storage format for the given matrix.
 
-    >>> m = scipy.sparse.random(100, 100, 0.01)
-    >>> choose_sparsity_model(m)
-    'indexed'
+    Args:
+        matrix (numpy.matrix, scipy.sparse.spmatrix, qutip.Qobj):
+            Input matrix, which must be quadratic.
 
-    >>> m = scipy.sparse.random(100, 100, 0.5)
-    >>> choose_sparsity_model(m)
-    'full'
+    Returns:
+        str: Returns one of 'full', 'banded', 'dia', or 'indexed'.
 
-    >>> m = np.diag(np.ones(20))
-    >>> choose_sparsity_model(m)
-    'banded'
+    Examples:
+        >>> m = scipy.sparse.random(100, 100, 0.01)
+        >>> choose_sparsity_model(m)
+        'indexed'
 
-    >>> m = np.diag(np.zeros(20))
-    >>> m[2,2] = m[10,10] = m[11,11] = 1
-    >>> choose_sparsity_model(m)
-    'indexed'
+        >>> m = scipy.sparse.random(100, 100, 0.5)
+        >>> choose_sparsity_model(m)
+        'full'
 
-    >>> td_data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)
-    >>> off = np.array([0, -1, 1])
-    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(5,5)).toarray()
-    >>> choose_sparsity_model(m) # should eventually be 'dia'
-    'indexed'
+        >>> m = np.diag(np.ones(20))
+        >>> choose_sparsity_model(m)
+        'banded'
 
-    >>> m = scipy.sparse.dia_matrix((td_data, off), shape=(20,20)).toarray()
-    >>> m[19,19] = 1
-    >>> choose_sparsity_model(m)
-    'indexed'
+        >>> m = np.diag(np.zeros(20))
+        >>> m[2,2] = m[10,10] = m[11,11] = 1
+        >>> choose_sparsity_model(m)
+        'indexed'
+
+        >>> td_data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)
+        >>> off = np.array([0, -1, 1])
+        >>> m = scipy.sparse.dia_matrix((td_data,off), shape=(5,5)).toarray()
+        >>> choose_sparsity_model(m) # should eventually be 'dia'
+        'indexed'
+
+        >>> m = scipy.sparse.dia_matrix((td_data,off), shape=(20,20)).toarray()
+        >>> m[19,19] = 1
+        >>> choose_sparsity_model(m)
+        'indexed'
     """
     if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
         matrix = matrix.data
@@ -239,11 +303,26 @@ def choose_sparsity_model(matrix):
 
 
 def triu(matrix):
-    """Return the upper triangle of the given `matrix`, which can be a numpy
-    object or scipy sparse matrix. The returned matrix will have the same type
-    as the input `matrix`. The input `matrix` can also be a QuTiP operator,
-    but in this case, the type is *not* preserved: the result is equivalent to
-    ``triu(matrix.data)``"""
+    """Return the upper triangle of the given `matrix`.
+
+    * If `matrix' is a numpy object or scipy sparse matrix, the returned matrix
+      will have the same type as the input `matrix`.
+
+    * If `matrix` is a QuTiP operator, the type is *not* preserved:
+      the result is equivalent to ``triu(matrix.data)``.
+
+    Args:
+        matrix (numpy.ndarray, scipy.sparse.spmatrix, qutip.Qobj):
+            Input array.
+
+    Returns:
+        numpy.ndarray, scipy.sparse.spmatrix:
+        Return a copy of the matrix with the elements below the diagonal
+        zeroed.
+
+    Raises:
+        TypeError: If `matrix` has an invalid type.
+    """
     if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
         matrix = matrix.data
     if isinstance(matrix, np.ndarray):
@@ -257,7 +336,26 @@ def triu(matrix):
 
 
 def tril(matrix):
-    """Like `triu`, but return the lower triangle"""
+    """Return the lower triangle of the given `matrix`.
+
+    * If `matrix' is a numpy object or scipy sparse matrix, the returned matrix
+      will have the same type as the input `matrix`.
+
+    * If `matrix` is a QuTiP operator, the type is *not* preserved:
+      the result is equivalent to ``tril(matrix.data)``.
+
+    Args:
+        matrix (numpy.ndarray, scipy.sparse.spmatrix, qutip.Qobj):
+            Input array.
+
+    Returns:
+        numpy.ndarray, scipy.sparse.spmatrix:
+        Return a copy of the matrix with the elements above the diagonal
+        zeroed.
+
+    Raises:
+        TypeError: If `matrix` has an invalid type.
+    """
     if repr(matrix).startswith('Quantum object'):  # qutip.Qobj
         matrix = matrix.data
     if isinstance(matrix, np.ndarray):
@@ -266,13 +364,14 @@ def tril(matrix):
         return scipy.sparse.tril(matrix)
     else:
         raise TypeError(
-            "matrix must be numpy object, sparse matrix, or " "QuTiP operator"
+            "matrix must be numpy object, sparse matrix, or QuTiP operator"
         )
 
 
 def banded_to_full(banded, n, kl, ku, mode):
     """Convert a rectangular matrix in the Lapack "banded" format
-    (http://www.netlib.org/lapack/lug/node124.html) into a (square) full matrix
+    (http://www.netlib.org/lapack/lug/node124.html) into a (square)
+    full matrix.
 
     Args:
         banded (numpy.ndarray): Rectangular matrix in banded format
@@ -289,7 +388,7 @@ def banded_to_full(banded, n, kl, ku, mode):
             contain the data for the upper or lower triangle
 
     Returns:
-        full: numpy array of same type as `banded`
+        full: Numpy array of same type as `banded`.
     """
     full = np.zeros(shape=(n, n), dtype=banded.dtype)
     if mode in ['g', 't']:
