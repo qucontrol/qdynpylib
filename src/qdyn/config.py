@@ -16,27 +16,37 @@ def _protect_str_vals(str_line):
     in the config match the regular expression '\w+\s*=\s*[\w.+-]+'. That is,
     the values do not contain spaces, quotes, or escaped characters. This
     function replaces values in the given `str_line` by a base-64 string
-    which is guaranteed to contain only letters and numbers. It returns the
-    "protected" string and a list of replacement tuples. The protected string
-    is guaranteed to not be shorter than the original string.
+    which is guaranteed to contain only letters and numbers.
 
-    >>> s_in = r'a = "text", '+"b = 'text'"
-    >>> print(s_in)
-    a = "text", b = 'text'
-    >>> s, r = _protect_str_vals(s_in)
-    >>> print(s)
-    a = InRleHQi, b = J3RleHQn
-    >>> print(r)
-    [('InRleHQi', '"text"'), ('J3RleHQn', "'text'")]
+    Args:
+        str_line (str): Unprotected string to be parsed.
 
-    >>> s_in = r'a = this\ is\ an\ unquoted\ string, b = "text"'
-    >>> print(s_in)
-    a = this\ is\ an\ unquoted\ string, b = "text"
-    >>> s, r = _protect_str_vals(s_in)
-    >>> print(s)
-    a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi
-    >>> print(r)
-    [('InRleHQi', '"text"'), ('dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n', 'this\\ is\\ an\\ unquoted\\ string')]
+    Returns:
+        tuple: Tuple containing
+
+             (str): Protected (base-64) string.
+             It is guaranteed to not be shorter than the original string.
+
+             (list): List of replacement tuples.
+
+    Examples:
+        >>> s_in = r'a = "text", '+"b = 'text'"
+        >>> print(s_in)
+        a = "text", b = 'text'
+        >>> s, r = _protect_str_vals(s_in)
+        >>> print(s)
+        a = InRleHQi, b = J3RleHQn
+        >>> print(r)
+        [('InRleHQi', '"text"'), ('J3RleHQn', "'text'")]
+
+        >>> s_in = r'a = this\ is\ an\ unquoted\ string, b = "text"'
+        >>> print(s_in)
+        a = this\ is\ an\ unquoted\ string, b = "text"
+        >>> s, r = _protect_str_vals(s_in)
+        >>> print(s)
+        a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi
+        >>> print(r)
+        [('InRleHQi', '"text"'), ('dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n', 'this\\ is\\ an\\ unquoted\\ string')]
     '''
     # handle quoted strings
     rx_dq = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')  # search for ...
@@ -79,11 +89,19 @@ def _protect_str_vals(str_line):
 
 
 def _unprotect_str_vals(str_line, replacements):
-    r'''Inverse to :func:`_protect_str_vals`
+    r'''Inverse to :func:`_protect_str_vals`.
 
-    >>> s, r = _protect_str_vals(r'a = "text", '+"b = 'text'")
-    >>> print(_unprotect_str_vals(s, r))
-    a = "text", b = 'text'
+    Args:
+        str_line (str): Protected string.
+        replaements (list): List of replacement tuples.
+
+    Returns:
+        str: Orginal unprotected string.
+
+    Examples:
+         >>> s, r = _protect_str_vals(r'a = "text", '+"b = 'text'")
+         >>> print(_unprotect_str_vals(s, r))
+         a = "text", b = 'text'
     '''
     for (b64, quoted_str) in replacements:
         str_line = str_line.replace(b64, quoted_str)
@@ -99,7 +117,14 @@ def _unprotect_str_vals(str_line, replacements):
 
 def _escape_str(s):
     """Replace special characters in the given string with escape codes.
-    Surround strings containing spaces with quotes"""
+    Surround strings containing spaces with quotes
+
+    Args:
+        s (str): String to be parsed.
+
+    Returns:
+        str: Parsed string with all special characters replaced.
+    """
     replacements = [
         (",", "\\,"),
         (":", "\\:"),
@@ -128,7 +153,15 @@ def _escape_str(s):
 
 
 def _unescape_str(s):
-    """Inverse to :func:`_escape_str`"""
+    """Inverse to :func:`_escape_str`.
+
+    Args:
+        s (str): String containing escape codes.
+
+    Returns:
+        str: Original string with escape codes replaced by the corresponding
+        special characters.
+    """
     replacements = [
         ("\\,", ","),
         ("\\:", ":"),
@@ -156,7 +189,15 @@ def _unescape_str(s):
 
 def _val_to_str(val):
     """Convert `val` to a string that can be written directly to the config
-    file"""
+    file.
+
+    Args:
+        val: Input object. `val` needs to have a `__str__()` method.
+        If `val` is a boolean type, it is converted to 'T' or 'F'.
+
+    Returns:
+        str: Input object converted to a string.
+    """
     logical_mapping = {True: 'T', False: 'F'}
     if isinstance(val, (bool, np.bool_)):
         return logical_mapping[val]
@@ -172,14 +213,16 @@ def _process_raw_lines(raw_lines):
     stripping out comments, and combining multiple continued raw lines into a
     single processed lines. The returned lines do not have a trailing newline.
 
-    Arguments:
+    Args:
         raw_lines (iterable): Iterable of a raw list of lines, as they might
         appear in a config file. These may contain comments and continuation.
         Each line may or may not contain trailing newlines (trailing whitespace
         is ignored)
 
-    Example:
+    Yields:
+        str: Next line to be processed.
 
+    Examples:
         >>> config = r"""
         ... ! the following is a config file for 3 pulses and some custom
         ... ! data
@@ -238,7 +281,17 @@ def _process_raw_lines(raw_lines):
 def _split_config_line(line, linewidth):
     """Split the given line into a multi-line string of continued lines, trying
     to keep the length of each line under `linewidth`. Trailing newlines in
-    `line` are ignored."""
+    `line` are ignored.
+
+    Args:
+        line (str): Input string containing a single (continued) line from a
+            config file.
+        linewidth (int): Maximum line width.
+
+    Returns:
+        str: Multi-line version of `line` wrapped to have a length smaller than
+        `linewdith` and with preceding and trailing newlines.
+    """
     full_line, replacements = _protect_str_vals(line.strip())
     if len(full_line) == 0:
         return "\n"
@@ -265,7 +318,15 @@ def _split_config_line(line, linewidth):
 def _render_config_lines(section_name, section_data):
     r'''Render `section_data` into a list of lines.
 
-    Example:
+    Args:
+        section_name (str): Name of the section that shall be rendered.
+        section_data (dict): Config data for the given `section_name`.
+
+    Returns:
+       list: List of strings each containing a formatted config file lines for
+       the given section.
+
+    Examples:
         >>> section_data = [
         ...     OrderedDict([
         ...         ('type', 'gauss'),
@@ -402,7 +463,8 @@ def _item_rxs(section_name=''):
 
 
 def read_config_fh(fh):
-    """Equivalent to ``read_config_str(fh.read())``"""
+    """Equivalent to ``read_config_str(fh.read())``
+    """
     return _read_config_lines(_process_raw_lines(fh))
 
 

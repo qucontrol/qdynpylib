@@ -113,7 +113,7 @@ def vectorize(a, order='F'):
 
     Args:
         a (list, numpy.ndarray, qutip.Qobj): Array to be vectorized.
-        order (str): One of {'C', 'F', 'A'}.
+        order (str): One of 'C', 'F', 'A'.
            Read the elements of `a` using this index order, and place the
            elements into the reshaped array using this index order.  'C'
            means to read / write the elements using C-like index order,
@@ -388,7 +388,7 @@ def banded_to_full(banded, n, kl, ku, mode):
             contain the data for the upper or lower triangle
 
     Returns:
-        full: Numpy array of same type as `banded`.
+        numpy.ndarray: Numpy array of same type as `banded`.
     """
     full = np.zeros(shape=(n, n), dtype=banded.dtype)
     if mode in ['g', 't']:
