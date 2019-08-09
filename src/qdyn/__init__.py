@@ -11,6 +11,7 @@ from . import memoize
 from . import model
 from . import prop_gate
 from . import pulse
+from . import scattering
 from . import shutil
 from . import testing
 from . import units
