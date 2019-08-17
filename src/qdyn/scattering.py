@@ -2,6 +2,7 @@
 
 import numpy as np
 from scipy.special import riccati_jn, riccati_yn
+from scipy.special import eval_legendre
 
 
 def scattering_phase_from_psi(psi, r_grid, E, mu):
@@ -53,3 +54,65 @@ def scattering_phase_from_psi(psi, r_grid, E, mu):
     # phase = np.arctan2(B,A)
 
     return phase
+
+
+def partial_wave_scattering_amplitude(l, k,  S_l):
+    """Return the legendre coefficient in the expansion of the scattering
+    amplitude for the given partial wave quantum number `l`.
+    """
+    #f_l = (S_l - 1)
+    #for l in l_vals:
+    #    f_l[l] = f_l[l] * (2*l+1)/(2j*k)
+    f_l = (S_l - 1) * (2*l+1)/(2j*k)
+    return f_l
+
+
+def scattering_amplitude(theta, l_vals, f_l):
+    """Calculate the scattering amplitude for a single energy.
+    """
+    f_k = np.zeros(len(theta))
+    for l in l_vals:
+        f_k = f_k + f_l[l] * eval_legendre(l, np.cos(theta))
+    return f_k
+
+
+def differential_cross_section(f_k):
+    """
+    """
+    d_sigma = np.abs(f_k)**2
+    return d_sigma
+
+
+def partial_wave_cross_section(k, l, delta_l):
+    """
+    """
+    sigma_l = np.zeros(len(l_vals))
+    for l in l_vals:
+        sigma_l[l] = 4*np.pi*(2*l+1)/(k**2) * np.sin(delta_l[l])**2
+    return sigma_l
+
+
+def integral_cross_section(sigma_l):
+    """
+    """
+    sigma = np.sum(sigma_l, axis=0)
+    return sigma
+
+
+def integrate_differential_cross_section(d_sigma, theta, range):
+    """
+    """
+    Ntheta = len(theta)
+
+    if range == 'full':
+        x = theta
+        y = d_sigma * np.sin(theta)
+    elif range == 'backward hemisphere':
+        x = theta[Ntheta//2:]
+        y = d_sigma[Ntheta//2:] * np.sin(x)
+    elif range == 'forward hemisphere':
+        x = theta[:Ntheta//2]
+        y = d_sigma[:Ntheta//2] * np.sin(x)
+
+    integral = 2*np.pi * integrate.trapz(y, x)
+    return integral
