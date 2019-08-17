@@ -5,6 +5,56 @@ from scipy.special import riccati_jn, riccati_yn
 from scipy.special import eval_legendre
 
 
+def numerov_asymptotic(E, l, mu, V, r):
+    """Numerov propagation in asymptotic basis.
+    """
+    # l not used jet
+    
+    ## Prepare matrices
+    Nr = r.shape[0] - 1
+    h = r[1] - r[0]
+    Id = np.diag([1,1]) # Identity matrix
+    
+    U = np.zeros((Nr, 2, 2))
+    T = np.zeros((Nr+1, 2, 2))
+    R = np.zeros((Nr+1, 2, 2))
+    
+    ## First and second step
+    T[0] = -h**2/12. * 2*mu*(E*Id - V[0])
+    U[0] = 12.*np.linalg.inv(Id - T[0]) - 10.*Id
+    R[1] = U[0]
+    
+    T[1] = -h**2/12. * 2*mu*(E*Id - V[1])
+    U[1] = 12.*np.linalg.inv(Id - T[1]) - 10.*Id
+    R[2] = U[1] - np.linalg.inv(U[0])
+    
+    ## loop over remaining steps
+    for i in range(2, Nr+1):
+        T[i] = -h**2/12. * 2*mu*(E*Id - V[i])
+        U[i-1] = 12.*np.linalg.inv(Id - T[i-1]) - 10.*Id
+        R[i] = U[i-1] - np.linalg.inv(R[i-1])
+    
+    # Calculate log derivative matrix Y_N
+    n = Nr-1 # because of zero indexing
+    Y_N = 1./h * (
+         (0.5*Id-T[n+1]) @ np.linalg.inv(Id-T[n+1]) @ R[n+1]
+        -(0.5*Id-T[n-1]) @ np.linalg.inv(Id-T[n-1]) @ np.linalg.inv(R[n])) @ (Id-T[n])
+    
+    # Calculate scattering matrix S
+    k = np.sqrt(np.diag(2.*mu*(E - V[n+1])))
+    h1 = np.diag(-1.j/np.sqrt(k) * np.exp(+1.j*k*r[n]))
+    h2 = h1.conj()
+    h1p = +1.j*np.diag(k) * h1
+    h2p = -1.j*np.diag(k) * h2
+    
+    S = np.linalg.inv(h1p - Y_N @ h1) @ (h2p - Y_N @ h2)
+    
+    return S, Y_N
+
+
+###############################################################################
+### functions to obtain scattering quantities from wavefunctions
+###############################################################################
 def scattering_phase_from_psi(psi, r_grid, E, mu):
     """Return the scattering phase of the given wavefunction.
     """
