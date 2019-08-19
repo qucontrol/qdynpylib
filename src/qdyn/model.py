@@ -586,9 +586,13 @@ class LevelModel:
         `tau_dat`, `params_file`, `krotov2_conv_dat`, `ABC_dat`,
         `delta_J_conv`, `delta_J_T_conv`, `A`, `B`, `C`, `dynamic_sigma`,
         `dynamic_lambda_a`, `strict_convergence`, `limit_pulses`, `sigma_form`,
-        `max_seconds`, `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`,
+        `max_seconds`, `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`
         `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN Fortran
         library documentation for details.
+
+        **Note**:
+        `continue` is a python keyword, which is why the key for `continue` is
+        can also be set with `continue_`
 
         Raises:
             KeyError: If the settings for a pulse contain invalid or
@@ -620,6 +624,7 @@ class LevelModel:
             'lambda_b',
             'keep_pulses',
             're_init_prop',
+            'continue_',
             'continue',
             'storage_folder',
             'bwr_nint',
@@ -645,7 +650,11 @@ class LevelModel:
         )
         for key in sorted(kwargs):
             if key in allowed_keys:
-                self._oct[key] = kwargs[key]
+                # `continue` is a python keyword
+                if key == 'continue_':
+                    self._oct['continue'] = kwargs['continue_']
+                else:
+                    self._oct[key] = kwargs[key]
             else:
                 raise TypeError(
                     "got an unexpected keyword argument '%s'" % key
