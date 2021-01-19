@@ -1,0 +1,1154 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.model &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/qdyn.html">API of the qdyn package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>qdyn.model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for qdyn.model</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Abstraction for complete physical models that can be written to a runfolder</span>
+<span class="sd">as a config file and dependent data&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">pi</span>
+
+<span class="kn">from</span> <span class="nn">.analytical_pulse</span> <span class="kn">import</span> <span class="n">AnalyticalPulse</span>
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">set_config_user_value</span><span class="p">,</span> <span class="n">write_config</span>
+<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">write_indexed_matrix</span><span class="p">,</span> <span class="n">write_psi_amplitudes</span>
+<span class="kn">from</span> <span class="nn">.linalg</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">choose_sparsity_model</span><span class="p">,</span>
+    <span class="n">is_hermitian</span><span class="p">,</span>
+    <span class="n">iscomplexobj</span><span class="p">,</span>
+    <span class="n">norm</span><span class="p">,</span>
+    <span class="n">tril</span><span class="p">,</span>
+    <span class="n">triu</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.pulse</span> <span class="kn">import</span> <span class="n">Pulse</span><span class="p">,</span> <span class="n">pulse_tgrid</span>
+<span class="kn">from</span> <span class="nn">.shutil</span> <span class="kn">import</span> <span class="n">mkdir</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">UnitFloat</span>
+
+
+<span class="k">class</span> <span class="nc">_SimpleNamespace</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of types.SimpleNamespace for Python 2&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="random_density_matrix"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.random_density_matrix">[docs]</a><span class="k">def</span> <span class="nf">random_density_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a random N x N density matrix.</span>
+
+<span class="sd">    &gt;&gt;&gt; rho = random_density_matrix(10)</span>
+
+<span class="sd">    The resulting density matrix is normalized, positive semidefinite, and</span>
+<span class="sd">    Hermitian</span>
+
+<span class="sd">    &gt;&gt;&gt; assert( abs(np.trace(rho) - 1.0) &lt;= 1.0e-14 )</span>
+<span class="sd">    &gt;&gt;&gt; assert( np.min(np.linalg.eigvals(rho).real) &gt; 0.0 )</span>
+<span class="sd">    &gt;&gt;&gt; assert( np.max(np.abs(rho.conjugate().transpose() - rho)) &lt;= 1.0e-14 )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+            <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">2.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span>
+    <span class="c1"># make hermitian</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">rho</span> <span class="o">+</span> <span class="n">rho</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+    <span class="c1"># make positive-semidifinite by squaring</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">@</span> <span class="n">rho</span>
+    <span class="c1"># normalize</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">trace</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="LevelModel"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel">[docs]</a><span class="k">class</span> <span class="nc">LevelModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Model for a system well-described in the energy basis. That is, all</span>
+<span class="sd">    operators are (sparse) matrices, and all states are simple vectors</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        t0 (float or qdyn.units.UnitFloat): Initial time.</span>
+<span class="sd">        T (float or qdyn.units.UnitFloat): Final time.</span>
+<span class="sd">        nt (int): Number of points in the time grid.</span>
+<span class="sd">        prop_method (str): Propagation method</span>
+<span class="sd">        use_mcwf: Propagate using the Monte-Carlo Wave Function (quantum</span>
+<span class="sd">            jump) method</span>
+<span class="sd">        construct_mcwf_ham (bool): When using the MCWF method, the propagation</span>
+<span class="sd">            must use an &quot;effective&quot; Hamiltonian that includes a non-Hermitian</span>
+<span class="sd">            decay term. This term is constructed from the Lindblad operators.</span>
+<span class="sd">            If ``use_mcwf=True`` and ``construct_mcwf_ham=False``, it is the</span>
+<span class="sd">            user&#39;s responsibility to ensure that `ham` is the proper effective</span>
+<span class="sd">            Hamiltonian. The `construct_mcwf` flag determines the presence of</span>
+<span class="sd">            `add_to_H_jump` config file parameter for each Lindblad operator</span>
+<span class="sd">        user_data (collections.OrderedDict): Key-value pairs that should that</span>
+<span class="sd">            describe user-defined data. These will go in the ``user_strings``,</span>
+<span class="sd">            ``user_reals``, ``user_logicals``, or ``user_ints`` section of the</span>
+<span class="sd">            config file, depending on the type of the value</span>
+
+<span class="sd">    After instantiation, the attributes `t0`, `T`, `nt`, `prop_method`,</span>
+<span class="sd">    `use-mcwf`, and `construct_mcwf_ham` are all set via</span>
+<span class="sd">    :meth:`set_propagation`.  Operators and pulses are added to the system</span>
+<span class="sd">    through :meth:`add_ham`, :meth:`add_observable`, and</span>
+<span class="sd">    :meth:`add_lindblad_op`. States are added through :meth:`add_state`.</span>
+<span class="sd">    Both the general OCT settings (OCT section in the QDYN config file) and</span>
+<span class="sd">    OCT-related settings for each control pulse are controlled through</span>
+<span class="sd">    :meth:`set_oct`. After the model has been constructed, a config file</span>
+<span class="sd">    and all dependent data input files for the operators, pulses, and</span>
+<span class="sd">    states can be written via :meth:`write_to_runfolder`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ham</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of (matrix, config_attribs)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of pulses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lindblad_ops</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of (matrix, config_attribs)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_observables</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of (matrix, config_attribs)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dissipator</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of (matrix, config_attribs)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psi</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>  <span class="c1"># label =&gt; amplitude array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_oct</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>  <span class="c1"># key =&gt; val for OCT section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;iu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;iu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_method</span> <span class="o">=</span> <span class="s1">&#39;newton&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_mcwf</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mcwf_order</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">construct_mcwf_ham</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_id</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># last used pulse_id, per label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_ids</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># (id(pulse), label) -&gt; pulse_id</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_obj_list</span><span class="p">(</span><span class="n">obj_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_attribs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Common implementation of methods `observables`, &#39;lindblad_ops`,</span>
+<span class="sd">        `ham`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attribs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">obj_list</span><span class="p">:</span>
+            <span class="n">obj_label</span> <span class="o">=</span> <span class="n">attribs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">obj_label</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">with_attribs</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">obj</span><span class="p">,</span> <span class="n">attribs</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="LevelModel.observables"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.observables">[docs]</a>    <span class="k">def</span> <span class="nf">observables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_attribs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of all observables with the matching label (or all</span>
+<span class="sd">        labels if `label` is &#39;*&#39;). If `with_attribs` is True, the result is a</span>
+<span class="sd">        list of tuples ``(observable, attributes``) where ``attributes`` is a</span>
+<span class="sd">        dictionary of config file attributes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_observables</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">with_attribs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.lindblad_ops"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.lindblad_ops">[docs]</a>    <span class="k">def</span> <span class="nf">lindblad_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_attribs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of all Lindblad operators with the matching label (or</span>
+<span class="sd">        all labels if `label` is &#39;*&#39;). If `with_attribs` is True, the result is</span>
+<span class="sd">        a list of tuples ``(operator, attributes``) where ``attributes`` is a</span>
+<span class="sd">        dictionary of config file attributes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lindblad_ops</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">with_attribs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.ham"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.ham">[docs]</a>    <span class="k">def</span> <span class="nf">ham</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_attribs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of all Hamiltonian operators with the matching label (or</span>
+<span class="sd">        all labels if `label` is &#39;*&#39;). If `with_attribs` is True, the result is</span>
+<span class="sd">        a list of tuples ``(ham, attributes``) where ``attributes`` is a</span>
+<span class="sd">        dictionary of config file attributes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ham</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">with_attribs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.pulses"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.pulses">[docs]</a>    <span class="k">def</span> <span class="nf">pulses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of all known pulses with the matching label (or all</span>
+<span class="sd">        labels if `label` is &#39;*&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pulse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">:</span>
+            <span class="n">pulse_label</span> <span class="o">=</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pulse_label</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pulse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">add_target</span><span class="p">,</span>
+        <span class="n">matrix</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">,</span>
+        <span class="n">pulse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">check_matrix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Common implementation of `add_ham`, `add_observable`,</span>
+<span class="sd">        `add_lindblad_op`, `set_dissipator`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Note: we do not use **kwargs to preserve an OrderedDict</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">check_matrix</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">):</span>
+                <span class="c1"># we take the existence of the &#39;shape&#39; attribute as a</span>
+                <span class="c1"># least-effort indication that we have a proper matrix</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; must be a matrix&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pulse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="p">(</span><span class="n">Pulse</span><span class="p">,</span> <span class="n">AnalyticalPulse</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;pulse must be instance of Pulse or &quot;</span>
+                    <span class="s2">&quot;AnalyticalPulse, not </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pulse</span><span class="o">.</span><span class="vm">__class__</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">is_complex</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">norm</span><span class="p">(</span><span class="n">triu</span><span class="p">(</span><span class="n">matrix</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-14</span> <span class="ow">and</span> <span class="n">norm</span><span class="p">(</span><span class="n">tril</span><span class="p">(</span><span class="n">matrix</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-14</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Cannot connect a complex pulse to a &quot;</span>
+                        <span class="s2">&quot;matrix with data in both triangles&quot;</span>
+                    <span class="p">)</span>
+        <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>  <span class="c1"># attributes for the matrix</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">if</span> <span class="n">pulse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pulse_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_pulse</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">system_label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;pulse_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pulse_id</span>
+        <span class="n">add_target</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">matrix</span><span class="p">,</span> <span class="n">config_attribs</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_add_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pulse</span><span class="p">,</span> <span class="n">system_label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store a copy of `pulse` with adjusted `config_attribs` in `_pulses`.</span>
+
+<span class="sd">        Increments ``self._pulse_id[label]`` and sets</span>
+<span class="sd">        ``self._pulse_ids[(id(pulse), label)]``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pulse: The pulse to add</span>
+<span class="sd">            system_label: Label to use for the pulse, only if</span>
+<span class="sd">                pulse.config_attribs[&#39;label&#39;] does not exist.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the pulse id, as an integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">system_label</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">pulse</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pulse_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_ids</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_id</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">pulse_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_id</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;pulse</span><span class="si">%d</span><span class="s2">.dat&quot;</span> <span class="o">%</span> <span class="n">pulse_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;pulse</span><span class="si">%d</span><span class="s2">_</span><span class="si">%s</span><span class="s2">.dat&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pulse_id</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_ids</span><span class="p">:</span>
+            <span class="n">pulse</span> <span class="o">=</span> <span class="n">pulse</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pulse_id</span>
+            <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pulse</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_ids</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pulse_id</span>
+        <span class="k">return</span> <span class="n">pulse_id</span>
+
+<div class="viewcode-block" id="LevelModel.add_ham"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.add_ham">[docs]</a>    <span class="k">def</span> <span class="nf">add_ham</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">H</span><span class="p">,</span>
+        <span class="n">pulse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">op_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sparsity_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">op_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a term to the system Hamiltonian. If called repeatedly, the</span>
+<span class="sd">        total Hamiltonian is the sum of all added terms.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            H: Hamiltonian matrix. Can be a numpy matrix or array,</span>
+<span class="sd">                scipy sparse matrix, or `qutip.Qobj`</span>
+<span class="sd">            pulse: if not None, `H` will couple to `pulse`. Can be an instance</span>
+<span class="sd">                of :class:`~qdyn.analytical_pulse.AnalyticalPulse` or</span>
+<span class="sd">                :class:`~qdyn.pulse.Pulse`.</span>
+<span class="sd">            op_unit (None or str): Unit of the values in `H`.</span>
+<span class="sd">            sparsity_model (None or str): sparsity model that QDYN should use</span>
+<span class="sd">                to encode the data in `H`. If None, will be determined</span>
+<span class="sd">                automatically</span>
+<span class="sd">            op_type (None or str): the value for ``op_type`` in the config file</span>
+<span class="sd">                that should be used for `H`. This determines how exactly `H`</span>
+<span class="sd">                couples to `pulse`. Common values are &#39;dipole&#39; (linear</span>
+<span class="sd">                coupling) and &#39;dstark&#39; (quadratic &quot;Stark shift&quot; coupling)</span>
+<span class="sd">            label (str or None): Multiple Hamiltonians may be defined in the</span>
+<span class="sd">                same config file if they are differentiated by label. The</span>
+<span class="sd">                default label is the empty string</span>
+<span class="sd">            kwargs: All other keyword arguments set options for `H` in the</span>
+<span class="sd">                config file (e.g. `specrad_method`, `filename`)</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            It is recommended to use</span>
+<span class="sd">            :class:`~qdyn.analytical_pulse.AnalyticalPulse` to</span>
+<span class="sd">            express time-dependency, as this is independent of a specific time</span>
+<span class="sd">            grid.  Instances of :class:`~qdyn.pulse.Pulse` must have a time</span>
+<span class="sd">            grid that exactly matches the time grid specified via</span>
+<span class="sd">            :meth:`set_propagation`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">op_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_unit</span>
+        <span class="k">if</span> <span class="n">sparsity_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;sparsity_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sparsity_model</span>
+        <span class="k">if</span> <span class="n">op_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_type</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_matrix</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ham</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">pulse</span><span class="o">=</span><span class="n">pulse</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">config_attribs</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.add_observable"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.add_observable">[docs]</a>    <span class="k">def</span> <span class="nf">add_observable</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">O</span><span class="p">,</span>
+        <span class="n">outfile</span><span class="p">,</span>
+        <span class="n">exp_unit</span><span class="p">,</span>
+        <span class="n">time_unit</span><span class="p">,</span>
+        <span class="n">col_label</span><span class="p">,</span>
+        <span class="n">square</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">exp_surf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_real</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">in_lab_frame</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">op_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pulse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">from_time_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">to_time_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an observable</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            O (numpy.matrix, str): Observable to add. Must be a matrix, or</span>
+<span class="sd">                one of &quot;ham&quot;, &quot;norm&quot;, &quot;pop&quot;</span>
+<span class="sd">            outfile (str): Name of output file to which to write expectation</span>
+<span class="sd">                values of `O`</span>
+<span class="sd">            exp_unit (str): The unit in which to write the expectation value in</span>
+<span class="sd">                `outfile`, as well as the default value for `op_unit`</span>
+<span class="sd">            time_unit (str):  The unit in which to write the time grid in</span>
+<span class="sd">                `outfile`</span>
+<span class="sd">            col_label (str): The label for the column in `outfile` containing</span>
+<span class="sd">                the expectation value of `O`</span>
+<span class="sd">            square (str or None): If not None, label for the column in</span>
+<span class="sd">                `outfile` containing the expectation value for the square of</span>
+<span class="sd">                `O`</span>
+<span class="sd">            exp_surf (int or None): The surface number the expectation value;</span>
+<span class="sd">                only if `O` is a string</span>
+<span class="sd">            is_real (bool or None): Whether or not the expectation value is</span>
+<span class="sd">                real. If not given, this is determined  automatically</span>
+<span class="sd">            in_lab_frame (bool): If True, indicates that the observable is</span>
+<span class="sd">                defined in the lab frame. When expectation values are</span>
+<span class="sd">                calculated, this should not be done with states in the rotating</span>
+<span class="sd">                frame.</span>
+<span class="sd">            op_unit (str or None): The unit in which the entries of `O` are</span>
+<span class="sd">                given. By default, this is the same as `exp_unit`.</span>
+<span class="sd">            label (str or None): Observables associated with different</span>
+<span class="sd">                Hamiltonians may be defined in the same config file if they are</span>
+<span class="sd">                differentiated by label. The default label is the empty string.</span>
+<span class="sd">            pulse: If not None, a pulse for the observable to couple to (see</span>
+<span class="sd">                :meth:`add_ham`)</span>
+<span class="sd">            from_time_index (int or None): Index on total time grid from where</span>
+<span class="sd">                to start calculating/writing expectation values. Negative</span>
+<span class="sd">                values count from the end of the time grid. If None, equivalent</span>
+<span class="sd">                to 1.</span>
+<span class="sd">            to_time_index (int or None): Index on total time grid where to stop</span>
+<span class="sd">                calculating/writing expectation values. Negative values count</span>
+<span class="sd">                from the end of the time grid. If None, equivalent to -1</span>
+<span class="sd">            step (int or None): Step width for where to calculate/write</span>
+<span class="sd">                expectation values between `from_time_index` and</span>
+<span class="sd">                `to_time_index`.  If None, equivalent to 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="k">if</span> <span class="n">is_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">O</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="s2">&quot;pop&quot;</span><span class="p">]:</span>
+                    <span class="n">is_real</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">O</span> <span class="o">==</span> <span class="s2">&quot;ham&quot;</span><span class="p">:</span>
+                    <span class="n">is_real</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid O&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">is_real</span> <span class="o">=</span> <span class="n">is_hermitian</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>
+        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;outfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outfile</span>
+        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;exp_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp_unit</span>
+        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;is_real&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_real</span>
+        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;time_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_unit</span>
+        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;column_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_label</span>
+        <span class="k">if</span> <span class="n">square</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;square&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">square</span>
+        <span class="k">if</span> <span class="n">exp_surf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;exp_surf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp_surf</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">if</span> <span class="n">in_lab_frame</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;in_lab_frame&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">op_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp_unit</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_unit</span>
+        <span class="k">if</span> <span class="n">from_time_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;from_time_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">from_time_index</span>
+        <span class="k">if</span> <span class="n">to_time_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;to_time_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_time_index</span>
+        <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_matrix</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_observables</span><span class="p">,</span>
+            <span class="n">O</span><span class="p">,</span>
+            <span class="n">label</span><span class="p">,</span>
+            <span class="n">pulse</span><span class="o">=</span><span class="n">pulse</span><span class="p">,</span>
+            <span class="n">check_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">config_attribs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.add_lindblad_op"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.add_lindblad_op">[docs]</a>    <span class="k">def</span> <span class="nf">add_lindblad_op</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">L</span><span class="p">,</span>
+        <span class="n">op_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sparsity_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_to_H_jump</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pulse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add Lindblad operator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            L (tuple, numpy.matrix): Lindblad operator to  add. Must be a</span>
+<span class="sd">                matrix or a tuple ``(matrix, pulse)``, cf. the `ham` attribute.</span>
+<span class="sd">            op_unit (None or str): Unit of the values in `L`, e.g. ``sqrt_GHz``</span>
+<span class="sd">                (Lindblad operators are in units square-root-of-energy)</span>
+<span class="sd">            sparsity_model (None or str): sparsity model that QDYN should use</span>
+<span class="sd">                to encode the data in `L`. If None, will be determined</span>
+<span class="sd">                automatically</span>
+<span class="sd">            add_to_H_jump (None, str): sparsity model to be set for</span>
+<span class="sd">                `add_to_H_jump`, i.e. for the decay term in the effective MCWF</span>
+<span class="sd">                Hamiltonian. If None, will be de determined automatically.</span>
+<span class="sd">            label (str or None): Lindblad operators associated with different</span>
+<span class="sd">                Hamiltonians may be defined in the same config file if they are</span>
+<span class="sd">                differentiated by label. The default label is the empty string.</span>
+<span class="sd">            pulse: If not None, a pulse for the Lindblad operator to couple to</span>
+<span class="sd">                (see :meth:`add_ham`)</span>
+
+<span class="sd">        All other keyword arguments set options for `L` in the config file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">config_attribs</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dissipator</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config_attribs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot set Lindblad operator for a system label for &quot;</span>
+                    <span class="s2">&quot;which there is already a dissipation superoperator &quot;</span>
+                    <span class="s2">&quot;defined&quot;</span>
+                <span class="p">)</span>
+        <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">op_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_unit</span>
+        <span class="k">if</span> <span class="n">sparsity_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;sparsity_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sparsity_model</span>
+        <span class="k">if</span> <span class="n">add_to_H_jump</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;add_to_H_jump&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_to_H_jump</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_matrix</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lindblad_ops</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pulse</span><span class="o">=</span><span class="n">pulse</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">config_attribs</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.set_dissipator"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.set_dissipator">[docs]</a>    <span class="k">def</span> <span class="nf">set_dissipator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">D</span><span class="p">,</span>
+        <span class="n">op_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sparsity_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pulse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a dissipation superoperator in the config file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            D (tuple, numpy.matrix): Dissiption superoperoperator to add.</span>
+<span class="sd">                Must be a matrix or a tuple ``(matrix, pulse)``</span>
+<span class="sd">            op_unit (None or str): Unit of the value in `D`. e.g. ``GHz``</span>
+<span class="sd">                (dissipators are in units of energy)</span>
+<span class="sd">            sparsity_model (None or str): sparsity model that QDYN should use</span>
+<span class="sd">                to encode the data in `D`. If None, will be determined</span>
+<span class="sd">                automatically</span>
+<span class="sd">            label (str or None): Dissipators associated with different</span>
+<span class="sd">                Hamiltonians may be defined in the same config file if they are</span>
+<span class="sd">                differentiated by label. The default label is the empty string.</span>
+<span class="sd">            pulse: If not None, a pulse for the Dissipator to couple to</span>
+
+<span class="sd">        All other keyword arguments set options for the dissipator in the</span>
+<span class="sd">        config file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">config_attribs</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lindblad_ops</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config_attribs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot set dissipator for a system label for which there &quot;</span>
+                    <span class="s2">&quot;are already Lindblad operators defined&quot;</span>
+                <span class="p">)</span>
+        <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">op_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_unit</span>
+        <span class="k">if</span> <span class="n">sparsity_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;sparsity_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sparsity_model</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_matrix</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dissipator</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pulse</span><span class="o">=</span><span class="n">pulse</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">config_attribs</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.set_propagation"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.set_propagation">[docs]</a>    <span class="k">def</span> <span class="nf">set_propagation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">T</span><span class="p">,</span>
+        <span class="n">nt</span><span class="p">,</span>
+        <span class="n">time_unit</span><span class="p">,</span>
+        <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">prop_method</span><span class="o">=</span><span class="s1">&#39;newton&#39;</span><span class="p">,</span>
+        <span class="n">use_mcwf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mcwf_order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">construct_mcwf_ham</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the time grid and other propagation-specific settings</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            T (float): final time</span>
+<span class="sd">            nt (int): number of points in the time grid</span>
+<span class="sd">            time_unit (str): physical unit of `T`, `t0`</span>
+<span class="sd">            t0 (float): initial time</span>
+<span class="sd">            prop_method (str): method to be used for propagation</span>
+<span class="sd">            use_mcwf (bool): If True, prepare for Monte-Carlo wave function</span>
+<span class="sd">                propagation</span>
+<span class="sd">            mcwf_order (int): Order for MCWF, must be 1 or 2</span>
+<span class="sd">            construct_mcwf_ham (bool): When using MCWF (`use_mcwf=True`), by</span>
+<span class="sd">                default an additional inhomogeneous decay term is added to the</span>
+<span class="sd">                Hamiltonian, based on the Lindblad operators. By passing</span>
+<span class="sd">                `construct_mcwf_ham=False`, this does not happen. It is the</span>
+<span class="sd">                user&#39;s responsibility then to ensure the Hamiltonian in the</span>
+<span class="sd">                model is the correct &quot;effective&quot; Hamiltonian for a MCWF</span>
+<span class="sd">                propagation.</span>
+<span class="sd">            label (str or None): The label for `initial_state`</span>
+<span class="sd">            initial_state (numpy.ndarray or None): Initial wave function</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            When setting up an MCWF propagation, using the `mcwf_order=2` is</span>
+<span class="sd">            usually the right thing to do. In some cases of strong dissipation,</span>
+<span class="sd">            it may be numerically more efficient to use a first-order MCWF</span>
+<span class="sd">            method, where in each time interval `dt` between two time grids</span>
+<span class="sd">            there is at most one quantum jump, and the jumps takes place over</span>
+<span class="sd">            the entire duration `dt`. The time steps must be very small</span>
+<span class="sd">            accordingly. In contrast, for `mcwf_order=2`, all jumps are</span>
+<span class="sd">            instantaneous, and there can be multiple jumps per time step, but</span>
+<span class="sd">            the numerical overhead is larger.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">initial_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nt</span> <span class="o">=</span> <span class="n">nt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop_method</span> <span class="o">=</span> <span class="n">prop_method</span>
+        <span class="k">if</span> <span class="n">use_mcwf</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_mcwf</span> <span class="o">=</span> <span class="n">use_mcwf</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mcwf_order</span> <span class="o">=</span> <span class="n">mcwf_order</span>
+        <span class="k">if</span> <span class="n">construct_mcwf_ham</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">construct_mcwf_ham</span> <span class="o">=</span> <span class="n">use_mcwf</span>
+        <span class="k">if</span> <span class="n">use_mcwf</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">construct_mcwf_ham</span> <span class="o">=</span> <span class="n">construct_mcwf_ham</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">construct_mcwf_ham</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LevelModel.set_oct"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.set_oct">[docs]</a>    <span class="k">def</span> <span class="nf">set_oct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">J_T_conv</span><span class="p">,</span> <span class="n">max_ram_mb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set config file data and pulse properties for optimal control</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            method (str): Optimization method. Allowed values are &#39;krotovpk&#39;,</span>
+<span class="sd">                &#39;krotov2&#39;, &#39;krotovbwr&#39;, and &#39;lbfgs&#39;</span>
+<span class="sd">            J_T_conv (float): The value of the final time functional</span>
+<span class="sd">            max_ram_mb (int): The amount of memory that is available for</span>
+<span class="sd">                storing propagated states. If this is not suffient to hold all</span>
+<span class="sd">                the states required to calculate the gradient, a &quot;segmented&quot;</span>
+<span class="sd">                storage scheme will be used that caches the states to disk,</span>
+<span class="sd">                using up to `max_disk_mb` hard drive storage.</span>
+
+<span class="sd">        All other keyword arguments directly specify keys and values for the</span>
+<span class="sd">        OCT config section. Allowed keys are `iter_start`, `iter_stop`,</span>
+<span class="sd">        `max_disk_mb`, `lbfgs_memory`, `linesearch`, `grad_order`, `iter_dat`,</span>
+<span class="sd">        `tau_dat`, `params_file`, `krotov2_conv_dat`, `ABC_dat`,</span>
+<span class="sd">        `delta_J_conv`, `delta_J_T_conv`, `A`, `B`, `C`, `dynamic_sigma`,</span>
+<span class="sd">        `dynamic_lambda_a`, `strict_convergence`, `limit_pulses`, `sigma_form`,</span>
+<span class="sd">        `max_seconds`, `lambda_b`, `keep_pulses`, `re_init_prop`, `continue`</span>
+<span class="sd">        `storage_folder`, `bwr_nint`, `bwr_base`, `g_a`, see the QDYN Fortran</span>
+<span class="sd">        library documentation for details.</span>
+
+<span class="sd">        **Note**:</span>
+<span class="sd">        `continue` is a python keyword, which is why the key for `continue` is</span>
+<span class="sd">        can also be set with `continue_`</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the settings for a pulse contain invalid or</span>
+<span class="sd">                missing keys</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">allowed_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;iter_start&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;iter_stop&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;max_disk_mb&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lbfgs_memory&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;linesearch&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;grad_order&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;iter_dat&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;tau_dat&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;params_file&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;krotov2_conv_dat&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ABC_dat&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;delta_J_conv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;delta_J_T_conv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;B&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;C&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dynamic_sigma&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dynamic_lambda_a&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;strict_convergence&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;limit_pulses&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sigma_form&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;max_seconds&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lambda_b&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;keep_pulses&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;re_init_prop&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;continue_&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;continue&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;storage_folder&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bwr_nint&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bwr_base&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;g_a&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">krotov_required_pulse_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;oct_lambda_a&#39;</span><span class="p">]</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">&quot;`method` must be string. Is your code adapted to the latest &quot;</span>
+            <span class="s2">&quot;version of QDYN?&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">default_outfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.oct.dat&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_oct</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="n">method</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;J_T_conv&#39;</span><span class="p">,</span> <span class="n">J_T_conv</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;max_ram_mb&#39;</span><span class="p">,</span> <span class="n">max_ram_mb</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">allowed_keys</span><span class="p">:</span>
+                <span class="c1"># `continue` is a python keyword</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;continue_&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_oct</span><span class="p">[</span><span class="s1">&#39;continue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;continue_&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_oct</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;got an unexpected keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span>
+                <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">pulse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;oct_shape&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">:</span>
+                <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;oct_shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;const&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;oct_outfile&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">:</span>
+                <span class="n">octout</span> <span class="o">=</span> <span class="n">default_outfile</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
+                <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;oct_outfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">octout</span>
+            <span class="k">if</span> <span class="s1">&#39;oct_increase_factor&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">:</span>
+                <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;oct_increase_factor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">if</span> <span class="s1">&#39;krotov&#39;</span> <span class="ow">in</span> <span class="n">method</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">krotov_required_pulse_keys</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                            <span class="s2">&quot;Key &#39;</span><span class="si">%s</span><span class="s2">&#39; is required for each pulse &quot;</span>
+                            <span class="s2">&quot;when using Krotov&#39;s method&quot;</span> <span class="o">%</span> <span class="n">key</span>
+                        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LevelModel.add_state"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.add_state">[docs]</a>    <span class="k">def</span> <span class="nf">add_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a state (amplitude array) for the given label. Note that there</span>
+<span class="sd">        can only be one state per label. Thus calling `add_state` with the same</span>
+<span class="sd">        `label` of an earlier call will replace the `state`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_psi</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span></div>
+
+<div class="viewcode-block" id="LevelModel.write_to_runfolder"><a class="viewcode-back" href="../../API/qdyn.model.html#qdyn.model.LevelModel.write_to_runfolder">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_runfolder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="s1">&#39;config&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the model to the given runfolder. This will create a config</span>
+<span class="sd">        file (`config`) in the runfolder, as well as all dependent data file</span>
+<span class="sd">        (operators, pulses)&quot;&quot;&quot;</span>
+        <span class="n">mkdir</span><span class="p">(</span><span class="n">runfolder</span><span class="p">)</span>
+        <span class="n">config_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+
+        <span class="c1"># time grid</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;tgrid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                <span class="p">[(</span><span class="s1">&#39;t_start&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t_stop&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;nt&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">)]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># propagation</span>
+        <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;prop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_method</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;use_mcwf&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mcwf</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mcwf</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mcwf_order</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mcwf_order must be in [1,2]&#39;</span><span class="p">)</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;prop&#39;</span><span class="p">][</span><span class="s1">&#39;mcwf_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mcwf_order</span>
+
+        <span class="c1"># pulses</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_pulses</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">)</span>
+
+        <span class="c1"># Hamiltonian</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ham</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_ham</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">)</span>
+
+        <span class="c1"># Lindblad operators and dissipation superoperators</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lindblad_ops</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_lindblad_ops</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dissipator</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_dissipator</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">)</span>
+
+        <span class="c1"># observables</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_observables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_observables</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">)</span>
+
+        <span class="c1"># states</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_psi</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_psi</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">)</span>
+
+        <span class="c1"># OCT</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oct</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;oct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oct</span>
+
+        <span class="c1"># user-defined data</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">set_config_user_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+        <span class="n">write_config</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">config</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_pulses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write numerical pulse files to runfolder, add pulse data to</span>
+<span class="sd">        config_data,&quot;&quot;&quot;</span>
+        <span class="n">tgrid</span> <span class="o">=</span> <span class="n">pulse_tgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;pulse&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;pulse&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pulse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pulses</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">AnalyticalPulse</span><span class="p">):</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">pulse</span><span class="o">.</span><span class="n">to_num_pulse</span><span class="p">(</span><span class="n">tgrid</span><span class="p">)</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;pulse&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">Pulse</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tgrid</span> <span class="o">-</span> <span class="n">pulse</span><span class="o">.</span><span class="n">tgrid</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-12</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mismatch of tgrid with pulse tgrid&quot;</span><span class="p">)</span>
+                <span class="n">pulse</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;pulse&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid pulse type&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_write_matrices</span><span class="p">(</span>
+        <span class="n">runfolder</span><span class="p">,</span>
+        <span class="n">config_data</span><span class="p">,</span>
+        <span class="n">section</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">outprefix</span><span class="p">,</span>
+        <span class="n">type_attrib</span><span class="o">=</span><span class="s1">&#39;matrix&#39;</span><span class="p">,</span>
+        <span class="n">set_n_surf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">set_op_type</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">set_add_to_H_jump</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">counter0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Common implementation of `_write_ham`, `_write_lindblad_ops`, and</span>
+<span class="sd">        `_write_dissipator`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">op_counter</span><span class="p">,</span> <span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">attribs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;filename&#39;</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">attribs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s%d</span><span class="s2">.dat&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outprefix</span><span class="p">,</span> <span class="n">op_counter</span> <span class="o">+</span> <span class="n">counter0</span><span class="p">)</span>
+            <span class="n">write_indexed_matrix</span><span class="p">(</span>
+                <span class="n">matrix</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span>
+                <span class="n">hermitian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">type_attrib</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;real_op&#39;</span><span class="p">,</span> <span class="p">(</span><span class="ow">not</span> <span class="n">iscomplexobj</span><span class="p">(</span><span class="n">matrix</span><span class="p">))),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">set_n_surf</span><span class="p">:</span>
+                <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;n_surf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attribs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">if</span> <span class="s1">&#39;sparsity_model&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_attribs</span><span class="p">:</span>
+                <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;sparsity_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">choose_sparsity_model</span><span class="p">(</span>
+                    <span class="n">matrix</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">set_op_type</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;op_type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_attribs</span><span class="p">:</span>
+                    <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pot&#39;</span>
+                    <span class="k">if</span> <span class="s1">&#39;pulse_id&#39;</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+                        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dip&#39;</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_attribs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_ham</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write operators in the Hamiltonian to data files inside `runfolder`,</span>
+<span class="sd">        and add ham data to `config_data`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_matrices</span><span class="p">(</span>
+            <span class="n">runfolder</span><span class="p">,</span>
+            <span class="n">config_data</span><span class="p">,</span>
+            <span class="s1">&#39;ham&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ham</span><span class="p">,</span>
+            <span class="n">outprefix</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">,</span>
+            <span class="n">set_op_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">counter0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_observables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write operators describing all observables to the runfolder,</span>
+<span class="sd">        and add observables data to `config_data`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;observables&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;observables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">op_counter</span><span class="p">,</span> <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">attribs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_observables</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;filename&#39;</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">attribs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;O</span><span class="si">%d</span><span class="s2">.dat&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">op_counter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ham&#39;</span><span class="p">,</span> <span class="s1">&#39;norm&#39;</span><span class="p">,</span> <span class="s1">&#39;pop&#39;</span><span class="p">]</span>
+                <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                    <span class="p">[(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">op</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;real_op&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># assume that op is a matrix</span>
+                <span class="n">matrix</span> <span class="o">=</span> <span class="n">op</span>
+                <span class="n">write_indexed_matrix</span><span class="p">(</span>
+                    <span class="n">matrix</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span>
+                    <span class="n">hermitian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">config_attribs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;matrix&#39;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s1">&#39;real_op&#39;</span><span class="p">,</span> <span class="p">(</span><span class="ow">not</span> <span class="n">iscomplexobj</span><span class="p">(</span><span class="n">op</span><span class="p">))),</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;sparsity_model&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_attribs</span><span class="p">:</span>
+                    <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;sparsity_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">choose_sparsity_model</span><span class="p">(</span>
+                        <span class="n">matrix</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;op_type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_attribs</span><span class="p">:</span>
+                    <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pot&#39;</span>
+                    <span class="k">if</span> <span class="s1">&#39;pulse_id&#39;</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+                        <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;op_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dip&#39;</span>
+                <span class="n">config_attribs</span><span class="p">[</span><span class="s1">&#39;n_surf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attribs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;observables&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_attribs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_lindblad_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write operators describing all Lindblad operators to the</span>
+<span class="sd">        `runfolder`, and add dissipator data to `config_data`&quot;&quot;&quot;</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">lindblad_ops</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lindblad_ops</span><span class="p">)</span>  <span class="c1"># copy</span>
+        <span class="k">for</span> <span class="n">L</span><span class="p">,</span> <span class="n">attribs</span> <span class="ow">in</span> <span class="n">lindblad_ops</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_mcwf_ham</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;add_to_H_jump&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+                    <span class="c1"># TODO: choose sparsity model that is optimal for the</span>
+                    <span class="c1"># entire decay term</span>
+                    <span class="n">attribs</span><span class="p">[</span><span class="s1">&#39;add_to_H_jump&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">choose_sparsity_model</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+                <span class="n">attribs</span><span class="p">[</span><span class="s1">&#39;conv_to_superop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;add_to_H_jump&#39;</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+                    <span class="c1"># add_to_H_jump should never be defined outside of the MCWF</span>
+                    <span class="c1"># method</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Removing &#39;add_to_H_jump&#39; attribute&quot;</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">attribs</span><span class="p">[</span><span class="s1">&#39;add_to_H_jump&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_matrices</span><span class="p">(</span>
+            <span class="n">runfolder</span><span class="p">,</span>
+            <span class="n">config_data</span><span class="p">,</span>
+            <span class="s1">&#39;dissipator&#39;</span><span class="p">,</span>
+            <span class="n">lindblad_ops</span><span class="p">,</span>
+            <span class="n">outprefix</span><span class="o">=</span><span class="s1">&#39;L&#39;</span><span class="p">,</span>
+            <span class="n">set_n_surf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">type_attrib</span><span class="o">=</span><span class="s1">&#39;lindblad_ops&#39;</span><span class="p">,</span>
+            <span class="n">counter0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_dissipator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write dissipation superoperator to `runfolder`, and add dissipator</span>
+<span class="sd">        data to `config_data`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_matrices</span><span class="p">(</span>
+            <span class="n">runfolder</span><span class="p">,</span>
+            <span class="n">config_data</span><span class="p">,</span>
+            <span class="s1">&#39;dissipator&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dissipator</span><span class="p">,</span>
+            <span class="n">outprefix</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span>
+            <span class="n">set_n_surf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">type_attrib</span><span class="o">=</span><span class="s1">&#39;dissipator&#39;</span><span class="p">,</span>
+            <span class="n">counter0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_psi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runfolder</span><span class="p">,</span> <span class="n">config_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write initial wave function to the runfolder, and add psi data to</span>
+<span class="sd">        config_data&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;psi&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">psi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psi</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;psi.dat&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;psi_</span><span class="si">%s</span><span class="s2">.dat&quot;</span> <span class="o">%</span> <span class="n">label</span>
+            <span class="n">write_psi_amplitudes</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runfolder</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;psi&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)])</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

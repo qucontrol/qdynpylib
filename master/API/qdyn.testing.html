@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.testing module &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdyn.units module" href="qdyn.units.html" />
+    <link rel="prev" title="qdyn.shutil module" href="qdyn.shutil.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the QDYN-pylib package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qdyn.analytical_pulse.html">qdyn.analytical_pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.config.html">qdyn.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.io.html">qdyn.io module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.linalg.html">qdyn.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.memoize.html">qdyn.memoize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.model.html">qdyn.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.prop_gate.html">qdyn.prop_gate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.pulse.html">qdyn.pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.shutil.html">qdyn.shutil module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qdyn.testing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.units.html">qdyn.units module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="qdyn.html">qdyn package</a> &raquo;</li>
+        
+      <li>qdyn.testing module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-qdyn.testing">
+<span id="qdyn-testing-module"></span><h1>qdyn.testing module<a class="headerlink" href="#module-qdyn.testing" title="Permalink to this headline">¶</a></h1>
+<p>Auxilliary routines for testing either the QDYN python package or the QDYN
+Fortran library</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.testing.datadir" title="qdyn.testing.datadir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datadir</span></code></a></p></td>
+<td><p>Proto-fixture responsible for searching a folder with the same name as a test module and, if available, moving all contents to a temporary directory so tests can use them freely.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.testing.get_mpi_implementation" title="qdyn.testing.get_mpi_implementation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mpi_implementation</span></code></a></p></td>
+<td><p>Return the name of the MPI implementation that QDYN was configured with (e.g.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.testing.get_qdyn_compiler" title="qdyn.testing.get_qdyn_compiler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_qdyn_compiler</span></code></a></p></td>
+<td><p>Return the name the Fortran compiler that QDYN was compiled with</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.testing.make_qdyn_utility" title="qdyn.testing.make_qdyn_utility"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_qdyn_utility</span></code></a></p></td>
+<td><p>Generate a proto-fixture that returns a wrapper around the utility <cite>util</cite> in ‘../utils/’, relative to the test directory.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.testing.mpirun" title="qdyn.testing.mpirun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mpirun</span></code></a></p></td>
+<td><p>Return a modified <cite>cmd</cite> that runs the given <cite>cmd</cite> (list) using MPI.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.testing.qdyn_feature" title="qdyn.testing.qdyn_feature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qdyn_feature</span></code></a></p></td>
+<td><p>Check whether QDYN was configured with the given feature (e.g.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="qdyn.testing.qdyn_feature">
+<code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">qdyn_feature</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configure_log</span></em>, <em class="sig-param"><span class="n">feature</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#qdyn_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.qdyn_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether QDYN was configured with the given feature (e.g.
+‘use_mpi’, ‘no-parallel-oct’, ect), given the path to configure.log</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.testing.get_mpi_implementation">
+<code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">get_mpi_implementation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configure_log</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#get_mpi_implementation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.get_mpi_implementation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the MPI implementation that QDYN was configured with
+(e.g. ‘openmpi’, or None if QDYN was compiled without MPI support</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.testing.get_qdyn_compiler">
+<code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">get_qdyn_compiler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configure_log</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#get_qdyn_compiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.get_qdyn_compiler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name the Fortran compiler that QDYN was compiled with</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.testing.mpirun">
+<code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">mpirun</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmd</span></em>, <em class="sig-param"><span class="n">procs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">implementation</span><span class="o">=</span><span class="default_value">'openmpi'</span></em>, <em class="sig-param"><span class="n">hostfile</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#mpirun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.mpirun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a modified <cite>cmd</cite> that runs the given <cite>cmd</cite> (list) using MPI.</p>
+<p>If <cite>hostfile</cite> is given, it will be overwritten and used in such a manner as
+to force the use of the given number of processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – list of command args, cf. <cite>subprocess.call</cite></p></li>
+<li><p><strong>procs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of MPI processes that should be used</p></li>
+<li><p><strong>implementation</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of MPI implementation</p></li>
+<li><p><strong>hostfile</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to file that should be used as a “hostfile”,
+forcing MPI to use the specified number of processes even if the
+MPI environment would not ordinarily allow for it.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.testing.datadir">
+<code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">datadir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tmpdir</span></em>, <em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#datadir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.datadir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Proto-fixture responsible for searching a folder with the same name
+as a test module and, if available, moving all contents to a temporary
+directory so tests can use them freely.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.testing.make_qdyn_utility">
+<code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">make_qdyn_utility</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">util</span><span class="o">=</span><span class="default_value">'qdyn_prop_traj'</span></em>, <em class="sig-param"><span class="n">procs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">threads</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#make_qdyn_utility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.make_qdyn_utility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a proto-fixture that returns a wrapper around
+the utility <cite>util</cite> in ‘../utils/’, relative to the test directory.</p>
+<p>If <cite>procs</cite> &gt; 1 and QDYN was compiled with MPI support, then call the
+utility through mpirun (or equivalent), to run <cite>procs</cite> simultaneous copies
+of the program. If <cite>threads</cite> is &gt; 1, the program will run with multiple
+OpenMP threads.</p>
+<p>The wrapper returned by the fixture behaves like <cite>subprocess.call</cite>, with a
+predefined <cite>cmd</cite> and environment.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="qdyn.units.html" class="btn btn-neutral float-right" title="qdyn.units module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="qdyn.shutil.html" class="btn btn-neutral float-left" title="qdyn.shutil module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

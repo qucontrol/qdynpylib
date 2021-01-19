@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Contributing &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Credits" href="authors.html" />
+    <link rel="prev" title="Installation" href="readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#code-of-conduct">Code of Conduct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#report-bugs">Report Bugs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submit-feedback">Submit Feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-prerequisites">Development Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#branching-model">Branching Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#commit-message-guidelines">Commit Message Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-style">Code Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#write-documentation">Write Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#versioning">Versioning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="API/qdyn.html">API of the QDYN-pylib package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Contributing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.</p>
+<div class="section" id="code-of-conduct">
+<h2>Code of Conduct<a class="headerlink" href="#code-of-conduct" title="Permalink to this headline">¶</a></h2>
+<p>Everyone interacting in the QDYN-pylib project’s code base, issue tracker, and any communication channels is expected to follow the <a class="reference external" href="https://www.pypa.io/en/latest/code-of-conduct/">PyPA Code of Conduct</a>.</p>
+</div>
+<div class="section" id="report-bugs">
+<h2>Report Bugs<a class="headerlink" href="#report-bugs" title="Permalink to this headline">¶</a></h2>
+<p>Report bugs at <a class="reference external" href="https://github.com/qucontrol/qdynpylib/issues">https://github.com/qucontrol/qdynpylib/issues</a>.</p>
+<p>If you are reporting a bug, please include:</p>
+<ul class="simple">
+<li><p>Your operating system name and version.</p></li>
+<li><p>Any details about your local setup that might be helpful in troubleshooting.</p></li>
+<li><p>Detailed steps to reproduce the bug, ideally a minimal but complete script or notebook.</p></li>
+<li><p>All error messages in full, as plain text. If the output is long, attach it as a file.</p></li>
+</ul>
+</div>
+<div class="section" id="submit-feedback">
+<h2>Submit Feedback<a class="headerlink" href="#submit-feedback" title="Permalink to this headline">¶</a></h2>
+<p>The best way to send feedback is to file an issue at <a class="reference external" href="https://github.com/qucontrol/qdynpylib/issues">https://github.com/qucontrol/qdynpylib/issues</a>.</p>
+<p>If you are proposing a feature:</p>
+<ul class="simple">
+<li><p>Explain in detail how it would work.</p></li>
+<li><p>Keep the scope as narrow as possible, to make it easier to implement.</p></li>
+<li><p>Remember that this is a volunteer-driven project, and that contributions are welcome :)</p></li>
+</ul>
+</div>
+<div class="section" id="pull-request-guidelines">
+<h2>Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>Before you submit a pull request, check that it meets these guidelines:</p>
+<ol class="arabic simple">
+<li><p>The pull request should include tests.</p></li>
+<li><p>If the pull request adds functionality, the docs should be updated.</p></li>
+<li><p>Check <a class="reference external" href="https://github.com/qucontrol/qdynpylib/actions">https://github.com/qucontrol/qdynpylib/actions</a> and make sure that the tests pass for all supported Python versions.</p></li>
+</ol>
+</div>
+<div class="section" id="get-started">
+<h2>Get Started!<a class="headerlink" href="#get-started" title="Permalink to this headline">¶</a></h2>
+<p>Ready to contribute? Follow <a class="reference external" href="https://www.asmeurer.com/git-workflow/">Aaron Meurer’s Git Workflow Notes</a> (with <code class="docutils literal notranslate"><span class="pre">qucontrol/qdyn</span></code> instead of <code class="docutils literal notranslate"><span class="pre">sympy/sympy</span></code>)</p>
+<p>In short,</p>
+<ol class="arabic simple">
+<li><p>Clone the repository from <code class="docutils literal notranslate"><span class="pre">git&#64;github.com:qucontrol/qdyn.git</span></code></p></li>
+<li><p>Fork the repo on GitHub to your personal account.</p></li>
+<li><p>Add your fork as a remote.</p></li>
+<li><p>Pull in the latest changes from the master branch.</p></li>
+<li><p>Create a topic branch.</p></li>
+<li><p>Make your changes and commit them (testing locally).</p></li>
+<li><p>Push changes to the topic branch on <em>your</em> remote.</p></li>
+<li><p>Make a pull request against the base master branch through the Github website of your fork.</p></li>
+</ol>
+<p>The project uses <a class="reference external" href="https://tox.readthedocs.io">tox</a> for automated testing across multiple versions of Python and for various development tasks such as linting and generating the documentation. See Development Prerequisites for details.</p>
+<p>There is also a <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> that wraps around tox, for convenience on Unix-based systems. In your checked-out clone, run</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">make help</span>
+</pre></div>
+</div>
+<p>to see the available make targets. If you cannot use <code class="docutils literal notranslate"><span class="pre">make</span></code>, but want to use <code class="docutils literal notranslate"><span class="pre">tox</span></code> directly (e.g., on Windows), run</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">tox -av</span>
+</pre></div>
+</div>
+<p>to see a list of tox environments and a description.</p>
+</div>
+<div class="section" id="development-prerequisites">
+<h2>Development Prerequisites<a class="headerlink" href="#development-prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>Contributing to the package’s developments requires that you have Python 3.8 and <a class="reference external" href="https://tox.readthedocs.io">tox</a> installed. It is strongly recommended that you also have installations of all other supported Python versions. The recommended way to install multiple versions of Python at the same time is through <a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a> (or <a class="reference external" href="https://github.com/pyenv-win/pyenv-win">pyenv-win</a> on Windows).</p>
+</div>
+<div class="section" id="branching-model">
+<h2>Branching Model<a class="headerlink" href="#branching-model" title="Permalink to this headline">¶</a></h2>
+<p>For developers with direct access to the repository, QDYN-pylib uses a simple branching model where all developments happens directly on the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch. Releases are tags on <code class="docutils literal notranslate"><span class="pre">master</span></code>. All commits on <code class="docutils literal notranslate"><span class="pre">master</span></code> <em>should</em> pass all tests and be well-documented. This is so that <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">bisect</span></code> can be effective. For any non-trivial issue, it is recommended to create a topic branch, instead of working on <code class="docutils literal notranslate"><span class="pre">master</span></code>. There are no restrictions on commits on topic branches, they do not need to contain complete documentation, pass any tests, or even be able to run.</p>
+<p>To create a topic-branch named to address issue #1:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git branch <span class="m">1</span>-title-of-issue
+git checkout <span class="m">1</span>-title-of-issue
+</pre></div>
+</div>
+<p>You can then make commits, and push them to Github to trigger Continuous Integration testing:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git push -u origin <span class="m">1</span>-title-of-issue
+</pre></div>
+</div>
+<p>Commit early and often! You are welcome to rewrite history on topic branches by force-pushing. Before submitting a pull request or merging into <code class="docutils literal notranslate"><span class="pre">master</span></code>, clean up the commit history of the topic branch.</p>
+<ul class="simple">
+<li><p>Avoid having a series of meaningless granular commits like “start bugfix”, “continue development”, “add more work on bugfix”, “fix typos”, and so forth. Instead, use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">--amend</span></code> to add to your previous commit. This is the ideal way to “commit early and often”. You do not have to wait until a commit is “perfect”; it is a good idea to make hourly/daily “snapshots” of work in progress. Amending a commit also allows you to change the commit message of your last commit.</p></li>
+<li><p>You can combine multiple existing commits by “squashing” them. For example, use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span> <span class="pre">-i</span> <span class="pre">HEAD~4</span></code> to combined the previous four commits into one. See the <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History">“Rewriting History” section of Pro Git book</a> for details (if you feel this is too far outside of your git comfort zone, just skip it).</p></li>
+<li><p>You can use the <code class="docutils literal notranslate"><span class="pre">--fixup</span></code> flag for <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code> to add to a previous commit. Fixup commits must be squashed (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span> <span class="pre">--autosquash</span></code>) before merging.</p></li>
+<li><p>If you work on a topic branch for a long time, and there is significant work on <code class="docutils literal notranslate"><span class="pre">master</span></code> in the meantime, periodically rebase your topic branch on the current master (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span> <span class="pre">master</span></code>). Avoid merging <code class="docutils literal notranslate"><span class="pre">master</span></code> into your topic branch. See <a class="reference external" href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">Merging vs. Rebasing</a>.</p></li>
+</ul>
+<p>If you are collaborating with others on a topic branch, coordinate with them before rewriting history.</p>
+<p>When you are done with a topic branch (the issue has been fixed), finish up by merging the topic branch back into <code class="docutils literal notranslate"><span class="pre">master</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git checkout master
+git merge --no-ff <span class="m">1</span>-title-of-issue
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--no-ff</span></code> option is critical, so that an explicit merge commit is created (especially if you rebased). Summarize the changes of the branch relative to <code class="docutils literal notranslate"><span class="pre">master</span></code> in the commit message.</p>
+<p>Then, you can push master and delete the topic branch both locally and on Github:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git push origin master
+git push --delete origin <span class="m">1</span>-title-of-issue
+git branch -D <span class="m">1</span>-title-of-issue
+</pre></div>
+</div>
+</div>
+<div class="section" id="commit-message-guidelines">
+<h2>Commit Message Guidelines<a class="headerlink" href="#commit-message-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>Write commit messages according to this template:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Short (50 chars or less) summary (&quot;subject line&quot;)
+
+More detailed explanatory text. Wrap it to 72 characters. The blank
+line separating the summary from the body is critical (unless you omit
+the body entirely).
+
+Write your subject line in the imperative: &quot;Fix bug&quot; and not &quot;Fixed
+bug&quot; or &quot;Fixes bug.&quot; This convention matches up with commit messages
+generated by commands like git merge and git revert. A properly formed
+git commit subject line should always be able to complete the sentence
+&quot;If applied, this commit will &lt;your subject line here&gt;&quot;.
+
+Further paragraphs come after blank lines.
+
+- Bullet points are okay, too.
+- Typically a hyphen or asterisk is used for the bullet, followed by a
+  single space. Use a hanging indent.
+
+You should reference any issue that is being addressed in the commit, as
+e.g. &quot;#1&quot; for issue #1. If the commit closes an issue, state this on the
+last line of the message (see below). This will automatically close the
+issue on Github as soon as the commit is pushed there.
+
+Closes #1
+</pre></div>
+</div>
+<p>See <a class="reference external" href="https://help.github.com/articles/closing-issues-using-keywords/">Closing issues using keywords</a> for details on references to issues that Github will understand.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>QDYN-pylib includes a full test-suite using <a class="reference external" href="https://docs.pytest.org/en/latest/">pytest</a>. We strive for a <a class="reference external" href="https://codecov.io/gh/qucontrol/qdyn">test coverage</a> above 90%.</p>
+<p>From a checkout of the <code class="docutils literal notranslate"><span class="pre">qdyn</span></code> repository you can use</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">make test</span>
+</pre></div>
+</div>
+<p>to run the entire test suite, or</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">tox -e py37-test,py38-test,py39-test</span>
+</pre></div>
+</div>
+<p>if <code class="docutils literal notranslate"><span class="pre">make</span></code> is not available.</p>
+<p>The tests are organized in the <code class="docutils literal notranslate"><span class="pre">tests</span></code> subfolder. It includes python scripts whose name start with <code class="docutils literal notranslate"><span class="pre">test_</span></code>, which contain functions whose names also start with <code class="docutils literal notranslate"><span class="pre">test_</span></code>. Any such functions in any such files are picked up by <a class="reference external" href="https://docs.pytest.org/en/latest/">pytest</a> for testing. In addition, <a class="reference external" href="https://docs.python.org/3.7/library/doctest.html">doctests</a> from any docstring or any documentation file (<code class="docutils literal notranslate"><span class="pre">*.rst</span></code>) are picked up (by the <a class="reference external" href="https://docs.pytest.org/en/latest/doctest.html">pytest doctest plugin</a>).</p>
+</div>
+<div class="section" id="code-style">
+<h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
+<p>All code must be compatible with <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a>. The line length limit is 79 characters, although exceptions are permissible if this improves readability significantly.</p>
+<p>Beyond PEP 8, this project adopts the <a class="reference external" href="https://github.com/ambv/black/#the-black-code-style">Black code style</a>. You can run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">black-check</span></code> or <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">run-blackcheck</span></code> to check adherence to the code style, and <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">black</span></code> or <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">run-black</span></code> to apply it.</p>
+<p>Imports within python modules must be sorted according to the <a class="reference external" href="https://github.com/timothycrosley/isort#readme">isort</a> configuration in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>. The command <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">isort-check</span></code> or <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">run-isortcheck</span></code> checks whether all imports are sorted correctly, and <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">isort</span></code> or <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">run-isort</span></code> modifies all Python modules in-place with the proper sorting.</p>
+<p>The code style is enforced as part of the test suite, as well as through git pre-commit hooks that prevent committing code not does not meet the requirements. These hooks are managed through the <a class="reference external" href="https://pre-commit.com">pre-commit framework</a>.
+You may use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">flake8-check</span></code> or <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">run-flake8</span></code> and <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">pylint-check</span></code> or <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">run-pylint</span></code> for additional checks on the code with <a class="reference external" href="http://flake8.pycqa.org">flake8</a> and <a class="reference external" href="http://pylint.pycqa.org">pylint</a>, but there is no strict requirement for a perfect score with either one of these linters. They only serve as a guideline for code that might be improved.</p>
+</div>
+<div class="section" id="write-documentation">
+<h2>Write Documentation<a class="headerlink" href="#write-documentation" title="Permalink to this headline">¶</a></h2>
+<p>QDYN-pylib could always use more documentation, whether as part of the official docs, in docstrings, or even on the web in blog posts, articles, and such.</p>
+<p>The package documentation is generated with <a class="reference external" href="http://www.sphinx-doc.org/en/master/">Sphinx</a>, the documentation (and docstrings) are formatted using the <a class="reference external" href="http://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html">Restructured Text markup language</a> (file extension <code class="docutils literal notranslate"><span class="pre">rst</span></code>). See also the <a class="reference external" href="https://matplotlib.org/sampledoc/cheatsheet.html">Matplotlib Sphinx cheat sheet</a> for some helpful tips.</p>
+<p>The Documentation should be structured in <a class="reference external" href="https://documentation.divio.com">four distinct categories</a>:</p>
+<ul class="simple">
+<li><p>Tutorials (learning-oriented)</p></li>
+<li><p>How-to Guides (problem-oriented)</p></li>
+<li><p>Reference Guides / API (information-oriented)</p></li>
+<li><p>Explanations (understanding-oriented)</p></li>
+</ul>
+<p>For the API documentation, each function or class must have a <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">docstring</a>; this docstring must be written in the <a class="reference external" href="http://www.sphinx-doc.org/en/master/usage/extensions/example_google.html#example-google">“Google Style” format</a> (as implemented by Sphinx’ <a class="reference external" href="http://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html">napoleon extension</a>). Docstrings and any other part of the documentation can include <a class="reference external" href="http://www.sphinx-doc.org/en/1.6/ext/math.html">mathematical formulas in LaTeX syntax</a> (using <a class="reference external" href="http://www.sphinx-doc.org/en/master/usage/extensions/math.html#module-sphinx.ext.mathjax">mathjax</a>).</p>
+<p>For module variables and class attributes, use a docstring “inline” immediately after the definition. However, for instance attributes, it is preferable to include an “Attributes:” section in the class docstring (instead of using “attribute docstrings” in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>). While attribute docstrings have the benefit that it is less likely for there to be a mismatch between the documentation and the implementation, they also have some significant drawbacks, for example: They do not show up in <code class="docutils literal notranslate"><span class="pre">help(&lt;class&gt;)</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;class&gt;?</span></code> in IPython, they tend to make <code class="docutils literal notranslate"><span class="pre">__init__</span></code> much harder to read, and they don’t work for classes defined via <a class="reference external" href="http://www.attrs.org">attrs</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method should never have a docstring; it’s arguments are described in the class docstring instead.</p>
+<p>At any point, from a checkout of the <code class="docutils literal notranslate"><span class="pre">qdyn</span></code> repository, you may run</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">make docs</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">tox -e docs</span>
+</pre></div>
+</div>
+<p>to generate the documentation locally.</p>
+</div>
+<div class="section" id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
+<p>Releases should follow <a class="reference external" href="https://semver.org">Semantic Versioning</a>, and version numbers published to <a class="reference external" href="http://pypi.org">PyPI</a> must be compatible with PEP 440.</p>
+<p>In short, versions number follow the pattern <code class="docutils literal notranslate"><span class="pre">major.minor.patch</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code> for the first release, and <code class="docutils literal notranslate"><span class="pre">1.0.0</span></code> for the first <em>stable</em> release. If necessary, pre-release versions might be published as e.g:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1.0.0-dev1  # developer&#39;s preview 1 for release 1.0.0
+1.0.0-rc1   # release candidate 1 for 1.0.0
+</pre></div>
+</div>
+<p>Errors in the release metadata or documentation only may be fixed in a post-release, e.g.:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1.0.0.post1  # first post-release after 1.0.0
+</pre></div>
+</div>
+<p>Post-releases should be used sparingly, but they are acceptable even though they are not supported by the <a class="reference external" href="https://semver.org">Semantic Versioning</a> specification.</p>
+<p>The current version is available through the <code class="docutils literal notranslate"><span class="pre">__version__</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">qdyn</span></code> package</p>
+<p>Between releases, <code class="docutils literal notranslate"><span class="pre">__version__</span></code> on the master branch should either be the version number of the last release, with “+dev” appended (as a <a class="reference external" href="https://www.python.org/dev/peps/pep-0440/#local-version-identifiers">“local version identifier”</a>), or the version number of the next planned release, with “-dev” appended (<a class="reference external" href="https://www.python.org/dev/peps/pep-0440/#pre-releases">“pre-release identifier”</a> with extra dash). The version string “1.0.0-dev1+dev” is a valid value after the “1.0.0-dev1” pre-release. The “+dev” suffix must never be included in a release to <a class="reference external" href="http://pypi.org">PyPI</a>.</p>
+<p>Note that <a class="reference external" href="https://twine.readthedocs.io/en/latest/">twine</a> applies <a class="reference external" href="https://legacy.python.org/dev/peps/pep-0440/#id29">normalization</a> to the above recommended forms to make them strictly compatible with PEP 440, before uploading to <a class="reference external" href="http://pypi.org">PyPI</a>. Users installing the package through <a class="reference external" href="https://pip.readthedocs.io/en/stable/">pip</a> may use the original version specification as well as the normalized one (or any other variation that normalizes to the same result).</p>
+<p>When making a release via</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make release
+</pre></div>
+</div>
+<p>the above versioning conventions will be taken into account automatically.</p>
+<p>Releases must be tagged in git, using the version string prefixed by “v”, e.g. <code class="docutils literal notranslate"><span class="pre">v1.0.0-dev1</span></code> and <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>. This makes them available at <a class="reference external" href="https://github.com/qucontrol/qdynpylib/releases">https://github.com/qucontrol/qdynpylib/releases</a>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="authors.html" class="btn btn-neutral float-right" title="Credits" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="readme.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

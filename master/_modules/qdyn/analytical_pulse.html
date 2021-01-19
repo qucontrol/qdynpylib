@@ -1,0 +1,825 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.analytical_pulse &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/qdyn.html">API of the qdyn package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>qdyn.analytical_pulse</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for qdyn.analytical_pulse</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Describing pulses by an analytical formula&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">getfullargspec</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.linalg</span> <span class="kn">import</span> <span class="n">iscomplexobj</span>
+<span class="kn">from</span> <span class="nn">.pulse</span> <span class="kn">import</span> <span class="n">Pulse</span><span class="p">,</span> <span class="n">_PulseConfigAttribs</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">UnitConvert</span><span class="p">,</span> <span class="n">UnitFloat</span>
+
+
+<span class="k">class</span> <span class="nc">_NumpyAwareJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;JSON Encoder than can handle 1D real numpy arrays by converting them to</span>
+<span class="sd">    to a special object. The result can be decoded using the</span>
+<span class="sd">    NumpyAwareJSONDecoder to recover the numpy arrays.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>  <span class="c1"># pylint: disable=method-hidden, arguments-differ</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;np.&#39;</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;vals&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_PulseConfigAttribs</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">return</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_SimpleNumpyAwareJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;JSON Encoder than can handle 1D real numpy arrays by converting them to</span>
+<span class="sd">    a list. Note that this does NOT allow to recover the original numpy array</span>
+<span class="sd">    from the JSON data&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>  <span class="c1"># pylint: disable=method-hidden, arguments-differ</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_PulseConfigAttribs</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">return</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_NumpyAwareJSONDecoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decode JSON data that hs been encoded with _NumpyAwareJSONEncoder&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">JSONDecoder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_to_object</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dict_to_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert (type, vals) to type(vals) for numpy-array-types&quot;&quot;&quot;</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;vals&#39;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">):</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;vals&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">typ</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;np.&quot;</span><span class="p">):</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="n">typ</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+            <span class="n">inst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span>
+
+
+<div class="viewcode-block" id="AnalyticalPulse"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse">[docs]</a><span class="k">class</span> <span class="nc">AnalyticalPulse</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Representation of a pulse determined by an analytical formula</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        formula (str): Name of a previously registered formula</span>
+<span class="sd">        parameters (dict): Dictionary of values for the pulse formula</span>
+<span class="sd">        time_unit (str or None): The unit of the `tgrid` input parameter of the</span>
+<span class="sd">            formula (None is equivalent to &#39;iu&#39;)</span>
+<span class="sd">        ampl_unit (str or None): Unit in which the amplitude is defined. It is</span>
+<span class="sd">            assumed that the formula gives values in the correct unit.</span>
+<span class="sd">        t0 (float or str or callable): Start time of the pulse</span>
+<span class="sd">        T (float or str or callable or None): End time of the pulse</span>
+<span class="sd">        nt (int or str or callable or None): Number of grid points between `t0`</span>
+<span class="sd">            and `T` (inclusive)</span>
+<span class="sd">        freq_unit (str or None): Preferred unit for pulse spectra. If None,</span>
+<span class="sd">            unit will be chose automatically.</span>
+<span class="sd">        config_attribs (dict or None): Additional config data, for when</span>
+<span class="sd">            generating a QDYN config file section describing the pulse (e.g.</span>
+<span class="sd">            `{&#39;oct_shape&#39;: &#39;flattop&#39;, &#39;t_rise&#39;: &#39;10_ns&#39;}`)</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        parameters (dict): Dictionary of values for the pulse formula</span>
+<span class="sd">        time_unit (str or None): Value of the `time_unit` arg</span>
+<span class="sd">        ampl_unit (str): Value of the `ampl_unit` arg</span>
+<span class="sd">        freq_unit (str): Value of the `freq_unit` arg</span>
+<span class="sd">        config_attribs (collections.abc.MutableMapping): dictionary with the</span>
+<span class="sd">            items from the `config_attribs` arg</span>
+<span class="sd">    Notes:</span>
+<span class="sd">        The `t0`, `T`, and `nt` may be given to specify a time grid that is</span>
+<span class="sd">        used by default when converting to a numerical pulse</span>
+<span class="sd">        (:meth:`to_num_pulse`). They may be a numerical value, which will</span>
+<span class="sd">        be used directly. Alternatively, they may be a string, which is a</span>
+<span class="sd">        key in the `parameters` dict, and the value of the corresponding</span>
+<span class="sd">        parameter will be used. Lastly, they may be a callable the receives</span>
+<span class="sd">        the entire :class:`AnalyticalPulse` object as its argument and</span>
+<span class="sd">        returns and appropriate numerical value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_formulas</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">{}</span>
+    <span class="p">)</span>  <span class="c1"># formula name =&gt; formula callable, see `register_formula()`</span>
+    <span class="n">_allowed_args</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># formula name =&gt; allowed arguments</span>
+    <span class="n">_required_args</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># formula name =&gt; required arguments</span>
+    <span class="n">unit_convert</span> <span class="o">=</span> <span class="n">UnitConvert</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AnalyticalPulse.register_formula"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.register_formula">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">register_formula</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">formula</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register a new analytical formula</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            name (str): Label for the formula</span>
+<span class="sd">            formula (callable): callable that takes an tgrid numpy array and an</span>
+<span class="sd">                arbitrary number of (keyword) arguments and returns a numpy</span>
+<span class="sd">                array of amplitude values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">argspec</span> <span class="o">=</span> <span class="n">getfullargspec</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argspec</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;formula has zero arguments, must take at least &quot;</span>
+                <span class="s2">&quot;a tgrid parameter&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_formulas</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_allowed_args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">argspec</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">n_opt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">argspec</span><span class="o">.</span><span class="n">defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_opt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">argspec</span><span class="o">.</span><span class="n">defaults</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_required_args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">argspec</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="n">n_opt</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">formula</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ampl_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">freq_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">config_attribs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">formula</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formulas</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown formula &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">formula</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span> <span class="o">=</span> <span class="n">time_unit</span> <span class="ow">or</span> <span class="s1">&#39;iu&#39;</span>  <span class="c1"># cannot be None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ampl_unit</span> <span class="o">=</span> <span class="n">ampl_unit</span> <span class="ow">or</span> <span class="s1">&#39;iu&#39;</span>  <span class="c1"># cannot be None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq_unit</span> <span class="o">=</span> <span class="n">freq_unit</span>
+        <span class="k">if</span> <span class="n">freq_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">freq_unit</span> <span class="o">=</span> <span class="n">Pulse</span><span class="o">.</span><span class="n">freq_units</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;freq_unit must be specified&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_attribs</span> <span class="o">=</span> <span class="n">_PulseConfigAttribs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config_attribs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config_attribs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_attribs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_t0</span> <span class="o">=</span> <span class="n">t0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T</span> <span class="o">=</span> <span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nt</span> <span class="o">=</span> <span class="n">nt</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">val</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">t0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time at which the pulse begins (dt/2 before the first point in the</span>
+<span class="sd">        pulse), as instance of :class:`~qdyn.units.UnitFloat`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;_t0&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time at which the pulse ends (dt/2 after the last point in the</span>
+<span class="sd">        pulse), as an instance of :class:`~qdyn.units.UnitFloat`.</span>
+
+<span class="sd">        None if T was given as None in initialization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;_T&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">T</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time grid points for the numerical pulse values, as numpy array in</span>
+<span class="sd">        units of :attr:`time_unit`.</span>
+
+<span class="sd">        None if missing `T`, `nt` in initialization.</span>
+
+<span class="sd">        The returned time grid has ``nt - 1`` values, and extends from ``t0 +</span>
+<span class="sd">        dt/2`` to ``T - dt/2``, matching the requirements for the `tgrid`</span>
+<span class="sd">        argument of :class:`~qdyn.pulse.Pulse`.</span>
+
+<span class="sd">        See also:</span>
+<span class="sd">            :attr:`states_tgrid` is the time grid of length ``nt`` from ``t0``</span>
+<span class="sd">            to ``T``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">states_tgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time grid values for the states propagated under the numerical pulse</span>
+<span class="sd">        values, as numpy array in units of :attr:`time_unit`.</span>
+
+<span class="sd">        None if missing `T`, `nt` in initialization.</span>
+
+<span class="sd">        The returned time grid has ``nt`` values, and extends from ``t0``</span>
+<span class="sd">        to ``T`` (inclusive).</span>
+
+<span class="sd">        See also:</span>
+<span class="sd">            attr:`tgrid` is the time grid for the numerical pulse values of</span>
+<span class="sd">            length ``nt-1``, extending from ``t0 + dt/2`` to ``T - dt/2``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time grid step, as instance of :class:`~qdyn.units.UnitFloat`</span>
+
+<span class="sd">        None if time grid is not defined (missing T, nt in initialization).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span>
+        <span class="n">nt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nt</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">if</span> <span class="n">T</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">t0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">nt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">T</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of time steps in the time grid between :attr:`t0` and</span>
+<span class="sd">        :attr:`T`, as an integer.</span>
+
+<span class="sd">        None if `nt` missing in initialization.</span>
+
+<span class="sd">        Note that this is the length of :attr:`states_tgrid`, not of</span>
+<span class="sd">        :attr:`tgrid`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;_nt&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">w_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Maximum frequency that can be represented with the</span>
+<span class="sd">        current sampling rate.</span>
+
+<span class="sd">        None if time grid is not defined (missing T, nt in initialization).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_num_pulse</span><span class="p">()</span><span class="o">.</span><span class="n">w_max</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Step width in the spectrum (i.e. the spectral resolution)</span>
+<span class="sd">        based on the current pulse duration, as an instance of</span>
+<span class="sd">        :class:`~qdyn.units.UnitFloat`.</span>
+
+<span class="sd">        None if time grid is not defined (missing T, nt in initialization).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_num_pulse</span><span class="p">()</span><span class="o">.</span><span class="n">dw</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="AnalyticalPulse.from_func"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.from_func">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_func</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ampl_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">freq_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">config_attribs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate directly from a callable `func`, without the need to</span>
+<span class="sd">        register the formula first</span>
+
+<span class="sd">        The callable `func` must fulfill the same requirements as `formula` in</span>
+<span class="sd">        :meth:`register_formula`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">register_formula</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span>
+            <span class="n">ampl_unit</span><span class="o">=</span><span class="n">ampl_unit</span><span class="p">,</span>
+            <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
+            <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">nt</span><span class="o">=</span><span class="n">nt</span><span class="p">,</span>
+            <span class="n">freq_unit</span><span class="o">=</span><span class="n">freq_unit</span><span class="p">,</span>
+            <span class="n">config_attribs</span><span class="o">=</span><span class="n">config_attribs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Is the pulse amplitude of complex type?&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">iscomplexobj</span><span class="p">(</span>
+            <span class="c1"># pylint: disable=not-callable</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_formula</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="AnalyticalPulse.__eq__"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare two pulses, within a precision of 1e-12&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">attribs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;_formula&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;_T&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;_t0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;_nt&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;time_unit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ampl_unit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;freq_unit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;config_attribs&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1.0e-12</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.copy"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a copy of the analytical pulse&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="n">time_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">,</span>
+            <span class="n">ampl_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ampl_unit</span><span class="p">,</span>
+            <span class="n">freq_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">freq_unit</span><span class="p">,</span>
+            <span class="n">config_attribs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">,</span>
+            <span class="n">t0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_t0</span><span class="p">,</span>
+            <span class="n">T</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_T</span><span class="p">,</span>
+            <span class="n">nt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nt</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.array_to_parameters"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.array_to_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">array_to_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unpack the given array (numpy array or regular list) into the pulse</span>
+<span class="sd">        parameters. This is especially useful for optimizing parameters with</span>
+<span class="sd">        the :func:`scipy.optimize.minimize` routine.</span>
+
+<span class="sd">        For each key, set the value of the `parameters[key]` attribute by</span>
+<span class="sd">        popping values from the beginning of the array. If `parameters[key]` is</span>
+<span class="sd">        an array, pop repeatedly to set every value.</span>
+
+<span class="sd">        If `keys` is not given, all parameter keys are used, in sorted order.</span>
+<span class="sd">        The array must contain exactly enough parameters, otherwise an</span>
+<span class="sd">        `IndexError` is raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;not all values in array placed in parameters&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.parameters_to_array"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.parameters_to_array">[docs]</a>    <span class="k">def</span> <span class="nf">parameters_to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Inverse method to `array_to_parameters`. Returns the &quot;packed&quot;</span>
+<span class="sd">        parameter values for the given keys as a numpy array&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">])):</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise a ValueError if self.parameters is missing any required</span>
+<span class="sd">        parameters for the current formula. Also raise ValueError is</span>
+<span class="sd">        self.parameters contains any extra parameters&quot;&quot;&quot;</span>
+        <span class="n">formula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required_args</span><span class="p">[</span><span class="n">formula</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="s1">&#39;Required parameter &quot;</span><span class="si">%s</span><span class="s1">&quot; for formula &quot;</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
+                        <span class="s1">&#39;not in parameters </span><span class="si">%s</span><span class="s1">&#39;</span>
+                    <span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allowed_args</span><span class="p">[</span><span class="n">formula</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s1">&#39;Parameter &quot;</span><span class="si">%s</span><span class="s1">&quot; does not exist in formula &#39;</span> <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">formula</span><span class="p">)</span>
+                <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">formula_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Name of the analytical formula that is used&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evaluate_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The callable that numerically evaluates the used formula, for</span>
+<span class="sd">        arbitrary parameters (keyword arguments)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formulas</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AnalyticalPulse.as_func"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.as_func">[docs]</a>    <span class="k">def</span> <span class="nf">as_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_args</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callable that evaluates the pulse for a given time value.</span>
+
+<span class="sd">        If `allow_args` is True, the resulting function takes two parameters,</span>
+<span class="sd">        `t` and `args` where `t` is a float for the time value at which to</span>
+<span class="sd">        evaluate the pulse (in units of :attr:`time_unit`), and `args` is a</span>
+<span class="sd">        dictionary that allows to override attr:`parameters`.</span>
+
+<span class="sd">        If `allow_args` is False, the resulting function will only take a</span>
+<span class="sd">        single parameter `t`, and evaluate the function for fixed</span>
+<span class="sd">        :attr:`parameters`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="n">tgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">])</span>
+            <span class="n">ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formulas</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">](</span><span class="n">tgrid</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ampl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">func_with_args</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+            <span class="n">tgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">])</span>
+            <span class="n">ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formulas</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">](</span>
+                <span class="n">tgrid</span><span class="p">,</span>
+                <span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">}</span>
+                <span class="c1"># args overrides self.parameters</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">ampl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">allow_args</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">func_with_args</span>
+        <span class="k">return</span> <span class="n">func</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.to_json"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a json representation of the pulse&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameters</span><span class="p">()</span>
+        <span class="n">json_opts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;sort_keys&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">pretty</span><span class="p">:</span>
+            <span class="n">json_opts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">),</span>
+                <span class="s1">&#39;sort_keys&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;formula&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;nt&#39;</span><span class="p">]:</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">_NumpyAwareJSONEncoder</span><span class="p">,</span> <span class="o">**</span><span class="n">json_opts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.__str__"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return string representation (JSON)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.write"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the analytical pulse to the given filename as a json data</span>
+<span class="sd">        structure&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fh</span><span class="p">:</span>
+            <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Single line summarizing the pulse. Suitable as preamble for</span>
+<span class="sd">        numerical pulse&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;# Formula &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="s1">&#39; with &#39;</span>
+            <span class="n">json_opts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">),</span>
+                <span class="s1">&#39;sort_keys&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">_SimpleNumpyAwareJSONEncoder</span><span class="p">,</span> <span class="o">**</span><span class="n">json_opts</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&quot;(\w+)&quot;: &#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1 = &#39;</span><span class="p">,</span> <span class="n">json_str</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="AnalyticalPulse.read"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.read">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read in a json data structure and return a new `AnalyticalPulse`&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">in_fh</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">_NumpyAwareJSONDecoder</span><span class="p">)</span>
+            <span class="n">pulse</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pulse</span></div>
+
+<div class="viewcode-block" id="AnalyticalPulse.to_num_pulse"><a class="viewcode-back" href="../../API/qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse.to_num_pulse">[docs]</a>    <span class="k">def</span> <span class="nf">to_num_pulse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">tgrid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ampl_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_unit</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a :class:`.Pulse` instance that contains the</span>
+<span class="sd">        corresponding numerical pulse.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tgrid (numpy.ndarray or None): The time grid on which to evaluate</span>
+<span class="sd">                the pulse. Use :func:`~qdyn.pulse.pulse_tgrid` to generate this.</span>
+<span class="sd">            time_unit (str or None): Unit of `tgrid`</span>
+<span class="sd">            ampl_unit (str or None): Unit of pulse amplitude</span>
+<span class="sd">            freq_unit (str or None): Unit of pulse frequencies</span>
+
+<span class="sd">        For any missing argument (None value), the corresponding attribute is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">        Returns None if `tgrid` is not given explicitly and no time grid was</span>
+<span class="sd">        defined on initialization (arguments `T`, `nt`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameters</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tgrid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tgrid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgrid</span>
+        <span class="k">if</span> <span class="n">tgrid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">time_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time_unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span>
+        <span class="k">if</span> <span class="n">ampl_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ampl_unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ampl_unit</span>
+        <span class="k">if</span> <span class="n">freq_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freq_unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">freq_unit</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formulas</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">](</span><span class="n">tgrid</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">time_unit</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">:</span>
+            <span class="n">tgrid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_convert</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">tgrid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ampl_unit</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ampl_unit</span><span class="p">:</span>
+            <span class="n">amplitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_convert</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span>
+                <span class="n">amplitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ampl_unit</span><span class="p">,</span> <span class="n">ampl_unit</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">amplitude</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s1">&#39;Formula &quot;</span><span class="si">%s</span><span class="s1">&quot; returned type </span><span class="si">%s</span><span class="s1"> instead of the &#39;</span>
+                    <span class="s1">&#39;required 1-D numpy array&#39;</span>
+                <span class="p">)</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">amplitude</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="n">pulse</span> <span class="o">=</span> <span class="n">Pulse</span><span class="p">(</span>
+            <span class="n">tgrid</span><span class="o">=</span><span class="n">tgrid</span><span class="p">,</span>
+            <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span>
+            <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span>
+            <span class="n">ampl_unit</span><span class="o">=</span><span class="n">ampl_unit</span><span class="p">,</span>
+            <span class="n">freq_unit</span><span class="o">=</span><span class="n">freq_unit</span><span class="p">,</span>
+            <span class="n">config_attribs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_attribs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">pulse</span><span class="o">.</span><span class="n">preamble</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">pulse</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

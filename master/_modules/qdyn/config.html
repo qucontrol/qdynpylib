@@ -1,0 +1,1145 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.config &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/qdyn.html">API of the qdyn package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>qdyn.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for qdyn.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Module containing utilities for managing QDYN config files&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">UnitFloat</span>
+
+
+<span class="k">def</span> <span class="nf">_protect_str_vals</span><span class="p">(</span><span class="n">str_line</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Parsing is greatly simplified if it can be assumed that key-value pairs</span>
+<span class="sd">    in the config match the regular expression &#39;\w+\s*=\s*[\w.+-]+&#39;. That is,</span>
+<span class="sd">    the values do not contain spaces, quotes, or escaped characters. This</span>
+<span class="sd">    function replaces values in the given `str_line` by a base-64 string</span>
+<span class="sd">    which is guaranteed to contain only letters and numbers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        str_line (str): Unprotected string to be parsed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Tuple containing</span>
+
+<span class="sd">             (str): Protected (base-64) string.</span>
+<span class="sd">             It is guaranteed to not be shorter than the original string.</span>
+
+<span class="sd">             (list): List of replacement tuples.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; s_in = r&#39;a = &quot;text&quot;, &#39;+&quot;b = &#39;text&#39;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; print(s_in)</span>
+<span class="sd">        a = &quot;text&quot;, b = &#39;text&#39;</span>
+<span class="sd">        &gt;&gt;&gt; s, r = _protect_str_vals(s_in)</span>
+<span class="sd">        &gt;&gt;&gt; print(s)</span>
+<span class="sd">        a = InRleHQi, b = J3RleHQn</span>
+<span class="sd">        &gt;&gt;&gt; print(r)</span>
+<span class="sd">        [(&#39;InRleHQi&#39;, &#39;&quot;text&quot;&#39;), (&#39;J3RleHQn&#39;, &quot;&#39;text&#39;&quot;)]</span>
+
+<span class="sd">        &gt;&gt;&gt; s_in = r&#39;a = this\ is\ an\ unquoted\ string, b = &quot;text&quot;&#39;</span>
+<span class="sd">        &gt;&gt;&gt; print(s_in)</span>
+<span class="sd">        a = this\ is\ an\ unquoted\ string, b = &quot;text&quot;</span>
+<span class="sd">        &gt;&gt;&gt; s, r = _protect_str_vals(s_in)</span>
+<span class="sd">        &gt;&gt;&gt; print(s)</span>
+<span class="sd">        a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi</span>
+<span class="sd">        &gt;&gt;&gt; print(r)</span>
+<span class="sd">        [(&#39;InRleHQi&#39;, &#39;&quot;text&quot;&#39;), (&#39;dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n&#39;, &#39;this\\ is\\ an\\ unquoted\\ string&#39;)]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># handle quoted strings</span>
+    <span class="n">rx_dq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&quot;[^&quot;</span><span class="se">\\</span><span class="s1">]*(?:</span><span class="se">\\</span><span class="s1">.[^&quot;</span><span class="se">\\</span><span class="s1">]*)*&quot;&#39;</span><span class="p">)</span>  <span class="c1"># search for ...</span>
+    <span class="n">rx_sq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&#39;[^&#39;</span><span class="se">\\</span><span class="s2">]*(?:</span><span class="se">\\</span><span class="s2">.[^&#39;</span><span class="se">\\</span><span class="s2">]*)*&#39;&quot;</span><span class="p">)</span>  <span class="c1"># ... balanced quotes</span>
+    <span class="n">replacements</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_replacements</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">while</span> <span class="n">n_replacements</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">replacements</span><span class="p">):</span>
+        <span class="n">n_replacements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">replacements</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">rx_dq</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">str_line</span><span class="p">)</span>
+        <span class="n">matches</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">rx_sq</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">str_line</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">quoted_str</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+            <span class="n">b64</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">quoted_str</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">replacements</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">))</span>
+            <span class="n">str_line</span> <span class="o">=</span> <span class="n">str_line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">quoted_str</span><span class="p">,</span> <span class="n">b64</span><span class="p">)</span>
+
+    <span class="c1"># handle un-quoted, but escaped strings</span>
+    <span class="n">rx_escaped_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="c1"># any string of characters that does not include spaces or any</span>
+        <span class="c1"># of the characters ,:!&amp;=\, except when they are escaped (preceded</span>
+        <span class="c1"># by a backslash)</span>
+        <span class="sa">r</span><span class="s1">&#39;(([^\s,:!&amp;=</span><span class="se">\\</span><span class="s1">]|</span><span class="se">\\</span><span class="s1">\s|</span><span class="se">\\\\</span><span class="s1">|</span><span class="se">\\</span><span class="s1">,|</span><span class="se">\\</span><span class="s1">:|</span><span class="se">\\</span><span class="s1">!|</span><span class="se">\\</span><span class="s1">&amp;|</span><span class="se">\\</span><span class="s1">=|</span><span class="se">\\</span><span class="s1">n|</span><span class="se">\\</span><span class="s1">r|</span><span class="se">\\</span><span class="s1">t|</span><span class="se">\\</span><span class="s1">b)+)&#39;</span>
+    <span class="p">)</span>
+    <span class="n">rx_good_word</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[\w.+-]+$&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">rx_escaped_word</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">str_line</span><span class="p">):</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">rx_good_word</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">word</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)):</span>
+            <span class="n">b64</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">replacements</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">b64</span><span class="p">,</span> <span class="n">word</span><span class="p">))</span>
+            <span class="n">str_line</span> <span class="o">=</span> <span class="n">str_line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">b64</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">str_line</span><span class="p">,</span> <span class="n">replacements</span>
+
+
+<span class="k">def</span> <span class="nf">_unprotect_str_vals</span><span class="p">(</span><span class="n">str_line</span><span class="p">,</span> <span class="n">replacements</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Inverse to :func:`_protect_str_vals`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        str_line (str): Protected string.</span>
+<span class="sd">        replaements (list): List of replacement tuples.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Orginal unprotected string.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">         &gt;&gt;&gt; s, r = _protect_str_vals(r&#39;a = &quot;text&quot;, &#39;+&quot;b = &#39;text&#39;&quot;)</span>
+<span class="sd">         &gt;&gt;&gt; print(_unprotect_str_vals(s, r))</span>
+<span class="sd">         a = &quot;text&quot;, b = &#39;text&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
+        <span class="n">str_line</span> <span class="o">=</span> <span class="n">str_line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">str_line</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
+        <span class="n">str_line</span> <span class="o">=</span> <span class="n">str_line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">str_line</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">str_line</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
+            <span class="n">str_line</span> <span class="o">=</span> <span class="n">str_line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">_escape_str</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replace special characters in the given string with escape codes.</span>
+<span class="sd">    Surround strings containing spaces with quotes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (str): String to be parsed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Parsed string with all special characters replaced.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">replacements</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">,&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">:&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">!&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&amp;&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">=&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">r&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">t&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\b</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">bs_protect</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">)])</span>
+    <span class="k">while</span> <span class="n">bs_protect</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">bs_protect</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">)])</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bs_protect</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">unescaped</span><span class="p">,</span> <span class="n">escaped</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">unescaped</span><span class="p">,</span> <span class="n">escaped</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">s</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">s</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">bs_protect</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">_unescape_str</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inverse to :func:`_escape_str`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (str): String containing escape codes.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Original string with escape codes replaced by the corresponding</span>
+<span class="sd">        special characters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">replacements</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">,&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">!&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">r&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">t&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\b</span><span class="s2">&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">bs_protect</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">)])</span>
+    <span class="k">while</span> <span class="n">bs_protect</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">bs_protect</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bs_protect</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">escaped</span><span class="p">,</span> <span class="n">unescaped</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">escaped</span><span class="p">,</span> <span class="n">unescaped</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">bs_protect</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">_val_to_str</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert `val` to a string that can be written directly to the config</span>
+<span class="sd">    file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        val: Input object. `val` needs to have a `__str__()` method.</span>
+<span class="sd">        If `val` is a boolean type, it is converted to &#39;T&#39; or &#39;F&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Input object converted to a string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logical_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="s1">&#39;F&#39;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">logical_mapping</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_escape_str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_process_raw_lines</span><span class="p">(</span><span class="n">raw_lines</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Return an iterator over the &quot;processed&quot; lines of a config file, based</span>
+<span class="sd">    on the given raw lines. The processing of the raw lines consists of</span>
+<span class="sd">    stripping out comments, and combining multiple continued raw lines into a</span>
+<span class="sd">    single processed lines. The returned lines do not have a trailing newline.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raw_lines (iterable): Iterable of a raw list of lines, as they might</span>
+<span class="sd">        appear in a config file. These may contain comments and continuation.</span>
+<span class="sd">        Each line may or may not contain trailing newlines (trailing whitespace</span>
+<span class="sd">        is ignored)</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        str: Next line to be processed.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; config = r&quot;&quot;&quot;</span>
+<span class="sd">        ... ! the following is a config file for 3 pulses and some custom</span>
+<span class="sd">        ... ! data</span>
+<span class="sd">        ... pulse: type = gauss, t_FWHM = 1.8, E_0 = 1.0, w_L = 0.2, &amp;</span>
+<span class="sd">        ... &amp; oct_shape = flattop, ftrt = 0.2, oct_lambda_a = 100, &amp;</span>
+<span class="sd">        ... &amp; oct_increase_factor = 10</span>
+<span class="sd">        ... * id = 1, t_0 = 0, oct_outfile = pulse1.dat    ! pulse 1</span>
+<span class="sd">        ... * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat  ! pulse 2</span>
+<span class="sd">        ... * id = 3, t_0 = 5, oct_outfile = pulse3.dat    ! pulse 3</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... user_string: &amp;</span>
+<span class="sd">        ...   A = &quot;x**2&quot;, &amp;</span>
+<span class="sd">        ...   B = &#39;B_{&quot;avg&quot;}&#39; ! some &quot;arbitrary&quot; strings</span>
+<span class="sd">        ... &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; for line in _process_raw_lines(config.splitlines()):</span>
+<span class="sd">        ...     print(line)</span>
+<span class="sd">        pulse: type = gauss, t_FWHM = 1.8, E_0 = 1.0, w_L = 0.2,  oct_shape = flattop, ftrt = 0.2, oct_lambda_a = 100,  oct_increase_factor = 10</span>
+<span class="sd">        * id = 1, t_0 = 0, oct_outfile = pulse1.dat</span>
+<span class="sd">        * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat</span>
+<span class="sd">        * id = 3, t_0 = 5, oct_outfile = pulse3.dat</span>
+<span class="sd">        user_string: A = &quot;x**2&quot;, B = &#39;B_{&quot;avg&quot;}&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">line_nr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">raw_lines</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">raw_lines</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">raw_line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">raw_lines</span><span class="p">)</span>
+            <span class="c1"># One iteration of the loop may consume multiple raw_lines (for</span>
+            <span class="c1"># continuations), so we can&#39;t just do `for raw_line in raw_lines`</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="c1"># see PEP 479</span>
+            <span class="k">return</span>
+        <span class="n">line_nr</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">line</span><span class="p">,</span> <span class="n">replacements</span> <span class="o">=</span> <span class="n">_protect_str_vals</span><span class="p">(</span><span class="n">raw_line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="c1"># strip out out comments</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;!.*$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># strip out trailing &#39;&amp;&#39; in continued line</span>
+            <span class="n">line2</span><span class="p">,</span> <span class="n">replacements2</span> <span class="o">=</span> <span class="n">_protect_str_vals</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">raw_lines</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">line_nr</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">replacements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">replacements2</span><span class="p">)</span>
+            <span class="c1"># strip out comments</span>
+            <span class="n">line2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;!.*$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">line2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="c1"># strip out leading &#39;&amp;&#39; in continuing line</span>
+            <span class="k">if</span> <span class="n">line2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">line2</span> <span class="o">=</span> <span class="n">line2</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="n">line2</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">_unprotect_str_vals</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">replacements</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">line</span>
+
+
+<span class="k">def</span> <span class="nf">_split_config_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">linewidth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split the given line into a multi-line string of continued lines, trying</span>
+<span class="sd">    to keep the length of each line under `linewidth`. Trailing newlines in</span>
+<span class="sd">    `line` are ignored.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        line (str): Input string containing a single (continued) line from a</span>
+<span class="sd">            config file.</span>
+<span class="sd">        linewidth (int): Maximum line width.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Multi-line version of `line` wrapped to have a length smaller than</span>
+<span class="sd">        `linewdith` and with preceding and trailing newlines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">full_line</span><span class="p">,</span> <span class="n">replacements</span> <span class="o">=</span> <span class="n">_protect_str_vals</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">rx_item</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\w+\s*=\s*[\w.+-]+\s*,?\s*)&#39;</span><span class="p">)</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">part</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">rx_item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">full_line</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">part</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">current_line</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">current_line</span> <span class="o">+=</span> <span class="n">parts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_line</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">linewidth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">current_line</span> <span class="o">+=</span> <span class="n">parts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># We&#39;ve exhausted all parts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">current_line</span> <span class="o">+=</span> <span class="s1">&#39;&amp;&#39;</span>
+        <span class="n">current_line</span> <span class="o">=</span> <span class="n">_unprotect_str_vals</span><span class="p">(</span><span class="n">current_line</span><span class="p">,</span> <span class="n">replacements</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+        <span class="n">current_line</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span>  <span class="c1"># indent for continuing line</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_render_config_lines</span><span class="p">(</span><span class="n">section_name</span><span class="p">,</span> <span class="n">section_data</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Render `section_data` into a list of lines.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        section_name (str): Name of the section that shall be rendered.</span>
+<span class="sd">        section_data (dict): Config data for the given `section_name`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       list: List of strings each containing a formatted config file lines for</span>
+<span class="sd">       the given section.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; section_data = [</span>
+<span class="sd">        ...     OrderedDict([</span>
+<span class="sd">        ...         (&#39;type&#39;, &#39;gauss&#39;),</span>
+<span class="sd">        ...         (&#39;t_FWHM&#39;, UnitFloat.from_str(&#39;1.8_ns&#39;)),</span>
+<span class="sd">        ...         (&#39;E_0&#39;, UnitFloat.from_str(&#39;1_GHz&#39;)),</span>
+<span class="sd">        ...         (&#39;id&#39;, 1), (&#39;oct_outfile&#39;, &#39;pulse1.dat&#39;)]),</span>
+<span class="sd">        ...     OrderedDict([</span>
+<span class="sd">        ...         (&#39;type&#39;, &#39;gauss&#39;),</span>
+<span class="sd">        ...         (&#39;t_FWHM&#39;, UnitFloat.from_str(&#39;1.8_ns&#39;)),</span>
+<span class="sd">        ...         (&#39;E_0&#39;, UnitFloat.from_str(&#39;1_GHz&#39;)),</span>
+<span class="sd">        ...         (&#39;id&#39;, 2), (&#39;oct_outfile&#39;, &#39;pulse2.dat&#39;)])</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt; for line in _render_config_lines(&#39;pulse&#39;, section_data):</span>
+<span class="sd">        ...     print(line)</span>
+<span class="sd">        pulse: type = gauss, t_FWHM = 1.8_ns, E_0 = 1_GHz</span>
+<span class="sd">        * id = 1, oct_outfile = pulse1.dat</span>
+<span class="sd">        * id = 2, oct_outfile = pulse2.dat</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Passing `section_name` and `section_data` separately (instead of a full</span>
+    <span class="c1"># `config_data` dict) allows this routine to be used for creating multiple</span>
+    <span class="c1"># &quot;blocks&quot; of the same section, each with a different &quot;label&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="c1"># section name and common items</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">section_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">common_items</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">section_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                    <span class="o">*</span><span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">section_data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">common_items</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="n">section_name</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">section_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="c1"># we *do not* iterate over keys in common_items, so that items</span>
+            <span class="c1"># are ordered the same as in section_data[0], instead of randomly</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">common_items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span> <span class="ow">and</span> <span class="n">common_items</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">,&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_val_to_str</span><span class="p">(</span><span class="n">common_items</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="c1"># item lines</span>
+        <span class="k">for</span> <span class="n">item_line</span> <span class="ow">in</span> <span class="n">section_data</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item_line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">common_items</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span> <span class="ow">and</span> <span class="n">item_line</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">,&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_val_to_str</span><span class="p">(</span><span class="n">item_line</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># section does not contain item lines, but key-value pairs only</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="n">section_name</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">section_data</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">,&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_val_to_str</span><span class="p">(</span><span class="n">section_data</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">lines</span>
+
+
+<span class="k">def</span> <span class="nf">_item_rxs</span><span class="p">(</span><span class="n">section_name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="n">logical_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;.true.&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;F&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;.false.&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">item_rxs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">section_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user_&#39;</span><span class="p">):</span>
+        <span class="n">item_rxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;key&gt;label)\s*=\s*(?P&lt;value&gt;.+)$&#39;</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_unescape_str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="p">)</span>  <span class="c1"># label is always a string!</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">section_name</span> <span class="o">==</span> <span class="s1">&#39;user_reals&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">section_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user_&#39;</span><span class="p">):</span>
+        <span class="n">item_rxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;key&gt;\w+)\s*=\s*(?P&lt;value&gt;[\dEe.+-]+_\w+)$&#39;</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">UnitFloat</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">section_name</span> <span class="o">==</span> <span class="s1">&#39;user_ints&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">section_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user_&#39;</span><span class="p">):</span>
+        <span class="n">item_rxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">                (?P&lt;key&gt;\w+) \s*=\s* (?P&lt;value&gt;</span>
+<span class="sd">                    [+-]? (0 | [1-9]\d*)  # leading zero not allowed</span>
+<span class="sd">                )$&#39;&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">section_name</span> <span class="o">==</span> <span class="s1">&#39;user_reals&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">section_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user_&#39;</span><span class="p">):</span>
+        <span class="n">item_rxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">                (?P&lt;key&gt;\w+) \s*=\s* (?P&lt;value&gt;</span>
+<span class="sd">                    [+-]?  (</span>
+<span class="sd">                    \d+\.\d+([Ee][+-]?\d+)? |  # 1.0, 1.0e5 (exponent optional)</span>
+<span class="sd">                    \d+[Ee][+-]?\d+            # 1e-5       (exponent required)</span>
+<span class="sd">                ))$&#39;&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">section_name</span> <span class="o">==</span> <span class="s1">&#39;user_logicals&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">section_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user_&#39;</span><span class="p">):</span>
+        <span class="n">item_rxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;(?P&lt;key&gt;\w+)\s*=\s*(?P&lt;value&gt;(T|F|true|false|&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\.true\.|\.false\.))$&#39;</span>
+                <span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">logical_mapping</span><span class="p">[</span><span class="n">v</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">item_rxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;key&gt;\w+)\s*=\s*(?P&lt;value&gt;.+)$&#39;</span><span class="p">),</span>
+            <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_unescape_str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">item_rxs</span>
+
+
+<div class="viewcode-block" id="read_config_fh"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.read_config_fh">[docs]</a><span class="k">def</span> <span class="nf">read_config_fh</span><span class="p">(</span><span class="n">fh</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Equivalent to ``read_config_str(fh.read())``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_read_config_lines</span><span class="p">(</span><span class="n">_process_raw_lines</span><span class="p">(</span><span class="n">fh</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="read_config_file"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.read_config_file">[docs]</a><span class="k">def</span> <span class="nf">read_config_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Equivalent to ``read_config_str(open(filename).read())``&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_read_config_lines</span><span class="p">(</span><span class="n">_process_raw_lines</span><span class="p">(</span><span class="n">in_fh</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="read_config_str"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.read_config_str">[docs]</a><span class="k">def</span> <span class="nf">read_config_str</span><span class="p">(</span><span class="n">config_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse the multi-line string containing the contents of a config file,</span>
+<span class="sd">    and return a nested data structure of the config file data.</span>
+
+<span class="sd">    Return an ordered dictionary containing the following mapping::</span>
+
+<span class="sd">        section name =&gt; dict(key =&gt; value)</span>
+
+<span class="sd">    or::</span>
+
+<span class="sd">        section name =&gt; list of dicts(key =&gt; value)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_read_config_lines</span><span class="p">(</span><span class="n">_process_raw_lines</span><span class="p">(</span><span class="n">config_str</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_read_config_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse an iterable of lines and return the nested config data structure</span>
+<span class="sd">    (see :func:`read_config_str`)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        `lines` must not contain comments or continuations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rx_sec</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        (?P&lt;section&gt;[a-z_A-Z]+) \s*:\s*</span>
+<span class="sd">        (?P&lt;items&gt;</span>
+<span class="sd">            (\w+ \s*=\s* [\w.+-]+ [\s,]+)*</span>
+<span class="sd">            (\w+ \s*=\s* [\w.+-]+ \s*)</span>
+<span class="sd">        )?</span>
+<span class="sd">        &#39;&#39;&#39;</span><span class="p">,</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rx_itemline</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        \* \s+</span>
+<span class="sd">        (?P&lt;items&gt;</span>
+<span class="sd">            (\w+ \s*=\s* [\w.+-]+ [\s,]+)*</span>
+<span class="sd">            (\w+ \s*=\s* [\w.+-]+ \s*)</span>
+<span class="sd">        )</span>
+<span class="sd">        &#39;&#39;&#39;</span><span class="p">,</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rx_item</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\w+\s*=\s*[\w.+-]+)&#39;</span><span class="p">)</span>
+
+    <span class="c1"># we need to make two passes over lines, so we may have to convert an</span>
+    <span class="c1"># iterator to a list</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="n">config_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+    <span class="c1"># first pass: identify sections, list of lines in each section</span>
+    <span class="n">current_section</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">line</span><span class="p">,</span> <span class="n">replacements</span> <span class="o">=</span> <span class="n">_protect_str_vals</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">m_sec</span> <span class="o">=</span> <span class="n">rx_sec</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">m_itemline</span> <span class="o">=</span> <span class="n">rx_itemline</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m_sec</span><span class="p">:</span>
+            <span class="n">current_section</span> <span class="o">=</span> <span class="n">m_sec</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;section&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="k">elif</span> <span class="n">m_itemline</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">],</span> <span class="n">OrderedDict</span><span class="p">):</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">([]))</span>
+
+    <span class="c1"># second pass: set items</span>
+    <span class="n">current_section</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">current_itemline</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># section =&gt; index</span>
+    <span class="n">item_rxs</span> <span class="o">=</span> <span class="n">_item_rxs</span><span class="p">(</span><span class="n">current_section</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">line</span><span class="p">,</span> <span class="n">replacements</span> <span class="o">=</span> <span class="n">_protect_str_vals</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">m_sec</span> <span class="o">=</span> <span class="n">rx_sec</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m_sec</span><span class="p">:</span>
+            <span class="n">current_section</span> <span class="o">=</span> <span class="n">m_sec</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;section&#39;</span><span class="p">)</span>
+            <span class="n">item_rxs</span> <span class="o">=</span> <span class="n">_item_rxs</span><span class="p">(</span><span class="n">current_section</span><span class="p">)</span>
+        <span class="n">m_itemline</span> <span class="o">=</span> <span class="n">rx_itemline</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">line_items</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rx_item</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">rx</span><span class="p">,</span> <span class="n">setter</span> <span class="ow">in</span> <span class="n">item_rxs</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">_unprotect_str_vals</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="n">replacements</span><span class="p">)</span>
+                    <span class="n">line_items</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">setter</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                    <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse item &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">m_sec</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">],</span> <span class="n">OrderedDict</span><span class="p">):</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">line_items</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i_item_line</span> <span class="o">=</span> <span class="n">current_itemline</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">line_dict</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">][</span><span class="n">i_item_line</span><span class="p">:]:</span>
+                    <span class="n">line_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">line_items</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">m_itemline</span><span class="p">:</span>
+            <span class="n">i_item_line</span> <span class="o">=</span> <span class="n">current_itemline</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="n">current_section</span><span class="p">][</span><span class="n">i_item_line</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">line_items</span><span class="p">)</span>
+            <span class="n">current_itemline</span><span class="p">[</span><span class="n">current_section</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse line &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config_data</span>
+
+
+<div class="viewcode-block" id="write_config"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.write_config">[docs]</a><span class="k">def</span> <span class="nf">write_config</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write out a config file</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        config_data (dict): data structure as returned by</span>
+<span class="sd">            :func:`read_config_str`.</span>
+<span class="sd">        filename (str): name of file to which to write config</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fh</span><span class="p">:</span>
+        <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">config_data_to_str</span><span class="p">(</span><span class="n">config_data</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="config_data_to_str"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.config_data_to_str">[docs]</a><span class="k">def</span> <span class="nf">config_data_to_str</span><span class="p">(</span><span class="n">config_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inverse of :func:`read_config_str`&quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_data</span><span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">label_groups</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">itemline</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">itemline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">label_groups</span><span class="p">:</span>
+                    <span class="n">label_groups</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">label_groups</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">itemline</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">label_groups</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_render_config_lines</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_render_config_lines</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">config_data</span><span class="p">[</span><span class="n">section</span><span class="p">]))</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># we ignore the trailing blank line</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">_split_config_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="get_config_value"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.get_config_value">[docs]</a><span class="k">def</span> <span class="nf">get_config_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key_tuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract value from `config_data` by the given `key_tuple`</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        config_data (dict): data structure as returned by</span>
+<span class="sd">            :func:`read_config_str`.</span>
+<span class="sd">        key_tuple (tuple): tuple of keys. For example if `key_tuple` is</span>
+<span class="sd">            ``(&#39;pulse&#39;, 0, &#39;id&#39;)``, then the returned value would be</span>
+<span class="sd">            ``config_data[&#39;pulse&#39;][0][&#39;id&#39;]``</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if any of the keys in `key_tuple` are invalid or cannot be</span>
+<span class="sd">            found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;key_tuple must be a with at least one element&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">config_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">key_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid key &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_info</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid key &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="get_config_user_value"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.get_config_user_value">[docs]</a><span class="k">def</span> <span class="nf">get_config_user_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the value of a user-defined key in the config file (in the</span>
+<span class="sd">    ``user_strings``, ``user_reals``, ``user_logicals``, or `user_ints``</span>
+<span class="sd">    section). Return the first value found in any of the above sections, as the</span>
+<span class="sd">    type corresponding to the section where the key was found. Raise a</span>
+<span class="sd">    `KeyError` if `key` does not exist in any of the user-defined sections</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logical_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;.true.&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;F&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;.false.&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">user_sections</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;user_strings&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;user_reals&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;user_logicals&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">logical_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;user_ints&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">convert</span> <span class="ow">in</span> <span class="n">user_sections</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">convert</span><span class="p">(</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No user-defined key &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_config_value"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.set_config_value">[docs]</a><span class="k">def</span> <span class="nf">set_config_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set a value in `config_data`, cf. `get_config_value`. The key that is</span>
+<span class="sd">    set must already exist in `config_data`&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_tuple</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;key_tuple must have at least two elements&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">config_data</span><span class="p">[</span><span class="n">key_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">key_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">[</span><span class="n">key_tuple</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid key &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_info</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid key &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,))</span></div>
+
+
+<div class="viewcode-block" id="set_config_user_value"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.set_config_user_value">[docs]</a><span class="k">def</span> <span class="nf">set_config_user_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set a user-defined value in the config file. The `value` must be an</span>
+<span class="sd">    instance of `str`, `float`, `bool`, or `int`, and it will be set for the</span>
+<span class="sd">    given `key` in the corresponding section ``user_strings``, ``user_reals``,</span>
+<span class="sd">    ``user_loigcals``, or ``user_ints``. This routine may be used to add *new*</span>
+<span class="sd">    user-defined data to `config_data`; a missing user-defined section will be</span>
+<span class="sd">    created as necessary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">user_sections</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;user_strings&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;user_reals&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;user_logicals&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span>  <span class="c1"># isinstance(False, int) is True, ...</span>
+        <span class="p">(</span><span class="s1">&#39;user_ints&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>  <span class="c1"># ... so the order is important here</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">section_name</span><span class="p">,</span> <span class="n">section_type</span> <span class="ow">in</span> <span class="n">user_sections</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">section_type</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">section_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_data</span><span class="p">:</span>
+                <span class="n">config_data</span><span class="p">[</span><span class="n">section_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+            <span class="n">config_data</span><span class="p">[</span><span class="n">section_name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">return</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;value must be of type str, float, int, or bool&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="generate_make_config"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.generate_make_config">[docs]</a><span class="k">def</span> <span class="nf">generate_make_config</span><span class="p">(</span>
+    <span class="n">config_template</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">dependencies</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">checks</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Generate a routine, e.g. `make_config`, that may be used to generate</span>
+<span class="sd">    config file data based on the given template.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        config_template (dict): data structure as returned by</span>
+<span class="sd">            :func:`read_config_str` that will serve as a template</span>
+<span class="sd">        variables (dict): mapping of a keyword variable name to a key-tuple</span>
+<span class="sd">            in the config (cf. :func:`set_config_value`)</span>
+<span class="sd">        dependencies (dict): mapping of a key-tuple to a callable that</span>
+<span class="sd">            calculates a value for that entry in the config file.</span>
+<span class="sd">        checks (dict): mapping of a keyword variable name to a callable that</span>
+<span class="sd">            checks whether a given value is acceptable.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        &gt;&gt;&gt; config_template = read_config_str(r&quot;&quot;&quot;</span>
+<span class="sd">        ...     pulse: type = gauss, t_FWHM = 1.8, E_0 = 1.0, w_L = 0.2, &amp;</span>
+<span class="sd">        ...     &amp; oct_shape = flattop, ftrt = 0.2, oct_lambda_a = 100, &amp;</span>
+<span class="sd">        ...     &amp; oct_increase_factor = 10</span>
+<span class="sd">        ...     * id = 1, t_0 = 0, oct_outfile = pulse1.dat    ! pulse 1</span>
+<span class="sd">        ...     * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat  ! pulse 2</span>
+<span class="sd">        ...     * id = 3, t_0 = 5, oct_outfile = pulse3.dat    ! pulse 3&quot;&quot;&quot;)</span>
+
+<span class="sd">        &gt;&gt;&gt; make_config = generate_make_config(config_template,</span>
+<span class="sd">        ...     variables={&#39;E_0&#39;: (&#39;pulse&#39;, 0, &#39;E_0&#39;), },</span>
+<span class="sd">        ...     dependencies={</span>
+<span class="sd">        ...         (&#39;pulse&#39;, 1, &#39;E_0&#39;): lambda kwargs: kwargs[&#39;E_0&#39;],</span>
+<span class="sd">        ...         (&#39;pulse&#39;, 2, &#39;E_0&#39;): lambda kwargs: kwargs[&#39;E_0&#39;]},</span>
+<span class="sd">        ...     checks={&#39;E_0&#39;: lambda val: val &gt;= 0.0})</span>
+
+<span class="sd">        &gt;&gt;&gt; print(make_config.__doc__)</span>
+<span class="sd">        Generate config file data (``config_data``) based on the given keyword parameters.</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">        Keyword Arguments:</span>
+<span class="sd">            E_0: Set ``config_data[&#39;pulse&#39;][0][&#39;E_0&#39;]`` (default: 1.0)</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">        Also, the following will be set to values that depend on the given keyword arguments:</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">        * ``config_data[&#39;pulse&#39;][0][&#39;E_0&#39;]``</span>
+<span class="sd">        * ``config_data[&#39;pulse&#39;][0][&#39;E_0&#39;]``</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">        If called without arguments, data equivalent to the following config file is returned::</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">            pulse: type = gauss, t_FWHM = 1.8, E_0 = 1.0, w_L = 0.2, oct_shape = flattop, &amp;</span>
+<span class="sd">              ftrt = 0.2, oct_lambda_a = 100, oct_increase_factor = 10</span>
+<span class="sd">            * id = 1, t_0 = 0, oct_outfile = pulse1.dat</span>
+<span class="sd">            * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat</span>
+<span class="sd">            * id = 3, t_0 = 5, oct_outfile = pulse3.dat</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: if an invalid keyword is passed.</span>
+<span class="sd">            ValueError: if any value fails to pass checks.</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; config = make_config(E_0=0.1)</span>
+<span class="sd">        &gt;&gt;&gt; print(config_data_to_str(config))</span>
+<span class="sd">        pulse: type = gauss, t_FWHM = 1.8, E_0 = 0.1, w_L = 0.2, oct_shape = flattop, &amp;</span>
+<span class="sd">          ftrt = 0.2, oct_lambda_a = 100, oct_increase_factor = 10</span>
+<span class="sd">        * id = 1, t_0 = 0, oct_outfile = pulse1.dat</span>
+<span class="sd">        * id = 2, t_0 = 2.5, oct_outfile = pulse2.dat</span>
+<span class="sd">        * id = 3, t_0 = 5, oct_outfile = pulse3.dat</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">dependencies</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dependencies</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">checks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">checks</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">key_tuple</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">defaults</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_config_value</span><span class="p">(</span><span class="n">config_template</span><span class="p">,</span> <span class="n">key_tuple</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key_tuple</span> <span class="ow">in</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1"># rely on get_config_value to throw Exception for invalid key_tuple</span>
+        <span class="n">get_config_value</span><span class="p">(</span><span class="n">config_template</span><span class="p">,</span> <span class="n">key_tuple</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">make_config</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate config file data&quot;&quot;&quot;</span>
+        <span class="n">config_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config_template</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">varname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">varname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;Got unexpected keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;. &quot;</span>
+                        <span class="s2">&quot;Valid keyword arguments are: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">checks</span><span class="p">[</span><span class="n">varname</span><span class="p">](</span><span class="n">value</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Value </span><span class="si">%s</span><span class="s2"> for &#39;</span><span class="si">%s</span><span class="s2">&#39; does not pass check&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">varname</span><span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="n">key_tuple</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+            <span class="n">set_config_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key_tuple</span><span class="p">,</span> <span class="n">eval_dependency</span> <span class="ow">in</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">eval_dependency</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">set_config_value</span><span class="p">(</span><span class="n">config_data</span><span class="p">,</span> <span class="n">key_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config_data</span>
+
+    <span class="c1"># Set the docstring of `make_config`</span>
+    <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Generate config file data (``config_data``) &quot;</span>
+        <span class="s2">&quot;based on the given keyword parameters.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s2">&quot;Keyword Arguments:</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+        <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s2">&quot;    </span><span class="si">%s</span><span class="s2">: Set ``</span><span class="si">%s</span><span class="s2">`` (default: </span><span class="si">%s</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">varname</span><span class="p">,</span>
+            <span class="s1">&#39;config_data&#39;</span>
+            <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="n">varname</span><span class="p">]]),</span>
+            <span class="nb">repr</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="n">varname</span><span class="p">]),</span>
+        <span class="p">)</span>
+    <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Also, the following will be set to values &quot;</span>
+        <span class="s2">&quot;that depend on the given keyword arguments:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">key_tuple</span> <span class="ow">in</span> <span class="n">dependencies</span><span class="p">:</span>
+        <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">&quot;* ``config_data&quot;</span>
+            <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="n">varname</span><span class="p">]])</span>
+            <span class="o">+</span> <span class="s2">&quot;``</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">If called without arguments, data equivalent &quot;</span>
+        <span class="s2">&quot;to the following config file is returned::&quot;</span>
+        <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">    &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_data_to_str</span><span class="p">(</span><span class="n">make_config</span><span class="p">())</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Raises:</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s2">&quot;    TypeError: if an invalid keyword is passed.</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">checks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">make_config</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">&quot;    ValueError: if any value fails to &quot;</span> <span class="s2">&quot;pass checks.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">make_config</span></div>
+
+
+<div class="viewcode-block" id="get_config_structure"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.get_config_structure">[docs]</a><span class="k">def</span> <span class="nf">get_config_structure</span><span class="p">(</span><span class="n">def_f90</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;new_config_structure.json&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a dumped .json-file with all the allowed section names and</span>
+<span class="sd">    correspondig items of the new config structure genereated by reading the</span>
+<span class="sd">    &#39;para_t&#39; type in the def.f90 file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_structure</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Local regular expression filters</span>
+    <span class="n">rx</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;get_pt_type&#39;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^type\s*\((?P&lt;sec_name&gt;[^\s]\w+)_pt\).*$&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;start_pt_sec&#39;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^type\s+(?P&lt;sec_name&gt;[^\s]\w+)_pt\s*$&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;get_pt_item&#39;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^.+::\s*(?P&lt;item_name&gt;.+)$&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># First pass: Get all *_pt sections in para_t</span>
+    <span class="n">config_sec_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">in_para_t</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">def_f90</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^type\s+para_t\s*$&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">in_para_t</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^end\s*type\s+para_t\s*$&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">in_para_t</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">in_para_t</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="p">[</span><span class="s1">&#39;get_pt_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">sec_name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;sec_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">sec_name</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">config_sec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sec_name</span><span class="p">)</span>
+
+    <span class="c1"># Second pass: Get all allowed items from the *_pt type definitions</span>
+    <span class="n">in_pt_sec</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sec_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">def_f90</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">in_pt_sec</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^end\s*type\s+(\w+)_pt$&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">in_pt_sec</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="p">[</span><span class="s1">&#39;start_pt_sec&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">in_pt_sec</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find end of last *_pt section&quot;</span><span class="p">)</span>
+            <span class="n">in_pt_sec</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">sec_name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;sec_name&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">in_pt_sec</span> <span class="ow">and</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">config_sec_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_structure</span><span class="p">:</span>
+                <span class="n">config_structure</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="p">[</span><span class="s1">&#39;get_pt_item&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">config_structure</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;item_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="c1"># Write to file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh_out</span><span class="p">:</span>
+        <span class="n">json_opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">),</span> <span class="s1">&#39;sort_keys&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="n">fh_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">config_structure</span><span class="p">,</span> <span class="o">**</span><span class="n">json_opts</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

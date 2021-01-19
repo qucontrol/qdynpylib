@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.analytical_pulse module &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdyn.config module" href="qdyn.config.html" />
+    <link rel="prev" title="qdyn package" href="qdyn.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the QDYN-pylib package</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qdyn.analytical_pulse module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.config.html">qdyn.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.io.html">qdyn.io module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.linalg.html">qdyn.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.memoize.html">qdyn.memoize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.model.html">qdyn.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.prop_gate.html">qdyn.prop_gate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.pulse.html">qdyn.pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.shutil.html">qdyn.shutil module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.testing.html">qdyn.testing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.units.html">qdyn.units module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="qdyn.html">qdyn package</a> &raquo;</li>
+        
+      <li>qdyn.analytical_pulse module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-qdyn.analytical_pulse">
+<span id="qdyn-analytical-pulse-module"></span><h1>qdyn.analytical_pulse module<a class="headerlink" href="#module-qdyn.analytical_pulse" title="Permalink to this headline">¶</a></h1>
+<p>Describing pulses by an analytical formula</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse" title="qdyn.analytical_pulse.AnalyticalPulse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalPulse</span></code></a></p></td>
+<td><p>Representation of a pulse determined by an analytical formula</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse">
+<em class="property">class </em><code class="sig-prename descclassname">qdyn.analytical_pulse.</code><code class="sig-name descname">AnalyticalPulse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">formula</span></em>, <em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">t0</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">T</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config_attribs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Representation of a pulse determined by an analytical formula</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of a previously registered formula</p></li>
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Dictionary of values for the pulse formula</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The unit of the <cite>tgrid</cite> input parameter of the
+formula (None is equivalent to ‘iu’)</p></li>
+<li><p><strong>ampl_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Unit in which the amplitude is defined. It is
+assumed that the formula gives values in the correct unit.</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>callable</em>) – Start time of the pulse</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>callable</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – End time of the pulse</p></li>
+<li><p><strong>nt</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>callable</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Number of grid points between <cite>t0</cite>
+and <cite>T</cite> (inclusive)</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Preferred unit for pulse spectra. If None,
+unit will be chose automatically.</p></li>
+<li><p><strong>config_attribs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Additional config data, for when
+generating a QDYN config file section describing the pulse (e.g.
+<cite>{‘oct_shape’: ‘flattop’, ‘t_rise’: ‘10_ns’}</cite>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.parameters">
+<code class="sig-name descname">parameters</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of values for the pulse formula</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.time_unit">
+<code class="sig-name descname">time_unit</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.time_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value of the <cite>time_unit</cite> arg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.ampl_unit">
+<code class="sig-name descname">ampl_unit</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.ampl_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value of the <cite>ampl_unit</cite> arg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.freq_unit">
+<code class="sig-name descname">freq_unit</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.freq_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value of the <cite>freq_unit</cite> arg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.config_attribs">
+<code class="sig-name descname">config_attribs</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.config_attribs" title="Permalink to this definition">¶</a></dt>
+<dd><p>dictionary with the
+items from the <cite>config_attribs</cite> arg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.8)">collections.abc.MutableMapping</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>The <cite>t0</cite>, <cite>T</cite>, and <cite>nt</cite> may be given to specify a time grid that is
+used by default when converting to a numerical pulse
+(<a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.to_num_pulse" title="qdyn.analytical_pulse.AnalyticalPulse.to_num_pulse"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_num_pulse()</span></code></a>). They may be a numerical value, which will
+be used directly. Alternatively, they may be a string, which is a
+key in the <cite>parameters</cite> dict, and the value of the corresponding
+parameter will be used. Lastly, they may be a callable the receives
+the entire <a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse" title="qdyn.analytical_pulse.AnalyticalPulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalyticalPulse</span></code></a> object as its argument and
+returns and appropriate numerical value.</p>
+<dl class="py attribute">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.unit_convert">
+<code class="sig-name descname">unit_convert</code><em class="property"> = &lt;qdyn.units.UnitConvert object&gt;</em><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.unit_convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.register_formula">
+<em class="property">classmethod </em><code class="sig-name descname">register_formula</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">formula</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.register_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.register_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a new analytical formula</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the formula</p></li>
+<li><p><strong>formula</strong> (<em>callable</em>) – callable that takes an tgrid numpy array and an
+arbitrary number of (keyword) arguments and returns a numpy
+array of amplitude values</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.t0">
+<em class="property">property </em><code class="sig-name descname">t0</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.t0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time at which the pulse begins (dt/2 before the first point in the
+pulse), as instance of <a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitFloat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.T">
+<em class="property">property </em><code class="sig-name descname">T</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.T" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time at which the pulse ends (dt/2 after the last point in the
+pulse), as an instance of <a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitFloat</span></code></a>.</p>
+<p>None if T was given as None in initialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.tgrid">
+<em class="property">property </em><code class="sig-name descname">tgrid</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.tgrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time grid points for the numerical pulse values, as numpy array in
+units of <a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.time_unit" title="qdyn.analytical_pulse.AnalyticalPulse.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a>.</p>
+<p>None if missing <cite>T</cite>, <cite>nt</cite> in initialization.</p>
+<p>The returned time grid has <code class="docutils literal notranslate"><span class="pre">nt</span> <span class="pre">-</span> <span class="pre">1</span></code> values, and extends from <code class="docutils literal notranslate"><span class="pre">t0</span> <span class="pre">+</span>
+<span class="pre">dt/2</span></code> to <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">-</span> <span class="pre">dt/2</span></code>, matching the requirements for the <cite>tgrid</cite>
+argument of <a class="reference internal" href="qdyn.pulse.html#qdyn.pulse.Pulse" title="qdyn.pulse.Pulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pulse</span></code></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.states_tgrid" title="qdyn.analytical_pulse.AnalyticalPulse.states_tgrid"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states_tgrid</span></code></a> is the time grid of length <code class="docutils literal notranslate"><span class="pre">nt</span></code> from <code class="docutils literal notranslate"><span class="pre">t0</span></code>
+to <code class="docutils literal notranslate"><span class="pre">T</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.states_tgrid">
+<em class="property">property </em><code class="sig-name descname">states_tgrid</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.states_tgrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time grid values for the states propagated under the numerical pulse
+values, as numpy array in units of <a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.time_unit" title="qdyn.analytical_pulse.AnalyticalPulse.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a>.</p>
+<p>None if missing <cite>T</cite>, <cite>nt</cite> in initialization.</p>
+<p>The returned time grid has <code class="docutils literal notranslate"><span class="pre">nt</span></code> values, and extends from <code class="docutils literal notranslate"><span class="pre">t0</span></code>
+to <code class="docutils literal notranslate"><span class="pre">T</span></code> (inclusive).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>attr:<cite>tgrid</cite> is the time grid for the numerical pulse values of
+length <code class="docutils literal notranslate"><span class="pre">nt-1</span></code>, extending from <code class="docutils literal notranslate"><span class="pre">t0</span> <span class="pre">+</span> <span class="pre">dt/2</span></code> to <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">-</span> <span class="pre">dt/2</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.dt">
+<em class="property">property </em><code class="sig-name descname">dt</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time grid step, as instance of <a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitFloat</span></code></a></p>
+<p>None if time grid is not defined (missing T, nt in initialization).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.nt">
+<em class="property">property </em><code class="sig-name descname">nt</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.nt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of time steps in the time grid between <a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.t0" title="qdyn.analytical_pulse.AnalyticalPulse.t0"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t0</span></code></a> and
+<a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.T" title="qdyn.analytical_pulse.AnalyticalPulse.T"><code class="xref py py-attr docutils literal notranslate"><span class="pre">T</span></code></a>, as an integer.</p>
+<p>None if <cite>nt</cite> missing in initialization.</p>
+<p>Note that this is the length of <a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.states_tgrid" title="qdyn.analytical_pulse.AnalyticalPulse.states_tgrid"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states_tgrid</span></code></a>, not of
+<a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.tgrid" title="qdyn.analytical_pulse.AnalyticalPulse.tgrid"><code class="xref py py-attr docutils literal notranslate"><span class="pre">tgrid</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.w_max">
+<em class="property">property </em><code class="sig-name descname">w_max</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.w_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum frequency that can be represented with the
+current sampling rate.</p>
+<p>None if time grid is not defined (missing T, nt in initialization).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.dw">
+<em class="property">property </em><code class="sig-name descname">dw</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.dw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Step width in the spectrum (i.e. the spectral resolution)
+based on the current pulse duration, as an instance of
+<a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitFloat</span></code></a>.</p>
+<p>None if time grid is not defined (missing T, nt in initialization).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.from_func">
+<em class="property">classmethod </em><code class="sig-name descname">from_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">t0</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">T</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config_attribs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.from_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.from_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate directly from a callable <cite>func</cite>, without the need to
+register the formula first</p>
+<p>The callable <cite>func</cite> must fulfill the same requirements as <cite>formula</cite> in
+<a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.register_formula" title="qdyn.analytical_pulse.AnalyticalPulse.register_formula"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_formula()</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.is_complex">
+<em class="property">property </em><code class="sig-name descname">is_complex</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.is_complex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the pulse amplitude of complex type?</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two pulses, within a precision of 1e-12</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of the analytical pulse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.array_to_parameters">
+<code class="sig-name descname">array_to_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">array</span></em>, <em class="sig-param"><span class="n">keys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.array_to_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.array_to_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpack the given array (numpy array or regular list) into the pulse
+parameters. This is especially useful for optimizing parameters with
+the <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a> routine.</p>
+<p>For each key, set the value of the <cite>parameters[key]</cite> attribute by
+popping values from the beginning of the array. If <cite>parameters[key]</cite> is
+an array, pop repeatedly to set every value.</p>
+<p>If <cite>keys</cite> is not given, all parameter keys are used, in sorted order.
+The array must contain exactly enough parameters, otherwise an
+<cite>IndexError</cite> is raised.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.parameters_to_array">
+<code class="sig-name descname">parameters_to_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.parameters_to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.parameters_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse method to <cite>array_to_parameters</cite>. Returns the “packed”
+parameter values for the given keys as a numpy array</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.formula_name">
+<em class="property">property </em><code class="sig-name descname">formula_name</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.formula_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the analytical formula that is used</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.evaluate_formula">
+<em class="property">property </em><code class="sig-name descname">evaluate_formula</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.evaluate_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>The callable that numerically evaluates the used formula, for
+arbitrary parameters (keyword arguments)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.as_func">
+<code class="sig-name descname">as_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">allow_args</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.as_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.as_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callable that evaluates the pulse for a given time value.</p>
+<p>If <cite>allow_args</cite> is True, the resulting function takes two parameters,
+<cite>t</cite> and <cite>args</cite> where <cite>t</cite> is a float for the time value at which to
+evaluate the pulse (in units of <a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.time_unit" title="qdyn.analytical_pulse.AnalyticalPulse.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a>), and <cite>args</cite> is a
+dictionary that allows to override attr:<cite>parameters</cite>.</p>
+<p>If <cite>allow_args</cite> is False, the resulting function will only take a
+single parameter <cite>t</cite>, and evaluate the function for fixed
+<a class="reference internal" href="#qdyn.analytical_pulse.AnalyticalPulse.parameters" title="qdyn.analytical_pulse.AnalyticalPulse.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pretty</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a json representation of the pulse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return string representation (JSON)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">pretty</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the analytical pulse to the given filename as a json data
+structure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.header">
+<em class="property">property </em><code class="sig-name descname">header</code><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single line summarizing the pulse. Suitable as preamble for
+numerical pulse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.read">
+<em class="property">classmethod </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a json data structure and return a new <cite>AnalyticalPulse</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.analytical_pulse.AnalyticalPulse.to_num_pulse">
+<code class="sig-name descname">to_num_pulse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tgrid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/analytical_pulse.html#AnalyticalPulse.to_num_pulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.analytical_pulse.AnalyticalPulse.to_num_pulse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="qdyn.pulse.html#qdyn.pulse.Pulse" title="qdyn.pulse.Pulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pulse</span></code></a> instance that contains the
+corresponding numerical pulse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tgrid</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The time grid on which to evaluate
+the pulse. Use <a class="reference internal" href="qdyn.pulse.html#qdyn.pulse.pulse_tgrid" title="qdyn.pulse.pulse_tgrid"><code class="xref py py-func docutils literal notranslate"><span class="pre">pulse_tgrid()</span></code></a> to generate this.</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Unit of <cite>tgrid</cite></p></li>
+<li><p><strong>ampl_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Unit of pulse amplitude</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Unit of pulse frequencies</p></li>
+</ul>
+</dd>
+</dl>
+<p>For any missing argument (None value), the corresponding attribute is
+used.</p>
+<p>Returns None if <cite>tgrid</cite> is not given explicitly and no time grid was
+defined on initialization (arguments <cite>T</cite>, <cite>nt</cite>)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="qdyn.config.html" class="btn btn-neutral float-right" title="qdyn.config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="qdyn.html" class="btn btn-neutral float-left" title="qdyn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

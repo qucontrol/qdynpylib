@@ -1,0 +1,1093 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.pulse module &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdyn.shutil module" href="qdyn.shutil.html" />
+    <link rel="prev" title="qdyn.prop_gate module" href="qdyn.prop_gate.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the QDYN-pylib package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qdyn.analytical_pulse.html">qdyn.analytical_pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.config.html">qdyn.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.io.html">qdyn.io module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.linalg.html">qdyn.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.memoize.html">qdyn.memoize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.model.html">qdyn.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.prop_gate.html">qdyn.prop_gate module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qdyn.pulse module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.shutil.html">qdyn.shutil module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.testing.html">qdyn.testing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.units.html">qdyn.units module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="qdyn.html">qdyn package</a> &raquo;</li>
+        
+      <li>qdyn.pulse module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-qdyn.pulse">
+<span id="qdyn-pulse-module"></span><h1>qdyn.pulse module<a class="headerlink" href="#module-qdyn.pulse" title="Permalink to this headline">¶</a></h1>
+<p>Module containing the <a class="reference internal" href="#qdyn.pulse.Pulse" title="qdyn.pulse.Pulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pulse</span></code></a> class and functions for initializing
+pulse shapes.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.pulse.Pulse" title="qdyn.pulse.Pulse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pulse</span></code></a></p></td>
+<td><p>Numerical real or complex control pulse</p></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.pulse.CRAB_carrier" title="qdyn.pulse.CRAB_carrier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRAB_carrier</span></code></a></p></td>
+<td><p>Construct a “carrier” based on the CRAB formula</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.pulse.blackman" title="qdyn.pulse.blackman"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackman</span></code></a></p></td>
+<td><p>Return a Blackman function between <cite>t_start</cite> and <cite>t_stop</cite>, see <a class="reference external" href="http://en.wikipedia.org/wiki/Window_function#Blackman_windows">http://en.wikipedia.org/wiki/Window_function#Blackman_windows</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.pulse.carrier" title="qdyn.pulse.carrier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">carrier</span></code></a></p></td>
+<td><p>Create the “carrier” of the pulse as a weighted superposition of cosines at different frequencies.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.pulse.gaussian" title="qdyn.pulse.gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian</span></code></a></p></td>
+<td><p>Return a Gaussian shape with peak amplitude 1.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.pulse.pulse_tgrid" title="qdyn.pulse.pulse_tgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pulse_tgrid</span></code></a></p></td>
+<td><p>Return a pulse time grid suitable for an equidistant time grid of the states between t0 and T with nt intervals.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.pulse.tgrid_from_config" title="qdyn.pulse.tgrid_from_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tgrid_from_config</span></code></a></p></td>
+<td><p>Extract the time grid from the given config file</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="qdyn.pulse.Pulse">
+<em class="property">class </em><code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">Pulse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tgrid</span></em>, <em class="sig-param"><span class="n">amplitude</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config_attribs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Numerical real or complex control pulse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tgrid</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – Time grid values</p></li>
+<li><p><strong>amplitude</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#complex" title="(in Python v3.8)"><em>complex</em></a><em>)</em>) – Amplitude values. If not given, amplitude will be zero</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of values in <cite>tgrid</cite>. Will be ignored when
+reading from file.</p></li>
+<li><p><strong>ampl_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of values in <cite>amplitude</cite>. Will be ignored when
+reading from file.</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of frequencies when calculating spectrum. If not
+given, an appropriate unit based on <cite>time_unit</cite> will be chosen, if
+possible (or a <cite>TypeError</cite> will be raised.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.tgrid">
+<code class="sig-name descname">tgrid</code><a class="headerlink" href="#qdyn.pulse.Pulse.tgrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>time points at which the pulse values
+are defined, from <code class="docutils literal notranslate"><span class="pre">t0</span> <span class="pre">+</span> <span class="pre">dt/2</span></code> to <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">-</span> <span class="pre">dt/2</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.amplitude">
+<code class="sig-name descname">amplitude</code><a class="headerlink" href="#qdyn.pulse.Pulse.amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>array
+of real or complex pulse values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>), <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#complex" title="(in Python v3.8)">complex</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.time_unit">
+<code class="sig-name descname">time_unit</code><a class="headerlink" href="#qdyn.pulse.Pulse.time_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit of values in <cite>tgrid</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.ampl_unit">
+<code class="sig-name descname">ampl_unit</code><a class="headerlink" href="#qdyn.pulse.Pulse.ampl_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit of values in <cite>amplitude</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.freq_unit">
+<code class="sig-name descname">freq_unit</code><a class="headerlink" href="#qdyn.pulse.Pulse.freq_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit to use for frequency when calculating the
+spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.preamble">
+<code class="sig-name descname">preamble</code><a class="headerlink" href="#qdyn.pulse.Pulse.preamble" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of lines that are written before the header
+when writing the pulse to file. Each line should start with ‘# ‘</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.postamble">
+<code class="sig-name descname">postamble</code><a class="headerlink" href="#qdyn.pulse.Pulse.postamble" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of lines that are written after all data
+lines. Each line should start with ‘# ‘</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.config_attribs">
+<code class="sig-name descname">config_attribs</code><a class="headerlink" href="#qdyn.pulse.Pulse.config_attribs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Additional config data, for when generating a
+QDYN config file section describing the pulse (e.g.
+<cite>{‘oct_shape’: ‘flattop’, ‘t_rise’: ‘10_ns’}</cite>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><dl class="simple">
+<dt>unit_convert (QDYN.units.UnitConvert): converter to be used for any</dt><dd><p>unit conversion within any methods</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tgrid</span> <span class="o">=</span> <span class="n">pulse_tgrid</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amplitude</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">tgrid</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pulse</span><span class="p">(</span><span class="n">tgrid</span><span class="o">=</span><span class="n">tgrid</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span>
+<span class="gp">... </span>          <span class="n">ampl_unit</span><span class="o">=</span><span class="s1">&#39;MHz&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;pulse.dat&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">Pulse</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;pulse.dat&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">unlink</span><span class="p">;</span> <span class="n">unlink</span><span class="p">(</span><span class="s1">&#39;pulse.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>It is important to remember that the QDYN Fortran library considers
+pulses to be defined on the intervals of the propagation time grid
+(i.e. for a time grid with n time steps of dt, the pulse will have n-1
+points, defined at points shifted by dt/2)</p>
+<p>The <cite>pulse_tgrid</cite> and <cite>tgrid_from_config</cite> routine may be used to obtain
+the proper pulse time grid from the propagation time grid:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pulse</span><span class="p">(</span><span class="n">tgrid</span><span class="o">=</span><span class="n">pulse_tgrid</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">ampl_unit</span><span class="o">=</span><span class="s1">&#39;MHz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>          <span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">tgrid</span><span class="p">)</span>
+<span class="go">99</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span>
+<span class="go">0.10101_ns</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">t0</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">tgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">0.05051</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+<span class="go">10_ns</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">tgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">9.94949</span>
+</pre></div>
+</div>
+<p>The type of the <cite>amplitude</cite> (not whether there is a non-zero
+imaginary part) decide whether the pulse is considered real or complex.
+Complex pulses are not allowed to couple to Hermitian operators, and
+in an optimization, both the real and imaginary part of the pulse are
+modified.</p>
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.unit_convert">
+<code class="sig-name descname">unit_convert</code><em class="property"> = &lt;qdyn.units.UnitConvert object&gt;</em><a class="headerlink" href="#qdyn.pulse.Pulse.unit_convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.pulse.Pulse.freq_units">
+<code class="sig-name descname">freq_units</code><em class="property"> = {'au': 'au', 'dimensionless': 'dimensionless', 'fs': 'eV', 'iu': 'iu', 'microsec': 'MHz', 'ns': 'GHz', 'ps': 'cminv', 'unitless': 'unitless'}</em><a class="headerlink" href="#qdyn.pulse.Pulse.freq_units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.__eq__">
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two pulses, within a precision of 1e-12</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of the pulse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.read">
+<em class="property">classmethod </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ignore_header</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a pulse from file, in the format generated by the QDYN
+<code class="docutils literal notranslate"><span class="pre">write_pulse</span></code> routine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path and name of file from which to read the pulse</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The unit of the time grid</p></li>
+<li><p><strong>ampl_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The unit of the pulse amplitude.</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Intended value for the <cite>freq_unit</cite>
+attribute. If None, a <cite>freq_unit</cite> will be chosen automatically,
+if possible (or a <cite>TypeError</cite> will be raised)</p></li>
+<li><p><strong>ignore_header</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, the file header will be ignored.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, the file is assumed to contain a header that
+identifies the columns and their units, as a comment line
+immediately preceding the data. If <cite>time_unit</cite> or <cite>ampl_unit</cite> are
+None, and <cite>ignore_header</cite> is False, the respective unites are
+extracted from the header line. If <cite>time_unit</cite> or <cite>ampl_unit</cite> are
+not None, the respective values will be converted from the unit
+specified in the file header. If <cite>ignore_header</cite> is True, both
+<cite>time_unit</cite> and <cite>ampl_unit</cite> must be given. This can be used to read
+in pulses that were not generated by the QDYN <code class="docutils literal notranslate"><span class="pre">write_pulse</span></code>
+routine.  Note that if <cite>ignore_header</cite> is True, <em>all</em> comment lines
+preceding the data will be included in the <cite>preamble</cite> attribute.</p>
+<p>The <cite>write</cite> method allows to restore <em>exactly</em> the original pulse
+file.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.from_func">
+<em class="property">classmethod </em><code class="sig-name descname">from_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tgrid</span></em>, <em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config_attribs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.from_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.from_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a pulse from an amplitude function <cite>func</cite>.</p>
+<p>All other parameters are passed on to <cite>__init__</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.dt">
+<em class="property">property </em><code class="sig-name descname">dt</code><a class="headerlink" href="#qdyn.pulse.Pulse.dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time grid step, as instance of <cite>UnitFloat</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.t0">
+<em class="property">property </em><code class="sig-name descname">t0</code><a class="headerlink" href="#qdyn.pulse.Pulse.t0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time at which the pulse begins (dt/2 before the first point in the
+pulse), as instance of <cite>UnitFloat</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.states_tgrid">
+<em class="property">property </em><code class="sig-name descname">states_tgrid</code><a class="headerlink" href="#qdyn.pulse.Pulse.states_tgrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time grid values for the states propagated under the numerical pulse
+values, as numpy array in units of <a class="reference internal" href="#qdyn.pulse.Pulse.time_unit" title="qdyn.pulse.Pulse.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a>.</p>
+<p>The returned time grid has one point more than <a class="reference internal" href="#qdyn.pulse.Pulse.tgrid" title="qdyn.pulse.Pulse.tgrid"><code class="xref py py-attr docutils literal notranslate"><span class="pre">tgrid</span></code></a>, and
+extends from <a class="reference internal" href="#qdyn.pulse.Pulse.t0" title="qdyn.pulse.Pulse.t0"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t0</span></code></a> to <a class="reference internal" href="#qdyn.pulse.Pulse.T" title="qdyn.pulse.Pulse.T"><code class="xref py py-attr docutils literal notranslate"><span class="pre">T</span></code></a> (inclusive).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.w_max">
+<em class="property">property </em><code class="sig-name descname">w_max</code><a class="headerlink" href="#qdyn.pulse.Pulse.w_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum frequency that can be represented with the
+current sampling rate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.dw">
+<em class="property">property </em><code class="sig-name descname">dw</code><a class="headerlink" href="#qdyn.pulse.Pulse.dw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Step width in the spectrum (i.e. the spectral resolution)
+based on the current pulse duration, as an instance of
+<a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitFloat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.T">
+<em class="property">property </em><code class="sig-name descname">T</code><a class="headerlink" href="#qdyn.pulse.Pulse.T" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time at which the pulse ends (dt/2 after the last point in the
+pulse), as an instance of <a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitFloat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.is_complex">
+<em class="property">property </em><code class="sig-name descname">is_complex</code><a class="headerlink" href="#qdyn.pulse.Pulse.is_complex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the pulse amplitude of complex type?</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.as_func">
+<code class="sig-name descname">as_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interpolation</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">allow_args</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.as_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.as_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callable that evaluates the pulse for a given time value.</p>
+<p>Possible values for <cite>interpolation</cite> are ‘linear’ and ‘piecewise’.</p>
+<p>The resulting function takes an argument <cite>t</cite> that must be a float
+in the range [<a class="reference internal" href="#qdyn.pulse.Pulse.t0" title="qdyn.pulse.Pulse.t0"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t0</span></code></a>, <a class="reference internal" href="#qdyn.pulse.Pulse.T" title="qdyn.pulse.Pulse.T"><code class="xref py py-attr docutils literal notranslate"><span class="pre">T</span></code></a>] and in units of
+<a class="reference internal" href="#qdyn.pulse.Pulse.time_unit" title="qdyn.pulse.Pulse.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a>). It returns the
+(interpolated) pulse amplitude as a float, in units of
+<a class="reference internal" href="#qdyn.pulse.Pulse.ampl_unit" title="qdyn.pulse.Pulse.ampl_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ampl_unit</span></code></a></p>
+<p>If <cite>allow_args</cite> is True, the resulting function takes a second argument
+<cite>args</cite> that is ignored. This is for compatibility with qutip, see
+<a class="reference external" href="http://qutip.org/docs/latest/guide/dynamics/dynamics-time.html">http://qutip.org/docs/latest/guide/dynamics/dynamics-time.html</a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.convert">
+<code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ampl_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the pulse data to different units</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.get_timegrid_point">
+<code class="sig-name descname">get_timegrid_point</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">move</span><span class="o">=</span><span class="default_value">'left'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.get_timegrid_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.get_timegrid_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next point to the left (or right) of the given <cite>t</cite> which
+is on the pulse time grid</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.fluence">
+<em class="property">property </em><code class="sig-name descname">fluence</code><a class="headerlink" href="#qdyn.pulse.Pulse.fluence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fluence (integrated pulse energy) for the pulse</p>
+<div class="math notranslate nohighlight">
+\[\int_{-\infty}^{\infty} \vert|E(t)\vert^2 dt\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.oct_iter">
+<em class="property">property </em><code class="sig-name descname">oct_iter</code><a class="headerlink" href="#qdyn.pulse.Pulse.oct_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>OCT iteration number from the pulse preamble, if available. If not
+available, 0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.spectrum">
+<code class="sig-name descname">spectrum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'complex'</span></em>, <em class="sig-param"><span class="n">sort</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the spectrum of the pulse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Desired unit of the <cite>freq</cite> output array.
+Can Hz (GHz, Mhz, etc) to obtain frequencies, or any energy
+unit, using the correspondence <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">E/h</span></code>. If not given,
+defaults to the <cite>freq_unit</cite> attribute</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Wanted mode for <cite>spectrum</cite> output array.
+Possible values are ‘complex’, ‘abs’, ‘real’, ‘imag’</p></li>
+<li><p><strong>sort</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Sort the output <cite>freq</cite> array (and the output
+<cite>spectrum</cite> array) so that frequecies are ordered from
+<code class="docutils literal notranslate"><span class="pre">-w_max</span> <span class="pre">..</span> <span class="pre">0</span> <span class="pre">..</span> <span class="pre">w_max</span></code>, instead of the direct output from the
+FFT. This is good for plotting, but does not allow to do an
+inverse Fourier transform afterwards</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Frequency values
+associated with the amplitude values in <cite>spectrum</cite>, i.e. the x-axis
+of the spectrogram. The values are in the unit <cite>freq_unit</cite>.
+Real (<cite>mode in [‘abs’, ‘real’, ‘imag’]</cite>) or complex
+(<cite>mode=’complex’</cite>) amplitude of each frequency component.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>), <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#complex" title="(in Python v3.8)">complex</a>)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <cite>sort=False</cite> and <cite>mode=’complex’</cite>, the original pulse
+values can be obtained by simply calling <cite>np.fft.ifft</cite></p>
+<p>The spectrum is not normalized (Scipy follows the convention of
+doing the normalization on the backward transform). You might want
+to normalized by 1/n for plotting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.fftfreq">
+<code class="sig-name descname">fftfreq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.fftfreq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.fftfreq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the FFT frequencies associated with the pulse. Cf.
+<cite>numpy.fft.fftfreq</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Desired unit of the output array.
+If not given, defaults to the <cite>freq_unit</cite> attribute</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Frequency values associated with
+the pulse time grid.
+The first half of the <cite>freq</cite> array contains the
+positive frequencies, the second half the negative frequencies</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.derivative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the derivative of the current pulse and return it as a new
+pulse. Note that the derivative is in units of <cite>ampl_unit</cite>/<cite>time_unit</cite>,
+but will be marked as ‘unitless’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.phase">
+<code class="sig-name descname">phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unwrap</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">derivative</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the pulse’s complex phase, or derivative of the phase</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unwrap</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If False, report the phase in <code class="docutils literal notranslate"><span class="pre">[-pi:pi]</span></code>. If True,
+the phase may take any real value, avoiding the discontinuous
+jumps introduced by limiting the phase to a 2 pi interval.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – smoothing parameter, see
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.UnivariateSpline.html#scipy.interpolate.UnivariateSpline" title="(in SciPy v1.6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.interpolate.UnivariateSpline</span></code></a>. If None, no
+smoothing is performed.</p></li>
+<li><p><strong>derivative</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If False, return the (smoothed) phase directly.
+If True, return the derivative of the (smoothed) phase.</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – If <cite>derivative</cite> is True, the unit in which
+the derivative should be calculated. If None, <cite>self.freq_unit</cite>
+is used.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When calculating the derivative, some smoothing is generally
+required. By specifying a smoothing parameter <cite>s</cite>, the phase is
+smoothed through univeriate splines before calculating the
+derivative.</p>
+<p>When calculating the phase directly (instead of the derivative),
+smoothing should only be used when also unwrapping the phase.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a pulse to file, in the same format as the QDYN <cite>write_pulse</cite>
+routine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file to which to write the pulse</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Mode in which to write files. Possible values
+are ‘abs’, ‘real’, or ‘complex’. The former two result in a
+two-column file, the latter in a three-column file. If not
+given, ‘real’ or ‘complex’ is used, depending on the type of
+<a class="reference internal" href="#qdyn.pulse.Pulse.amplitude" title="qdyn.pulse.Pulse.amplitude"><code class="xref py py-attr docutils literal notranslate"><span class="pre">amplitude</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.write_oct_spectral_filter">
+<code class="sig-name descname">write_oct_spectral_filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">filter_func</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.write_oct_spectral_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.write_oct_spectral_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a spectral filter function and write the result to the file
+with a given <cite>filename</cite>, in a format such that the file may be used for
+the <cite>oct_spectral_filter</cite> field of a pulse in a QDYN config file. The
+file will have two columns: The pulse frequencies (see <cite>fftfreq</cite>
+method), and the value of the filter function in the range [0, 1]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Filename of the output file</p></li>
+<li><p><strong>filter_func</strong> (<em>callable</em>) – A function that takes a frequency values
+(in units of <cite>freq_unit</cite>) and returns a filter value in the
+range [0, 1]</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of frequencies that <cite>filter_func</cite>
+assumes.  If not given, defaults to the <cite>freq_unit</cite> attribute.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <cite>filter_func</cite> function may return any values that numpy
+considers equivalent to floats in the range [0, 1]. This
+includes boolean values, where True is equivalent to 1.0 and
+False is equivalent to 0.0</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.apply_spectral_filter">
+<code class="sig-name descname">apply_spectral_filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filter_func</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.apply_spectral_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.apply_spectral_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a spectral filter function to the pulse (in place)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter_func</strong> (<em>callable</em>) – A function that takes a frequency values
+(in units of <cite>freq_unit</cite>) and returns a filter value in the
+range [0, 1]</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of frequencies that <cite>filter_func</cite>
+assumes.  If not given, defaults to the <cite>freq_unit</cite> attribute.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.apply_smoothing">
+<code class="sig-name descname">apply_smoothing</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.apply_smoothing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.apply_smoothing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth the pulse amplitude (in place) through univariate splining.
+All keyword arguments are passed directly to
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.UnivariateSpline.html#scipy.interpolate.UnivariateSpline" title="(in SciPy v1.6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.interpolate.UnivariateSpline</span></code></a>. This especially
+includes the smoothing parameter <cite>s</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.resample">
+<code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">upsample</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">downsample</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resample the pulse, either by giving an upsample ratio, a downsample
+ration, or a number of sampling points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>upsample</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Factor by which to increase the number of
+samples. Afterwards, those points extending beyond the original
+end point of the pulse are discarded.</p></li>
+<li><p><strong>downsample</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – For <code class="docutils literal notranslate"><span class="pre">downsample=n</span></code>, keep only every
+n’th point of the original pulse. This may cause the resampled
+pulse to end earlier than the original pulse</p></li>
+<li><p><strong>num</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Resample with <cite>num</cite> sampling points. This may
+case the end point of the resampled pulse to change</p></li>
+<li><p><strong>window</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>, </em><em>callable</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a>) – Specifies the window applied to the signal in the Fourier
+domain.  See <cite>sympy.signal.resample</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Exactly one of <cite>upsample</cite>, <cite>downsample</cite>, or <cite>num</cite> must be given.</p>
+<p>Upsampling will maintain the pulse start and end point (as returned
+by the <cite>T</cite> and <cite>t0</cite> properties), up to some rounding errors.
+Downsampling, or using an arbitrary number will change the end
+point of the pulse in general.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.render_pulse">
+<code class="sig-name descname">render_pulse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">'pulse'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.render_pulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.render_pulse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the pulse amplitude on the given axes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.render_phase">
+<code class="sig-name descname">render_phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">'phase'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.render_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.render_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the complex phase of the pulse on the given axes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.render_spectrum">
+<code class="sig-name descname">render_spectrum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">wmin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_scale</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_max</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mark_freqs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mark_freq_points</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">'spectrum'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.render_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.render_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render spectrum onto the given axis, see <cite>plot</cite> for arguments</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_pulse</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_spectrum</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zoom</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">wmin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_scale</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_max</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mark_freqs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mark_freq_points</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">figargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a plot of the pulse on a given figure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> (<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.3.3)"><em>matplotlib.figure.Figure</em></a>) – The figure onto which to plot. If
+not given, create a new figure from <cite>matplotlib.pyplot.figure</cite></p></li>
+<li><p><strong>show_pulse</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Include a plot of the pulse amplitude? If the
+pulse has a vanishing imaginary part, the plot will show the
+real part of the amplitude, otherwise, there will be one plot
+for the absolute value of the amplitude and one showing the
+complex phase in units of pi</p></li>
+<li><p><strong>show_spectrum</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Include a plot of the spectrum?</p></li>
+<li><p><strong>zoom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <cite>True</cite>, only show the part of the spectrum that has
+amplitude of at least 0.1% of the maximum peak in the spectrum.
+For real pulses, only the positive part of the spectrum is
+shown</p></li>
+<li><p><strong>wmin</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Lowest frequency to show. Overrides zoom options.
+Must be given together with <cite>wmax</cite>.</p></li>
+<li><p><strong>wmax</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Highest frequency to show. Overrides zoom options.
+Must be given together with <cite>wmin</cite>.</p></li>
+<li><p><strong>spec_scale</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Factor by which to scale the amplitudes in the
+spectrum</p></li>
+<li><p><strong>spec_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Maximum amplitude in the spectrum, after
+spec_scale has been applied</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit in which to show the frequency axis in the
+spectrum. If not given, use the <cite>freq_unit</cite> attribute</p></li>
+<li><p><strong>mark_freqs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>)</em><em>)</em>) – Array of frequencies to mark in spectrum as vertical dashed
+lines.  If list of tuples (float, dict), the float value is the
+frequency to mark, and the dict gives the keyword arguments
+that are passed to the matplotlib <cite>axvline</cite> method.</p></li>
+<li><p><strong>mark_freq_points</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.markers.MarkerStyle.html#matplotlib.markers.MarkerStyle" title="(in Matplotlib v3.3.3)"><em>MarkerStyle</em></a>) – Marker to
+be used to indicate the individual points in the spectrum.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The remaining figargs are passed to <cite>matplotlib.pyplot.figure</cite> to
+create a new figure if <cite>fig</cite> is None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a plot of the pulse and its spectrum. All arguments will be
+passed to the plot method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.show_pulse">
+<code class="sig-name descname">show_pulse</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.show_pulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.show_pulse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a plot of the pulse amplitude; alias for
+<cite>show(show_spectrum=False)</cite>. All other arguments will be passed to the
+<cite>show</cite> method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.pulse.Pulse.show_spectrum">
+<code class="sig-name descname">show_spectrum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">zoom</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">freq_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#Pulse.show_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.Pulse.show_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a plot of the pulse spectrum; alias for
+<cite>show(show_pulse=False, zoom=zoom, freq_unit=freq_unit)</cite>. All other
+arguments will be passed to the <cite>show</cite> method</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.pulse.pulse_tgrid">
+<code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">pulse_tgrid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">nt</span></em>, <em class="sig-param"><span class="n">t0</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#pulse_tgrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.pulse_tgrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pulse time grid suitable for an equidistant time grid of the
+states between t0 and T with nt intervals. The values of the pulse are
+defined in the intervals of the time grid, so the pulse time grid will be
+shifted by dt/2 with respect to the time grid of the states. Also, the
+pulse time grid will have nt-1 points:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">pulse_tgrid</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">nt</span><span class="o">=</span><span class="mi">4</span><span class="p">)]))</span>
+<span class="go">0.25, 0.75, 1.25</span>
+</pre></div>
+</div>
+<p>The limits of the states time grid are defined as the starting and end
+points of the pulse, however:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pulse</span><span class="p">(</span><span class="n">tgrid</span><span class="o">=</span><span class="n">pulse_tgrid</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">ampl_unit</span><span class="o">=</span><span class="s1">&#39;MHz&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">t0</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">T</span>
+<span class="go">1.5_ns</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.pulse.tgrid_from_config">
+<code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">tgrid_from_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tgrid_dict</span></em>, <em class="sig-param"><span class="n">time_unit</span></em>, <em class="sig-param"><span class="n">pulse_grid</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#tgrid_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.tgrid_from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the time grid from the given config file</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tgrid_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s1">&#39;t_start&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t_stop&#39;</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;ns&#39;</span><span class="p">)),</span>
+<span class="gp">... </span>                   <span class="p">(</span><span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;ps&#39;</span><span class="p">)),</span> <span class="p">(</span><span class="s1">&#39;fixed&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tgrid</span> <span class="o">=</span> <span class="n">tgrid_from_config</span><span class="p">(</span><span class="n">tgrid_dict</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">0.01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">9.99</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.pulse.carrier">
+<code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">carrier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">time_unit</span></em>, <em class="sig-param"><span class="n">freq</span></em>, <em class="sig-param"><span class="n">freq_unit</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">phases</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">complex</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#carrier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.carrier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the “carrier” of the pulse as a weighted superposition of
+cosines at different frequencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – Time value or time grid</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of <cite>t</cite></p></li>
+<li><p><strong>freq</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – Carrier frequency or frequencies</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of <cite>freq</cite></p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – If <cite>freq</cite> is an array, weights for
+the different frequencies. If not given, all weights are 1. The
+weights are normalized to sum to one.  Any weight smaller than
+machine precision is assumed zero.</p></li>
+<li><p><strong>phases</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – If <cite>phases</cite> is an array, phase shift
+for each frequency component, in units of pi. If not given, all
+phases are 0.</p></li>
+<li><p><strong>complex</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <cite>True</cite>, oscillate in the complex plane</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Depending on whether
+<cite>complex</cite> is <cite>True</cite> or <cite>False</cite>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}s(t) = \sum_j  w_j * \cos(\omega_j * t + \phi_j) \\
+s(t) = \sum_j  w_j * \exp(i*(\omega_j * t + \phi_j))\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\omega_j = 2 * \pi * f_j\)</span>, and frequency
+<span class="math notranslate nohighlight">\(f_j\)</span> where <span class="math notranslate nohighlight">\(f_j\)</span> is the j’th value in <cite>freq</cite>. The
+value of <span class="math notranslate nohighlight">\(\phi_j\)</span> is the j’th value in <cite>phases</cite></p>
+<p><cite>signal</cite> is a scalar if <cite>t</cite> is a scalar, and and array if <cite>t</cite>
+is an array</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#complex" title="(in Python v3.8)">complex</a>)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><cite>freq_unit</cite> can be Hz (GHz, MHz, etc), describing the frequency
+directly, or any energy unit, in which case the energy value E (given
+through the freq parameter) is converted to an actual frequency as</p>
+<div class="math notranslate nohighlight">
+\[f = E / (\hbar * 2 * \pi)\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.pulse.CRAB_carrier">
+<code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">CRAB_carrier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">time_unit</span></em>, <em class="sig-param"><span class="n">freq</span></em>, <em class="sig-param"><span class="n">freq_unit</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">normalize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">complex</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#CRAB_carrier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.CRAB_carrier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a “carrier” based on the CRAB formula</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))\]</div>
+</div></blockquote>
+<p>where <span class="math notranslate nohighlight">\(a_n\)</span> is the n’th element of <cite>a</cite>, <span class="math notranslate nohighlight">\(b_n\)</span> is the n’th
+element of <cite>b</cite>, and <span class="math notranslate nohighlight">\(\omega_n\)</span> is the n’th element of freq.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – time grid values</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of <cite>t</cite></p></li>
+<li><p><strong>freq</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Carrier frequency or frequencies</p></li>
+<li><p><strong>freq_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of <cite>freq</cite></p></li>
+<li><p><strong>a</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Coefficients for cosines</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Coefficients for sines</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, normalize the resulting carrier
+such that its values are in [-1,1]</p></li>
+<li><p><strong>complex</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <p>If True, oscillate in the complex
+plane</p>
+<div class="math notranslate nohighlight">
+\[E(t) = \sum_{n} (a_n - i b_n) \exp(i \omega_n t)\]</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><cite>freq_unit</cite> can be Hz (GHz, MHz, etc), describing the frequency
+directly, or any energy unit, in which case the energy value E (given
+through the freq parameter) is converted to an actual frequency as</p>
+<div class="math notranslate nohighlight">
+\[f = E / (\hbar * 2 * \pi)\]</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.pulse.gaussian">
+<code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">gaussian</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">t0</span></em>, <em class="sig-param"><span class="n">sigma</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Gaussian shape with peak amplitude 1.0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – time value or grid</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – center of peak</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – width of Gaussian</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Gaussian shape of same type as <cite>t</cite></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.pulse.blackman">
+<code class="sig-prename descclassname">qdyn.pulse.</code><code class="sig-name descname">blackman</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">t_start</span></em>, <em class="sig-param"><span class="n">t_stop</span></em>, <em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">0.16</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/pulse.html#blackman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.pulse.blackman" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Blackman function between <cite>t_start</cite> and <cite>t_stop</cite>,
+see <a class="reference external" href="http://en.wikipedia.org/wiki/Window_function#Blackman_windows">http://en.wikipedia.org/wiki/Window_function#Blackman_windows</a></p>
+<p>A Blackman shape looks nearly identical to a Gaussian with a 6-sigma
+interval between start and stop  Unlike the Gaussian,
+however, it will go exactly to zero at the edges. Thus, Blackman pulses
+are often preferable to Gaussians.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Time point or time grid</p></li>
+<li><p><strong>t_start</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Starting point of Blackman shape</p></li>
+<li><p><strong>t_stop</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – End point of Blackman shape</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If <cite>t</cite> is a scalar, <cite>blackman_shape</cite> is the scalar value of the
+Blackman shape at <cite>t</cite>.  If <cite>t</cite> is an array, <cite>blackman_shape</cite> is an
+array of same size as <cite>t</cite>, containing the values for the Blackman
+shape (zero before <cite>t_start</cite> and after <cite>t_stop</cite>)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>))</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>numpy.blackman</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="qdyn.shutil.html" class="btn btn-neutral float-right" title="qdyn.shutil module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="qdyn.prop_gate.html" class="btn btn-neutral float-left" title="qdyn.prop_gate module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

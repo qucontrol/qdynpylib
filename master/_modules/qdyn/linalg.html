@@ -1,0 +1,658 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.linalg &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/qdyn.html">API of the qdyn package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>qdyn.linalg</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for qdyn.linalg</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;Linear algebra helper routines&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
+
+
+<div class="viewcode-block" id="inner"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.inner">[docs]</a><span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the inner product of the two vectors or matrices `v1`, `v2`.</span>
+
+<span class="sd">    * For vectors, the inner product is the standard Euclidian inner product.</span>
+
+<span class="sd">    * For matrices, the innner product is the Hilbert-Schmidt overlap.</span>
+
+<span class="sd">    Note that the inner product of the vectorization of two matrices is the</span>
+<span class="sd">    same as the inner product of the original matrices, and that two m x 1</span>
+<span class="sd">    matrices have the same inner product as the corresponding m-dimensional</span>
+<span class="sd">    vectors.</span>
+
+<span class="sd">    The `inner` routine corresponds to `overlap` in QDYN.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        v1 (numpy.ndarray): First argument.</span>
+<span class="sd">            The conjugate transposed of `v1` is taken before the calculation of</span>
+<span class="sd">            the inner product.</span>
+<span class="sd">        v2 (numpy.ndarray): Second argument.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Inner product of `v1` and `v2`.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; v1 = np.array([1.0, 1.0j, 1.0, 1.0j])</span>
+<span class="sd">        &gt;&gt;&gt; v2 = np.array([1.0j, 1.0j, 1.0j, 1.0j])</span>
+<span class="sd">        &gt;&gt;&gt; inner(v1, v2)</span>
+<span class="sd">        (2+2j)</span>
+<span class="sd">        &gt;&gt;&gt; m1 = v1.reshape((2,2))</span>
+<span class="sd">        &gt;&gt;&gt; m2 = v2.reshape((2,2))</span>
+<span class="sd">        &gt;&gt;&gt; inner(m1, m2)</span>
+<span class="sd">        (2+2j)</span>
+<span class="sd">        &gt;&gt;&gt; m1 = v1.reshape((4,1))</span>
+<span class="sd">        &gt;&gt;&gt; m2 = v2.reshape((4,1))</span>
+<span class="sd">        &gt;&gt;&gt; inner(m1, m2)</span>
+<span class="sd">        (2+2j)</span>
+<span class="sd">        &gt;&gt;&gt; m1 = v1.reshape((4,1), order=&#39;F&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; m2 = v2.reshape((4,1), order=&#39;F&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; inner(m1, m2)</span>
+<span class="sd">        (2+2j)</span>
+<span class="sd">        &gt;&gt;&gt; m1 = v1.reshape((1,4), order=&#39;F&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; m2 = v2.reshape((1,4), order=&#39;F&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; inner(m1, m2)</span>
+<span class="sd">        (2+2j)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span> <span class="p">(</span>
+        <span class="s2">&quot;v1 and v2 must be of the same type: types are </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">&quot;</span>
+        <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">v2</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;v1, v2 must be 1D/2D numpy arrays&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;v1, v2 must be matrix or vector&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># vector</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># matrix as 2D array</span>
+        <span class="k">return</span> <span class="n">trace</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">@</span> <span class="n">v2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="trace"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.trace">[docs]</a><span class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the trace of the given matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        m (list, numpy.ndarray): Input array from which the diagonals are taken.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float:</span>
+<span class="sd">        If `m` is a matrix, the sum along the diagonal is returned. If `m` has</span>
+<span class="sd">        larger dimensions, then an array of sums along diagonals is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">))</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="norm"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.norm">[docs]</a><span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the norm of a vector or matrix `v`, matching the inner product</span>
+<span class="sd">    defined in the `inner` routine. An algorithm like</span>
+<span class="sd">    Gram-Schmidt-Orthonormalization will only work if the choice of norm and</span>
+<span class="sd">    inner product are compatible.</span>
+
+<span class="sd">    * If `v` is a vector, the norm is the 2-norm (i.e. the standard Euclidian</span>
+<span class="sd">      vector norm).</span>
+
+<span class="sd">    * If `v` is a matrix, the norm is the Hilbert-Schmidt (aka Frobenius) norm.</span>
+<span class="sd">      Note that the HS norm of a matrix is identical to the 2-norm of any</span>
+<span class="sd">      vectorization of that matrix (e.g. writing the columns of the matrix</span>
+<span class="sd">      underneat each other). Also, the HS norm of the m x 1 matrix is the same</span>
+<span class="sd">      as the 2-norm of the equivalent m-dimensional vector.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        v (numpy.ndarray, scipy.sparse.spmatrix, qutip.Qobj):</span>
+<span class="sd">            Input vector or matrix.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Norm of `v`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Quantum object&#39;</span><span class="p">):</span>  <span class="c1"># qutip.Qobj</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">spmatrix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="vectorize"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.vectorize">[docs]</a><span class="k">def</span> <span class="nf">vectorize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return vectorization of multi-dimensional array `a`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a (list, numpy.ndarray, qutip.Qobj): Array to be vectorized.</span>
+<span class="sd">        order (str): One of &#39;C&#39;, &#39;F&#39;, &#39;A&#39;.</span>
+<span class="sd">           Read the elements of `a` using this index order, and place the</span>
+<span class="sd">           elements into the reshaped array using this index order.  &#39;C&#39;</span>
+<span class="sd">           means to read / write the elements using C-like index order,</span>
+<span class="sd">           with the last axis index changing fastest, back to the first</span>
+<span class="sd">           axis index changing slowest. &#39;F&#39; means to read / write the</span>
+<span class="sd">           elements using Fortran-like index order, with the first index</span>
+<span class="sd">           changing fastest, and the last index changing slowest. Note that</span>
+<span class="sd">           the &#39;C&#39; and &#39;F&#39; options take no account of the memory layout of</span>
+<span class="sd">           the underlying array, and only refer to the order of indexing.</span>
+<span class="sd">           &#39;A&#39; means to read / write the elements in Fortran-like index</span>
+<span class="sd">           order if `a` is Fortran *contiguous* in memory, C-like order</span>
+<span class="sd">           otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The input array, but with all or `a` subset of the</span>
+<span class="sd">        dimensions of length 1 removed. This is always `a` itself or a view</span>
+<span class="sd">        into `a`.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; a = np.array([1,2,3,4])</span>
+<span class="sd">        &gt;&gt;&gt; vectorize(a)</span>
+<span class="sd">        array([1, 2, 3, 4])</span>
+
+<span class="sd">        &gt;&gt;&gt; a = np.array([[1,2],[3,4]])</span>
+<span class="sd">        &gt;&gt;&gt; vectorize(a)</span>
+<span class="sd">        array([1, 3, 2, 4])</span>
+<span class="sd">        &gt;&gt;&gt; vectorize(a, order=&#39;C&#39;)</span>
+<span class="sd">        array([1, 2, 3, 4])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">repr</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Quantum object&#39;</span><span class="p">):</span>  <span class="c1"># qutip.Qobj</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="is_hermitian"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.is_hermitian">[docs]</a><span class="k">def</span> <span class="nf">is_hermitian</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check, if a matrix is Hermitian.</span>
+
+<span class="sd">    `matrix` can be a numpy array, a scipy sparse matrix, or a `qutip.Qobj`</span>
+<span class="sd">    instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matrix (list, numpy.ndarray, qutip.Qobj): Input array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: Returns `True` if matrix is Hermitian, `False` otherwise.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">         &gt;&gt;&gt; m = np.array([[0, 1j], [-1j, 1]])</span>
+<span class="sd">         &gt;&gt;&gt; is_hermitian(m)</span>
+<span class="sd">         True</span>
+
+<span class="sd">         &gt;&gt;&gt; m = np.array([[0, 1j], [-1j, 1j]])</span>
+<span class="sd">         &gt;&gt;&gt; is_hermitian(m)</span>
+<span class="sd">         False</span>
+
+<span class="sd">         &gt;&gt;&gt; m = np.array([[0, -1j], [-1j, 1]])</span>
+<span class="sd">         &gt;&gt;&gt; is_hermitian(m)</span>
+<span class="sd">         False</span>
+
+<span class="sd">         &gt;&gt;&gt; from scipy.sparse import coo_matrix</span>
+<span class="sd">         &gt;&gt;&gt; m  = coo_matrix(np.array([[0, 1j], [-1j, 0]]))</span>
+<span class="sd">         &gt;&gt;&gt; is_hermitian(m)</span>
+<span class="sd">         True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="s1">&#39;isherm&#39;</span><span class="p">):</span>  <span class="c1"># qutip.Qobj</span>
+        <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">isherm</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># any numpy matrix/array or scipy sparse matrix)</span>
+        <span class="c1"># pylint: disable=simplifiable-if-statement</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">matrix</span> <span class="o">-</span> <span class="n">matrix</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()))</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-14</span><span class="p">:</span>
+            <span class="c1"># If we were to &quot;simplify the if statement&quot; and return the above</span>
+            <span class="c1"># expression directly, we might get an instance of numpy.bool_</span>
+            <span class="c1"># instead of the builtin bool that we want.</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="iscomplexobj"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.iscomplexobj">[docs]</a><span class="k">def</span> <span class="nf">iscomplexobj</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether the (multidimensional `x` object) has a type that</span>
+<span class="sd">    allows for complex entries.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: Multidimensional array like object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: Returns `True`, if `x` allows for complex entries, `False`</span>
+<span class="sd">        otherwise.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">         &gt;&gt;&gt; iscomplexobj(1)</span>
+<span class="sd">         False</span>
+<span class="sd">         &gt;&gt;&gt; iscomplexobj(1+0j)</span>
+<span class="sd">         True</span>
+<span class="sd">         &gt;&gt;&gt; iscomplexobj([3, 1+0j, True])</span>
+<span class="sd">         True</span>
+<span class="sd">         &gt;&gt;&gt; iscomplexobj(np.array([3, 1j]))</span>
+<span class="sd">         True</span>
+<span class="sd">         &gt;&gt;&gt; iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5]]))</span>
+<span class="sd">         False</span>
+<span class="sd">         &gt;&gt;&gt; iscomplexobj(scipy.sparse.csr_matrix([[1, 2], [4, 5j]]))</span>
+<span class="sd">         True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This is a workaround for numpy bug #7924. It also works for qutip objects</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># qutip.Qobj</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">numeric</span><span class="o">.</span><span class="n">complexfloating</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="choose_sparsity_model"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.choose_sparsity_model">[docs]</a><span class="k">def</span> <span class="nf">choose_sparsity_model</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Estimate which might be the best storage format for the given matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matrix (numpy.matrix, scipy.sparse.spmatrix, qutip.Qobj):</span>
+<span class="sd">            Input matrix, which must be quadratic.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns one of &#39;full&#39;, &#39;banded&#39;, &#39;dia&#39;, or &#39;indexed&#39;.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; m = scipy.sparse.random(100, 100, 0.01)</span>
+<span class="sd">        &gt;&gt;&gt; choose_sparsity_model(m)</span>
+<span class="sd">        &#39;indexed&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; m = scipy.sparse.random(100, 100, 0.5)</span>
+<span class="sd">        &gt;&gt;&gt; choose_sparsity_model(m)</span>
+<span class="sd">        &#39;full&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; m = np.diag(np.ones(20))</span>
+<span class="sd">        &gt;&gt;&gt; choose_sparsity_model(m)</span>
+<span class="sd">        &#39;banded&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; m = np.diag(np.zeros(20))</span>
+<span class="sd">        &gt;&gt;&gt; m[2,2] = m[10,10] = m[11,11] = 1</span>
+<span class="sd">        &gt;&gt;&gt; choose_sparsity_model(m)</span>
+<span class="sd">        &#39;indexed&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; td_data = np.array([[1, 2, 3, 4]]).repeat(3, axis=0)</span>
+<span class="sd">        &gt;&gt;&gt; off = np.array([0, -1, 1])</span>
+<span class="sd">        &gt;&gt;&gt; m = scipy.sparse.dia_matrix((td_data,off), shape=(5,5)).toarray()</span>
+<span class="sd">        &gt;&gt;&gt; choose_sparsity_model(m) # should eventually be &#39;dia&#39;</span>
+<span class="sd">        &#39;indexed&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; m = scipy.sparse.dia_matrix((td_data,off), shape=(20,20)).toarray()</span>
+<span class="sd">        &gt;&gt;&gt; m[19,19] = 1</span>
+<span class="sd">        &gt;&gt;&gt; choose_sparsity_model(m)</span>
+<span class="sd">        &#39;indexed&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">repr</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Quantum object&#39;</span><span class="p">):</span>  <span class="c1"># qutip.Qobj</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">n</span> <span class="o">==</span> <span class="n">m</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">m</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dia_matrix</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dia_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dia_matrix</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># diagonal matrix</span>
+                <span class="n">nnz</span> <span class="o">=</span> <span class="p">(</span><span class="n">dia_matrix</span><span class="o">.</span><span class="n">data</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">nnz</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s1">&#39;indexed&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s1">&#39;banded&#39;</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dia_matrix</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">nnz</span> <span class="o">=</span> <span class="p">(</span><span class="n">dia_matrix</span><span class="o">.</span><span class="n">data</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">nnz</span> <span class="o">&lt;</span> <span class="n">dia_matrix</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s1">&#39;indexed&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># return &#39;dia&#39; # &#39;dia&#39; is not yet fully implemented in QDYN</span>
+                    <span class="k">return</span> <span class="s1">&#39;indexed&#39;</span>
+        <span class="k">except</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">SparseEfficiencyWarning</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># continue on to coo_matrix</span>
+    <span class="n">coo_matrix</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">coo_matrix</span><span class="o">.</span><span class="n">nnz</span> <span class="o">&lt;=</span> <span class="n">size</span> <span class="o">/</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;indexed&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;full&#39;</span></div>
+
+
+<div class="viewcode-block" id="triu"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.triu">[docs]</a><span class="k">def</span> <span class="nf">triu</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the upper triangle of the given `matrix`.</span>
+
+<span class="sd">    * If `matrix&#39; is a numpy object or scipy sparse matrix, the returned matrix</span>
+<span class="sd">      will have the same type as the input `matrix`.</span>
+
+<span class="sd">    * If `matrix` is a QuTiP operator, the type is *not* preserved:</span>
+<span class="sd">      the result is equivalent to ``triu(matrix.data)``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matrix (numpy.ndarray, scipy.sparse.spmatrix, qutip.Qobj):</span>
+<span class="sd">            Input array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray, scipy.sparse.spmatrix:</span>
+<span class="sd">        Return a copy of the matrix with the elements below the diagonal</span>
+<span class="sd">        zeroed.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If `matrix` has an invalid type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">repr</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Quantum object&#39;</span><span class="p">):</span>  <span class="c1"># qutip.Qobj</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">spmatrix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;matrix must be numpy object, sparse matrix, or &quot;</span> <span class="s2">&quot;QuTiP operator&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="tril"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.tril">[docs]</a><span class="k">def</span> <span class="nf">tril</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the lower triangle of the given `matrix`.</span>
+
+<span class="sd">    * If `matrix&#39; is a numpy object or scipy sparse matrix, the returned matrix</span>
+<span class="sd">      will have the same type as the input `matrix`.</span>
+
+<span class="sd">    * If `matrix` is a QuTiP operator, the type is *not* preserved:</span>
+<span class="sd">      the result is equivalent to ``tril(matrix.data)``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matrix (numpy.ndarray, scipy.sparse.spmatrix, qutip.Qobj):</span>
+<span class="sd">            Input array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray, scipy.sparse.spmatrix:</span>
+<span class="sd">        Return a copy of the matrix with the elements above the diagonal</span>
+<span class="sd">        zeroed.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If `matrix` has an invalid type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">repr</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Quantum object&#39;</span><span class="p">):</span>  <span class="c1"># qutip.Qobj</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">spmatrix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;matrix must be numpy object, sparse matrix, or QuTiP operator&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="banded_to_full"><a class="viewcode-back" href="../../API/qdyn.linalg.html#qdyn.linalg.banded_to_full">[docs]</a><span class="k">def</span> <span class="nf">banded_to_full</span><span class="p">(</span><span class="n">banded</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">kl</span><span class="p">,</span> <span class="n">ku</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a rectangular matrix in the Lapack &quot;banded&quot; format</span>
+<span class="sd">    (http://www.netlib.org/lapack/lug/node124.html) into a (square)</span>
+<span class="sd">    full matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        banded (numpy.ndarray): Rectangular matrix in banded format</span>
+<span class="sd">        n (int): The dimension of the (full) matrix</span>
+<span class="sd">        kl (int):  The number of lower diagonals (kl=0 for</span>
+<span class="sd">            diagonal/upper-triangular matrix)</span>
+<span class="sd">        ku (int):  The number of upper diagonals (ku=0 for</span>
+<span class="sd">            diagonal/lower-triangular matrix)</span>
+<span class="sd">        mode (str): On of &#39;g&#39;, &#39;h&#39;, &#39;s&#39;, &#39;t&#39; corresponding to &quot;general&quot;,</span>
+<span class="sd">            &quot;Hermitian&quot;, &quot;symmetric&quot;, and &#39;triangular&#39;. The values &#39;g&#39; and &#39;s&#39;</span>
+<span class="sd">            are dequivalent, except that for &#39;s&#39; iether kl or ku must be zero.</span>
+<span class="sd">            For Hermitian or symmetric storage, exactly one of `kl`, `ku` must</span>
+<span class="sd">            be zero.  Which one determines whether `banded` is assumed to</span>
+<span class="sd">            contain the data for the upper or lower triangle</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Numpy array of same type as `banded`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">banded</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">kl</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">ku</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">ku</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">kl</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="n">full</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">ku</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Hermitian or symmetric</span>
+        <span class="k">if</span> <span class="n">kl</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># upper triangle</span>
+            <span class="n">kd</span> <span class="o">=</span> <span class="n">ku</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">kd</span><span class="p">),</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">full</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">kd</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+                            <span class="n">full</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">kd</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
+                        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                            <span class="n">full</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">kd</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ku</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># lower triangle</span>
+            <span class="n">kd</span> <span class="o">=</span> <span class="n">kl</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">kd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+                    <span class="n">full</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+                            <span class="n">full</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
+                        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                            <span class="n">full</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">banded</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;For mode </span><span class="si">%s</span><span class="s2">, either kl or ku must be zero&quot;</span> <span class="o">%</span> <span class="n">mode</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">full</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

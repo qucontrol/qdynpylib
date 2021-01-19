@@ -1,0 +1,1449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.io &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/qdyn.html">API of the qdyn package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>qdyn.io</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for qdyn.io</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Routines for reading and writing files compatible with QDYN&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
+
+<span class="kn">from</span> <span class="nn">.linalg</span> <span class="kn">import</span> <span class="n">iscomplexobj</span><span class="p">,</span> <span class="n">norm</span>
+
+
+<div class="viewcode-block" id="open_file"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.open_file">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">open_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper around :func:`io.open`, allowing `file` to be a file handle.</span>
+
+<span class="sd">    Any `kwargs` are passed to :func:`io.open`. The `file` parameter may also</span>
+<span class="sd">    be given as the string &#39;-&#39;, which indicates :obj:`sys.stdin` for</span>
+<span class="sd">    ``mode=&#39;r&#39;`` and :obj:`sys.stdout` for ``mode=&#39;w&#39;``. If `file` is an open</span>
+<span class="sd">    file handle, its `mode` and `encoding` are checked against the arguments;</span>
+<span class="sd">    the file handle will not be closed one exit.</span>
+
+<span class="sd">    In Python 2, if no `kwargs` beyond `mode` are given and `file` is a string</span>
+<span class="sd">    giving a pathname or a file descriptor, the built-in :func:`open` function</span>
+<span class="sd">    is used instead of :func:`io.open`. As a consequence, regular (unencoded)</span>
+<span class="sd">    strings can be read or written directly from or to the resulting file</span>
+<span class="sd">    handle, without having to open it in binary mode. This behavior provides</span>
+<span class="sd">    maximal compatibility between Python 2 and 3.</span>
+
+<span class="sd">    This function must be used as a context manager::</span>
+
+<span class="sd">        &gt;&gt;&gt; with open_file(&#39;-&#39;, &#39;w&#39;) as out_fh:</span>
+<span class="sd">        ...      written_bytes = out_fh.write(&quot;Hello World&quot;)</span>
+<span class="sd">        Hello World</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        IOError: If the file cannot be opened (see :func:`io.open`), if `file`</span>
+<span class="sd">            is open file handle with the incorrect `mode` or `encoding`, or if</span>
+<span class="sd">            `file` is &#39;-&#39; and `mode` is neither &#39;r&#39; nor &#39;w&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fh_attribs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;seek&#39;</span><span class="p">,</span> <span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">)</span>
+    <span class="n">is_fh</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">fh_attribs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_fh</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">):</span>  <span class="c1"># e.g. sys.stdout doesn&#39;t have mode attr</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+                    <span class="s2">&quot;File handle </span><span class="si">%s</span><span class="s2"> aleady open in mode </span><span class="si">%s</span><span class="s2">; cannot open in &quot;</span>
+                    <span class="s2">&quot;mode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;encoding&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;encoding&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">file</span><span class="o">.</span><span class="n">encoding</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+                    <span class="s2">&quot;Open file handle </span><span class="si">%s</span><span class="s2"> has enconding </span><span class="si">%s</span><span class="s2">; cannot open with &quot;</span>
+                    <span class="s2">&quot;encoding </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">])</span>
+                <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">file</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># str or descriptor or path-like object</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+                    <span class="s2">&quot;File &#39;-&#39; can only be opened in &#39;r&#39; mode (stdin) or &quot;</span>
+                    <span class="s2">&quot;&#39;w&#39; mode (stdout)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">fh</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># on Python 3, `io.open` and `open` are identical</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">fh</span></div>
+
+
+<div class="viewcode-block" id="tempinput"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.tempinput">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">tempinput</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Context manager providing a temporary filename for a file containing the</span>
+<span class="sd">    given data. If binary is True, the data will be written as-is, and must be</span>
+<span class="sd">    suitable for writing in binary mode. Otherwise, if encoding the given data</span>
+<span class="sd">    to utf-8 is at all possible, the temporary file will be</span>
+<span class="sd">    a text file with utf-8 encoding. The file is deleted on leaving the</span>
+<span class="sd">    context.</span>
+
+<span class="sd">    &gt;&gt;&gt; test_str = &#39;&#39;&#39;</span>
+<span class="sd">    ... In the world of the very small, where particle and wave</span>
+<span class="sd">    ... aspects of reality are equally significant, things do not</span>
+<span class="sd">    ... behave in any way that we can understand from our experience</span>
+<span class="sd">    ... of the everyday world...all pictures are false, and there is</span>
+<span class="sd">    ... no physical analogy we can make to understand what goes on</span>
+<span class="sd">    ... inside atoms. Atoms behave like atoms, nothing else.&#39;&#39;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; with tempinput(test_str) as filename:</span>
+<span class="sd">    ...     with open_file(filename) as in_fh:</span>
+<span class="sd">    ...         for line in in_fh:</span>
+<span class="sd">    ...             print(line.strip())</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">    In the world of the very small, where particle and wave</span>
+<span class="sd">    aspects of reality are equally significant, things do not</span>
+<span class="sd">    behave in any way that we can understand from our experience</span>
+<span class="sd">    of the everyday world...all pictures are false, and there is</span>
+<span class="sd">    no physical analogy we can make to understand what goes on</span>
+<span class="sd">    inside atoms. Atoms behave like atoms, nothing else.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># see http://stackoverflow.com/questions/11892623</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">binary</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Python 3 str data can be encoded, as well as Python 2 unicode</span>
+            <span class="c1"># data</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+            <span class="c1"># Python 3 bytes data is already encoded and will raise an</span>
+            <span class="c1"># AttributeError; standard Python 2 str data</span>
+            <span class="c1"># tends to raise UnicodeDecodeError for non-ascii strings. Consider</span>
+            <span class="c1"># importing unicode_literals from __future__ to fix this</span>
+            <span class="k">pass</span>
+    <span class="n">temp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">temp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">yield</span> <span class="n">temp</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_indexed_matrix"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.write_indexed_matrix">[docs]</a><span class="k">def</span> <span class="nf">write_indexed_matrix</span><span class="p">(</span>
+    <span class="n">matrix</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">,</span>
+    <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">line_formatter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">hermitian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">limit</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write the given matrix to file in indexed format (1-based indexing)</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+
+<span class="sd">    matrix: numpy.matrix, numpy.ndarray, qutip.Qobj or scipy.sparse.spmatrix</span>
+<span class="sd">        Matrix to write to file. If an ndarray is given, it has to be</span>
+<span class="sd">        2-dimenstional</span>
+
+<span class="sd">    filename: str</span>
+<span class="sd">        Name of file to write to</span>
+
+<span class="sd">    comment: str or list(str)</span>
+<span class="sd">        Comment line, or array of comment lines to write to the top of the</span>
+<span class="sd">        file. Each line that does not start with &#39;#&#39; will have &quot;# &quot;</span>
+<span class="sd">        prepended.</span>
+
+<span class="sd">    line_formatter: callable</span>
+<span class="sd">        Function that takes three arguments i, j, v (row index, column index,</span>
+<span class="sd">        and complex value matrix[i,j]) and returns a line to be written to</span>
+<span class="sd">        file. If the function returns None for any input data, no line will be</span>
+<span class="sd">        written to file. If not given, defaults to</span>
+
+<span class="sd">            lambda i, j, v: &quot;%8d%8d%25.16E&quot; % (i, j, v.real)</span>
+
+<span class="sd">        if matrix is real and</span>
+
+<span class="sd">            lambda i, j, v:  &quot;%8d%8d%25.16E%25.16E&quot; % (i, j, v.real, v.imag)</span>
+
+<span class="sd">        if matrix is complex.</span>
+
+<span class="sd">    header: str</span>
+<span class="sd">        Header line to be written before any data. Must start with either &#39;#&#39;</span>
+<span class="sd">        or a space, in which case the leading space will be replaced with &#39;#&#39;.</span>
+<span class="sd">        Defaults to a header line suitable for the default line_formatter</span>
+
+<span class="sd">    hermitian: bool</span>
+<span class="sd">        If True, write only entries from the upper triangle</span>
+
+<span class="sd">    limit: float</span>
+<span class="sd">        Only values with an absolute value greater than `limit` are written</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># set line formatter</span>
+
+    <span class="k">def</span> <span class="nf">real_formatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%8d%8d%25.16E</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">complex_formatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%8d%8d%25.16E%25.16E</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">repr</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Quantum object&#39;</span><span class="p">):</span>
+        <span class="c1"># handle qutip Qobj (without importing the qutip package)</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">if</span> <span class="n">iscomplexobj</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+        <span class="n">is_real</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">line_formatter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">line_formatter</span> <span class="o">=</span> <span class="n">complex_formatter</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_real</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">line_formatter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">line_formatter</span> <span class="o">=</span> <span class="n">real_formatter</span>
+
+    <span class="c1"># set header</span>
+    <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">iscomplexobj</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;# </span><span class="si">%6s%8s%25s%25s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="s1">&#39;row&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;column&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Re(val)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Im(val)&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;# </span><span class="si">%6s%8s%25s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;row&#39;</span><span class="p">,</span> <span class="s1">&#39;column&#39;</span><span class="p">,</span> <span class="s1">&#39;Re(val)&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">):</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">header</span>
+
+    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fh</span><span class="p">:</span>
+
+        <span class="c1"># write comment(s)</span>
+        <span class="k">if</span> <span class="n">comment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comment</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">comment</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;# &quot;</span> <span class="o">+</span> <span class="n">line</span>
+                    <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write header</span>
+        <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+
+        <span class="c1"># write data</span>
+        <span class="n">sparse_h</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sparse_h</span><span class="o">.</span><span class="n">nnz</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">sparse_h</span><span class="o">.</span><span class="n">row</span><span class="p">[</span><span class="n">i_val</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># 1-based indexing</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">sparse_h</span><span class="o">.</span><span class="n">col</span><span class="p">[</span><span class="n">i_val</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">sparse_h</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i_val</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">hermitian</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">j</span> <span class="o">&gt;=</span> <span class="n">i</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limit</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">is_real</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">imag</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line_formatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                            <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_indexed_matrix"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_indexed_matrix">[docs]</a><span class="k">def</span> <span class="nf">read_indexed_matrix</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;coo&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expand_hermitian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">val_real</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read in a matrix from the file with the given filename</span>
+
+<span class="sd">    The file must contain a description in indexed format, like this:</span>
+
+<span class="sd">        # row  col  re(val) im(val)</span>
+<span class="sd">            0    1  1.0     0.0</span>
+<span class="sd">            1    0  0.0     1.0</span>
+
+<span class="sd">    The fourth column is optional, if not present, the result will be real.</span>
+
+<span class="sd">    Return a matrix in any of the numpy/scipy sparse (or non-sparse) formats.</span>
+<span class="sd">    See the documentation of scipy.sparse for information about the different</span>
+<span class="sd">    sparse formats</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+
+<span class="sd">    filename: str</span>
+<span class="sd">        Name of file from which to read the matrix</span>
+<span class="sd">    format: str</span>
+<span class="sd">        Result type:</span>
+<span class="sd">        * &#39;coo&#39; (default): scipy.sparse.coo.coo_matrix</span>
+<span class="sd">        * &#39;array&#39;: numpy.ndarray</span>
+<span class="sd">        * &#39;dense&#39;: numpy.matrixlib.defmatrix.matrix</span>
+<span class="sd">        * &#39;bsr&#39;: scipy.sparse.bsr.bsr_matrix</span>
+<span class="sd">        * &#39;csc&#39;: scipy.sparse.csc.csc_matrix</span>
+<span class="sd">        * &#39;csr&#39;: scipy.sparse.csr.csr_matrix</span>
+<span class="sd">        * &#39;dia&#39;: scipy.sparse.dia.dia_matrix</span>
+<span class="sd">        * &#39;dok&#39;: scipy.sparse.dok.dok_matrix</span>
+<span class="sd">        * &#39;lil&#39;: scipy.sparse.lil.lil_matrix</span>
+<span class="sd">    shape: int or (int,int)</span>
+<span class="sd">        If given, shape of the resulting matrix. If not given, will be</span>
+<span class="sd">        determined from largest occurring index in the data from the input file</span>
+<span class="sd">    expand_hermitian: bool</span>
+<span class="sd">        If True, the input file must contain data only for the upper or lower</span>
+<span class="sd">        triangle. The oterh triangle will be set with the complex conjugate</span>
+<span class="sd">        values.</span>
+<span class="sd">    val_real: bool</span>
+<span class="sd">        If True, only read 3 columns from the input file (i, j, value), even if</span>
+<span class="sd">        more columns are present in the file, and return a real matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
+
+    <span class="n">file_row</span><span class="p">,</span> <span class="n">file_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span>
+    <span class="p">)</span>
+    <span class="n">file_real_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="p">)</span>
+    <span class="c1"># numpy doesn&#39;t generate arrays if there is only one value -- force it!</span>
+    <span class="n">file_row</span> <span class="o">=</span> <span class="n">file_row</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">file_row</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">file_col</span> <span class="o">=</span> <span class="n">file_col</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">file_col</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">file_real_val</span> <span class="o">=</span> <span class="n">file_real_val</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">file_real_val</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">val_is_real</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">val_real</span><span class="p">:</span>
+        <span class="n">val_is_real</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_imag_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+            <span class="p">)</span>
+            <span class="n">file_imag_val</span> <span class="o">=</span> <span class="n">file_imag_val</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">file_imag_val</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># File does not contain a fourth column</span>
+            <span class="n">val_is_real</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># check data consistency, count number of non-zero elements (nnz)</span>
+    <span class="n">nnz</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="kc">None</span>
+    <span class="p">)</span>  <span class="c1"># all vals in upper triangle (True) or lower triangle (False)?</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_real_val</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">file_row</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">file_col</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Row-indices in file must be one-based&quot;</span>
+        <span class="k">assert</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Column-indices in file must be one-based&quot;</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+            <span class="n">nnz</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">expand_hermitian</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">upper</span> <span class="o">=</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">i</span>
+                <span class="k">assert</span> <span class="p">(</span><span class="n">j</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">upper</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="s2">&quot;If expand_hermitian is True, file must contain data only &quot;</span>
+                    <span class="s2">&quot;for the upper or only for the lower triangle&quot;</span>
+                <span class="p">)</span>
+                <span class="n">nnz</span> <span class="o">+=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nnz</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nnz</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nnz</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">val_is_real</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nnz</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nnz</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_real_val</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">file_row</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># adjust for zero-based indexing in Python</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">file_col</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">file_real_val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">val_is_real</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">+=</span> <span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">file_imag_val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">row</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">col</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
+        <span class="n">val</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">l</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">expand_hermitian</span><span class="p">):</span>
+            <span class="n">row</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
+            <span class="n">col</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">val</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
+            <span class="n">l</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;coo&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">m</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span>
+            <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span> <span class="o">+</span> <span class="nb">format</span>
+        <span class="p">)()</span>  <span class="c1"># e.g. format=&#39;dense&#39; -&gt; m.toarray()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_compress_str</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">spaces_to_drop</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove `spaces_to_drop` spaces from `s`, alternating between left and</span>
+<span class="sd">    right&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">spaces_to_drop</span>
+    <span class="n">from_left</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">drop</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">remaining_spaces</span> <span class="o">=</span> <span class="n">spaces_to_drop</span>
+    <span class="k">while</span> <span class="n">remaining_spaces</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">from_left</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            <span class="n">drop</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+            <span class="n">l</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># since `s.find` is inclusive, but we need exclusive</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">drop</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">from_left</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">from_left</span>
+        <span class="n">remaining_spaces</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span> <span class="o">==</span> <span class="n">spaces_to_drop</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">l</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="print_matrix"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.print_matrix">[docs]</a><span class="k">def</span> <span class="nf">print_matrix</span><span class="p">(</span>
+    <span class="n">M</span><span class="p">,</span>
+    <span class="n">matrix_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">limit</span><span class="o">=</span><span class="mf">1.0e-14</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%9.2E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">compress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">zero_as_blank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print a numpy complex matrix to screen, or to a file if outfile is given.</span>
+<span class="sd">    Values below the given limit are printed as zero</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+
+<span class="sd">    M: numpy.ndarray, scipy.sparse.spmatrix</span>
+<span class="sd">        Matrix to print. In addition to a standard dense matrix, may also be</span>
+<span class="sd">        any scipy sparse matrix in a format where M[i,j] is defined.</span>
+<span class="sd">    matrix_name: str</span>
+<span class="sd">        Name of matrix</span>
+<span class="sd">    limit: float</span>
+<span class="sd">       Any number (real or imaginary part) whose absolute value is smaller than</span>
+<span class="sd">       this limit will be printed as 0.0.</span>
+<span class="sd">    fmt: str or callable</span>
+<span class="sd">        Format of each entry (both for real and imaginary part). If str, must</span>
+<span class="sd">        be an &quot;old-style&quot; format string the formats a single floating value. If</span>
+<span class="sd">        a callable, the callable must return a string of fixed length when</span>
+<span class="sd">        passed a number. The string returned by ``fmt(0)`` will be used for</span>
+<span class="sd">        values that are exactly zero, whereas the string returned by</span>
+<span class="sd">        ``fmt(0.0)`` will be used for values that are below `limit`.</span>
+<span class="sd">    compress: bool</span>
+<span class="sd">        If True, remove spaces to compress the output to be narrower. Real and</span>
+<span class="sd">        imaginary parts will no longer be aligned.</span>
+<span class="sd">    zero_as_blank: bool</span>
+<span class="sd">        If True, represent entries that are exactly zero as blank strings</span>
+<span class="sd">    out: file</span>
+<span class="sd">        open filehandle. If None, print to stdout</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; M = np.array([[1.0, 2.0, 0.0], [-1.0j, 2.0, 1.0e-20],</span>
+<span class="sd">    ... [1+1j, 1.0e-9, -1.0]])</span>
+
+<span class="sd">    &gt;&gt;&gt; print_matrix(M)</span>
+<span class="sd">    { 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)</span>
+<span class="sd">    (      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)</span>
+<span class="sd">    ( 1.00E+00, 1.00E+00)( 1.00E-09,      0.0){-1.00E+00,      0.0}</span>
+
+<span class="sd">    &gt;&gt;&gt; print_matrix(M, limit=1.0e-5)</span>
+<span class="sd">    { 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)</span>
+<span class="sd">    (      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)</span>
+<span class="sd">    ( 1.00E+00, 1.00E+00)(      0.0,      0.0){-1.00E+00,      0.0}</span>
+
+<span class="sd">    &gt;&gt;&gt; print_matrix(M, compress=True)</span>
+<span class="sd">    {1.00E+00,     0.0}(2.00E+00,     0.0)(       0,       0)</span>
+<span class="sd">    (    0.0,-1.00E+00){2.00E+00,     0.0}(     0.0,     0.0)</span>
+<span class="sd">    (1.00E+00,1.00E+00)(1.00E-09,     0.0){-1.00E+00,    0.0}</span>
+
+<span class="sd">    &gt;&gt;&gt; print_matrix(M, compress=True, zero_as_blank=True)</span>
+<span class="sd">    {1.00E+00,     0.0}(2.00E+00,     0.0)(                 )</span>
+<span class="sd">    (    0.0,-1.00E+00){2.00E+00,     0.0}(     0.0,     0.0)</span>
+<span class="sd">    (1.00E+00,1.00E+00)(1.00E-09,     0.0){-1.00E+00,    0.0}</span>
+
+<span class="sd">    &gt;&gt;&gt; M[2,1] = 1.0</span>
+<span class="sd">    &gt;&gt;&gt; print_matrix(M, fmt=&quot;%5.1f&quot;)</span>
+<span class="sd">    {  1.0,  0.0}(  2.0,  0.0)(    0,    0)</span>
+<span class="sd">    (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)</span>
+<span class="sd">    (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}</span>
+
+<span class="sd">    &gt;&gt;&gt; def compact_exp_fmt(x):</span>
+<span class="sd">    ...     if x == 0:</span>
+<span class="sd">    ...         return &#39;%7d&#39; % 0</span>
+<span class="sd">    ...     else:  # single-digit exponent</span>
+<span class="sd">    ...         s = &quot;%8.1e&quot; % x</span>
+<span class="sd">    ...         base, exp = s.split(&#39;e&#39;)</span>
+<span class="sd">    ...         return base + &#39;e%+d&#39; % int(exp)</span>
+<span class="sd">    &gt;&gt;&gt; print_matrix(M, compress=True, zero_as_blank=True, fmt=compact_exp_fmt)</span>
+<span class="sd">    {1.0e+0,     0}(2.0e+0,     0)(             )</span>
+<span class="sd">    (    0,-1.0e+0){2.0e+0,     0}(     0,     0)</span>
+<span class="sd">    (1.0e+0,1.0e+0)(1.0e+0,     0){-1.0e+0,    0}</span>
+
+<span class="sd">    &gt;&gt;&gt; print_matrix(M, matrix_name=&quot;M&quot;, fmt=&quot;%5.1f&quot;)</span>
+<span class="sd">    M = [</span>
+<span class="sd">    {  1.0,  0.0}(  2.0,  0.0)(    0,    0)</span>
+<span class="sd">    (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)</span>
+<span class="sd">    (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}</span>
+<span class="sd">    ]</span>
+
+<span class="sd">    &gt;&gt;&gt; import scipy.sparse</span>
+<span class="sd">    &gt;&gt;&gt; print_matrix(scipy.sparse.csr_matrix(M), matrix_name=&quot;M&quot;, fmt=&quot;%5.1f&quot;)</span>
+<span class="sd">    M = [</span>
+<span class="sd">    {  1.0,  0.0}(  2.0,  0.0)(    0,    0)</span>
+<span class="sd">    (  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)</span>
+<span class="sd">    (  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}</span>
+<span class="sd">    ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">fmt</span><span class="p">):</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">fmt</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">small</span> <span class="o">=</span> <span class="n">fmt</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">fmt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fmt_rx</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;%[#0i +-]?(?P&lt;width&gt;\d+)\.\d+[hlL]?[diouxXeEfFgG]&#39;</span>
+        <span class="p">)</span>
+        <span class="n">fmt_m</span> <span class="o">=</span> <span class="n">fmt_rx</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="k">if</span> <span class="n">fmt_m</span><span class="p">:</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fmt_m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">))</span>
+            <span class="n">zero_fmt</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">d&quot;</span> <span class="o">%</span> <span class="n">width</span><span class="p">)</span>
+            <span class="n">zero_fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">zero_fmt</span><span class="p">,</span> <span class="n">zero_fmt</span><span class="p">)</span>
+            <span class="n">zero</span> <span class="o">=</span> <span class="n">zero_fmt</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">small_fmt</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.1f&quot;</span> <span class="o">%</span> <span class="n">width</span><span class="p">)</span>
+            <span class="n">small</span> <span class="o">=</span> <span class="n">small_fmt</span> <span class="o">%</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fmt must match &#39;%[conversion flags]w.d&lt;type&gt;&#39;&quot;</span><span class="p">)</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">fmt</span> <span class="o">%</span> <span class="n">x</span>
+    <span class="k">if</span> <span class="n">zero_as_blank</span><span class="p">:</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+    <span class="k">if</span> <span class="n">matrix_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = [</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">matrix_name</span><span class="p">)</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="p">[[]]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">zero</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">entry</span> <span class="o">=</span> <span class="n">small</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">entry</span> <span class="o">=</span> <span class="n">formatter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">entry</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">entry</span> <span class="o">+=</span> <span class="n">small</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">entry</span> <span class="o">+=</span> <span class="n">formatter</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+    <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+        <span class="n">spaces_to_drop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">_compress_str</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">spaces_to_drop</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">entry</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">entry</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">matrix_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fix_fortran_exponent"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.fix_fortran_exponent">[docs]</a><span class="k">def</span> <span class="nf">fix_fortran_exponent</span><span class="p">(</span><span class="n">num_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;In 3-digit exponents, Fortran drops the &#39;E&#39;. Return a string with the</span>
+<span class="sd">    &#39;E&#39; restored.</span>
+
+<span class="sd">    &gt;&gt;&gt; print(fix_fortran_exponent(&quot;1.0-100&quot;))</span>
+<span class="sd">    1.0E-100</span>
+<span class="sd">    &gt;&gt;&gt; print(fix_fortran_exponent(&quot;1.0E-99&quot;))</span>
+<span class="sd">    1.0E-99</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;E&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">num_str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d)([+-]\d)&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1E\2&#39;</span><span class="p">,</span> <span class="n">num_str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">num_str</span></div>
+
+
+<div class="viewcode-block" id="read_complex"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_complex">[docs]</a><span class="k">def</span> <span class="nf">read_complex</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a string to a complex number</span>
+
+<span class="sd">    &gt;&gt;&gt; read_complex(&quot;1.0 -2.0-100&quot;)</span>
+<span class="sd">    (1-2e-100j)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">real_part</span><span class="p">,</span> <span class="n">imag_part</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">real_part</span> <span class="o">=</span> <span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="n">real_part</span><span class="p">)</span>
+    <span class="n">imag_part</span> <span class="o">=</span> <span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="n">imag_part</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">real_part</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">imag_part</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">read_real</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a string to a real number</span>
+
+<span class="sd">    This works for Fortran-formatted numbers with a missing &#39;E&#39; sign</span>
+
+<span class="sd">    &gt;&gt;&gt; read_real(&quot;-2.0-100&quot;)</span>
+<span class="sd">    -2e-100</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="read_real"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_real">[docs]</a><span class="k">def</span> <span class="nf">read_real</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a string to a real number</span>
+
+<span class="sd">    This works for Fortran-formatted numbers with a missing &#39;E&#39; sign</span>
+
+<span class="sd">    &gt;&gt;&gt; read_real(&quot;-2.0-100&quot;)</span>
+<span class="sd">    -2e-100</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="read_cmplx_array"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_cmplx_array">[docs]</a><span class="k">def</span> <span class="nf">read_cmplx_array</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read a complex array from a file. The file must contain two columns</span>
+<span class="sd">    (real and imaginary part). This routine is equivalent to the Fortran QDYN</span>
+<span class="sd">    ``read_cmplx_array`` routine</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (file, str, pathlib.Path, list(str), generator): File,</span>
+<span class="sd">            filename, list, or generator to read. Cf. `fname` in</span>
+<span class="sd">            :func:`numpy.genfromtxt`.</span>
+<span class="sd">        **kwargs: All keyword arguments are passed to :func:`numpy.genfromtxt`</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        You may use :func:`datablock` as a wrapper for `fileanme` in order to</span>
+<span class="sd">        read a specific block from a file that contains multiple blocks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="read_cmplx_matrix"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_cmplx_matrix">[docs]</a><span class="k">def</span> <span class="nf">read_cmplx_matrix</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read in complex matrix from file (as written by the Fortran QDYN</span>
+<span class="sd">    ``print_cmplx_matrix`` routine).</span>
+
+<span class="sd">    Return a two-dimensional, double precision complex Numpy array</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename: str or file-like object from which to read gate, or file-like</span>
+<span class="sd">            object with equivalent content</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[()</span><span class="si">{}</span><span class="s2">]+&quot;</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">U</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">U</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="datablock"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.datablock">[docs]</a><span class="k">def</span> <span class="nf">datablock</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">decoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Iterator over the lines inside the file with the given `filename` inside</span>
+<span class="sd">    the given `block` only. Blocks must be separated by two empty lines.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): Name of file from which to read</span>
+<span class="sd">        block (int): One-based Index of the desired block. A value of less than</span>
+<span class="sd">            1 or more than the number of block available in the file will not</span>
+<span class="sd">            cause an error, but result in an empty iterator</span>
+<span class="sd">        decoding (None or str): By default, the resulting lines are byte</span>
+<span class="sd">            strings (so that :func:`datablock` can wrap `fname` in</span>
+<span class="sd">            :func:`numpy.genfromtxt`). If `decoding` is given different from None,</span>
+<span class="sd">            the resulting strings will be decoded instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">in_block</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">blank</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">in_fh</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">blank</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">in_block</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">blank</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">in_block</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">blank</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># reset counter</span>
+                <span class="k">if</span> <span class="n">in_block</span> <span class="o">==</span> <span class="n">block</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">decoding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">line</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">decoding</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">in_block</span> <span class="o">&gt;</span> <span class="n">block</span><span class="p">:</span>
+                    <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="write_cmplx_array"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.write_cmplx_array">[docs]</a><span class="k">def</span> <span class="nf">write_cmplx_array</span><span class="p">(</span>
+    <span class="n">carray</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmtstr</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%25.16E</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a complex array to file. Equivalent to the Fortran QDYN</span>
+<span class="sd">    `write_cmplx_array`  routine. Two columns will be written to the output</span>
+<span class="sd">    file (real and imaginary part of `carray`)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): Name of file to which to write the array</span>
+<span class="sd">        header (str or None): A header line, to be written immediately before</span>
+<span class="sd">            the data. Should start with a &#39;#&#39;</span>
+<span class="sd">        fmtstr (str or None): The format to use for reach of the two columns</span>
+<span class="sd">        append (bool): If True, append to existing files, with a separator of</span>
+<span class="sd">            two blank lines</span>
+<span class="sd">        comment (str or None): A comment line, to be written at the top of the</span>
+<span class="sd">            file (before the header). Should start with a &#39;#&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">header_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">comment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">header_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">header_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fh</span><span class="p">:</span>
+            <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">writetotxt</span><span class="p">(</span>
+                <span class="n">out_fh</span><span class="p">,</span> <span class="n">carray</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="p">(</span><span class="n">fmtstr</span><span class="p">,</span> <span class="n">fmtstr</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="n">header_lines</span>
+            <span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">writetotxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">carray</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="p">(</span><span class="n">fmtstr</span><span class="p">,</span> <span class="n">fmtstr</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="n">header_lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="writetotxt"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.writetotxt">[docs]</a><span class="k">def</span> <span class="nf">writetotxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inverse function to numpy.genfromtxt and similar to `numpy.savetxt`,</span>
+<span class="sd">    but allowing to write *multiple* numpy arrays as columns to a text file.</span>
+<span class="sd">    Also, handle headers/footers more intelligently.</span>
+
+<span class="sd">    The first argument is the filename or handler to which to write, followed</span>
+<span class="sd">    by an arbitrary number of numpy arrays, to be written as columns in the</span>
+<span class="sd">    file (real arrays will produce once column, complex arrays two). The</span>
+<span class="sd">    remaining keyword arguments are passed directly to `numpy.savetxt` (with</span>
+<span class="sd">    fixes to the header/footer lines, as described below)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): filename or file handle</span>
+<span class="sd">        args (numpy.ndarray): Numpy arrays to write to fname. All arrays must have</span>
+<span class="sd">            the same length</span>
+<span class="sd">        fmt (str, list(str)): A single format (e.g. &#39;%10.5f&#39;), a sequence</span>
+<span class="sd">            of formats, or a multi-format string, e.g.</span>
+<span class="sd">            &#39;Iteration %d -- %10.5f&#39;, in which case `delimiter` is ignored. For</span>
+<span class="sd">            a complex array in `*args`, a format for the real and imaginary</span>
+<span class="sd">            parts must be given.  Defaults to &#39;%25.16E&#39;.</span>
+<span class="sd">        delimiter (str): Character separating columns. Defaults to &#39;&#39;</span>
+<span class="sd">        header (str, list(str)): String that will be written at the beginning</span>
+<span class="sd">            of the file. If sequence of strings, multiple lines will be</span>
+<span class="sd">            written.</span>
+<span class="sd">        footer (str, list(str)): String that will be written at the end of the</span>
+<span class="sd">            file. If sequence of strings, multiple lines will be written</span>
+<span class="sd">        comments (str): String that will be prepended to the each line of the</span>
+<span class="sd">            ``header`` and ``footer`` strings, to mark them as comments.</span>
+<span class="sd">            Defaults to &#39;# &#39;</span>
+
+<span class="sd">    Note:</span>
+
+<span class="sd">        The `header` and `footer` lines are handled more intelligently than by</span>
+<span class="sd">        the `numpy.savetxt` routine.  First, header and footer may be an array</span>
+<span class="sd">        of lines instead of just a (multiline) string.  Second, each line in</span>
+<span class="sd">        the header may or may not already include the `comments` prefix. If a</span>
+<span class="sd">        line does not include the `comments` prefix yet, but starts with a</span>
+<span class="sd">        sufficient number of spaces, the `comments` prefix will not be</span>
+<span class="sd">        prepended to the line in output, but will overwrite the beginning of</span>
+<span class="sd">        the line, so as not to change the line length. E.g. giving</span>
+<span class="sd">        `header=&quot;   time [ns]&quot;` will result in a header line of</span>
+<span class="sd">        `#  time [ns]` in the output, not `#    time [ns]`.</span>
+
+<span class="sd">        Further explanation of the `fmt` parameter</span>
+<span class="sd">        (``%[flag]width[.precision]specifier``):</span>
+
+<span class="sd">        flags:</span>
+<span class="sd">            ``-`` : left justify</span>
+
+<span class="sd">            ``+`` : Forces to precede result with + or -.</span>
+
+<span class="sd">            ``0`` : Left pad the number with zeros instead of space (see</span>
+<span class="sd">                    width).</span>
+
+<span class="sd">        width:</span>
+<span class="sd">            Minimum number of characters to be printed. The value is not</span>
+<span class="sd">            truncated if it has more characters.</span>
+
+<span class="sd">        precision:</span>
+<span class="sd">            - For integer specifiers (eg. ``d,i``), the minimum number of</span>
+<span class="sd">              digits.</span>
+<span class="sd">            - For ``e, E`` and ``f`` specifiers, the number of digits to print</span>
+<span class="sd">              after the decimal point.</span>
+<span class="sd">            - For ``g`` and ``G``, the maximum number of significant digits.</span>
+
+<span class="sd">        specifiers (partial list):</span>
+<span class="sd">            ``c`` : character</span>
+
+<span class="sd">            ``d`` or ``i`` : signed decimal integer</span>
+
+<span class="sd">            ``e`` or ``E`` : scientific notation with ``e`` or ``E``.</span>
+
+<span class="sd">            ``f`` : decimal floating point</span>
+
+<span class="sd">            ``g,G`` : use the shorter of ``e,E`` or ``f``</span>
+
+<span class="sd">        For more details, see `numpy.savetxt`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fmt&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%25.16E</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">delimiter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;delimiter&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">footer</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;footer&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">comments</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comments&#39;</span><span class="p">,</span> <span class="s2">&quot;# &quot;</span><span class="p">)</span>
+    <span class="n">l_comments</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comments</span><span class="p">)</span>
+
+    <span class="c1"># open file</span>
+    <span class="n">own_fh</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">own_fh</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">gzip</span>
+
+            <span class="n">fh</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">fname</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;fname must be a string or file handle&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="c1"># write header</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">comments</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">l_comments</span><span class="p">):</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">comments</span> <span class="o">+</span> <span class="n">line</span><span class="p">[</span><span class="n">l_comments</span><span class="p">:]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">comments</span> <span class="o">+</span> <span class="n">line</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># check input data and prepare row format</span>
+        <span class="n">n_cols</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_rows</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">row_fmt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">completed_row_fmt</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">row_fmt</span> <span class="o">=</span> <span class="n">delimiter</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+            <span class="n">completed_row_fmt</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fmt</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">row_fmt</span> <span class="o">=</span> <span class="n">fmt</span>
+                <span class="n">completed_row_fmt</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n_rows</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All arrays must be of same length&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+                <span class="n">n_cols</span> <span class="o">+=</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">completed_row_fmt</span><span class="p">:</span>
+                    <span class="n">row_fmt</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%s%s%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_cols</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">completed_row_fmt</span><span class="p">:</span>
+                    <span class="n">row_fmt</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row_fmt</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_cols</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;fmt has wrong number of </span><span class="si">%%</span><span class="s1"> formats:  </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">row_fmt</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">completed_row_fmt</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">row_fmt</span> <span class="o">=</span> <span class="n">row_fmt</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)]</span>
+            <span class="n">completed_row_fmt</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># write out data</span>
+        <span class="k">for</span> <span class="n">i_row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">):</span>
+            <span class="n">row_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+                    <span class="n">row_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i_row</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+                    <span class="n">row_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i_row</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">row_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i_row</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row_fmt</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row_data</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot format row data </span><span class="si">%s</span><span class="s2"> with format </span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row_data</span><span class="p">)),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write footer</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">footer</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">footer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">footer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">footer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">footer</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">comments</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">l_comments</span><span class="p">):</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">comments</span> <span class="o">+</span> <span class="n">line</span><span class="p">[</span><span class="n">l_comments</span><span class="p">:]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">comments</span> <span class="o">+</span> <span class="n">line</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">own_fh</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="read_ascii_dump"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_ascii_dump">[docs]</a><span class="k">def</span> <span class="nf">read_ascii_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">convert_boolean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read a file in the format written by the QDYN `dump_ascii_*` routines</span>
+<span class="sd">    and return its data as a nested OrderedDict. The QDYN type of the dumped</span>
+<span class="sd">    data structure is recorded in the `typename` attribute of the result.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): name of file from which to read data</span>
+<span class="sd">        convert_boolean (bool): Convert strings &#39;T&#39;, &#39;F&#39; to Boolean values True</span>
+<span class="sd">            and False</span>
+<span class="sd">        flatten (bool):  If True, numerical array data is returned flattend</span>
+<span class="sd">            (one-dimensional). If False, it is reshaped to the shape defined in</span>
+<span class="sd">            the dump file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_read_ascii_dump</span><span class="p">(</span>
+                <span class="n">in_fh</span><span class="p">,</span> <span class="n">convert_boolean</span><span class="o">=</span><span class="n">convert_boolean</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="n">flatten</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="c1"># If the file properly ended in &#39;# END ASCII DUMP&#39;, we should have</span>
+            <span class="c1"># returned cleanly instead of running into the end of the file</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Premature file end&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_read_ascii_dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">convert_boolean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recursive implementation of `read_ascci_dump`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (iterator): An iterator of lines (e.g., an open file handle).</span>
+<span class="sd">        convert_boolean (bool): Convert &#39;T&#39;, &#39;F&#39; to boolean values?</span>
+<span class="sd">        flatten (bool):  If True, numerical array data is returned flattend</span>
+<span class="sd">            (one-dimensional). If False, it is reshaped to the shape defined in</span>
+<span class="sd">            the dump file.</span>
+<span class="sd">        typename (str or None): The name of the type that is being read. If</span>
+<span class="sd">            None, extract it from the first line.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ENTERING READ_ASCII_DUMP&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([])</span>
+    <span class="n">rx_field</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^# (?P&lt;field&gt;\w+)$&#39;</span><span class="p">)</span>
+    <span class="n">rx_arraybounds</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(\s+\d+){2,}$&#39;</span><span class="p">)</span>
+    <span class="n">rx_item</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^# item\s+\d+&#39;</span><span class="p">)</span>
+    <span class="n">rx_int</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*(?P&lt;val&gt;[0-9+-]+)$&#39;</span><span class="p">)</span>
+    <span class="n">rx_float</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*(?P&lt;val&gt;([+-]?\d+\.[\dEe+-]+))$&#39;</span><span class="p">)</span>
+    <span class="n">rx_complex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;^\s*(?P&lt;re&gt;([+-]?\d+\.[\dEe+-]+))\s+&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;im&gt;([+-]?\d+\.[\dEe+-]+))$&#39;</span>
+    <span class="p">)</span>
+    <span class="n">rx_boolean</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(?P&lt;val&gt;[T|F])$&#39;</span><span class="p">)</span>
+    <span class="n">rx_str</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(?P&lt;val&gt;.*)$&#39;</span><span class="p">)</span>
+    <span class="n">bool_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">ftfloat</span><span class="p">(</span><span class="n">num_str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="n">num_str</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_shape</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+        <span class="n">lbounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bounds</span><span class="p">[:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">ubounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bounds</span><span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="p">:])</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ubounds</span> <span class="o">-</span> <span class="n">lbounds</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">rx_converters</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">rx_int</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">))),</span>
+        <span class="p">(</span><span class="n">rx_float</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">ftfloat</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">))),</span>
+        <span class="p">(</span>
+            <span class="n">rx_complex</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="nb">complex</span><span class="p">(</span><span class="n">ftfloat</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;re&#39;</span><span class="p">)),</span> <span class="n">ftfloat</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;im&#39;</span><span class="p">))),</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">convert_boolean</span><span class="p">:</span>
+        <span class="n">rx_converters</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rx_boolean</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">bool_map</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">)]))</span>
+    <span class="n">rx_converters</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rx_str</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">typename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">first_line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;FIRST LINE: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">first_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">first_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;# ASCII DUMP&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid dump format&quot;</span><span class="p">)</span>
+        <span class="n">typename</span> <span class="o">=</span> <span class="n">first_line</span><span class="p">[</span><span class="mi">13</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">typename</span> <span class="o">=</span> <span class="n">typename</span>
+
+    <span class="n">field</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">array_size</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">looking_for_field_name</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;LINE: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">rx_item</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  (skipped as item line)&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>  <span class="c1"># skip line</span>
+        <span class="k">if</span> <span class="n">looking_for_field_name</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">rx_field</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>  <span class="c1"># field name line</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  (matched as field-name line, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># so we can detect fixed-sized arrays</span>
+            <span class="n">array_size</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">array</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">looking_for_field_name</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># Not looking for two consecutive field name lines means we could</span>
+            <span class="c1"># have string values that start with &#39;#&#39;</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># value-line, array bound line, or end of dump</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;# END ASCII DUMP&#39;</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  (end dump -&gt; return)&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">result</span>
+            <span class="c1"># array bounds?</span>
+            <span class="k">if</span> <span class="n">rx_arraybounds</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">array_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># what we thought was a simple int ...</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ... value is actually the array_size</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="n">get_shape</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;  (array bound line -&gt; value will be array &quot;</span>
+                    <span class="s2">&quot;of size </span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">array_size</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># note that only allocatable components have an array bound</span>
+                <span class="c1"># line. Fixed-sized arrays are handled separately (below)</span>
+                <span class="k">continue</span>
+            <span class="c1"># obtain value</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;# ASCII DUMP&#39;</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  (value is sub-dump, recurse)&quot;</span><span class="p">)</span>
+                <span class="n">typename</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">13</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">_read_ascii_dump</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span>
+                    <span class="n">convert_boolean</span><span class="o">=</span><span class="n">convert_boolean</span><span class="p">,</span>
+                    <span class="n">flatten</span><span class="o">=</span><span class="n">flatten</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="n">typename</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">rx</span><span class="p">,</span> <span class="n">conv</span> <span class="ow">in</span> <span class="n">rx_converters</span><span class="p">:</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                        <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  (value: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                        <span class="k">break</span>
+                <span class="k">assert</span> <span class="n">matched</span>
+            <span class="c1"># append value to array, or set result</span>
+            <span class="k">if</span> <span class="n">array_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">array_size</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;  (appended value </span><span class="si">%s</span><span class="s2">, </span><span class="si">%d</span><span class="s2"> remaining)&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">array_size</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">array_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                        <span class="k">if</span> <span class="n">flatten</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="s2">&quot;  (set result for </span><span class="si">%s</span><span class="s2"> as flat &quot;</span> <span class="s2">&quot;np.array)&quot;</span><span class="p">,</span>
+                                <span class="n">field</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="s2">&quot;  (set result for </span><span class="si">%s</span><span class="s2"> as reshaped &quot;</span>
+                                <span class="s2">&quot;np.array)&quot;</span><span class="p">,</span>
+                                <span class="n">field</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                                <span class="n">shape</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span>
+                            <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">array</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;  (set result for </span><span class="si">%s</span><span class="s2"> as list)&quot;</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># not an array (or at least not an allocatable array)</span>
+                <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;  (set result for </span><span class="si">%s</span><span class="s2"> as simple value </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="n">field</span><span class="p">,</span>
+                        <span class="n">value</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;  (append simple value </span><span class="si">%s</span><span class="s2"> to fixed-sized &quot;</span>
+                        <span class="s2">&quot;array for </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="n">value</span><span class="p">,</span>
+                        <span class="n">field</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;  (append simple value </span><span class="si">%s</span><span class="s2"> to fixed-sized &quot;</span>
+                        <span class="s2">&quot;array for </span><span class="si">%s</span><span class="s2"> [new])&quot;</span><span class="p">,</span>
+                        <span class="n">value</span><span class="p">,</span>
+                        <span class="n">field</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="n">field</span><span class="p">],</span> <span class="n">value</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">array_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">looking_for_field_name</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># next line may be a field name</span>
+
+
+<div class="viewcode-block" id="write_psi_amplitudes"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.write_psi_amplitudes">[docs]</a><span class="k">def</span> <span class="nf">write_psi_amplitudes</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write the wave function to file in the same format as the</span>
+<span class="sd">    `write_psi_amplitudes` Fortran routine</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        psi (numpy.ndarray): Array of complex probability amplitudes</span>
+<span class="sd">        filename (str): Name of file to which to write</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fh</span><span class="p">:</span>
+        <span class="n">is_complex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iscomplex</span><span class="p">(</span><span class="n">psi</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">is_complex</span><span class="p">:</span>
+            <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#</span><span class="si">%9s%25s%25s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Re[Psi]&#39;</span><span class="p">,</span> <span class="s1">&#39;Im[Psi]&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#</span><span class="si">%9s%25s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Re[Psi]&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">psi</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-16</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">is_complex</span><span class="p">:</span>
+                    <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="si">%10d%25.16E%25.16E</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%10d%25.16E</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">real</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="read_psi_amplitudes"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.read_psi_amplitudes">[docs]</a><span class="k">def</span> <span class="nf">read_psi_amplitudes</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read the wave function of size `n` from file. For &#39;block=1&#39;, inverse to</span>
+<span class="sd">    `write_psi_amplitudes`. Returns complex or real numpy array</span>
+
+<span class="sd">    By specifying `blocks`, data may be read from a file that contains multiple</span>
+<span class="sd">    wave functions, in the format generated e.g. by the</span>
+<span class="sd">    ``qdyn_prop_traj --write-all-states`` utility</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        filename (str): Name of file from which to read data</span>
+<span class="sd">        n (int): dimension of the Hilbert space (i.e. size of returned vector)</span>
+<span class="sd">        block (int): One-based index of the block to read from</span>
+<span class="sd">            `filename`, if the file contains multiple block. Blocks must be</span>
+<span class="sd">            separated by exactly two empty lines</span>
+<span class="sd">        normalize (bool): Whether or not to normalize the wave function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">block</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid block </span><span class="si">%d</span><span class="s2">, block must be &gt;= 1&quot;</span> <span class="o">%</span> <span class="n">block</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterate_psi_amplitudes</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">normalize</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="iterate_psi_amplitudes"><a class="viewcode-back" href="../../API/qdyn.io.html#qdyn.io.iterate_psi_amplitudes">[docs]</a><span class="k">def</span> <span class="nf">iterate_psi_amplitudes</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">start_from_block</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Iterate over blocks of wave functions stored in `filename`</span>
+
+<span class="sd">    This is equivalent to the following pseudocode::</span>
+
+<span class="sd">        iter([read_psi_amplitudes(filename, n, block, normalize)</span>
+<span class="sd">              for block &gt;= start_from_block])</span>
+
+<span class="sd">    Hoever, the data file is only traversed once, and memory is only required</span>
+<span class="sd">    for one block.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        filename (str): Name of file from which to read data</span>
+<span class="sd">        n (int): dimension of the Hilbert space (i.e. size of returned vector)</span>
+<span class="sd">        start_from_block (int): One-based index of block from which to</span>
+<span class="sd">            start the iterator.</span>
+<span class="sd">        normalize (bool): Whether or not to normalize the wave function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">i_block</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">blanks</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">normalized</span><span class="p">(</span><span class="n">psi</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">nrm</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nrm</span> <span class="o">&gt;</span> <span class="mf">1e-15</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">psi</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">psi</span> <span class="o">*</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psi</span>
+
+    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line_nr</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">in_fh</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">blanks</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">blanks</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i_block</span> <span class="o">&gt;=</span> <span class="n">start_from_block</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">normalized</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+                        <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+                    <span class="n">blanks</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">i_block</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">i_block</span> <span class="o">&lt;</span> <span class="n">start_from_block</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                <span class="n">vals</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_real</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">read_real</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc_info</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid format: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_info</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">start_from_block</span> <span class="o">&gt;</span> <span class="n">i_block</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Requested block </span><span class="si">%d</span><span class="s2">, file only has </span><span class="si">%d</span><span class="s2"> blocks&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">start_from_block</span><span class="p">,</span> <span class="n">i_block</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">yield</span> <span class="n">normalized</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

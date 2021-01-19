@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.model module &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdyn.prop_gate module" href="qdyn.prop_gate.html" />
+    <link rel="prev" title="qdyn.memoize module" href="qdyn.memoize.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the QDYN-pylib package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qdyn.analytical_pulse.html">qdyn.analytical_pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.config.html">qdyn.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.io.html">qdyn.io module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.linalg.html">qdyn.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.memoize.html">qdyn.memoize module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qdyn.model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.prop_gate.html">qdyn.prop_gate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.pulse.html">qdyn.pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.shutil.html">qdyn.shutil module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.testing.html">qdyn.testing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.units.html">qdyn.units module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="qdyn.html">qdyn package</a> &raquo;</li>
+        
+      <li>qdyn.model module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-qdyn.model">
+<span id="qdyn-model-module"></span><h1>qdyn.model module<a class="headerlink" href="#module-qdyn.model" title="Permalink to this headline">¶</a></h1>
+<p>Abstraction for complete physical models that can be written to a runfolder
+as a config file and dependent data</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.model.LevelModel" title="qdyn.model.LevelModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LevelModel</span></code></a></p></td>
+<td><p>Model for a system well-described in the energy basis.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.model.random_density_matrix" title="qdyn.model.random_density_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_density_matrix</span></code></a></p></td>
+<td><p>Return a random N x N density matrix.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="qdyn.model.random_density_matrix">
+<code class="sig-prename descclassname">qdyn.model.</code><code class="sig-name descname">random_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#random_density_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.random_density_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random N x N density matrix.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rho</span> <span class="o">=</span> <span class="n">random_density_matrix</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting density matrix is normalized, positive semidefinite, and
+Hermitian</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.0e-14</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">-</span> <span class="n">rho</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mf">1.0e-14</span> <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="qdyn.model.LevelModel">
+<em class="property">class </em><code class="sig-prename descclassname">qdyn.model.</code><code class="sig-name descname">LevelModel</code><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Model for a system well-described in the energy basis. That is, all
+operators are (sparse) matrices, and all states are simple vectors</p>
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.t0">
+<code class="sig-name descname">t0</code><a class="headerlink" href="#qdyn.model.LevelModel.t0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initial time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat">qdyn.units.UnitFloat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.T">
+<code class="sig-name descname">T</code><a class="headerlink" href="#qdyn.model.LevelModel.T" title="Permalink to this definition">¶</a></dt>
+<dd><p>Final time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference internal" href="qdyn.units.html#qdyn.units.UnitFloat" title="qdyn.units.UnitFloat">qdyn.units.UnitFloat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.nt">
+<code class="sig-name descname">nt</code><a class="headerlink" href="#qdyn.model.LevelModel.nt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of points in the time grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.prop_method">
+<code class="sig-name descname">prop_method</code><a class="headerlink" href="#qdyn.model.LevelModel.prop_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagation method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.use_mcwf">
+<code class="sig-name descname">use_mcwf</code><a class="headerlink" href="#qdyn.model.LevelModel.use_mcwf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate using the Monte-Carlo Wave Function (quantum
+jump) method</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.construct_mcwf_ham">
+<code class="sig-name descname">construct_mcwf_ham</code><a class="headerlink" href="#qdyn.model.LevelModel.construct_mcwf_ham" title="Permalink to this definition">¶</a></dt>
+<dd><p>When using the MCWF method, the propagation
+must use an “effective” Hamiltonian that includes a non-Hermitian
+decay term. This term is constructed from the Lindblad operators.
+If <code class="docutils literal notranslate"><span class="pre">use_mcwf=True</span></code> and <code class="docutils literal notranslate"><span class="pre">construct_mcwf_ham=False</span></code>, it is the
+user’s responsibility to ensure that <cite>ham</cite> is the proper effective
+Hamiltonian. The <cite>construct_mcwf</cite> flag determines the presence of
+<cite>add_to_H_jump</cite> config file parameter for each Lindblad operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="qdyn.model.LevelModel.user_data">
+<code class="sig-name descname">user_data</code><a class="headerlink" href="#qdyn.model.LevelModel.user_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Key-value pairs that should that
+describe user-defined data. These will go in the <code class="docutils literal notranslate"><span class="pre">user_strings</span></code>,
+<code class="docutils literal notranslate"><span class="pre">user_reals</span></code>, <code class="docutils literal notranslate"><span class="pre">user_logicals</span></code>, or <code class="docutils literal notranslate"><span class="pre">user_ints</span></code> section of the
+config file, depending on the type of the value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/collections.html#collections.OrderedDict" title="(in Python v3.8)">collections.OrderedDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>After instantiation, the attributes <cite>t0</cite>, <cite>T</cite>, <cite>nt</cite>, <cite>prop_method</cite>,
+<cite>use-mcwf</cite>, and <cite>construct_mcwf_ham</cite> are all set via
+<a class="reference internal" href="#qdyn.model.LevelModel.set_propagation" title="qdyn.model.LevelModel.set_propagation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_propagation()</span></code></a>.  Operators and pulses are added to the system
+through <a class="reference internal" href="#qdyn.model.LevelModel.add_ham" title="qdyn.model.LevelModel.add_ham"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_ham()</span></code></a>, <a class="reference internal" href="#qdyn.model.LevelModel.add_observable" title="qdyn.model.LevelModel.add_observable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_observable()</span></code></a>, and
+<a class="reference internal" href="#qdyn.model.LevelModel.add_lindblad_op" title="qdyn.model.LevelModel.add_lindblad_op"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_lindblad_op()</span></code></a>. States are added through <a class="reference internal" href="#qdyn.model.LevelModel.add_state" title="qdyn.model.LevelModel.add_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_state()</span></code></a>.
+Both the general OCT settings (OCT section in the QDYN config file) and
+OCT-related settings for each control pulse are controlled through
+<a class="reference internal" href="#qdyn.model.LevelModel.set_oct" title="qdyn.model.LevelModel.set_oct"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_oct()</span></code></a>. After the model has been constructed, a config file
+and all dependent data input files for the operators, pulses, and
+states can be written via <a class="reference internal" href="#qdyn.model.LevelModel.write_to_runfolder" title="qdyn.model.LevelModel.write_to_runfolder"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_to_runfolder()</span></code></a>.</p>
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.observables">
+<code class="sig-name descname">observables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">with_attribs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.observables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.observables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of all observables with the matching label (or all
+labels if <cite>label</cite> is ‘*’). If <cite>with_attribs</cite> is True, the result is a
+list of tuples <code class="docutils literal notranslate"><span class="pre">(observable,</span> <span class="pre">attributes</span></code>) where <code class="docutils literal notranslate"><span class="pre">attributes</span></code> is a
+dictionary of config file attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.lindblad_ops">
+<code class="sig-name descname">lindblad_ops</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">with_attribs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.lindblad_ops"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.lindblad_ops" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of all Lindblad operators with the matching label (or
+all labels if <cite>label</cite> is ‘*’). If <cite>with_attribs</cite> is True, the result is
+a list of tuples <code class="docutils literal notranslate"><span class="pre">(operator,</span> <span class="pre">attributes</span></code>) where <code class="docutils literal notranslate"><span class="pre">attributes</span></code> is a
+dictionary of config file attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.ham">
+<code class="sig-name descname">ham</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">with_attribs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.ham"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.ham" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of all Hamiltonian operators with the matching label (or
+all labels if <cite>label</cite> is ‘*’). If <cite>with_attribs</cite> is True, the result is
+a list of tuples <code class="docutils literal notranslate"><span class="pre">(ham,</span> <span class="pre">attributes</span></code>) where <code class="docutils literal notranslate"><span class="pre">attributes</span></code> is a
+dictionary of config file attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.pulses">
+<code class="sig-name descname">pulses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.pulses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.pulses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all known pulses with the matching label (or all
+labels if <cite>label</cite> is ‘*’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.add_ham">
+<code class="sig-name descname">add_ham</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">H</span></em>, <em class="sig-param"><span class="n">pulse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">op_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sparsity_model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">op_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.add_ham"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.add_ham" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a term to the system Hamiltonian. If called repeatedly, the
+total Hamiltonian is the sum of all added terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>H</strong> – Hamiltonian matrix. Can be a numpy matrix or array,
+scipy sparse matrix, or <cite>qutip.Qobj</cite></p></li>
+<li><p><strong>pulse</strong> – if not None, <cite>H</cite> will couple to <cite>pulse</cite>. Can be an instance
+of <a class="reference internal" href="qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse" title="qdyn.analytical_pulse.AnalyticalPulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalyticalPulse</span></code></a> or
+<a class="reference internal" href="qdyn.pulse.html#qdyn.pulse.Pulse" title="qdyn.pulse.Pulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pulse</span></code></a>.</p></li>
+<li><p><strong>op_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of the values in <cite>H</cite>.</p></li>
+<li><p><strong>sparsity_model</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – sparsity model that QDYN should use
+to encode the data in <cite>H</cite>. If None, will be determined
+automatically</p></li>
+<li><p><strong>op_type</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the value for <code class="docutils literal notranslate"><span class="pre">op_type</span></code> in the config file
+that should be used for <cite>H</cite>. This determines how exactly <cite>H</cite>
+couples to <cite>pulse</cite>. Common values are ‘dipole’ (linear
+coupling) and ‘dstark’ (quadratic “Stark shift” coupling)</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Multiple Hamiltonians may be defined in the
+same config file if they are differentiated by label. The
+default label is the empty string</p></li>
+<li><p><strong>kwargs</strong> – All other keyword arguments set options for <cite>H</cite> in the
+config file (e.g. <cite>specrad_method</cite>, <cite>filename</cite>)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is recommended to use
+<a class="reference internal" href="qdyn.analytical_pulse.html#qdyn.analytical_pulse.AnalyticalPulse" title="qdyn.analytical_pulse.AnalyticalPulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalyticalPulse</span></code></a> to
+express time-dependency, as this is independent of a specific time
+grid.  Instances of <a class="reference internal" href="qdyn.pulse.html#qdyn.pulse.Pulse" title="qdyn.pulse.Pulse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pulse</span></code></a> must have a time
+grid that exactly matches the time grid specified via
+<a class="reference internal" href="#qdyn.model.LevelModel.set_propagation" title="qdyn.model.LevelModel.set_propagation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_propagation()</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.add_observable">
+<code class="sig-name descname">add_observable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">O</span></em>, <em class="sig-param"><span class="n">outfile</span></em>, <em class="sig-param"><span class="n">exp_unit</span></em>, <em class="sig-param"><span class="n">time_unit</span></em>, <em class="sig-param"><span class="n">col_label</span></em>, <em class="sig-param"><span class="n">square</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">exp_surf</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_real</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">in_lab_frame</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">op_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">from_time_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_time_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.add_observable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.add_observable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an observable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>O</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.matrix.html#numpy.matrix" title="(in NumPy v1.19)"><em>numpy.matrix</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Observable to add. Must be a matrix, or
+one of “ham”, “norm”, “pop”</p></li>
+<li><p><strong>outfile</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of output file to which to write expectation
+values of <cite>O</cite></p></li>
+<li><p><strong>exp_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The unit in which to write the expectation value in
+<cite>outfile</cite>, as well as the default value for <cite>op_unit</cite></p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The unit in which to write the time grid in
+<cite>outfile</cite></p></li>
+<li><p><strong>col_label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label for the column in <cite>outfile</cite> containing
+the expectation value of <cite>O</cite></p></li>
+<li><p><strong>square</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – If not None, label for the column in
+<cite>outfile</cite> containing the expectation value for the square of
+<cite>O</cite></p></li>
+<li><p><strong>exp_surf</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The surface number the expectation value;
+only if <cite>O</cite> is a string</p></li>
+<li><p><strong>is_real</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Whether or not the expectation value is
+real. If not given, this is determined  automatically</p></li>
+<li><p><strong>in_lab_frame</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, indicates that the observable is
+defined in the lab frame. When expectation values are
+calculated, this should not be done with states in the rotating
+frame.</p></li>
+<li><p><strong>op_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The unit in which the entries of <cite>O</cite> are
+given. By default, this is the same as <cite>exp_unit</cite>.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Observables associated with different
+Hamiltonians may be defined in the same config file if they are
+differentiated by label. The default label is the empty string.</p></li>
+<li><p><strong>pulse</strong> – If not None, a pulse for the observable to couple to (see
+<a class="reference internal" href="#qdyn.model.LevelModel.add_ham" title="qdyn.model.LevelModel.add_ham"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_ham()</span></code></a>)</p></li>
+<li><p><strong>from_time_index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Index on total time grid from where
+to start calculating/writing expectation values. Negative
+values count from the end of the time grid. If None, equivalent
+to 1.</p></li>
+<li><p><strong>to_time_index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Index on total time grid where to stop
+calculating/writing expectation values. Negative values count
+from the end of the time grid. If None, equivalent to -1</p></li>
+<li><p><strong>step</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Step width for where to calculate/write
+expectation values between <cite>from_time_index</cite> and
+<cite>to_time_index</cite>.  If None, equivalent to 1</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.add_lindblad_op">
+<code class="sig-name descname">add_lindblad_op</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">op_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sparsity_model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">add_to_H_jump</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.add_lindblad_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.add_lindblad_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add Lindblad operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.matrix.html#numpy.matrix" title="(in NumPy v1.19)"><em>numpy.matrix</em></a>) – Lindblad operator to  add. Must be a
+matrix or a tuple <code class="docutils literal notranslate"><span class="pre">(matrix,</span> <span class="pre">pulse)</span></code>, cf. the <cite>ham</cite> attribute.</p></li>
+<li><p><strong>op_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of the values in <cite>L</cite>, e.g. <code class="docutils literal notranslate"><span class="pre">sqrt_GHz</span></code>
+(Lindblad operators are in units square-root-of-energy)</p></li>
+<li><p><strong>sparsity_model</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – sparsity model that QDYN should use
+to encode the data in <cite>L</cite>. If None, will be determined
+automatically</p></li>
+<li><p><strong>add_to_H_jump</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – sparsity model to be set for
+<cite>add_to_H_jump</cite>, i.e. for the decay term in the effective MCWF
+Hamiltonian. If None, will be de determined automatically.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Lindblad operators associated with different
+Hamiltonians may be defined in the same config file if they are
+differentiated by label. The default label is the empty string.</p></li>
+<li><p><strong>pulse</strong> – If not None, a pulse for the Lindblad operator to couple to
+(see <a class="reference internal" href="#qdyn.model.LevelModel.add_ham" title="qdyn.model.LevelModel.add_ham"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_ham()</span></code></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>All other keyword arguments set options for <cite>L</cite> in the config file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.set_dissipator">
+<code class="sig-name descname">set_dissipator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">D</span></em>, <em class="sig-param"><span class="n">op_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sparsity_model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.set_dissipator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.set_dissipator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a dissipation superoperator in the config file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>D</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.matrix.html#numpy.matrix" title="(in NumPy v1.19)"><em>numpy.matrix</em></a>) – Dissiption superoperoperator to add.
+Must be a matrix or a tuple <code class="docutils literal notranslate"><span class="pre">(matrix,</span> <span class="pre">pulse)</span></code></p></li>
+<li><p><strong>op_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit of the value in <cite>D</cite>. e.g. <code class="docutils literal notranslate"><span class="pre">GHz</span></code>
+(dissipators are in units of energy)</p></li>
+<li><p><strong>sparsity_model</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – sparsity model that QDYN should use
+to encode the data in <cite>D</cite>. If None, will be determined
+automatically</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Dissipators associated with different
+Hamiltonians may be defined in the same config file if they are
+differentiated by label. The default label is the empty string.</p></li>
+<li><p><strong>pulse</strong> – If not None, a pulse for the Dissipator to couple to</p></li>
+</ul>
+</dd>
+</dl>
+<p>All other keyword arguments set options for the dissipator in the
+config file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.set_propagation">
+<code class="sig-name descname">set_propagation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">nt</span></em>, <em class="sig-param"><span class="n">time_unit</span></em>, <em class="sig-param"><span class="n">t0</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">prop_method</span><span class="o">=</span><span class="default_value">'newton'</span></em>, <em class="sig-param"><span class="n">use_mcwf</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">mcwf_order</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">construct_mcwf_ham</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">initial_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.set_propagation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.set_propagation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the time grid and other propagation-specific settings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – final time</p></li>
+<li><p><strong>nt</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of points in the time grid</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – physical unit of <cite>T</cite>, <cite>t0</cite></p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – initial time</p></li>
+<li><p><strong>prop_method</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – method to be used for propagation</p></li>
+<li><p><strong>use_mcwf</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, prepare for Monte-Carlo wave function
+propagation</p></li>
+<li><p><strong>mcwf_order</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Order for MCWF, must be 1 or 2</p></li>
+<li><p><strong>construct_mcwf_ham</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – When using MCWF (<cite>use_mcwf=True</cite>), by
+default an additional inhomogeneous decay term is added to the
+Hamiltonian, based on the Lindblad operators. By passing
+<cite>construct_mcwf_ham=False</cite>, this does not happen. It is the
+user’s responsibility then to ensure the Hamiltonian in the
+model is the correct “effective” Hamiltonian for a MCWF
+propagation.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The label for <cite>initial_state</cite></p></li>
+<li><p><strong>initial_state</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Initial wave function</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>When setting up an MCWF propagation, using the <cite>mcwf_order=2</cite> is
+usually the right thing to do. In some cases of strong dissipation,
+it may be numerically more efficient to use a first-order MCWF
+method, where in each time interval <cite>dt</cite> between two time grids
+there is at most one quantum jump, and the jumps takes place over
+the entire duration <cite>dt</cite>. The time steps must be very small
+accordingly. In contrast, for <cite>mcwf_order=2</cite>, all jumps are
+instantaneous, and there can be multiple jumps per time step, but
+the numerical overhead is larger.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.set_oct">
+<code class="sig-name descname">set_oct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">J_T_conv</span></em>, <em class="sig-param"><span class="n">max_ram_mb</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.set_oct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.set_oct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set config file data and pulse properties for optimal control</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Optimization method. Allowed values are ‘krotovpk’,
+‘krotov2’, ‘krotovbwr’, and ‘lbfgs’</p></li>
+<li><p><strong>J_T_conv</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The value of the final time functional</p></li>
+<li><p><strong>max_ram_mb</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The amount of memory that is available for
+storing propagated states. If this is not suffient to hold all
+the states required to calculate the gradient, a “segmented”
+storage scheme will be used that caches the states to disk,
+using up to <cite>max_disk_mb</cite> hard drive storage.</p></li>
+</ul>
+</dd>
+</dl>
+<p>All other keyword arguments directly specify keys and values for the
+OCT config section. Allowed keys are <cite>iter_start</cite>, <cite>iter_stop</cite>,
+<cite>max_disk_mb</cite>, <cite>lbfgs_memory</cite>, <cite>linesearch</cite>, <cite>grad_order</cite>, <cite>iter_dat</cite>,
+<cite>tau_dat</cite>, <cite>params_file</cite>, <cite>krotov2_conv_dat</cite>, <cite>ABC_dat</cite>,
+<cite>delta_J_conv</cite>, <cite>delta_J_T_conv</cite>, <cite>A</cite>, <cite>B</cite>, <cite>C</cite>, <cite>dynamic_sigma</cite>,
+<cite>dynamic_lambda_a</cite>, <cite>strict_convergence</cite>, <cite>limit_pulses</cite>, <cite>sigma_form</cite>,
+<cite>max_seconds</cite>, <cite>lambda_b</cite>, <cite>keep_pulses</cite>, <cite>re_init_prop</cite>, <cite>continue</cite>
+<cite>storage_folder</cite>, <cite>bwr_nint</cite>, <cite>bwr_base</cite>, <cite>g_a</cite>, see the QDYN Fortran
+library documentation for details.</p>
+<p><strong>Note</strong>:
+<cite>continue</cite> is a python keyword, which is why the key for <cite>continue</cite> is
+can also be set with <cite>continue_</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the settings for a pulse contain invalid or
+    missing keys</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.add_state">
+<code class="sig-name descname">add_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.add_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.add_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a state (amplitude array) for the given label. Note that there
+can only be one state per label. Thus calling <cite>add_state</cite> with the same
+<cite>label</cite> of an earlier call will replace the <cite>state</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="qdyn.model.LevelModel.write_to_runfolder">
+<code class="sig-name descname">write_to_runfolder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">runfolder</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">'config'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/model.html#LevelModel.write_to_runfolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.model.LevelModel.write_to_runfolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the model to the given runfolder. This will create a config
+file (<cite>config</cite>) in the runfolder, as well as all dependent data file
+(operators, pulses)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="qdyn.prop_gate.html" class="btn btn-neutral float-right" title="qdyn.prop_gate module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="qdyn.memoize.html" class="btn btn-neutral float-left" title="qdyn.memoize module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

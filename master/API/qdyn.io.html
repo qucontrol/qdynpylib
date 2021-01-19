@@ -1,0 +1,834 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.io module &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdyn.linalg module" href="qdyn.linalg.html" />
+    <link rel="prev" title="qdyn.config module" href="qdyn.config.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the QDYN-pylib package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qdyn.analytical_pulse.html">qdyn.analytical_pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.config.html">qdyn.config module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qdyn.io module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.linalg.html">qdyn.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.memoize.html">qdyn.memoize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.model.html">qdyn.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.prop_gate.html">qdyn.prop_gate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.pulse.html">qdyn.pulse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.shutil.html">qdyn.shutil module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.testing.html">qdyn.testing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qdyn.units.html">qdyn.units module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="qdyn.html">qdyn package</a> &raquo;</li>
+        
+      <li>qdyn.io module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-qdyn.io">
+<span id="qdyn-io-module"></span><h1>qdyn.io module<a class="headerlink" href="#module-qdyn.io" title="Permalink to this headline">¶</a></h1>
+<p>Routines for reading and writing files compatible with QDYN</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.datablock" title="qdyn.io.datablock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datablock</span></code></a></p></td>
+<td><p>Iterator over the lines inside the file with the given <cite>filename</cite> inside the given <cite>block</cite> only.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.fix_fortran_exponent" title="qdyn.io.fix_fortran_exponent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fix_fortran_exponent</span></code></a></p></td>
+<td><p>In 3-digit exponents, Fortran drops the ‘E’.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.iterate_psi_amplitudes" title="qdyn.io.iterate_psi_amplitudes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterate_psi_amplitudes</span></code></a></p></td>
+<td><p>Iterate over blocks of wave functions stored in <cite>filename</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.open_file" title="qdyn.io.open_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_file</span></code></a></p></td>
+<td><p>Wrapper around <a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.open" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a>, allowing <cite>file</cite> to be a file handle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.print_matrix" title="qdyn.io.print_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_matrix</span></code></a></p></td>
+<td><p>Print a numpy complex matrix to screen, or to a file if outfile is given.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.read_ascii_dump" title="qdyn.io.read_ascii_dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_ascii_dump</span></code></a></p></td>
+<td><p>Read a file in the format written by the QDYN <cite>dump_ascii_*</cite> routines and return its data as a nested OrderedDict.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.read_cmplx_array" title="qdyn.io.read_cmplx_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_cmplx_array</span></code></a></p></td>
+<td><p>Read a complex array from a file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.read_cmplx_matrix" title="qdyn.io.read_cmplx_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_cmplx_matrix</span></code></a></p></td>
+<td><p>Read in complex matrix from file (as written by the Fortran QDYN <code class="docutils literal notranslate"><span class="pre">print_cmplx_matrix</span></code> routine).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.read_complex" title="qdyn.io.read_complex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_complex</span></code></a></p></td>
+<td><p>Convert a string to a complex number</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.read_indexed_matrix" title="qdyn.io.read_indexed_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_indexed_matrix</span></code></a></p></td>
+<td><p>Read in a matrix from the file with the given filename</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.read_psi_amplitudes" title="qdyn.io.read_psi_amplitudes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_psi_amplitudes</span></code></a></p></td>
+<td><p>Read the wave function of size <cite>n</cite> from file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.read_real" title="qdyn.io.read_real"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_real</span></code></a></p></td>
+<td><p>Convert a string to a real number</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.tempinput" title="qdyn.io.tempinput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tempinput</span></code></a></p></td>
+<td><p>Context manager providing a temporary filename for a file containing the given data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.write_cmplx_array" title="qdyn.io.write_cmplx_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_cmplx_array</span></code></a></p></td>
+<td><p>Write a complex array to file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.write_indexed_matrix" title="qdyn.io.write_indexed_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_indexed_matrix</span></code></a></p></td>
+<td><p>Write the given matrix to file in indexed format (1-based indexing)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdyn.io.write_psi_amplitudes" title="qdyn.io.write_psi_amplitudes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_psi_amplitudes</span></code></a></p></td>
+<td><p>Write the wave function to file in the same format as the <cite>write_psi_amplitudes</cite> Fortran routine</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.io.writetotxt" title="qdyn.io.writetotxt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">writetotxt</span></code></a></p></td>
+<td><p>Inverse function to numpy.genfromtxt and similar to <cite>numpy.savetxt</cite>, but allowing to write <em>multiple</em> numpy arrays as columns to a text file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="qdyn.io.open_file">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">open_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'r'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#open_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.open_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.open" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a>, allowing <cite>file</cite> to be a file handle.</p>
+<p>Any <cite>kwargs</cite> are passed to <a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.open" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a>. The <cite>file</cite> parameter may also
+be given as the string ‘-‘, which indicates <a class="reference external" href="https://docs.python.org/3.8/library/sys.html#sys.stdin" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.stdin</span></code></a> for
+<code class="docutils literal notranslate"><span class="pre">mode='r'</span></code> and <a class="reference external" href="https://docs.python.org/3.8/library/sys.html#sys.stdout" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.stdout</span></code></a> for <code class="docutils literal notranslate"><span class="pre">mode='w'</span></code>. If <cite>file</cite> is an open
+file handle, its <cite>mode</cite> and <cite>encoding</cite> are checked against the arguments;
+the file handle will not be closed one exit.</p>
+<p>In Python 2, if no <cite>kwargs</cite> beyond <cite>mode</cite> are given and <cite>file</cite> is a string
+giving a pathname or a file descriptor, the built-in <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#open" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> function
+is used instead of <a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.open" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a>. As a consequence, regular (unencoded)
+strings can be read or written directly from or to the resulting file
+handle, without having to open it in binary mode. This behavior provides
+maximal compatibility between Python 2 and 3.</p>
+<p>This function must be used as a context manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fh</span><span class="p">:</span>
+<span class="gp">... </span>     <span class="n">written_bytes</span> <span class="o">=</span> <span class="n">out_fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Hello World&quot;</span><span class="p">)</span>
+<span class="go">Hello World</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#IOError" title="(in Python v3.8)"><strong>IOError</strong></a> – If the file cannot be opened (see <a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.open" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a>), if <cite>file</cite>
+    is open file handle with the incorrect <cite>mode</cite> or <cite>encoding</cite>, or if
+    <cite>file</cite> is ‘-‘ and <cite>mode</cite> is neither ‘r’ nor ‘w’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.tempinput">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">tempinput</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">binary</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#tempinput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.tempinput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager providing a temporary filename for a file containing the
+given data. If binary is True, the data will be written as-is, and must be
+suitable for writing in binary mode. Otherwise, if encoding the given data
+to utf-8 is at all possible, the temporary file will be
+a text file with utf-8 encoding. The file is deleted on leaving the
+context.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">In the world of the very small, where particle and wave</span>
+<span class="gp">... </span><span class="s1">aspects of reality are equally significant, things do not</span>
+<span class="gp">... </span><span class="s1">behave in any way that we can understand from our experience</span>
+<span class="gp">... </span><span class="s1">of the everyday world...all pictures are false, and there is</span>
+<span class="gp">... </span><span class="s1">no physical analogy we can make to understand what goes on</span>
+<span class="gp">... </span><span class="s1">inside atoms. Atoms behave like atoms, nothing else.&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">tempinput</span><span class="p">(</span><span class="n">test_str</span><span class="p">)</span> <span class="k">as</span> <span class="n">filename</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">in_fh</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+<span class="go">In the world of the very small, where particle and wave</span>
+<span class="go">aspects of reality are equally significant, things do not</span>
+<span class="go">behave in any way that we can understand from our experience</span>
+<span class="go">of the everyday world...all pictures are false, and there is</span>
+<span class="go">no physical analogy we can make to understand what goes on</span>
+<span class="go">inside atoms. Atoms behave like atoms, nothing else.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.write_indexed_matrix">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">write_indexed_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">line_formatter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hermitian</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#write_indexed_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.write_indexed_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the given matrix to file in indexed format (1-based indexing)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.matrix.html#numpy.matrix" title="(in NumPy v1.19)"><em>numpy.matrix</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>, </em><em>qutip.Qobj</em><em> or </em><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.spmatrix.html#scipy.sparse.spmatrix" title="(in SciPy v1.6.0)"><em>scipy.sparse.spmatrix</em></a>) – Matrix to write to file. If an ndarray is given, it has to be
+2-dimenstional</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file to write to</p></li>
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – Comment line, or array of comment lines to write to the top of the
+file. Each line that does not start with ‘#’ will have “# ”
+prepended.</p></li>
+<li><p><strong>line_formatter</strong> (<em>callable</em>) – <p>Function that takes three arguments i, j, v (row index, column index,
+and complex value matrix[i,j]) and returns a line to be written to
+file. If the function returns None for any input data, no line will be
+written to file. If not given, defaults to</p>
+<blockquote>
+<div><p>lambda i, j, v: “%8d%8d%25.16E” % (i, j, v.real)</p>
+</div></blockquote>
+<p>if matrix is real and</p>
+<blockquote>
+<div><p>lambda i, j, v:  “%8d%8d%25.16E%25.16E” % (i, j, v.real, v.imag)</p>
+</div></blockquote>
+<p>if matrix is complex.</p>
+</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Header line to be written before any data. Must start with either ‘#’
+or a space, in which case the leading space will be replaced with ‘#’.
+Defaults to a header line suitable for the default line_formatter</p></li>
+<li><p><strong>hermitian</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, write only entries from the upper triangle</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Only values with an absolute value greater than <cite>limit</cite> are written</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_indexed_matrix">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_indexed_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'coo'</span></em>, <em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expand_hermitian</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">val_real</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_indexed_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_indexed_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a matrix from the file with the given filename</p>
+<p>The file must contain a description in indexed format, like this:</p>
+<blockquote>
+<div><dl class="simple">
+<dt># row  col  re(val) im(val)</dt><dd><p>0    1  1.0     0.0
+1    0  0.0     1.0</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The fourth column is optional, if not present, the result will be real.</p>
+<p>Return a matrix in any of the numpy/scipy sparse (or non-sparse) formats.
+See the documentation of scipy.sparse for information about the different
+sparse formats</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file from which to read the matrix</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Result type:
+* ‘coo’ (default): scipy.sparse.coo.coo_matrix
+* ‘array’: numpy.ndarray
+* ‘dense’: numpy.matrixlib.defmatrix.matrix
+* ‘bsr’: scipy.sparse.bsr.bsr_matrix
+* ‘csc’: scipy.sparse.csc.csc_matrix
+* ‘csr’: scipy.sparse.csr.csr_matrix
+* ‘dia’: scipy.sparse.dia.dia_matrix
+* ‘dok’: scipy.sparse.dok.dok_matrix
+* ‘lil’: scipy.sparse.lil.lil_matrix</p></li>
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – If given, shape of the resulting matrix. If not given, will be
+determined from largest occurring index in the data from the input file</p></li>
+<li><p><strong>expand_hermitian</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, the input file must contain data only for the upper or lower
+triangle. The oterh triangle will be set with the complex conjugate
+values.</p></li>
+<li><p><strong>val_real</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, only read 3 columns from the input file (i, j, value), even if
+more columns are present in the file, and return a real matrix.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.print_matrix">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">print_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">M</span></em>, <em class="sig-param"><span class="n">matrix_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">1e-14</span></em>, <em class="sig-param"><span class="n">fmt</span><span class="o">=</span><span class="default_value">'%9.2E'</span></em>, <em class="sig-param"><span class="n">compress</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">zero_as_blank</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">out</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#print_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.print_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a numpy complex matrix to screen, or to a file if outfile is given.
+Values below the given limit are printed as zero</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.spmatrix.html#scipy.sparse.spmatrix" title="(in SciPy v1.6.0)"><em>scipy.sparse.spmatrix</em></a>) – Matrix to print. In addition to a standard dense matrix, may also be
+any scipy sparse matrix in a format where M[i,j] is defined.</p></li>
+<li><p><strong>matrix_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of matrix</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Any number (real or imaginary part) whose absolute value is smaller than
+this limit will be printed as 0.0.</p></li>
+<li><p><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>callable</em>) – Format of each entry (both for real and imaginary part). If str, must
+be an “old-style” format string the formats a single floating value. If
+a callable, the callable must return a string of fixed length when
+passed a number. The string returned by <code class="docutils literal notranslate"><span class="pre">fmt(0)</span></code> will be used for
+values that are exactly zero, whereas the string returned by
+<code class="docutils literal notranslate"><span class="pre">fmt(0.0)</span></code> will be used for values that are below <cite>limit</cite>.</p></li>
+<li><p><strong>compress</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, remove spaces to compress the output to be narrower. Real and
+imaginary parts will no longer be aligned.</p></li>
+<li><p><strong>zero_as_blank</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, represent entries that are exactly zero as blank strings</p></li>
+<li><p><strong>out</strong> (<em>file</em>) – open filehandle. If None, print to stdout</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0e-20</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mf">1.0e-9</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="go">{ 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)</span>
+<span class="go">(      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)</span>
+<span class="go">( 1.00E+00, 1.00E+00)( 1.00E-09,      0.0){-1.00E+00,      0.0}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">)</span>
+<span class="go">{ 1.00E+00,      0.0}( 2.00E+00,      0.0)(        0,        0)</span>
+<span class="go">(      0.0,-1.00E+00){ 2.00E+00,      0.0}(      0.0,      0.0)</span>
+<span class="go">( 1.00E+00, 1.00E+00)(      0.0,      0.0){-1.00E+00,      0.0}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{1.00E+00,     0.0}(2.00E+00,     0.0)(       0,       0)</span>
+<span class="go">(    0.0,-1.00E+00){2.00E+00,     0.0}(     0.0,     0.0)</span>
+<span class="go">(1.00E+00,1.00E+00)(1.00E-09,     0.0){-1.00E+00,    0.0}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zero_as_blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{1.00E+00,     0.0}(2.00E+00,     0.0)(                 )</span>
+<span class="go">(    0.0,-1.00E+00){2.00E+00,     0.0}(     0.0,     0.0)</span>
+<span class="go">(1.00E+00,1.00E+00)(1.00E-09,     0.0){-1.00E+00,    0.0}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%5.1f</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">{  1.0,  0.0}(  2.0,  0.0)(    0,    0)</span>
+<span class="go">(  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)</span>
+<span class="go">(  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">compact_exp_fmt</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%7d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="mi">0</span>
+<span class="gp">... </span>    <span class="k">else</span><span class="p">:</span>  <span class="c1"># single-digit exponent</span>
+<span class="gp">... </span>        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%8.1e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">x</span>
+<span class="gp">... </span>        <span class="n">base</span><span class="p">,</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">base</span> <span class="o">+</span> <span class="s1">&#39;e</span><span class="si">%+d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zero_as_blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">compact_exp_fmt</span><span class="p">)</span>
+<span class="go">{1.0e+0,     0}(2.0e+0,     0)(             )</span>
+<span class="go">(    0,-1.0e+0){2.0e+0,     0}(     0,     0)</span>
+<span class="go">(1.0e+0,1.0e+0)(1.0e+0,     0){-1.0e+0,    0}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">matrix_name</span><span class="o">=</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%5.1f</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">M = [</span>
+<span class="go">{  1.0,  0.0}(  2.0,  0.0)(    0,    0)</span>
+<span class="go">(  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)</span>
+<span class="go">(  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}</span>
+<span class="go">]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">scipy.sparse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_matrix</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">matrix_name</span><span class="o">=</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%5.1f</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">M = [</span>
+<span class="go">{  1.0,  0.0}(  2.0,  0.0)(    0,    0)</span>
+<span class="go">(  0.0, -1.0){  2.0,  0.0}(  0.0,  0.0)</span>
+<span class="go">(  1.0,  1.0)(  1.0,  0.0){ -1.0,  0.0}</span>
+<span class="go">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.fix_fortran_exponent">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">fix_fortran_exponent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#fix_fortran_exponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.fix_fortran_exponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>In 3-digit exponents, Fortran drops the ‘E’. Return a string with the
+‘E’ restored.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="s2">&quot;1.0-100&quot;</span><span class="p">))</span>
+<span class="go">1.0E-100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fix_fortran_exponent</span><span class="p">(</span><span class="s2">&quot;1.0E-99&quot;</span><span class="p">))</span>
+<span class="go">1.0E-99</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_complex">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_complex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_complex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_complex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a string to a complex number</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">read_complex</span><span class="p">(</span><span class="s2">&quot;1.0 -2.0-100&quot;</span><span class="p">)</span>
+<span class="go">(1-2e-100j)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_real">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_real</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">str</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_real"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_real" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a string to a real number</p>
+<p>This works for Fortran-formatted numbers with a missing ‘E’ sign</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">read_real</span><span class="p">(</span><span class="s2">&quot;-2.0-100&quot;</span><span class="p">)</span>
+<span class="go">-2e-100</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_cmplx_array">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_cmplx_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_cmplx_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_cmplx_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a complex array from a file. The file must contain two columns
+(real and imaginary part). This routine is equivalent to the Fortran QDYN
+<code class="docutils literal notranslate"><span class="pre">read_cmplx_array</span></code> routine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>file</em><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><em>pathlib.Path</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em><em>, </em><em>generator</em>) – File,
+filename, list, or generator to read. Cf. <cite>fname</cite> in
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.genfromtxt.html#numpy.genfromtxt" title="(in NumPy v1.19)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.genfromtxt()</span></code></a>.</p></li>
+<li><p><strong>**kwargs</strong> – All keyword arguments are passed to <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.genfromtxt.html#numpy.genfromtxt" title="(in NumPy v1.19)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.genfromtxt()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>You may use <a class="reference internal" href="#qdyn.io.datablock" title="qdyn.io.datablock"><code class="xref py py-func docutils literal notranslate"><span class="pre">datablock()</span></code></a> as a wrapper for <cite>fileanme</cite> in order to
+read a specific block from a file that contains multiple blocks</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_cmplx_matrix">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_cmplx_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_cmplx_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_cmplx_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in complex matrix from file (as written by the Fortran QDYN
+<code class="docutils literal notranslate"><span class="pre">print_cmplx_matrix</span></code> routine).</p>
+<p>Return a two-dimensional, double precision complex Numpy array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – str or file-like object from which to read gate, or file-like
+object with equivalent content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.datablock">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">datablock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">block</span></em>, <em class="sig-param"><span class="n">decoding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#datablock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.datablock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterator over the lines inside the file with the given <cite>filename</cite> inside
+the given <cite>block</cite> only. Blocks must be separated by two empty lines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file from which to read</p></li>
+<li><p><strong>block</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – One-based Index of the desired block. A value of less than
+1 or more than the number of block available in the file will not
+cause an error, but result in an empty iterator</p></li>
+<li><p><strong>decoding</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – By default, the resulting lines are byte
+strings (so that <a class="reference internal" href="#qdyn.io.datablock" title="qdyn.io.datablock"><code class="xref py py-func docutils literal notranslate"><span class="pre">datablock()</span></code></a> can wrap <cite>fname</cite> in
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.genfromtxt.html#numpy.genfromtxt" title="(in NumPy v1.19)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.genfromtxt()</span></code></a>). If <cite>decoding</cite> is given different from None,
+the resulting strings will be decoded instead.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.write_cmplx_array">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">write_cmplx_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">carray</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fmtstr</span><span class="o">=</span><span class="default_value">'%25.16E'</span></em>, <em class="sig-param"><span class="n">append</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#write_cmplx_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.write_cmplx_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a complex array to file. Equivalent to the Fortran QDYN
+<cite>write_cmplx_array</cite>  routine. Two columns will be written to the output
+file (real and imaginary part of <cite>carray</cite>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file to which to write the array</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A header line, to be written immediately before
+the data. Should start with a ‘#’</p></li>
+<li><p><strong>fmtstr</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The format to use for reach of the two columns</p></li>
+<li><p><strong>append</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, append to existing files, with a separator of
+two blank lines</p></li>
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A comment line, to be written at the top of the
+file (before the header). Should start with a ‘#’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.writetotxt">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">writetotxt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#writetotxt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.writetotxt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse function to numpy.genfromtxt and similar to <cite>numpy.savetxt</cite>,
+but allowing to write <em>multiple</em> numpy arrays as columns to a text file.
+Also, handle headers/footers more intelligently.</p>
+<p>The first argument is the filename or handler to which to write, followed
+by an arbitrary number of numpy arrays, to be written as columns in the
+file (real arrays will produce once column, complex arrays two). The
+remaining keyword arguments are passed directly to <cite>numpy.savetxt</cite> (with
+fixes to the header/footer lines, as described below)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – filename or file handle</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Numpy arrays to write to fname. All arrays must have
+the same length</p></li>
+<li><p><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – A single format (e.g. ‘%10.5f’), a sequence
+of formats, or a multi-format string, e.g.
+‘Iteration %d – %10.5f’, in which case <cite>delimiter</cite> is ignored. For
+a complex array in <cite>*args</cite>, a format for the real and imaginary
+parts must be given.  Defaults to ‘%25.16E’.</p></li>
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Character separating columns. Defaults to ‘’</p></li>
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – String that will be written at the beginning
+of the file. If sequence of strings, multiple lines will be
+written.</p></li>
+<li><p><strong>footer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – String that will be written at the end of the
+file. If sequence of strings, multiple lines will be written</p></li>
+<li><p><strong>comments</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – String that will be prepended to the each line of the
+<code class="docutils literal notranslate"><span class="pre">header</span></code> and <code class="docutils literal notranslate"><span class="pre">footer</span></code> strings, to mark them as comments.
+Defaults to ‘# ‘</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <cite>header</cite> and <cite>footer</cite> lines are handled more intelligently than by
+the <cite>numpy.savetxt</cite> routine.  First, header and footer may be an array
+of lines instead of just a (multiline) string.  Second, each line in
+the header may or may not already include the <cite>comments</cite> prefix. If a
+line does not include the <cite>comments</cite> prefix yet, but starts with a
+sufficient number of spaces, the <cite>comments</cite> prefix will not be
+prepended to the line in output, but will overwrite the beginning of
+the line, so as not to change the line length. E.g. giving
+<cite>header=”   time [ns]”</cite> will result in a header line of
+<cite>#  time [ns]</cite> in the output, not <cite>#    time [ns]</cite>.</p>
+<p>Further explanation of the <cite>fmt</cite> parameter
+(<code class="docutils literal notranslate"><span class="pre">%[flag]width[.precision]specifier</span></code>):</p>
+<dl>
+<dt>flags:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">-</span></code> : left justify</p>
+<p><code class="docutils literal notranslate"><span class="pre">+</span></code> : Forces to precede result with + or -.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">0</span></code><span class="classifier">Left pad the number with zeros instead of space (see</span></dt><dd><p>width).</p>
+</dd>
+</dl>
+</dd>
+<dt>width:</dt><dd><p>Minimum number of characters to be printed. The value is not
+truncated if it has more characters.</p>
+</dd>
+<dt>precision:</dt><dd><ul class="simple">
+<li><p>For integer specifiers (eg. <code class="docutils literal notranslate"><span class="pre">d,i</span></code>), the minimum number of
+digits.</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">e,</span> <span class="pre">E</span></code> and <code class="docutils literal notranslate"><span class="pre">f</span></code> specifiers, the number of digits to print
+after the decimal point.</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">g</span></code> and <code class="docutils literal notranslate"><span class="pre">G</span></code>, the maximum number of significant digits.</p></li>
+</ul>
+</dd>
+<dt>specifiers (partial list):</dt><dd><p><code class="docutils literal notranslate"><span class="pre">c</span></code> : character</p>
+<p><code class="docutils literal notranslate"><span class="pre">d</span></code> or <code class="docutils literal notranslate"><span class="pre">i</span></code> : signed decimal integer</p>
+<p><code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code> : scientific notation with <code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">f</span></code> : decimal floating point</p>
+<p><code class="docutils literal notranslate"><span class="pre">g,G</span></code> : use the shorter of <code class="docutils literal notranslate"><span class="pre">e,E</span></code> or <code class="docutils literal notranslate"><span class="pre">f</span></code></p>
+</dd>
+</dl>
+<p>For more details, see <cite>numpy.savetxt</cite></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_ascii_dump">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_ascii_dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">convert_boolean</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">flatten</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_ascii_dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_ascii_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a file in the format written by the QDYN <cite>dump_ascii_*</cite> routines
+and return its data as a nested OrderedDict. The QDYN type of the dumped
+data structure is recorded in the <cite>typename</cite> attribute of the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of file from which to read data</p></li>
+<li><p><strong>convert_boolean</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Convert strings ‘T’, ‘F’ to Boolean values True
+and False</p></li>
+<li><p><strong>flatten</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, numerical array data is returned flattend
+(one-dimensional). If False, it is reshaped to the shape defined in
+the dump file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.write_psi_amplitudes">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">write_psi_amplitudes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psi</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#write_psi_amplitudes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.write_psi_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the wave function to file in the same format as the
+<cite>write_psi_amplitudes</cite> Fortran routine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>psi</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Array of complex probability amplitudes</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file to which to write</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.read_psi_amplitudes">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">read_psi_amplitudes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">block</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">normalize</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#read_psi_amplitudes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.read_psi_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the wave function of size <cite>n</cite> from file. For ‘block=1’, inverse to
+<cite>write_psi_amplitudes</cite>. Returns complex or real numpy array</p>
+<p>By specifying <cite>blocks</cite>, data may be read from a file that contains multiple
+wave functions, in the format generated e.g. by the
+<code class="docutils literal notranslate"><span class="pre">qdyn_prop_traj</span> <span class="pre">--write-all-states</span></code> utility</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file from which to read data</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – dimension of the Hilbert space (i.e. size of returned vector)</p></li>
+<li><p><strong>block</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – One-based index of the block to read from
+<cite>filename</cite>, if the file contains multiple block. Blocks must be
+separated by exactly two empty lines</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to normalize the wave function</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="qdyn.io.iterate_psi_amplitudes">
+<code class="sig-prename descclassname">qdyn.io.</code><code class="sig-name descname">iterate_psi_amplitudes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">start_from_block</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">normalize</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/io.html#iterate_psi_amplitudes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.io.iterate_psi_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over blocks of wave functions stored in <cite>filename</cite></p>
+<p>This is equivalent to the following pseudocode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">iter</span><span class="p">([</span><span class="n">read_psi_amplitudes</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">normalize</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">block</span> <span class="o">&gt;=</span> <span class="n">start_from_block</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Hoever, the data file is only traversed once, and memory is only required
+for one block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of file from which to read data</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – dimension of the Hilbert space (i.e. size of returned vector)</p></li>
+<li><p><strong>start_from_block</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – One-based index of block from which to
+start the iterator.</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to normalize the wave function</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="qdyn.linalg.html" class="btn btn-neutral float-right" title="qdyn.linalg module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="qdyn.config.html" class="btn btn-neutral float-left" title="qdyn.config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

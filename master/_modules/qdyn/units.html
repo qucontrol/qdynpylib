@@ -1,0 +1,1001 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>qdyn.units &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/mycss.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/doctr-versions-menu.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"extensions": ["tex2jax.js"], "jax": ["input/TeX", "output/SVG"], "TeX": {"extensions": ["AMSmath.js", "AMSsymbols.js"], "Macros": {"Re": ["{\\operatorname{Re}}", 0], "Im": ["{\\operatorname{Im}}", 0], "Real": ["{\\mathbb{R}}", 0], "Complex": ["{\\mathbb{C}}", 0], "Integer": ["{\\mathbb{N}}", 0]}}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> QDYN-pylib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0+dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#usage">Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/qdyn.html">API of the qdyn package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QDYN-pylib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>qdyn.units</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for qdyn.units</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Conversion between physical units&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+
+<span class="n">DEFAULT_UNITS</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1"># ------------------------------------------------------------------------------</span>
+<span class="s1">#                               ATOMIC UNITS</span>
+<span class="s1"># ------------------------------------------------------------------------------</span>
+<span class="s1">#</span>
+<span class="s1"># As the name suggest, these units are convenient when dealing with atoms or</span>
+<span class="s1"># molecules, using quantities on the order of</span>
+<span class="s1"># - energies ~ 10^{-18} J</span>
+<span class="s1"># - times    ~ 10^{-17} s</span>
+<span class="s1"># - masses   ~ 10^{-31} kg</span>
+<span class="s1"># - lengths  ~ 10^{-11} m</span>
+<span class="s1">#</span>
+<span class="s1"># Atomic units are the default internal units of QDYN.</span>
+
+<span class="s1"># This file lists the conversion factors from internal units (iu) to the</span>
+<span class="s1"># given physical units</span>
+
+<span class="s1">iu             1.00000000000000000000  # unity :-)</span>
+<span class="s1">au             1.00000000000000000000  # internal units = atomic units</span>
+<span class="s1">unitless       1.00000000000000000000  # unitless number</span>
+<span class="s1">dimensionless  1.00000000000000000000  # dimensionless units</span>
+
+
+<span class="s1"># ------------------------------------------------------------------------------</span>
+<span class="s1"># Basic Units</span>
+<span class="s1"># ------------------------------------------------------------------------------</span>
+
+<span class="s1"># energy</span>
+
+<span class="s1">Hartree        1.00000000000000000000  # Hartree</span>
+<span class="s1">hartree        1.00000000000000000000  # Hartree</span>
+<span class="s1">eV             27.2113834492829731459  # Hartree to electronvolt</span>
+<span class="s1">cminv          2.194746312856066506e5  # Hartree to inverse cm (wavenumbers) (E = h c / lambda) with lambda in cm</span>
+<span class="s1">K              3.157746662555312504e5  # Hartree to Kelvin (E = kb T)</span>
+<span class="s1">J              4.3597438060897550e-18  # Hartree to Joule</span>
+<span class="s1">Hz             6.579683918175572e15    # Hartree to Hz * h</span>
+<span class="s1">GHz            6.579683918175572e6     # Hartree to 10^9 Hz * h</span>
+<span class="s1">MHz            6.579683918175572e9     # Hartree to 10^6 Hz * h</span>
+<span class="s1">kHz            6.579683918175572e12    # Hartree to 10^3 Hz * h</span>
+
+<span class="s1"># square-root of energy (unit of dissipators)</span>
+
+<span class="s1">sqrt_Hartree   1.0000000000000000e+00</span>
+<span class="s1">sqrt_hartree   1.0000000000000000e+00</span>
+<span class="s1">sqrt_eV        5.2164531483837724e+00</span>
+<span class="s1">sqrt_cminv     4.6848119629885537e+02</span>
+<span class="s1">sqrt_K         5.6193831178834148e+02</span>
+<span class="s1">sqrt_J         2.0879999535655540e-09</span>
+<span class="s1">sqrt_Hz        8.1115250835928336e+07</span>
+<span class="s1">sqrt_GHz       2.5650894561741061e+03</span>
+<span class="s1">sqrt_MHz       8.1115250835928338e+04</span>
+<span class="s1">sqrt_kHz       2.5650894561741063e+06</span>
+
+
+<span class="s1"># time</span>
+
+<span class="s1">hartreeinv     1.00000000000000000000  # au = Hartree^{-1}</span>
+<span class="s1">fs             0.02418884327440855991  # au to femtosecond</span>
+<span class="s1">ps             2.4188843274408560e-05  # au to picosecond</span>
+<span class="s1">ns             2.4188843274408560e-08  # au to nanosecond</span>
+<span class="s1">microsec       2.4188843274408560e-11  # au to microsecond</span>
+
+<span class="s1"># length</span>
+
+<span class="s1">Bohr           1.00000000000000000000  # Bohr radius a_0</span>
+<span class="s1">bohr           1.00000000000000000000  # a_0</span>
+<span class="s1">m              5.2917720827883533e-11  # a_0 to meter</span>
+<span class="s1">nm             5.2917720827883533e-2   # a_0 to nanometer</span>
+<span class="s1">microm         5.2917720827883535e-05  # a_0 to micrometer</span>
+<span class="s1">pm             52.917720827883533      # a_0 to picometer</span>
+<span class="s1">Angstrom       0.5291772082788353      # a_0 to angstrom</span>
+<span class="s1">angstrom       0.5291772082788353      # a_0 to angstrom</span>
+
+<span class="s1"># mass</span>
+
+<span class="s1">kg             9.1093818871545313e-31  # electron mass to kg</span>
+<span class="s1">Dalton         5.48579911000000039e-4  # electron mass to Dalton (unified internal mass)</span>
+<span class="s1">dalton         5.48579911000000039e-4  # electron mass to Dalton (unified internal mass)</span>
+
+
+<span class="s1"># ------------------------------------------------------------------------------</span>
+<span class="s1"># Units for couplings (product of coupling and control must yield energy)</span>
+<span class="s1"># ------------------------------------------------------------------------------</span>
+
+<span class="s1"># -----------------------------</span>
+<span class="s1"># single-photon dipole coupling</span>
+<span class="s1"># -----------------------------</span>
+
+<span class="s1"># coupling in dipole strength (charge*length),</span>
+
+<span class="s1">Debye          2.54174622886413859035  # e * a_0 to Debye with e = electron charge</span>
+<span class="s1">debye          2.54174622886413859035  # e * a_0 to Debye</span>
+<span class="s1">coulombmeter   8.4783528105438162e-30  # e * a_0 to Coulomb*meter</span>
+<span class="s1">statCcm        2.5417462288641390e-18  # e * a_0 to statCoulomb*cm</span>
+
+<span class="s1"># control in electric field strength (energy / (charge*length))</span>
+
+<span class="s1">Vpm            5.14220624463189208e11  # Hartree/(a_0*e) to volt/meter</span>
+<span class="s1">Vpcm           5.14220624463189208e09  # Hartree/(a_0*e) to volt/centimeter</span>
+
+<span class="s1"># -----------</span>
+<span class="s1"># Stark shift</span>
+<span class="s1"># -----------</span>
+
+<span class="s1"># Operator is given as polarizability, for field in electric field strength</span>
+<span class="s1">C2m2Jinv       1.6487772754e-41        # e^2 a_0^2 / Hartree to C^2 m^2 J^{-1}</span>
+<span class="s1">cm3            1.4819210151E-25        # e^2 a_0^2 / Hartree to CGS cm^3</span>
+
+<span class="s1"># See http://en.wikipedia.org/wiki/Polarizability for conversion au -&gt; CGS</span>
+
+<span class="s1"># QDYN knows how to square the pulse connected to a &#39;dstark&#39; operator.</span>
+<span class="s1"># Therefore, the field must still be given in units of electric field strength</span>
+
+<span class="s1"># Operator given as inverse energy, for field in energy</span>
+<span class="s1">Hartree^-1     1.00000000000000000000  # Hartree^{-1}</span>
+<span class="s1">hartree^-1     1.00000000000000000000  # Hartree^{-1}</span>
+<span class="s1">eV^-1          3.6749323778896184e-02  # Hartree^{-1} to electronvolt^{-1}</span>
+<span class="s1">cminv^-1       4.5563352523616969e-06  # Hartree^{-1} to wavenumbers^{-1}</span>
+<span class="s1">K^-1           3.1668151592337675e-06  # Hartree^{-1} to Kelvin^{-1}</span>
+<span class="s1">J^-1           2.2937124772447402e+17  # Hartree^{-1} to Joule^{-1}</span>
+<span class="s1">Hz^-1          1.5198298458734732e-16  # Hartree^{-1} to {Hz * h}^{-1}</span>
+<span class="s1">GHz^-1         1.5198298458734732e-07  # Hartree^{-1} to {10^9 Hz * h}^{-1}</span>
+<span class="s1">MHz^-1         1.5198298458734732e-10  # Hartree^{-1} to {10^6 Hz * h}^{-1}</span>
+<span class="s1">kHz^-1         1.5198298458734733e-13  # Hartree^{-1} to {10^3 Hz * h}^{-1}</span>
+
+
+<span class="s1"># ------------------------------------------------------------------------------</span>
+<span class="s1"># Other units</span>
+<span class="s1"># ------------------------------------------------------------------------------</span>
+
+<span class="s1"># Laser field intensity</span>
+<span class="s1"># The conversion factor results here from the standard relation between laser</span>
+<span class="s1"># intensity I and electric field strength E,</span>
+<span class="s1">#  I=1/2 * eps_zero * speed of light * E**2.</span>
+<span class="s1"># (See, for example, Rep. Prog. Phys. 60, 389 (1997), Eq. 1.1)</span>
+<span class="s1"># alpha in the lines below is the fine structure constant</span>
+
+<span class="s1">Wpm2           3.50944521626224e20     # This corresponds to</span>
+<span class="s1">#             1/8/Pi/alpha*atomicenergy/(atomictime*atomiclength**2) to Watt/m^2</span>
+<span class="s1">Wpcm2          3.50944521626224e16     # This corresponds to</span>
+<span class="s1">#            1/8/Pi/alpha*atomicenergy/(atomictime*atomiclength**2) to Watt/cm^2</span>
+
+<span class="s1"># B-field strength (magnetic flux density)</span>
+<span class="s1">gauss          2.35051746468947e09     # hbar/(a_0^2*e) to gauss</span>
+<span class="s1">tesla          2.35051746468947e05     # hbar/(a_0^2*e) to tesla</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="UnitConvert"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitConvert">[docs]</a><span class="k">class</span> <span class="nc">UnitConvert</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Perform conversion between different physical units</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        units_file (str): file from which to read unit definitions.</span>
+<span class="sd">            The content in the file must be in the format specified in</span>
+<span class="sd">            :meth:`read_units_definition`. The file  must contain two columns.</span>
+<span class="sd">            The first columns contains the unit name, the second column the</span>
+<span class="sd">            conversion factor between internal units and the unit. Units are</span>
+<span class="sd">            separated into category blocks of compatible units by comment lines</span>
+<span class="sd">            (starting with &#39;#&#39;). Only units in the same category (i.e., the</span>
+<span class="sd">            same block in `units_file`) can be converted into each other.  If</span>
+<span class="sd">            not given, the converter is initialized with a default set of</span>
+<span class="sd">            units, using atomic units internally.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The special unit name &#39;iu&#39; indicates &quot;internal units&quot;, from and to</span>
+<span class="sd">        which any unit can be converted. By default, this is atomic units (and</span>
+<span class="sd">        &#39;au&#39; is an alias for &#39;iu&#39;). Different internal units may be used by</span>
+<span class="sd">        loading a `units_file`, although there is little reason to do so. It is</span>
+<span class="sd">        required that hbar is 1 in internal units, making energy and time</span>
+<span class="sd">        directly inverse quantities.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; convert = UnitConvert()</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;%.2f&quot; % convert.convert(1000, &#39;MHz&#39;, &#39;GHz&#39;))</span>
+<span class="sd">        1.00</span>
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1000, &#39;MHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;%s&quot; % convert.convert(v, to_unit=&#39;GHz&#39;))</span>
+<span class="sd">        1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; v_in_MHz = numpy.linspace(0, 1000, 3)</span>
+<span class="sd">        &gt;&gt;&gt; v_in_GHz = convert.convert(v_in_MHz, &#39;MHz&#39;, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;, &quot;.join([(&quot;%.2f&quot; % entry) for entry in v_in_GHz]))</span>
+<span class="sd">        0.00, 0.50, 1.00</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># unit =&gt; factor for internal unit to unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># unit =&gt; category ID or &#39;*&#39;</span>
+        <span class="k">if</span> <span class="n">units_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_units_definition</span><span class="p">(</span><span class="n">DEFAULT_UNITS</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="s1">&#39;au&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="s1">&#39;au&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+            <span class="c1"># if the category is &#39;*&#39;, conversion to/from any unit is possible</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">units_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_read_units_definition</span><span class="p">(</span><span class="n">in_fh</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+<div class="viewcode-block" id="UnitConvert.convert"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitConvert.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">from_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert `value` between units. The result will be of the same type</span>
+<span class="sd">        as the input `value`.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            value (float, numpy.ndarray, UnitFloat): Value (or array of values)</span>
+<span class="sd">                to convert</span>
+<span class="sd">            from_unit (str): Unit of `value`. Alternatively, if</span>
+<span class="sd">                `value` is an instance of :class:`UnitFloat`, the `from_unit`</span>
+<span class="sd">                can be taken from value. If given neither directly or obtained</span>
+<span class="sd">                from `value`, convert from &#39;internal units&#39;</span>
+<span class="sd">            to_unit (str): Unit to which to convert. If not given,</span>
+<span class="sd">                convert to &#39;internal units&#39;. Note that `from_unit` and</span>
+<span class="sd">                `to_unit` must be compatible (i.e., both must be units of the</span>
+<span class="sd">                same category, e.g. energy, length, or time)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if `from_unit` and `to_unit` are not compatible,</span>
+<span class="sd">                `from_unit`  is incompatible with `value`, or either</span>
+<span class="sd">                `from_unit` or `to_unit` are unknown units</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">from_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">):</span>
+                <span class="n">from_unit</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">unit</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">from_unit</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="p">(</span><span class="s2">&quot;Value </span><span class="si">%s</span><span class="s2"> of from_unit clashes &quot;</span> <span class="s2">&quot;with value </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># handle a float of 0.0, which is 0.0 in any unit</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">from_unit</span> <span class="o">=</span> <span class="n">to_unit</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># numpy arrays cannot be converted to float</span>
+
+        <span class="k">if</span> <span class="n">from_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">to_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">from_cat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">from_unit</span><span class="p">]</span>
+                <span class="n">to_cat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">to_unit</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">from_cat</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="n">from_cat</span> <span class="o">=</span> <span class="n">to_cat</span>
+                <span class="k">if</span> <span class="n">to_cat</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="n">to_cat</span> <span class="o">=</span> <span class="n">from_cat</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">from_cat</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+                <span class="n">to_cat</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+            <span class="k">if</span> <span class="n">from_cat</span> <span class="o">!=</span> <span class="n">to_cat</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Incompatible units in conversion: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">from_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">convfactor</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">convfactor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="n">from_unit</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown from_unit </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">from_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">to_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">convfactor</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="n">to_unit</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown to_unit </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">to_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="n">convfactor</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">to_unit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="n">convfactor</span></div>
+
+<div class="viewcode-block" id="UnitConvert.add_unit"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitConvert.add_unit">[docs]</a>    <span class="k">def</span> <span class="nf">add_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">convfactor</span><span class="p">,</span> <span class="n">compatible_with</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register a new unit</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            unit (str): name of the unit</span>
+<span class="sd">            convfactor (float): conversion factor to internal units</span>
+<span class="sd">            compatible_with (str): name of another unit that `unit` can be</span>
+<span class="sd">                converted to. Compatibility is transitive, i.e. `unit` will</span>
+<span class="sd">                also be convertible to anything compatible with</span>
+<span class="sd">                `compatible_with`. If not given, the new `unit` can only be</span>
+<span class="sd">                converted to internal units.</span>
+
+
+<span class="sd">        &gt;&gt;&gt; convert = UnitConvert()</span>
+<span class="sd">        &gt;&gt;&gt; convert.add_unit(&quot;THz&quot;, 6.579683918175572e3, compatible_with=&#39;J&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot; &quot;.join(sorted(convert.compatible_units(&#39;GHz&#39;))))</span>
+<span class="sd">        Hartree Hz J K MHz THz au cminv eV hartree iu kHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">convfactor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">compatible_with</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">compatible_with</span> <span class="o">==</span> <span class="s1">&#39;iu&#39;</span><span class="p">:</span>
+            <span class="n">new_category</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_category</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">compatible_with</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_units_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units_def_str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">rx_comment</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^#\s*&#39;</span><span class="p">)</span>
+        <span class="n">rx_unit</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;^(?P&lt;unit&gt;[A-Za-z\d_]+)\s+&#39;</span> <span class="sa">r</span><span class="s1">&#39;(?P&lt;factor&gt;[0-9eE.+-]+)&#39;</span>
+        <span class="p">)</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">units_def_str</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">rx_comment</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">category</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">m_unit</span> <span class="o">=</span> <span class="n">rx_unit</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m_unit</span><span class="p">:</span>
+                    <span class="n">unit</span> <span class="o">=</span> <span class="n">m_unit</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span>
+                    <span class="n">convfactor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m_unit</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;factor&#39;</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">convfactor</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">=</span> <span class="n">category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="s1">&#39;iu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="s1">&#39;iu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="s1">&#39;unitless&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="p">[</span><span class="s1">&#39;dimensionless&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="s1">&#39;unitless&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="s1">&#39;dimensionless&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+
+<div class="viewcode-block" id="UnitConvert.compatible_units"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitConvert.compatible_units">[docs]</a>    <span class="k">def</span> <span class="nf">compatible_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set of all units to which `unit` can be converted</span>
+
+<span class="sd">        &gt;&gt;&gt; convert = UnitConvert()</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot; &quot;.join(sorted(convert.compatible_units(&#39;GHz&#39;))))</span>
+<span class="sd">        Hartree Hz J K MHz au cminv eV hartree iu kHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">unit2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">unit2</span> <span class="o">!=</span> <span class="n">unit</span><span class="p">:</span>
+                <span class="n">cat2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category</span><span class="p">[</span><span class="n">unit2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">cat2</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">or</span> <span class="n">cat</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="n">cat2</span> <span class="o">=</span> <span class="n">cat</span>
+                <span class="k">if</span> <span class="n">cat</span> <span class="o">==</span> <span class="n">cat2</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">unit2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set of all defined unit names&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convfactor</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="UnitFloat"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat">[docs]</a><span class="k">class</span> <span class="nc">UnitFloat</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for a float value with a physical unit. Behaves like a float in</span>
+<span class="sd">    most contexts.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        val (float, UnitFloat): The value. If `val` is an instance of</span>
+<span class="sd">            `UnitFloat` and `unit` is given also, the value will be converted.</span>
+<span class="sd">        unit (str, None): The unit. If None, the unit is take from `val` if</span>
+<span class="sd">            `val` is an instance  of `UnitFloat`, or else the unit is set to</span>
+<span class="sd">            ``unitless``. Any unit known to to the unternal unit convert may be</span>
+<span class="sd">            used. Using internal units (``unit=&#39;iu&#39;``) is valid, but should be</span>
+<span class="sd">            avoided.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        val (float): Value</span>
+<span class="sd">        unit (str): Unit</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        unit_convert (UnitConvert): internal unit converter</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        1_GHz</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        1_unitless</span>
+
+<span class="sd">        &gt;&gt;&gt; v2 = UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(v2, &#39;MHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        1000_MHz</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_str_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*(?P&lt;val&gt;[\d.Ee+-]+)(_(?P&lt;unit&gt;\w+))?\s*$&#39;</span><span class="p">)</span>
+    <span class="n">unit_convert</span> <span class="o">=</span> <span class="n">UnitConvert</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">unit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">unit</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
+
+<div class="viewcode-block" id="UnitFloat.from_str"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.from_str">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create instance from a string</span>
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat.from_str(&#39;1.0_GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v == UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     v = UnitFloat.from_str(&#39;abcd&#39;)</span>
+<span class="sd">        ... except ValueError as e:</span>
+<span class="sd">        ...     print(e)</span>
+<span class="sd">        String &#39;abcd&#39; does not describe a UnitFloat</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="o">.</span><span class="n">_str_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">))</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;String &#39;</span><span class="si">%s</span><span class="s2">&#39; does not describe a UnitFloat&quot;</span> <span class="o">%</span> <span class="n">val_str</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.to_str"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.to_str">[docs]</a>    <span class="k">def</span> <span class="nf">to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert to string while using the specified format for the value</span>
+<span class="sd">        part.</span>
+
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(5.2, &#39;GHz&#39;).to_str(&#39;%.2f&#39;))</span>
+<span class="sd">        5.20_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fmt</span> <span class="o">%</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">fmt</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">fmt</span> <span class="o">+</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.check_str"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.check_str">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check wether the given string describes a valid unit_float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="o">.</span><span class="n">_str_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">val_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_with_unit_conversion</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decoractor for a method taking two instances of UnitFloat (first,</span>
+<span class="sd">        second) as parameter. Converts `second` to the same unit as `first`, if</span>
+<span class="sd">        possible, and throws ValueError otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">other</span> <span class="o">=</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;All arguments must be instances of &quot;</span> <span class="s2">&quot;UnitFloat&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">wrapped</span>
+
+<div class="viewcode-block" id="UnitFloat.__str__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;String representation. Equivalent to :meth:`to_str`.</span>
+
+<span class="sd">        &gt;&gt;&gt; f = UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(f)</span>
+<span class="sd">        1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(str(f))</span>
+<span class="sd">        1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;%s&quot; % str(f))</span>
+<span class="sd">        1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(5.2, &#39;GHz&#39;))</span>
+<span class="sd">        5.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1000.2, &#39;GHz&#39;))</span>
+<span class="sd">        1000.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(100000000000.2, &#39;GHz&#39;))</span>
+<span class="sd">        1e+11_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.2e12, &#39;GHz&#39;))</span>
+<span class="sd">        1.2e+12_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(0))</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.2))</span>
+<span class="sd">        1.2_unitless</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;0&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">()</span></div>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="UnitFloat.__eq__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test equality. Two instances of `UnitFloat` are the same if their</span>
+<span class="sd">        string representation is the same, making the equality check robust</span>
+<span class="sd">        against conversion rounding errors.</span>
+
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) == UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) == UnitFloat(2.0, &#39;GHz&#39;)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) != UnitFloat(2.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) == UnitFloat(1000, &#39;MHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) == &#39;1_GHz&#39;</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) == (1, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0) == 1</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">repr</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># we&#39;ll try other as string, tuple and float</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">UnitFloat</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">other</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">other</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot compare UnitFloat to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">other</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__gt__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__gt__">[docs]</a>    <span class="nd">@_with_unit_conversion</span>
+    <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare two numbers</span>
+
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) &gt; UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(2.0, &#39;GHz&#39;) &gt; UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) &gt;= UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) &lt; UnitFloat(2.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) &lt;= UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; UnitFloat(1.0, &#39;GHz&#39;) &gt; UnitFloat(900, &#39;MHz&#39;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     UnitFloat(1.0, &#39;GHz&#39;) &lt; UnitFloat(2.0, &#39;ns&#39;)</span>
+<span class="sd">        ... except ValueError as e:</span>
+<span class="sd">        ...     print(e)</span>
+<span class="sd">        Incompatible units in conversion: GHz, ns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span></div>
+
+    <span class="nd">@_with_unit_conversion</span>
+    <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span>
+
+<div class="viewcode-block" id="UnitFloat.__neg__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__neg__">[docs]</a>    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Negate number</span>
+
+<span class="sd">        &gt;&gt;&gt; print(-UnitFloat(1.1, &#39;GHz&#39;))</span>
+<span class="sd">        -1.1_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__pos__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__pos__">[docs]</a>    <span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unary positive&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__abs__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__abs__">[docs]</a>    <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute value of number</span>
+
+<span class="sd">        &gt;&gt;&gt; print(abs(UnitFloat(-1.1, &#39;GHz&#39;)))</span>
+<span class="sd">        1.1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(abs(UnitFloat(1.1, &#39;GHz&#39;)))</span>
+<span class="sd">        1.1_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__round__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__round__">[docs]</a>    <span class="k">def</span> <span class="fm">__round__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Round to n decimal places.</span>
+<span class="sd">        This results in a :class:`UnitFloat` in Python 3 and a float in Python</span>
+<span class="sd">        2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__floor__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__floor__">[docs]</a>    <span class="k">def</span> <span class="nf">__floor__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Round down to nearest integer.</span>
+<span class="sd">        This results in a :class:`UnitFloat` in Python 3 and a float in Python</span>
+<span class="sd">        2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__ceil__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__ceil__">[docs]</a>    <span class="k">def</span> <span class="nf">__ceil__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Round up to nearest integer.</span>
+<span class="sd">        This results in a :class:`UnitFloat` in Python 3 and a float in Python</span>
+<span class="sd">        2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__add__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__add__">[docs]</a>    <span class="nd">@_with_unit_conversion</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add two numbers, which must use exactly the same unit.</span>
+
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.1, &#39;GHz&#39;) + UnitFloat(2.1, &#39;GHz&#39;))</span>
+<span class="sd">        3.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.1, &#39;GHz&#39;) - UnitFloat(2.0, &#39;GHz&#39;))</span>
+<span class="sd">        -0.9_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.0, &#39;GHz&#39;) + UnitFloat(100, &#39;MHz&#39;))</span>
+<span class="sd">        1.1_GHz</span>
+
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     UnitFloat(1.0, &#39;GHz&#39;) + 1.0</span>
+<span class="sd">        ... except TypeError as e:</span>
+<span class="sd">        ...     print(e)</span>
+<span class="sd">        All arguments must be instances of UnitFloat</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+    <span class="nd">@_with_unit_conversion</span>
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UnitFloat.__mul__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__mul__">[docs]</a>    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Multiply with a number</span>
+
+<span class="sd">        &gt;&gt;&gt; print(2*UnitFloat(1.1, &#39;GHz&#39;))</span>
+<span class="sd">        2.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.1, &#39;GHz&#39;)*2)</span>
+<span class="sd">        2.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; print(UnitFloat(1.1, &#39;GHz&#39;)*&quot;2.0&quot;)</span>
+<span class="sd">        2.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     print(UnitFloat(1.1, &#39;GHz&#39;)*UnitFloat(1.1, &#39;GHz&#39;))</span>
+<span class="sd">        ... except TypeError as e:</span>
+<span class="sd">        ...     print(e)</span>
+<span class="sd">        Factor cannot be an instance of UnitFloat</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     print(UnitFloat(1.1, &#39;GHz&#39;)*2.0j)</span>
+<span class="sd">        ... except TypeError as e:</span>
+<span class="sd">        ...     print(e)</span>
+<span class="sd">        can&#39;t convert complex to float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Factor cannot be an instance of UnitFloat&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+<div class="viewcode-block" id="UnitFloat.__iadd__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__iadd__">[docs]</a>    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Augmented assignment</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.1, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v += 1</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        2.1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; v -= 1</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        1.1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; v2 = UnitFloat(1.0, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v += v2</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        2.1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; v -= v2</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        1.1_GHz</span>
+<span class="sd">        &gt;&gt;&gt; v2 = UnitFloat(100.0, &#39;MHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v += v2</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        1.2_GHz</span>
+<span class="sd">        &gt;&gt;&gt; v2 = UnitFloat(1.0, &#39;ns&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; try:</span>
+<span class="sd">        ...     v += v2</span>
+<span class="sd">        ... except ValueError as e:</span>
+<span class="sd">        ...     print(e)</span>
+<span class="sd">        Incompatible units in conversion: ns, GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">-=</span> <span class="n">other</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">-=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="UnitFloat.__imul__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__imul__">[docs]</a>    <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Augmented multiplication</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.1, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v *= 2</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        2.2_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Factor cannot be an instance of UnitFloat&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">*=</span> <span class="nb">float</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="UnitFloat.__truediv__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__truediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Division</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.1, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; r = v / UnitFloat(0.1, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; isinstance(r, float)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;%.1f&quot; % r)</span>
+<span class="sd">        11.0</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;%.1f&quot; % (v / UnitFloat(100, &#39;MHz&#39;)))</span>
+<span class="sd">        11.0</span>
+<span class="sd">        &gt;&gt;&gt; print(v / 10)</span>
+<span class="sd">        0.11_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># `other` is assumed to be a float</span>
+            <span class="k">return</span> <span class="n">UnitFloat</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)),</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+    <span class="n">__div__</span> <span class="o">=</span> <span class="fm">__truediv__</span>
+
+<div class="viewcode-block" id="UnitFloat.__itruediv__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__itruediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quotient</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Augmented division</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.1, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; v /= 10</span>
+<span class="sd">        &gt;&gt;&gt; print(v)</span>
+<span class="sd">        0.11_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quotient</span><span class="p">,</span> <span class="n">UnitFloat</span><span class="p">):</span>
+            <span class="c1"># allowing to divide by another UnitFloat would cause a type change</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Quotient cannot be an instance of UnitFloat&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">/=</span> <span class="nb">float</span><span class="p">(</span><span class="n">quotient</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="n">__idiv__</span> <span class="o">=</span> <span class="fm">__itruediv__</span>
+
+<div class="viewcode-block" id="UnitFloat.__float__"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.__float__">[docs]</a>    <span class="k">def</span> <span class="fm">__float__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert to float (discarding unit)</span>
+
+<span class="sd">        &gt;&gt;&gt; float(UnitFloat(1.1, &#39;GHz&#39;))</span>
+<span class="sd">        1.1</span>
+<span class="sd">        &gt;&gt;&gt; float(UnitFloat(1.1, &#39;MHz&#39;))</span>
+<span class="sd">        1.1</span>
+<span class="sd">        &gt;&gt;&gt; float(UnitFloat(1.1))</span>
+<span class="sd">        1.1</span>
+
+<span class="sd">        The conversion is also invoked for format strings:</span>
+
+<span class="sd">        &gt;&gt;&gt; print(&quot;%.1f&quot; % UnitFloat(1.1, &#39;GHz&#39;))</span>
+<span class="sd">        1.1</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;%s&quot; % UnitFloat(1.1, &#39;GHz&#39;))</span>
+<span class="sd">        1.1_GHz</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitFloat.convert"><a class="viewcode-back" href="../../API/qdyn.units.html#qdyn.analytical_pulse.UnitFloat.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert to a different unit</span>
+
+<span class="sd">        &gt;&gt;&gt; v = UnitFloat(1.1, &#39;GHz&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; str(v.convert(&#39;MHz&#39;))</span>
+<span class="sd">        &#39;1100_MHz&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">to_unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_convert</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_unit</span><span class="o">=</span><span class="n">to_unit</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Goerz.
+      <span class="lastupdated">
+        Last updated on Jan 18, 2021.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
