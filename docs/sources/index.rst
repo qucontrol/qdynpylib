@@ -4,7 +4,7 @@ Welcome to QDYN-pylib's documentation!
 
 .. only:: html
 
-   .. image:: https://img.shields.io/badge/qucontrol-qdyn-blue.svg?logo=github
+   .. image:: https://img.shields.io/badge/qucontrol-qdynpylib-blue.svg?logo=github
       :alt: Source code on Github
       :target: https://github.com/qucontrol/qdynpylib
 
