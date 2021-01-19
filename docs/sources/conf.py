@@ -266,6 +266,8 @@ nbsphinx_prolog = r"""
     '<<GIT_TAG>>', git_tag
 )
 
+doctr_versions_menu_conf = {'menu_title': 'Docs'}
+
 # -- Options for LaTeX output -------------------------------------------------
 
 # latex_engine = 'lualatex'
