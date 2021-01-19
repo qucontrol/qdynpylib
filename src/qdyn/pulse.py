@@ -123,7 +123,6 @@ class Pulse:
         ampl_unit (str): Unit of values in `amplitude`
         freq_unit (str): Unit to use for frequency when calculating the
             spectrum
-        dt (float): Time step (in `time_unit`)
         preamble (list): List of lines that are written before the header
             when writing the pulse to file. Each line should start with '# '
         postamble (list): List of lines that are written after all data
@@ -1451,7 +1450,7 @@ def carrier(
 def CRAB_carrier(
     t, time_unit, freq, freq_unit, a, b, normalize=False, complex=False
 ):
-    r'''Construct a "carrier" based on the CRAB formula
+    r"""Construct a "carrier" based on the CRAB formula
 
         .. math::
             E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))
@@ -1481,7 +1480,7 @@ def CRAB_carrier(
 
         .. math::
             f = E / (\hbar * 2 * \pi)
-    '''
+    """
     unit_convert = UnitConvert()
     c = unit_convert.convert(1, time_unit, 'iu') * unit_convert.convert(
         1, freq_unit, 'iu'
@@ -1519,7 +1518,7 @@ def gaussian(t, t0, sigma):
         (float, numpy.ndarray): Gaussian shape of same type as `t`
 
     """
-    return np.exp(-(t - t0) ** 2 / (2 * sigma ** 2))
+    return np.exp(-((t - t0) ** 2) / (2 * sigma ** 2))
 
 
 @np.vectorize

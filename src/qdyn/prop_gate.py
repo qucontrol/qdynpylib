@@ -24,7 +24,7 @@ def _isqrt(n):
 
 
 def get_prop_gate_of_t(gates_file, with_t=False):
-    r'''Yield gates in `gates_file`, where `gates_file` is in the format
+    r"""Yield gates in `gates_file`, where `gates_file` is in the format
     written by the ``qdyn_prop_gate`` utility's ``--write-gate`` option. That
     is, each row in `gates_files` has $2 n^2 + 1$ columns. The first column is
     a time stamp, the remaining columns are the real and imaginary part for
@@ -39,7 +39,7 @@ def get_prop_gate_of_t(gates_file, with_t=False):
         * If ``with_t=True``, iterator of tuples ``(gate, t)``, where ``t`` is
           a float or an instance of UnitFloat if the time unit can be derived
           from the header of `gates_file`
-    '''
+    """
     with open(gates_file) as in_fh:
         time_unit = None
         for line in in_fh:

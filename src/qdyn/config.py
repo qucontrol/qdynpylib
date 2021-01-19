@@ -12,7 +12,7 @@ from .units import UnitFloat
 
 
 def _protect_str_vals(str_line):
-    r'''Parsing is greatly simplified if it can be assumed that key-value pairs
+    r"""Parsing is greatly simplified if it can be assumed that key-value pairs
     in the config match the regular expression '\w+\s*=\s*[\w.+-]+'. That is,
     the values do not contain spaces, quotes, or escaped characters. This
     function replaces values in the given `str_line` by a base-64 string
@@ -47,7 +47,7 @@ def _protect_str_vals(str_line):
         a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi
         >>> print(r)
         [('InRleHQi', '"text"'), ('dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n', 'this\\ is\\ an\\ unquoted\\ string')]
-    '''
+    """
     # handle quoted strings
     rx_dq = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"')  # search for ...
     rx_sq = re.compile(r"'[^'\\]*(?:\\.[^'\\]*)*'")  # ... balanced quotes
@@ -89,7 +89,7 @@ def _protect_str_vals(str_line):
 
 
 def _unprotect_str_vals(str_line, replacements):
-    r'''Inverse to :func:`_protect_str_vals`.
+    r"""Inverse to :func:`_protect_str_vals`.
 
     Args:
         str_line (str): Protected string.
@@ -102,7 +102,7 @@ def _unprotect_str_vals(str_line, replacements):
          >>> s, r = _protect_str_vals(r'a = "text", '+"b = 'text'")
          >>> print(_unprotect_str_vals(s, r))
          a = "text", b = 'text'
-    '''
+    """
     for (b64, quoted_str) in replacements:
         str_line = str_line.replace(b64, quoted_str)
     result = str_line
@@ -316,7 +316,7 @@ def _split_config_line(line, linewidth):
 
 
 def _render_config_lines(section_name, section_data):
-    r'''Render `section_data` into a list of lines.
+    r"""Render `section_data` into a list of lines.
 
     Args:
         section_name (str): Name of the section that shall be rendered.
@@ -344,7 +344,7 @@ def _render_config_lines(section_name, section_data):
         pulse: type = gauss, t_FWHM = 1.8_ns, E_0 = 1_GHz
         * id = 1, oct_outfile = pulse1.dat
         * id = 2, oct_outfile = pulse2.dat
-    '''
+    """
     # Passing `section_name` and `section_data` separately (instead of a full
     # `config_data` dict) allows this routine to be used for creating multiple
     # "blocks" of the same section, each with a different "label"
@@ -463,8 +463,7 @@ def _item_rxs(section_name=''):
 
 
 def read_config_fh(fh):
-    """Equivalent to ``read_config_str(fh.read())``
-    """
+    """Equivalent to ``read_config_str(fh.read())``"""
     return _read_config_lines(_process_raw_lines(fh))
 
 

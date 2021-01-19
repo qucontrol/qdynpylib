@@ -1,10 +1,10 @@
 graft src
-include AUTHORS.rst
-include CONTRIBUTING.rst
-include HISTORY.rst
+include AUTHORS.md
+include CONTRIBUTING.md
+include HISTORY.md
 include LICENSE
-include README.rst
-include pyproject.tom
+include README.md
+include pyproject.toml
 include setup.cfg
 
 recursive-include tests *

@@ -438,8 +438,7 @@ class UnitFloat:
 
     @classmethod
     def check_str(cls, val_str):
-        """Check wether the given string describes a valid unit_float
-        """
+        """Check wether the given string describes a valid unit_float"""
         m = UnitFloat._str_pattern.match(val_str)
         return bool(m)
 
