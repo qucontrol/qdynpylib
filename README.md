@@ -46,10 +46,10 @@ pip install git+https://github.com/qucontrol/qdynpylib.git@master#egg=qdyn
 
 ## Usage
 
-To use QDYN-pylib in a project:
+To use QDYN-pylib in a Python project:
 
 ``` python
-    import qdyn
+import qdyn
 ```
 
 [Github]: https://github.com/qucontrol/qdynpylib
