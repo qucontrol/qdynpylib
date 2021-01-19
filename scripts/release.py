@@ -2,21 +2,21 @@
 """Automation script for making a release. Must be run from the root for the
 repository"""
 # Note: Version scheme according to https://www.python.org/dev/peps/pep-0440
-import os
-from os.path import join
-import sys
-import re
-from subprocess import run, DEVNULL, CalledProcessError
-from pkg_resources import parse_version
 import json
-import urllib.request
+import os
+import re
+import shutil
+import sys
 import urllib.error
 import urllib.parse
-import shutil
+import urllib.request
+from os.path import join
+from subprocess import DEVNULL, CalledProcessError, run
 
-import pytest
-import git
 import click
+import git
+import pytest
+from pkg_resources import parse_version
 
 
 RX_VERSION = re.compile(
@@ -31,17 +31,17 @@ def make_release(package_name):
     click.confirm("Do you want to make a release?", abort=True)
     check_git_clean()
     new_version = ask_for_release_version(package_name)
-    run_tests()
     set_version(join('.', 'src', package_name, '__init__.py'), new_version)
     edit_history(new_version)
     while not check_dist():
         click.confirm(
             "Fix errors manually! Continue?", default=True, abort=True
         )
-    check_docs()
     make_release_commit(new_version)
-    make_upload(test=True)
+    check_docs()
+    run_tests()
     push_release_commit()
+    make_upload(test=True)
     make_upload(test=False)
     make_and_push_tag(new_version)
     next_dev_version = new_version + '+dev'
@@ -96,14 +96,14 @@ def get_version(filename):
 
 
 def edit(filename):
-    """Open filename in EDITOR"""
+    """Open filename in EDITOR."""
     editor = os.getenv('EDITOR', 'vi')
     if click.confirm("Open %s in %s?" % (filename, editor), default=True):
         run([editor, filename])
 
 
 def check_git_clean():
-    """Ensure that a given git.Repo is clean"""
+    """Ensure that a given git.Repo is clean."""
     repo = git.Repo(os.getcwd())
     if repo.is_dirty():
         run(['git', 'status'])
@@ -116,8 +116,18 @@ def check_git_clean():
 
 
 def run_tests():
-    """Run 'make test'"""
-    run(['make', 'test'], check=True)
+    """Run 'make test'."""
+    success = False
+    while not success:
+        try:
+            run(['make', 'test'], check=True)
+        except CalledProcessError as exc_info:
+            print("Failed tests: %s\n" % exc_info)
+            print("Fix the tests and ammend the release commit.")
+            print("Then continue.\n")
+            click.confirm("Continue?", default=True, abort=True)
+        else:
+            success = True
 
 
 def split_version(version, base=True):
@@ -166,15 +176,24 @@ def list_versions(package_name):
         click.echo("PyPI versions no available")
         pypi_versions = []
     local_versions = get_local_versions()
-    versions = sorted(
-        set(pypi_versions).union(local_versions), key=parse_version
+    normalized_local_versions = set(
+        [str(parse_version(v)) for v in local_versions]
     )
+    versions = local_versions.copy()
+    for version in pypi_versions:
+        if version not in normalized_local_versions:
+            versions.append(version)
+    versions = sorted(versions, key=parse_version)
     for version in versions:
-        if version in pypi_versions and version in local_versions:
+        normalized_version = str(parse_version(version))
+        if (
+            normalized_version in pypi_versions
+            and normalized_version in normalized_local_versions
+        ):
             status = 'PyPI/local'
-        elif version in pypi_versions:
+        elif normalized_version in pypi_versions:
             status = 'PyPI only!'
-        elif version in local_versions:
+        elif normalized_version in normalized_local_versions:
             status = 'local only!'
         click.echo("%-20s %s" % (version, status))
     return versions
@@ -260,12 +279,12 @@ def set_version(filename, version):
 
 
 def edit_history(version):
-    """Interactively edit HISTORY.rst"""
+    """Interactively edit HISTORY.md"""
     click.echo(
-        "Edit HISTORY.rst to add changelog and release date for %s" % version
+        "Edit HISTORY.md to add changelog and release date for %s" % version
     )
-    edit('HISTORY.rst')
-    click.confirm("Is HISTORY.rst up to date?", default=True, abort=True)
+    edit('HISTORY.md')
+    click.confirm("Is HISTORY.md up to date?", default=True, abort=True)
 
 
 def check_dist():
@@ -296,16 +315,10 @@ def check_docs():
 
 
 def make_release_commit(version):
-    """Commit 'Bump version to xxx and update HISTORY'"""
+    """Commit Release."""
     click.confirm("Make release commit?", default=True, abort=True)
     run(
-        [
-            'git',
-            'commit',
-            '-a',
-            '-m',
-            "Bump version to %s and update HISTORY" % version,
-        ],
+        ['git', 'commit', '-a', '-m', "Release %s" % version],
         check=True,
     )
 
@@ -342,7 +355,7 @@ def make_upload(test=True):
 
 
 def push_release_commit():
-    """Push local commits to origin"""
+    """Push local commits to origin."""
     click.confirm("Push release commit to origin?", default=True, abort=True)
     run(['git', 'push', 'origin', 'master'], check=True)
     click.confirm(
@@ -353,16 +366,47 @@ def push_release_commit():
 
 
 def make_and_push_tag(version):
-    """Tag the current commit and push that tag to origin"""
+    """Tag the current commit and push that tag to origin."""
     click.confirm(
-        "Push tag '%s' to origin?" % version, default=True, abort=True
+        "Create signed tag v'%s' and push to origin?" % version,
+        default=True,
+        abort=True,
     )
-    run(['git', 'tag', "-s", "v%s" % version], check=True)
-    run(['git', 'push', '--tags', 'origin'], check=True)
+    click.confirm(
+        (
+            "Please use 'Release %s' as the message title, and the full "
+            "release notes in markdown format as the message body."
+        )
+        % version,
+        default=True,
+        abort=False,
+    )
+    try:
+        run(['git', 'tag', "-s", "v%s" % version], check=True)
+    except CalledProcessError as exc_info:
+        click.echo(
+            "Failed to create signed tag 'v%s': %s" % (version, str(exc_info))
+        )
+        click.echo(
+            "Please create signed tag manually (git tag -s v%s)" % version
+        )
+        click.confirm("Continue with pushing tag to origin?", default=True)
+    try:
+        run(['git', 'push', '--tags', 'origin'], check=True)
+    except CalledProcessError as exc_info:
+        click.confirm(
+            (
+                "Failed to push tags: %s. "
+                "Please push manually (git push --tags origin). "
+                "Continue?"
+            )
+            % str(exc_info),
+            default=True,
+        )
 
 
 def make_next_dev_version_commit(version):
-    """Commit 'Bump version to xxx'"""
+    """Commit 'Bump version to xxx'."""
     click.confirm(
         "Make commit for bumping to %s?" % version, default=True, abort=True
     )

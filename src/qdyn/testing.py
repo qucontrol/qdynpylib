@@ -96,10 +96,10 @@ def mpirun(cmd, procs=1, implementation='openmpi', hostfile=None):
 
 
 def datadir(tmpdir, request):
-    '''Proto-fixture responsible for searching a folder with the same name
+    """Proto-fixture responsible for searching a folder with the same name
     as a test module and, if available, moving all contents to a temporary
     directory so tests can use them freely.
-    '''
+    """
     filename = request.module.__file__
     test_dir, _ = os.path.splitext(filename)
 

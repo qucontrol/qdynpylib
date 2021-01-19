@@ -323,8 +323,8 @@ def read_indexed_matrix(
     # check data consistency, count number of non-zero elements (nnz)
     nnz = 0
     upper = (
-        None
-    )  # all vals in upper triangle (True) or lower triangle (False)?
+        None  # all vals in upper triangle (True) or lower triangle (False)?
+    )
     for k in range(len(file_real_val)):
         i = file_row[k]
         j = file_col[k]

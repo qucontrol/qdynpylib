@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
+import datetime
 import os
 import sys
-import datetime
+from pathlib import Path
+
 import git
+from m2r import MdInclude
 
 import qdyn
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+
+DOCS_SOURCES = Path(__file__).parent
+ROOT = DOCS_SOURCES / '..' / '..'  # project root
+
 sys.path.insert(0, os.path.abspath('_extensions'))
 
 # -- Generate API documentation ------------------------------------------------
@@ -23,13 +25,13 @@ def run_apidoc(app):
         [
             'better-apidoc',
             '-t',
-            os.path.join('.', '_templates'),
+            str(DOCS_SOURCES / '_templates'),
             '--force',
             '--no-toc',
             '--separate',
             '-o',
-            os.path.join('.', 'API'),
-            os.path.join('..', 'src', 'qdyn'),
+            str(DOCS_SOURCES / 'API'),
+            os.path.join(ROOT / 'src' / 'qdyn'),
         ]
     )
 
@@ -38,7 +40,7 @@ def run_apidoc(app):
 
 # Report broken links as warnings
 nitpicky = True
-nitpick_ignore = [('py:class', 'callable'), ('py:class', 'file'),]
+nitpick_ignore = [('py:class', 'callable')]
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -53,29 +55,25 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.todo',
     'sphinx.ext.inheritance_diagram',
+    'sphinx_copybutton',
     'dollarmath',
     'sphinx_autodoc_typehints',
+    'doctr_versions_menu',
 ]
 
-extensions.append('nbsphinx')
-
-
 if os.getenv('SPELLCHECK'):
-    extensions += ('sphinxcontrib.spelling',)
+    extensions.append('sphinxcontrib.spelling')
     spelling_show_suggestions = True
     spelling_lang = os.getenv('SPELLCHECK')
     spelling_word_list_filename = 'spelling_wordlist.txt'
     spelling_ignore_pypi_package_names = True
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.7', None),
+    'python': ('https://docs.python.org/3.8', None),
     'sympy': ('https://docs.sympy.org/latest/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'matplotlib': ('https://matplotlib.org/', None),
-    'qutip': ('http://qutip.org/docs/latest/', None),
-    'weylchamber': ('https://weylchamber.readthedocs.io/en/latest/', None),
-    'krotov': ('https://krotov.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -88,12 +86,15 @@ year = str(datetime.datetime.now().year)
 author = 'Michael Goerz'
 copyright = '{0}, {1}'.format(year, author)
 version = qdyn.__version__
-rootfolder = os.path.join(os.path.dirname(__file__), '..')
-try:
-    last_commit = str(git.Repo(rootfolder).head.commit)[:7]
-    release = last_commit
-except (git.exc.InvalidGitRepositoryError, ValueError):
-    release = version
+release = version
+git_tag = "v%s" % version
+if version.endswith('dev'):
+    try:
+        last_commit = str(git.Repo(ROOT).head.commit)[:7]
+        release = "%s (%s)" % (version, last_commit)
+        git_tag = str(git.Repo(ROOT).head.commit)
+    except git.exc.InvalidGitRepositoryError:
+        git_tag = "master"
 numfig = True
 
 pygments_style = 'friendly'
@@ -105,14 +106,7 @@ extlinks = {
 # autodoc settings
 autoclass_content = 'both'
 autodoc_member_order = 'bysource'
-autodoc_mock_imports = [
-    'numpy',
-    'numpy.linalg',
-    'scipy',
-    'scipy.sparse',
-    'matplotlib',
-    'matplotlib.pyplot',
-]
+autodoc_mock_imports = []  # e.g.: 'numpy', 'scipy', ...
 
 
 html_last_updated_fmt = '%b %d, %Y'
@@ -122,52 +116,15 @@ html_short_title = '%s-%s' % (project, version)
 
 
 # Mathjax settings
-mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js'
+mathjax_path = (
+    'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js'
+)
 mathjax_config = {
     'extensions': ['tex2jax.js'],
     'jax': ['input/TeX', 'output/SVG'],
     'TeX': {
-        'extensions': [
-            "AMSmath.js",
-            "AMSsymbols.js",
-            "noErrors.js",
-            "noUndefined.js",
-        ],
+        'extensions': ["AMSmath.js", "AMSsymbols.js"],
         'Macros': {
-            'tr': ['{\\operatorname{tr}}', 0],
-            'diag': ['{\\operatorname{diag}}', 0],
-            'abs': ['{\\operatorname{abs}}', 0],
-            'pop': ['{\\operatorname{pop}}', 0],
-            'ee': ['{\\text{e}}', 0],
-            'ii': ['{\\text{i}}', 0],
-            'aux': ['{\\text{aux}}', 0],
-            'opt': ['{\\text{opt}}', 0],
-            'tgt': ['{\\text{tgt}}', 0],
-            'init': ['{\\text{init}}', 0],
-            'lab': ['{\\text{lab}}', 0],
-            'rwa': ['{\\text{rwa}}', 0],
-            'bra': ['{\\langle#1\\vert}', 1],
-            'ket': ['{\\vert#1\\rangle}', 1],
-            'Bra': ['{\\left\\langle#1\\right\\vert}', 1],
-            'Braket': [
-                '{\\left\\langle #1\\vphantom{#2} \\mid #2\\vphantom{#1}\\right\\rangle}',
-                2,
-            ],
-            'Ket': ['{\\left\\vert#1\\right\\rangle}', 1],
-            'mat': ['{\\mathbf{#1}}', 1],
-            'op': ['{\\hat{#1}}', 1],
-            'Op': ['{\\hat{#1}}', 1],
-            'dd': ['{\\,\\text{d}}', 0],
-            'daggered': ['{^{\\dagger}}', 0],
-            'transposed': ['{^{\\text{T}}}', 0],
-            'Liouville': ['{\\mathcal{L}}', 0],
-            'DynMap': ['{\\mathcal{E}}', 0],
-            'identity': ['{\\mathbf{1}}', 0],
-            'Norm': ['{\\lVert#1\\rVert}', 1],
-            'Abs': ['{\\left\\vert#1\\right\\vert}', 1],
-            'avg': ['{\\langle#1\\rangle}', 1],
-            'Avg': ['{\\left\langle#1\\right\\rangle}', 1],
-            'AbsSq': ['{\\left\\vert#1\\right\\vert^2}', 1],
             'Re': ['{\\operatorname{Re}}', 0],
             'Im': ['{\\operatorname{Im}}', 0],
             'Real': ['{\\mathbb{R}}', 0],
@@ -252,6 +209,9 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# JavaScript filenames, relative to html_static_path
+html_js_files = []
+
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
@@ -292,6 +252,7 @@ html_show_sourcelink = False
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 # html_file_suffix = None
+
 nbsphinx_prolog = r"""
 {% set docname = env.doc2path(env.docname, base='docs') %}
 
@@ -300,8 +261,37 @@ nbsphinx_prolog = r"""
     .. role:: raw-html(raw)
         :format: html
 
-    :raw-html:`<a href="http://nbviewer.jupyter.org/github/qucontrol/qdynpylib/blob/{{ env.config.release }}/{{ docname }}" target="_blank"><img alt="Render on nbviewer" src="https://img.shields.io/badge/render%20on-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>&nbsp;<a href="https://mybinder.org/v2/gh/qucontrol/qdynpylib/{{ env.config.release }}?filepath={{ docname }}" target="_blank"><img alt="Launch Binder" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
-"""
+    :raw-html:`<a href="http://nbviewer.jupyter.org/github/qucontrol/qdynpylib/blob/<<GIT_TAG>>/{{ docname }}" target="_blank"><img alt="Render on nbviewer" src="https://img.shields.io/badge/render%20on-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>&nbsp;<a href="https://mybinder.org/v2/gh/qucontrol/qdynpylib/<<GIT_TAG>>?filepath={{ docname }}}" target="_blank"><img alt="Launch Binder" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
+""".replace(
+    '<<GIT_TAG>>', git_tag
+)
+
+# -- Options for LaTeX output -------------------------------------------------
+
+# latex_engine = 'lualatex'
+latex_elements = {
+    'preamble': r'''
+\usepackage[titles]{tocloft}
+\cftsetpnumwidth {1.25cm}\cftsetrmarg{1.5cm}
+\setlength{\cftchapnumwidth}{0.75cm}
+\setlength{\cftsecindent}{\cftchapnumwidth}
+\setlength{\cftsecnumwidth}{1.25cm}
+\usepackage{emptypage}
+''',
+    'fncychap': r'\usepackage[Bjornstrup]{fncychap}',
+    'printindex': r'\footnotesize\raggedright\printindex',
+    'babel': '',
+}
+latex_show_urls = 'no'
+
 # -----------------------------------------------------------------------------
+
+
 def setup(app):
     app.connect('builder-inited', run_apidoc)
+    # from m2r to make `mdinclude` work
+    app.add_config_value('no_underscore_emphasis', False, 'env')
+    app.add_config_value('m2r_parse_relative_links', False, 'env')
+    app.add_config_value('m2r_anonymous_references', False, 'env')
+    app.add_config_value('m2r_disable_inline_math', False, 'env')
+    app.add_directive('mdinclude', MdInclude)

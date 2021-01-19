@@ -52,9 +52,11 @@ def inner(v1, v2):
         >>> inner(m1, m2)
         (2+2j)
     """
-    assert type(v1) is type(v2), (
-        "v1 and v2 must be of the same type: types are %s vs %s"
-        % (type(v1), type(v2))
+    assert type(v1) is type(
+        v2
+    ), "v1 and v2 must be of the same type: types are %s vs %s" % (
+        type(v1),
+        type(v2),
     )
     assert isinstance(v1, np.ndarray), "v1, v2 must be 1D/2D numpy arrays"
     assert len(v1.shape) <= 2, "v1, v2 must be matrix or vector"
