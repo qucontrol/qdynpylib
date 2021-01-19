@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>qdyn.prop_gate &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  <title>qdyn.prop_gate &mdash; QDYN-pylib 0.4.0+dev (89f76cd) documentation</title>
   
 
   
@@ -204,7 +204,7 @@
 
 
 <div class="viewcode-block" id="get_prop_gate_of_t"><a class="viewcode-back" href="../../API/qdyn.prop_gate.html#qdyn.prop_gate.get_prop_gate_of_t">[docs]</a><span class="k">def</span> <span class="nf">get_prop_gate_of_t</span><span class="p">(</span><span class="n">gates_file</span><span class="p">,</span> <span class="n">with_t</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Yield gates in `gates_file`, where `gates_file` is in the format</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield gates in `gates_file`, where `gates_file` is in the format</span>
 <span class="sd">    written by the ``qdyn_prop_gate`` utility&#39;s ``--write-gate`` option. That</span>
 <span class="sd">    is, each row in `gates_files` has $2 n^2 + 1$ columns. The first column is</span>
 <span class="sd">    a time stamp, the remaining columns are the real and imaginary part for</span>
@@ -219,7 +219,7 @@
 <span class="sd">        * If ``with_t=True``, iterator of tuples ``(gate, t)``, where ``t`` is</span>
 <span class="sd">          a float or an instance of UnitFloat if the time unit can be derived</span>
 <span class="sd">          from the header of `gates_file`</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">gates_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_fh</span><span class="p">:</span>
         <span class="n">time_unit</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">in_fh</span><span class="p">:</span>
@@ -256,7 +256,7 @@
     <p>
         &#169; Copyright 2021, Michael Goerz.
       <span class="lastupdated">
-        Last updated on Jan 18, 2021.
+        Last updated on Jan 23, 2021.
       </span>
 
     </p>

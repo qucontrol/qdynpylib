@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>qdyn.testing &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  <title>qdyn.testing &mdash; QDYN-pylib 0.4.0+dev (89f76cd) documentation</title>
   
 
   
@@ -184,6 +184,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">distutils</span> <span class="kn">import</span> <span class="n">dir_util</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 
 <span class="n">FEATURES</span> <span class="o">=</span> <span class="p">[</span>
@@ -253,7 +254,7 @@
 <span class="sd">    to force the use of the given number of processes.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        cmd (list): list of command args, cf. `subprocess.call`</span>
+<span class="sd">        cmd (list): list of command args, cf. `subprocess.run`</span>
 <span class="sd">        procs (int): Number of MPI processes that should be used</span>
 <span class="sd">        implementation (str): name of MPI implementation</span>
 <span class="sd">        hostfile (str): Path to file that should be used as a &quot;hostfile&quot;,</span>
@@ -276,10 +277,10 @@
 
 
 <div class="viewcode-block" id="datadir"><a class="viewcode-back" href="../../API/qdyn.testing.html#qdyn.testing.datadir">[docs]</a><span class="k">def</span> <span class="nf">datadir</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Proto-fixture responsible for searching a folder with the same name</span>
+    <span class="sd">&quot;&quot;&quot;Proto-fixture responsible for searching a folder with the same name</span>
 <span class="sd">    as a test module and, if available, moving all contents to a temporary</span>
 <span class="sd">    directory so tests can use them freely.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span>
     <span class="n">test_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
@@ -290,41 +291,65 @@
 
 
 <div class="viewcode-block" id="make_qdyn_utility"><a class="viewcode-back" href="../../API/qdyn.testing.html#qdyn.testing.make_qdyn_utility">[docs]</a><span class="k">def</span> <span class="nf">make_qdyn_utility</span><span class="p">(</span><span class="n">util</span><span class="o">=</span><span class="s1">&#39;qdyn_prop_traj&#39;</span><span class="p">,</span> <span class="n">procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Generate a proto-fixture that returns a wrapper around</span>
-<span class="sd">    the utility `util` in &#39;../utils/&#39;, relative to the test directory.</span>
+    <span class="sd">&quot;&quot;&quot;Generate a proto-fixture to wrap around the tiven `util`.</span>
 
-<span class="sd">    If `procs` &gt; 1 and QDYN was compiled with MPI support, then call the</span>
-<span class="sd">    utility through mpirun (or equivalent), to run `procs` simultaneous copies</span>
-<span class="sd">    of the program. If `threads` is &gt; 1, the program will run with multiple</span>
-<span class="sd">    OpenMP threads.</span>
+<span class="sd">    Returns a callable that takes any numer of positional `args` and any number</span>
+<span class="sd">    of `kwargs`, such that calling it is equivalent to</span>
 
-<span class="sd">    The wrapper returned by the fixture behaves like `subprocess.call`, with a</span>
-<span class="sd">    predefined `cmd` and environment.</span>
+<span class="sd">    ::</span>
+
+<span class="sd">        subprocess.run([cmd, *args], **kwargs)</span>
+
+<span class="sd">    where ``cmd`` is the absolute path of the compiled QDYN utility (in the</span>
+<span class="sd">    ``utils`` subfolder of the project root, found by traversing up from the</span>
+<span class="sd">    directory in which the test is defined).</span>
+
+<span class="sd">    If `procs` &gt; 1 and QDYN was compiled with MPI support, then ``cmd`` will be</span>
+<span class="sd">    ``mpirun`` (or an equivalent suitable MPI runner based on how QDYN was</span>
+<span class="sd">    compiled), to run `procs` simultaneous copies of the `util`. If `threads`</span>
+<span class="sd">    is &gt; 1, the program will run with multiple OpenMP threads, by setting the</span>
+<span class="sd">    ``OMP_NUM_THREADS`` environment variable.</span>
+
+<span class="sd">    The `util` will also use the development units file by setting</span>
+<span class="sd">    ``QDYN_UNITS`` to the ``units_file`` folder in the project root.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">qdyn_utility</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tmpdir</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Wrapper for the {util} utility&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">util</span><span class="o">=</span><span class="n">util</span><span class="p">)</span>
-        <span class="n">test_module</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span>
-        <span class="n">testdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">test_module</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">units_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">testdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;units_files&#39;</span><span class="p">)</span>
-        <span class="n">configure_log</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">testdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;configure.log&#39;</span><span class="p">)</span>
+        <span class="n">test_module</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+        <span class="n">root_dir</span> <span class="o">=</span> <span class="n">test_module</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_dir</span><span class="o">.</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># go to filesystem root</span>
+            <span class="n">root_dir</span> <span class="o">=</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">parent</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s1">&#39;qdyn.f90&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">break</span>
+
+        <span class="n">units_files</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s1">&#39;units_files&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">units_files</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find units_files folder in </span><span class="si">{</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">configure_log</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s1">&#39;configure.log&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">configure_log</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find configure.log folder in </span><span class="si">{</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">mpi_implementation</span> <span class="o">=</span> <span class="n">get_mpi_implementation</span><span class="p">(</span><span class="n">configure_log</span><span class="p">)</span>
-        <span class="n">exe</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">testdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="n">util</span><span class="p">))</span>
-        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;QDYN_UNITS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units_files</span>
-        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">exe</span><span class="p">]</span>
+        <span class="n">exe</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s1">&#39;utils&#39;</span> <span class="o">/</span> <span class="n">util</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exe</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find executable </span><span class="si">{</span><span class="n">exe</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">cmds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">exe</span><span class="p">)]</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">mpi_implementation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">procs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">cmd</span> <span class="o">=</span> <span class="n">mpirun</span><span class="p">(</span>
-                <span class="n">cmd</span><span class="p">,</span>
+            <span class="n">cmds</span> <span class="o">=</span> <span class="n">mpirun</span><span class="p">(</span>
+                <span class="n">cmds</span><span class="p">,</span>
                 <span class="n">procs</span><span class="o">=</span><span class="n">procs</span><span class="p">,</span>
                 <span class="n">implementation</span><span class="o">=</span><span class="n">mpi_implementation</span><span class="p">,</span>
                 <span class="n">hostfile</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tmpdir</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;hostfile&#39;</span><span class="p">)),</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">run_cmd</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-            <span class="n">full_cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">full_cmd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">run_cmd</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="k">if</span> <span class="s1">&#39;QDYN_UNITS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env</span><span class="p">:</span>
+                <span class="n">env</span><span class="p">[</span><span class="s1">&#39;QDYN_UNITS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units_files</span>
+            <span class="k">if</span> <span class="s1">&#39;OMP_NUM_THREADS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env</span><span class="p">:</span>
+                <span class="n">env</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env</span>
+            <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="o">*</span><span class="n">cmds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">run_cmd</span>
 
@@ -342,7 +367,7 @@
     <p>
         &#169; Copyright 2021, Michael Goerz.
       <span class="lastupdated">
-        Last updated on Jan 18, 2021.
+        Last updated on Jan 23, 2021.
       </span>
 
     </p>

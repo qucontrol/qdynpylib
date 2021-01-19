@@ -4,7 +4,7 @@ Welcome to QDYN-pylib's documentation!
 
 .. only:: html
 
-   .. image:: https://img.shields.io/badge/qucontrol-qdyn-blue.svg?logo=github
+   .. image:: https://img.shields.io/badge/qucontrol-qdynpylib-blue.svg?logo=github
       :alt: Source code on Github
       :target: https://github.com/qucontrol/qdynpylib
 
@@ -26,7 +26,7 @@ Welcome to QDYN-pylib's documentation!
 
    .. image:: https://codecov.io/gh/qucontrol/qdynpylib/branch/master/graph/badge.svg
       :alt: Coverage
-      :target: https://codecov.io/gh/qucontrol/qdyn
+      :target: https://codecov.io/gh/qucontrol/qdynpylib
 
    .. image:: https://img.shields.io/badge/License-BSD-green.svg
       :alt: BSD License

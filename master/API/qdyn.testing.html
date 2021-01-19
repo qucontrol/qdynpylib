@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>qdyn.testing module &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  <title>qdyn.testing module &mdash; QDYN-pylib 0.4.0+dev (89f76cd) documentation</title>
   
 
   
@@ -109,7 +109,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Reference</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the QDYN-pylib package</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qdyn.html">API of the qdyn package</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="qdyn.analytical_pulse.html">qdyn.analytical_pulse module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qdyn.config.html">qdyn.config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qdyn.io.html">qdyn.io module</a></li>
@@ -227,7 +227,7 @@ Fortran library</p>
 <td><p>Return the name the Fortran compiler that QDYN was compiled with</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#qdyn.testing.make_qdyn_utility" title="qdyn.testing.make_qdyn_utility"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_qdyn_utility</span></code></a></p></td>
-<td><p>Generate a proto-fixture that returns a wrapper around the utility <cite>util</cite> in ‘../utils/’, relative to the test directory.</p></td>
+<td><p>Generate a proto-fixture to wrap around the tiven <cite>util</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#qdyn.testing.mpirun" title="qdyn.testing.mpirun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mpirun</span></code></a></p></td>
 <td><p>Return a modified <cite>cmd</cite> that runs the given <cite>cmd</cite> (list) using MPI.</p></td>
@@ -269,7 +269,7 @@ to force the use of the given number of processes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – list of command args, cf. <cite>subprocess.call</cite></p></li>
+<li><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – list of command args, cf. <cite>subprocess.run</cite></p></li>
 <li><p><strong>procs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of MPI processes that should be used</p></li>
 <li><p><strong>implementation</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of MPI implementation</p></li>
 <li><p><strong>hostfile</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to file that should be used as a “hostfile”,
@@ -291,14 +291,22 @@ directory so tests can use them freely.</p>
 <dl class="py function">
 <dt id="qdyn.testing.make_qdyn_utility">
 <code class="sig-prename descclassname">qdyn.testing.</code><code class="sig-name descname">make_qdyn_utility</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">util</span><span class="o">=</span><span class="default_value">'qdyn_prop_traj'</span></em>, <em class="sig-param"><span class="n">procs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">threads</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qdyn/testing.html#make_qdyn_utility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qdyn.testing.make_qdyn_utility" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a proto-fixture that returns a wrapper around
-the utility <cite>util</cite> in ‘../utils/’, relative to the test directory.</p>
-<p>If <cite>procs</cite> &gt; 1 and QDYN was compiled with MPI support, then call the
-utility through mpirun (or equivalent), to run <cite>procs</cite> simultaneous copies
-of the program. If <cite>threads</cite> is &gt; 1, the program will run with multiple
-OpenMP threads.</p>
-<p>The wrapper returned by the fixture behaves like <cite>subprocess.call</cite>, with a
-predefined <cite>cmd</cite> and environment.</p>
+<dd><p>Generate a proto-fixture to wrap around the tiven <cite>util</cite>.</p>
+<p>Returns a callable that takes any numer of positional <cite>args</cite> and any number
+of <cite>kwargs</cite>, such that calling it is equivalent to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">cmd</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">cmd</span></code> is the absolute path of the compiled QDYN utility (in the
+<code class="docutils literal notranslate"><span class="pre">utils</span></code> subfolder of the project root, found by traversing up from the
+directory in which the test is defined).</p>
+<p>If <cite>procs</cite> &gt; 1 and QDYN was compiled with MPI support, then <code class="docutils literal notranslate"><span class="pre">cmd</span></code> will be
+<code class="docutils literal notranslate"><span class="pre">mpirun</span></code> (or an equivalent suitable MPI runner based on how QDYN was
+compiled), to run <cite>procs</cite> simultaneous copies of the <cite>util</cite>. If <cite>threads</cite>
+is &gt; 1, the program will run with multiple OpenMP threads, by setting the
+<code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code> environment variable.</p>
+<p>The <cite>util</cite> will also use the development units file by setting
+<code class="docutils literal notranslate"><span class="pre">QDYN_UNITS</span></code> to the <code class="docutils literal notranslate"><span class="pre">units_file</span></code> folder in the project root.</p>
 </dd></dl>
 
 </div>
@@ -320,7 +328,7 @@ predefined <cite>cmd</cite> and environment.</p>
     <p>
         &#169; Copyright 2021, Michael Goerz.
       <span class="lastupdated">
-        Last updated on Jan 18, 2021.
+        Last updated on Jan 23, 2021.
       </span>
 
     </p>

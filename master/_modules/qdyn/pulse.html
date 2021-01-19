@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>qdyn.pulse &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  <title>qdyn.pulse &mdash; QDYN-pylib 0.4.0+dev (89f76cd) documentation</title>
   
 
   
@@ -1630,7 +1630,7 @@
 <div class="viewcode-block" id="CRAB_carrier"><a class="viewcode-back" href="../../API/qdyn.pulse.html#qdyn.pulse.CRAB_carrier">[docs]</a><span class="k">def</span> <span class="nf">CRAB_carrier</span><span class="p">(</span>
     <span class="n">t</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">freq_unit</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Construct a &quot;carrier&quot; based on the CRAB formula</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a &quot;carrier&quot; based on the CRAB formula</span>
 
 <span class="sd">        .. math::</span>
 <span class="sd">            E(t) = \sum_{n} (a_n \cos(\omega_n t) + b_n \cos(\omega_n t))</span>
@@ -1660,7 +1660,7 @@
 
 <span class="sd">        .. math::</span>
 <span class="sd">            f = E / (\hbar * 2 * \pi)</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">unit_convert</span> <span class="o">=</span> <span class="n">UnitConvert</span><span class="p">()</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">unit_convert</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">,</span> <span class="s1">&#39;iu&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">unit_convert</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span>
         <span class="mi">1</span><span class="p">,</span> <span class="n">freq_unit</span><span class="p">,</span> <span class="s1">&#39;iu&#39;</span>
@@ -1698,7 +1698,7 @@
 <span class="sd">        (float, numpy.ndarray): Gaussian shape of same type as `t`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">t</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
 
 
 <span class="nd">@np</span><span class="o">.</span><span class="n">vectorize</span>
@@ -1812,7 +1812,7 @@
     <p>
         &#169; Copyright 2021, Michael Goerz.
       <span class="lastupdated">
-        Last updated on Jan 18, 2021.
+        Last updated on Jan 23, 2021.
       </span>
 
     </p>

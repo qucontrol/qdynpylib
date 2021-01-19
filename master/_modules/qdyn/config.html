@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>qdyn.config &mdash; QDYN-pylib 0.4.0+dev (ff2cb4b) documentation</title>
+  <title>qdyn.config &mdash; QDYN-pylib 0.4.0+dev (89f76cd) documentation</title>
   
 
   
@@ -192,7 +192,7 @@
 
 
 <span class="k">def</span> <span class="nf">_protect_str_vals</span><span class="p">(</span><span class="n">str_line</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Parsing is greatly simplified if it can be assumed that key-value pairs</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parsing is greatly simplified if it can be assumed that key-value pairs</span>
 <span class="sd">    in the config match the regular expression &#39;\w+\s*=\s*[\w.+-]+&#39;. That is,</span>
 <span class="sd">    the values do not contain spaces, quotes, or escaped characters. This</span>
 <span class="sd">    function replaces values in the given `str_line` by a base-64 string</span>
@@ -227,7 +227,7 @@
 <span class="sd">        a = dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n, b = InRleHQi</span>
 <span class="sd">        &gt;&gt;&gt; print(r)</span>
 <span class="sd">        [(&#39;InRleHQi&#39;, &#39;&quot;text&quot;&#39;), (&#39;dGhpc1wgaXNcIGFuXCB1bnF1b3RlZFwgc3RyaW5n&#39;, &#39;this\\ is\\ an\\ unquoted\\ string&#39;)]</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># handle quoted strings</span>
     <span class="n">rx_dq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&quot;[^&quot;</span><span class="se">\\</span><span class="s1">]*(?:</span><span class="se">\\</span><span class="s1">.[^&quot;</span><span class="se">\\</span><span class="s1">]*)*&quot;&#39;</span><span class="p">)</span>  <span class="c1"># search for ...</span>
     <span class="n">rx_sq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&#39;[^&#39;</span><span class="se">\\</span><span class="s2">]*(?:</span><span class="se">\\</span><span class="s2">.[^&#39;</span><span class="se">\\</span><span class="s2">]*)*&#39;&quot;</span><span class="p">)</span>  <span class="c1"># ... balanced quotes</span>
@@ -269,7 +269,7 @@
 
 
 <span class="k">def</span> <span class="nf">_unprotect_str_vals</span><span class="p">(</span><span class="n">str_line</span><span class="p">,</span> <span class="n">replacements</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Inverse to :func:`_protect_str_vals`.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inverse to :func:`_protect_str_vals`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        str_line (str): Protected string.</span>
@@ -282,7 +282,7 @@
 <span class="sd">         &gt;&gt;&gt; s, r = _protect_str_vals(r&#39;a = &quot;text&quot;, &#39;+&quot;b = &#39;text&#39;&quot;)</span>
 <span class="sd">         &gt;&gt;&gt; print(_unprotect_str_vals(s, r))</span>
 <span class="sd">         a = &quot;text&quot;, b = &#39;text&#39;</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
         <span class="n">str_line</span> <span class="o">=</span> <span class="n">str_line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="n">quoted_str</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">str_line</span>
@@ -496,7 +496,7 @@
 
 
 <span class="k">def</span> <span class="nf">_render_config_lines</span><span class="p">(</span><span class="n">section_name</span><span class="p">,</span> <span class="n">section_data</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Render `section_data` into a list of lines.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Render `section_data` into a list of lines.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        section_name (str): Name of the section that shall be rendered.</span>
@@ -524,7 +524,7 @@
 <span class="sd">        pulse: type = gauss, t_FWHM = 1.8_ns, E_0 = 1_GHz</span>
 <span class="sd">        * id = 1, oct_outfile = pulse1.dat</span>
 <span class="sd">        * id = 2, oct_outfile = pulse2.dat</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Passing `section_name` and `section_data` separately (instead of a full</span>
     <span class="c1"># `config_data` dict) allows this routine to be used for creating multiple</span>
     <span class="c1"># &quot;blocks&quot; of the same section, each with a different &quot;label&quot;</span>
@@ -643,8 +643,7 @@
 
 
 <div class="viewcode-block" id="read_config_fh"><a class="viewcode-back" href="../../API/qdyn.config.html#qdyn.config.read_config_fh">[docs]</a><span class="k">def</span> <span class="nf">read_config_fh</span><span class="p">(</span><span class="n">fh</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Equivalent to ``read_config_str(fh.read())``</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Equivalent to ``read_config_str(fh.read())``&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_read_config_lines</span><span class="p">(</span><span class="n">_process_raw_lines</span><span class="p">(</span><span class="n">fh</span><span class="p">))</span></div>
 
 
@@ -1107,7 +1106,7 @@
     <p>
         &#169; Copyright 2021, Michael Goerz.
       <span class="lastupdated">
-        Last updated on Jan 18, 2021.
+        Last updated on Jan 23, 2021.
       </span>
 
     </p>
