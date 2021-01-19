@@ -1,8 +1,8 @@
 # QDYN-pylib
 
-[![Source code on Github](https://img.shields.io/badge/qucontrol-qdynpylib-blue.svg?logo=github)](https://github.com/qucontrol/qdynpylib)
+[![Source code on Github](https://img.shields.io/badge/qucontrol-qdynpylib-blue.svg?logo=github)][Github]
 [![PyPI](https://img.shields.io/pypi/v/qdyn.svg)](https://pypi.python.org/pypi/qdyn)
-[![Documentation](https://img.shields.io/badge/docs-gh--pages-blue.svg)](https://qucontrol.github.io/qdynpylib/)
+[![Documentation](https://img.shields.io/badge/docs-gh--pages-blue.svg)][docs]
 [![Docs](https://github.com/qucontrol/qdynpylib/workflows/Docs/badge.svg?branch=master)](https://github.com/qucontrol/qdynpylib/actions?query=workflow%3ADocs)
 [![Tests](https://github.com/qucontrol/qdynpylib/workflows/Tests/badge.svg?branch=master)](https://github.com/qucontrol/qdynpylib/actions?query=workflow%3ATests)
 [![Coverage](https://codecov.io/gh/qucontrol/qdynpylib/branch/master/graph/badge.svg)](https://codecov.io/gh/qucontrol/qdynpylib)
@@ -23,14 +23,12 @@ Development of QDYN-pylib happens on [Github][].
 
 You can read the full documentation [online][docs].
 
-[docs]: https://qucontrol.github.io/qdyn/
-
 
 ## Installation
 
 To install the latest released version of QDYN-pylib, run this command in your terminal:
 
-``` console
+```
 pip install qdyn
 ```
 
@@ -41,15 +39,18 @@ If you don't have [pip](https://pip.pypa.io) installed, the [Python installation
 
 To install the latest development version of QDYN-pylib from [Github][].
 
-``` console
-$ pip install git+https://github.com/qucontrol/qdynpylib.git@master#egg=qdyn
 ```
-
-[Github]: https://github.com/qucontrol/qdynpylib
+pip install git+https://github.com/qucontrol/qdynpylib.git@master#egg=qdyn
+```
 
 
 ## Usage
 
 To use QDYN-pylib in a project:
 
+``` python
     import qdyn
+```
+
+[Github]: https://github.com/qucontrol/qdynpylib
+[docs]: https://qucontrol.github.io/qdynpylib/
