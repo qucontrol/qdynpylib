@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 from distutils import dir_util
+from pathlib import Path
 
 
 FEATURES = [
@@ -73,7 +74,7 @@ def mpirun(cmd, procs=1, implementation='openmpi', hostfile=None):
     to force the use of the given number of processes.
 
     Args:
-        cmd (list): list of command args, cf. `subprocess.call`
+        cmd (list): list of command args, cf. `subprocess.run`
         procs (int): Number of MPI processes that should be used
         implementation (str): name of MPI implementation
         hostfile (str): Path to file that should be used as a "hostfile",
@@ -110,41 +111,65 @@ def datadir(tmpdir, request):
 
 
 def make_qdyn_utility(util='qdyn_prop_traj', procs=1, threads=1):
-    """Generate a proto-fixture that returns a wrapper around
-    the utility `util` in '../utils/', relative to the test directory.
+    """Generate a proto-fixture to wrap around the tiven `util`.
 
-    If `procs` > 1 and QDYN was compiled with MPI support, then call the
-    utility through mpirun (or equivalent), to run `procs` simultaneous copies
-    of the program. If `threads` is > 1, the program will run with multiple
-    OpenMP threads.
+    Returns a callable that takes any numer of positional `args` and any number
+    of `kwargs`, such that calling it is equivalent to
 
-    The wrapper returned by the fixture behaves like `subprocess.call`, with a
-    predefined `cmd` and environment.
+    ::
+
+        subprocess.run([cmd, *args], **kwargs)
+
+    where ``cmd`` is the absolute path of the compiled QDYN utility (in the
+    ``utils`` subfolder of the project root, found by traversing up from the
+    directory in which the test is defined).
+
+    If `procs` > 1 and QDYN was compiled with MPI support, then ``cmd`` will be
+    ``mpirun`` (or an equivalent suitable MPI runner based on how QDYN was
+    compiled), to run `procs` simultaneous copies of the `util`. If `threads`
+    is > 1, the program will run with multiple OpenMP threads, by setting the
+    ``OMP_NUM_THREADS`` environment variable.
+
+    The `util` will also use the development units file by setting
+    ``QDYN_UNITS`` to the ``units_file`` folder in the project root.
     """
 
     def qdyn_utility(request, tmpdir):
         """Wrapper for the {util} utility""".format(util=util)
-        test_module = request.module.__file__
-        testdir = os.path.split(test_module)[0]
-        units_files = os.path.join(testdir, '..', 'units_files')
-        configure_log = os.path.join(testdir, '..', 'configure.log')
+        test_module = Path(request.module.__file__)
+        root_dir = test_module.parent.absolute()
+        while len(root_dir.parts) > 1:  # go to filesystem root
+            root_dir = root_dir.parent
+            if (root_dir / 'qdyn.f90').is_file():
+                break
+
+        units_files = root_dir / 'units_files'
+        if not units_files.is_dir():
+            raise IOError(f"Cannot find units_files folder in {root_dir}")
+        configure_log = root_dir / 'configure.log'
+        if not configure_log.is_file():
+            raise IOError(f"Cannot find configure.log folder in {root_dir}")
         mpi_implementation = get_mpi_implementation(configure_log)
-        exe = os.path.abspath(os.path.join(testdir, '..', 'utils', util))
-        env = os.environ.copy()
-        env['QDYN_UNITS'] = units_files
-        env['OMP_NUM_THREADS'] = str(threads)
-        cmd = [exe]
+        exe = root_dir / 'utils' / util
+        if not exe.is_file():
+            raise IOError(f"Cannot find executable {exe}")
+        cmds = [str(exe)]
         if (mpi_implementation is not None) and (procs > 1):
-            cmd = mpirun(
-                cmd,
+            cmds = mpirun(
+                cmds,
                 procs=procs,
                 implementation=mpi_implementation,
                 hostfile=str(tmpdir.join('hostfile')),
             )
 
-        def run_cmd(*args):
-            full_cmd = cmd + list(args)
-            return subprocess.call(full_cmd, env=env, universal_newlines=True)
+        def run_cmd(*args, **kwargs):
+            env = kwargs.get('env', os.environ.copy())
+            if 'QDYN_UNITS' not in env:
+                env['QDYN_UNITS'] = units_files
+            if 'OMP_NUM_THREADS' not in env:
+                env['OMP_NUM_THREADS'] = str(threads)
+            kwargs['env'] = env
+            return subprocess.run([*cmds, *args], **kwargs)
 
         return run_cmd
 
